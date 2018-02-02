@@ -13,122 +13,27 @@ import Datable
 
 class ViewController: NSViewController
 {
-    var connectionID = 0
-    var streaming = false
-    var allowedConnectionsMessage = ""
-    @objc dynamic var allowedPacketsSeen: String
-    {
-        get
-        {
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue > 0
-            {
-                return "\(allowedPacketsSeenValue)"
-            }
-            else
-            {
-                return "Loading..."
-            }
-        }
-        set
-        {
-            //
-        }
-    }
+    var fakeConnectionID = 0
+    var streaming: Bool = false
     
-    @objc dynamic var allowedPacketsAnalyzed: String
-    {
-        get
-        {
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue > 0
-            {
-                return "\(allowedPacketsAnalyzedValue)"
-            }
-            else
-            {
-                return "Loading..."
-            }
-        }
-        set
-        {
-            //
-        }
-    }
+    @objc dynamic var allowedPacketsSeen = "Loading..."
+    @objc dynamic var allowedPacketsAnalyzed = "Loading..."
+    @objc dynamic var blockedPacketsSeen = "Loading..."
+    @objc dynamic var blockedPacketsAnalyzed = "Loading..."
     
-    @objc dynamic var blockedPacketsSeen: String
-        {
-        get
-        {
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue > 0
-            {
-                return "\(blockedPacketsSeenValue)"
-            }
-            else
-            {
-                return "Loading..."
-            }
-        }
-        set
-        {
-            //
-        }
-    }
-
-    @objc dynamic var blockedPacketsAnalyzed: String
-        {
-        get
-        {
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue > 0
-            {
-                return "\(blockedPacketsAnalyzedValue)"
-            }
-            else
-            {
-                return "Loading..."
-            }
-        }
-        set
-        {
-            //
-        }
-    }
-    
-    @objc dynamic var numberOfAOPLengthsMessage: String
+    override func viewDidLoad()
     {
-        get
-        {
-            let allowedOutgoingLengths: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthsKey)
-            return "Recorded \(allowedOutgoingLengths.count) allowed unique outgoing packet lengths."
-        }
+        super.viewDidLoad()
         
-        set
-        {
-            //
-        }
-    }
-    
-    @objc dynamic var numberOfAIPLengthsMessage: String
-    {
-        get
-        {
-            let allowedIncomingLengths: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthsKey)
-            return "Recorded \(allowedIncomingLengths.count) allowed unique incoming packet lengths."
-        }
-        
-        set
-        {
-            //
-        }
+        subscribeToAllowedConnections()
+        subscribeToBlockedConnections()
+        loadLabelData()
     }
     
     @IBAction func runClick(_ sender: NSButton)
     {
-        addAllowedPackets()
-        addBlockedPackets()
-        processPacketLengths()
+        self.addAllowedPackets()
+        self.addblockedPackets()
     }
     
     @IBAction func streamPacketsClicked(_ sender: NSButton)
@@ -140,64 +45,42 @@ class ViewController: NSViewController
         else
         {
             streaming = true
+            self.addAllowedPackets()
+            self.addblockedPackets()
         }
-        
-        DispatchQueue.global(qos: .background).async
-        {
-            while self.streaming
-            {
-                self.addAllowedPackets()
-
-                DispatchQueue.main.async
-                {
-                    let apsValue = self.allowedPacketsSeen
-                    if apsValue != "0"
-                    {
-                        self.allowedPacketsSeen = apsValue
-                    }
-                }
-            }
-        }
-        
-        DispatchQueue.global(qos: .background).async
-        {
-            while self.streaming
-            {
-                self.addBlockedPackets()
-
-                DispatchQueue.main.async
-                {
-                    let bpsValue = self.blockedPacketsSeen
-                    if bpsValue != "0"
-                    {
-                        self.blockedPacketsSeen = bpsValue
-                    }
-                }
-            }
-        }
-
-//        DispatchQueue.global(qos: .background).async
-//        {
-//            while self.streaming
-//            {
-//                self.processPacketLengths()
-//
-//                DispatchQueue.main.async
-//                {
-//                    let apaValue = self.allowedPacketsAnalyzed
-//                    self.allowedPacketsAnalyzed = apaValue
-//
-//                    let bpaValue = self.blockedPacketsAnalyzed
-//                    self.blockedPacketsAnalyzed = bpaValue
-//                }
-//            }
-//        }
     }
     
-    override func viewDidLoad()
+    func loadLabelData()
     {
-        super.viewDidLoad()
-
+        let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+        
+        // Allowed Packets Seen
+        if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+        {
+            self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
+        }
+        
+        // Allowed Packets Analyzed
+        if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
+        {
+            self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
+        }
+        
+        // Blocked Packets Seen
+        if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
+        {
+            self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
+        }
+        
+        //Blocked Packets Analyzed
+        if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
+        {
+            self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
+        }
+    }
+    
+    func subscribeToAllowedConnections()
+    {
         guard let redis = try? Redis(hostname: "localhost", port: 6379)
             else
         {
@@ -209,31 +92,81 @@ class ViewController: NSViewController
         {
             try redis.subscribe(channel:allowedChannel)
             { (maybeRedisType, maybeError) in
-                if let redisList = maybeRedisType as? [Datable]
+                
+                guard let redisList = maybeRedisType as? [Datable]
+                    else
                 {
-                    for each in redisList
-                    {
-                        if let eachData = each as? Data
-                        {
-                            print("\nReceived a message list:")
-                            print("\(eachData.string)\n")
-//                            DispatchQueue.main.async {
-//                                self.label3.stringValue = eachData.string
-//                            }
-                        }
-                    }
+                    return
                 }
-                else
+                
+                for each in redisList
                 {
-                    print(String(describing: maybeRedisType))
+                    guard let thisElement = each as? Data
+                        else
+                    {
+                        continue
+                    }
+                    
+                    guard thisElement.string == newAllowedConnectionMessage
+                        else
+                    {
+                        print(thisElement.string)
+                        continue
+                    }
+
+                    self.analyzeAllowedConnections()
                 }
             }
         }
         catch
         {
-            print("\nError subscribing to pubsub.")
             print(error)
         }        
+    }
+    
+    func subscribeToBlockedConnections()
+    {
+        guard let redis = try? Redis(hostname: "localhost", port: 6379)
+            else
+        {
+            print("Unable to connect to Redis")
+            return
+        }
+        
+        do
+        {
+            try redis.subscribe(channel: blockedChannel)
+            { (maybeRedisType, maybeError) in
+                
+                guard let redisList = maybeRedisType as? [Datable]
+                    else
+                {
+                    return
+                }
+                
+                for each in redisList
+                {
+                    guard let thisElement = each as? Data
+                        else
+                    {
+                        continue
+                    }
+                    
+                    guard thisElement.string == newBlockedConnectionMessage
+                        else
+                    {
+                        print(thisElement.string)
+                        continue
+                    }
+                    
+                    self.analyzeBlockedConnections()
+                }
+            }
+        }
+        catch
+        {
+            print(error)
+        }
     }
     
     func createFakePacket(minSize: UInt32, maxSize: UInt32) -> Data
@@ -246,162 +179,422 @@ class ViewController: NSViewController
     {
         let minSize: UInt32 = 200
         let maxSize: UInt32 = 500
-        var allowedConnections: RList<String> = RList(key: allowedConnectionsKey)
+        let allowedConnections: RList<String> = RList(key: allowedConnectionsKey)
         
         guard let redis = try? Redis(hostname: "localhost", port: 6379)
             else
         {
-            print("Unable to connect to Redis")
             return
         }
-        
-        for _ in 1...100
+        analysisQueue.sync
         {
-            let connectionIDString = String(connectionID)
-            
-            let inPacket = createFakePacket(minSize: minSize, maxSize: maxSize)
-            let inMap: RMap<String, Data> = RMap(key: allowedIncomingKey)
-            inMap[connectionIDString] = inPacket
-            
-            let outPacket = createFakePacket(minSize: minSize, maxSize: maxSize)
-            let outMap: RMap<String, Data> = RMap(key: allowedOutgoingKey)
-            outMap[connectionIDString] = outPacket
-
-            
-            allowedConnections.append(connectionIDString)
-            
-            do
+            for _ in 1...73
             {
-                let _ = try redis.publish(channel: allowedChannel, message: "Added allowed connection. Total: \(allowedConnections.count)")
+                self.fakeConnectionID += 1
+                let connectionIDString = String(self.fakeConnectionID)
+                
+                // Adding a fake incoming packet
+                let inPacket = self.createFakePacket(minSize: minSize, maxSize: maxSize)
+                let inMap: RMap<String, Data> = RMap(key: allowedIncomingKey)
+                inMap[connectionIDString] = inPacket
+                print("📥  In Packet for \(connectionIDString) added.")
+                
+                // Adding a fake outgoing packet
+                let outPacket = self.createFakePacket(minSize: minSize, maxSize: maxSize)
+                let outMap: RMap<String, Data> = RMap(key: allowedOutgoingKey)
+                outMap[connectionIDString] = outPacket
+                print("📤  Out packet for \(connectionIDString) added.")
+                
+                // Both packets have been added, update the list of connections to process.
+                print("Appending Connection ID \(connectionIDString) to the allowed connections list.\n🎈 🎈 🎈 🎈 🎈")
+                allowedConnections.append(connectionIDString)
+                
+                // Publish: A new allowed connection is ready to be analyzed.
+                do
+                {
+                    let numberOfSubscribers = try redis.publish(channel: allowedChannel, message: newAllowedConnectionMessage)
+                    print("\(numberOfSubscribers as! Int) subscriber(s)")
+                }
+                catch
+                {
+                    print(error)
+                }
+                
+                // Increment the allowed packets seen field.
+                let packetStatsDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+                
+                if let allowedPacketsSeenValue = packetStatsDictionary.increment(field: allowedPacketsSeenKey), allowedPacketsSeenValue > 0
+                {
+                    DispatchQueue.main.async {
+                        self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
+                    }
+                }
             }
-            catch
-            {
-                print("\nError trying to publish message.")
-                print(error)
-            }
-            
-            connectionID += 1
-            let packetStatsDictionary: RMap<String, Data> = RMap(key: packetStatsKey)
-            let _ = packetStatsDictionary.increment(field: allowedPacketsSeenKey)
         }
-        
-        allowedConnections = RList(key: allowedConnectionsKey)
     }
     
-    func addBlockedPackets()
+    func addblockedPackets()
     {
-        let minSize: UInt32 = 200
-        let maxSize: UInt32 = 500
-        var blockedConnections: RList<String> = RList(key: blockedConnectionsKey)
+        let minSize: UInt32 = 400
+        let maxSize: UInt32 = 700
+        
+        //TODO: This should be a var, append should be a mutating function...
+        let blockedConnections: RList<String> = RList(key: blockedConnectionsKey)
         
         guard let redis = try? Redis(hostname: "localhost", port: 6379)
             else
         {
-            print("Unable to connect to Redis")
             return
         }
-        
-        for _ in 1...100
+        analysisQueue.sync
         {
-            let connectionIDString = String(connectionID)
-            
-            let inPacket = createFakePacket(minSize: minSize, maxSize: maxSize)
-            let inMap: RMap<String, Data> = RMap(key: blockedIncomingKey)
-            inMap[connectionIDString] = inPacket
-            
-            let outPacket = createFakePacket(minSize: minSize, maxSize: maxSize)
-            let outMap: RMap<String, Data> = RMap(key: blockedOutgoingKey)
-            outMap[connectionIDString] = outPacket
-            
-            
-            blockedConnections.append(connectionIDString)
-            
-            do
+            for _ in 1...73
             {
-                let _ = try redis.publish(channel: blockedChannel, message: "Added blocked connection. Total: \(blockedConnections.count)")
+                self.fakeConnectionID += 1
+                let connectionIDString = String(self.fakeConnectionID)
+                
+                // Adding a fake incoming packet
+                let inPacket = self.createFakePacket(minSize: minSize, maxSize: maxSize)
+                let inMap: RMap<String, Data> = RMap(key: blockedIncomingKey)
+                inMap[connectionIDString] = inPacket
+                print("📥  In Packet for \(connectionIDString) added.")
+                
+                // Adding a fake outgoing packet
+                let outPacket = self.createFakePacket(minSize: minSize, maxSize: maxSize)
+                let outMap: RMap<String, Data> = RMap(key: blockedOutgoingKey)
+                outMap[connectionIDString] = outPacket
+                print("📤  Out packet for \(connectionIDString) added.")
+                
+                // Both packets have been added, update the list of connections to process.
+                print("Appending Connection ID \(connectionIDString) to the blocked connections list.\n🎁 🎁 🎁 🎁")
+                blockedConnections.append(connectionIDString)
+                
+                // Publish: A new blocked connection is ready to be analyzed.
+                do
+                {
+                    let numberOfSubscribers = try redis.publish(channel: blockedChannel, message: newBlockedConnectionMessage)
+                    print("\(numberOfSubscribers as! Int) subscriber(s)")
+                }
+                catch
+                {
+                    print(error)
+                }
+                
+                // Increment the allowed packets seen field.
+                let packetStatsDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+                
+                if let blockedPacketsSeenValue = packetStatsDictionary.increment(field: blockedPacketsSeenKey), blockedPacketsSeenValue > 0
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
+                    }
+                }
             }
-            catch
-            {
-                print("\nError trying to publish message.")
-                print(error)
-            }
-            
-            connectionID += 1
-            let packetStatsDictionary: RMap<String, Data> = RMap(key: packetStatsKey)
-            let _ = packetStatsDictionary.increment(field: blockedPacketsSeenKey)
-        }
-        
-        blockedConnections = RList(key: blockedConnectionsKey)
-    }
-    
-    func processPacketLengths(connectionKey: String, outgoingKey: String, outgoingLengthsKey: String, incomingKey: String, incomingLengthsKey: String, packetsAnalyzedKey: String)
-    {
-        var connectionList: RList<String> = RList(key: connectionKey)
-        let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
-        
-        while connectionList.count > 0
-        {
-            let outPacketDictionary: RMap<String, Data> = RMap(key: outgoingKey)
-            let outgoingLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingLengthsKey)
-            let inPacketDictionary: RMap<String, Data> = RMap(key: incomingKey)
-            let incomingLengthSet: RSortedSet<Int> = RSortedSet(key: incomingLengthsKey)
-            
-            guard let connectionID = connectionList.removeFirst()
-                else
-            {
-                print("Failed to remove first connection ID from allowed connections list.")
-                continue
-            }
-            
-            guard let outPacket: Data = outPacketDictionary[connectionID]
-                else
-            {
-                print("Failed to find outgoing packet for connection \(connectionID)")
-                continue
-            }
-            
-            let newOutScore = outgoingLengthSet.incrementScore(ofField: String(outPacket.count), byIncrement: 1)
-            if newOutScore == nil
-            {
-                print("Error incrementing score for allowed out length of:\(outPacket.count)")
-            }
-            
-            guard let inPacket = inPacketDictionary[connectionID]
-                else
-            {
-                print("Failed to find incoming packet for connection \(connectionID)")
-                continue
-            }
-            
-            let newInScore = incomingLengthSet.incrementScore(ofField: String(inPacket.count), byIncrement: 1)
-            if newInScore == nil
-            {
-                print("Error incrementing score for allowed incoming length of:\(inPacket.count)")
-            }
-            
-            let _ = packetsAnalyzedDictionary.increment(field: packetsAnalyzedKey)
-            connectionList = RList(key: connectionKey)
         }
     }
     
-    func processPacketLengths()
+    func analyzeAllowedConnections()
     {
-        processPacketLengths(connectionKey: allowedConnectionsKey, outgoingKey: allowedOutgoingKey, outgoingLengthsKey: allowedOutgoingLengthsKey, incomingKey: allowedIncomingKey, incomingLengthsKey: allowedIncomingLengthsKey, packetsAnalyzedKey: allowedPacketsAnalyzedKey)
-        
-        let allowedOutgoingLengths: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthsKey)
-        numberOfAOPLengthsMessage = "Recorded \(allowedOutgoingLengths.count) allowed unique outgoing packet lengths."
-        let allowedIncomingLengths: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthsKey)
-        numberOfAIPLengthsMessage = "Recorded \(allowedIncomingLengths.count) allowed unique incoming packet lengths"
-        
-        processPacketLengths(connectionKey: blockedConnectionsKey, outgoingKey: blockedOutgoingKey, outgoingLengthsKey: blockedOutgoingLengthsKey, incomingKey: blockedIncomingKey, incomingLengthsKey: blockedIncomingLengthsKey, packetsAnalyzedKey: blockedPacketsAnalyzedKey)
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
+        let connectionList: RList<String> = RList(key: allowedConnectionsKey)
+        analysisQueue.async
+        {
+            while connectionList.count != 0
+            {
+                // Get the first connection ID from the list
+                guard let connectionID = connectionList.removeFirst()
+                    else
+                {
+                    continue
+                }
+                
+                if "\(type(of: connectionID))" == "NSNull"
+                {
+                    print("\nSkipping connectionID: \(connectionID)")
+                    continue
+                }
+                
+                let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: connectionID)
+                let (successful, error) = self.processPacketLengths(forConnection: allowedConnection)
+                if successful
+                {
+                    // Increment Packets Analyzed Field as we are done analyzing this connection
+                    let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+                    let _ = packetsAnalyzedDictionary.increment(field: allowedPacketsAnalyzedKey)
+                }
+                else if error != nil
+                {
+                    print(error!)
+                    continue
+                }
+                
+                // Get values to show in Text Labels
+                let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+                
+                // Allowed Packets Analyzed
+                if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
+                    }
+                }
+                
+                // Allowed Packets Seen
+                if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
+                    }
+                }
+            }
         }
     }
+    
+    func analyzeBlockedConnections()
+    {
+        let connectionList: RList<String> = RList(key: blockedConnectionsKey)
+        analysisQueue.async
+        {
+            while connectionList.count != 0
+            {
+                // Get the first connection ID from the list
+                guard let connectionID = connectionList.removeFirst()
+                    else
+                {
+                    continue
+                }
+                
+                if "\(type(of: connectionID))" == "NSNull"
+                {
+                    print("\nSkipping connectionID: \(connectionID)")
+                    continue
+                }
+                
+                let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: connectionID)
+                
+                // Process Packet Lengths
+                let (successful, error) = self.processPacketLengths(forConnection: blockedConnection)
+                if successful
+                {
+                    // Increment Packets Analyzed Field as we are done analyzing this connection
+                    let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+                    let _ = packetsAnalyzedDictionary.increment(field: blockedPacketsAnalyzedKey)
+                }
+                else if error != nil
+                {
+                    print(error!)
+                    continue
+                }
+                
+                //TODO: Other Tests
+                
+                // Get values to show in Text Labels
+                let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+                
+                // Blocked Packets Analyzed
+                if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
+                    }
+                }
+                
+                // Blocked Packets Seen
+                if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
+                    }
+                }
+            }
+        }
+    }
+    
+    func processPacketLengths(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
+    {
+        let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
+        let outgoingLengthSet: RSortedSet<Int> = RSortedSet(key: connection.outgoingLengthsKey)
+        let inPacketDictionary: RMap<String, Data> = RMap(key: connection.incomingKey)
+        let incomingLengthSet: RSortedSet<Int> = RSortedSet(key: connection.incomingLengthsKey)
 
+        // Get the out packet that corresponds with this connection ID
+        guard let outPacket: Data = outPacketHash[connection.connectionID]
+            else
+        {
+            return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID))
+        }
+        
+        /// DEBUG
+        if outPacket.count < 100
+        {
+            print("\n### Outpacket count = \(String(outPacket.count))")
+            print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
+        }
+        ///
+        
+        // Increment the score of this particular outgoing packet length
+        let newOutScore = outgoingLengthSet.incrementScore(ofField: String(outPacket.count), byIncrement: 1)
+        if newOutScore == nil
+        {
+            print("Error incrementing score for allowed out length of \(outPacket.count) for connection ID \(connection.connectionID)")
+            print(outPacket.string)
+        }
+        
+        // Get the in packet that corresponds with this connection ID
+        guard let inPacket = inPacketDictionary[connection.connectionID]
+            else
+        {
+            return(false, PacketLengthError.noInPacketForConnection(connection.connectionID))
+        }
+        
+        /// DEBUG
+        if inPacket.count < 100
+        {
+            print("\n### Inpacket count = \(String(inPacket.count))\n")
+            print("\n⁉️  We got a weird in packet size... \(String(describing: String(data: outPacket, encoding: .utf8))) <---\n")
+        }
+        ///
+        
+        // Increment the score of this particular incoming packet length
+        let newInScore = incomingLengthSet.incrementScore(ofField: String(inPacket.count), byIncrement: 1)
+        if newInScore == nil
+        {
+            return(false, PacketLengthError.unableToIncremementScore(packetSize: inPacket.count, connectionID: connection.connectionID))
+        }
+        
+        return(true, nil)
+    }
+    
+//    func processPacketLengths(connectionKey: String,
+//                              outgoingKey: String,
+//                              outgoingLengthsKey: String,
+//                              incomingKey: String,
+//                              incomingLengthsKey: String,
+//                              packetsAnalyzedKey: String)
+//    {
+//        let connectionList: RList<String> = RList(key: connectionKey)
+//        analysisQueue.async
+//        {
+//            while connectionList.count != 0
+//            {
+//                print("\n🔛 Entered analyzing packet lengths loop. Connection list contains \(connectionList.count) elements. 🔛\n")
+//
+//                let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+//                let outPacketDictionary: RMap<String, Data> = RMap(key: outgoingKey)
+//                let outgoingLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingLengthsKey)
+//                let inPacketDictionary: RMap<String, Data> = RMap(key: incomingKey)
+//                let incomingLengthSet: RSortedSet<Int> = RSortedSet(key: incomingLengthsKey)
+//
+//                // Get the first connection ID from the list
+//                guard let connectionID = connectionList.removeFirst()
+//                    else
+//                {
+//                    continue
+//                }
+//
+//                if "\(type(of: connectionID))" == "NSNull"
+//                {
+//                    print("\nSkipping connectionID: \(connectionID)")
+//                    continue
+//                }
+//
+//                // Get the out packet that corresponds with this connection ID
+//                guard let outPacket: Data = outPacketDictionary[connectionID]
+//                    else
+//                {
+//                    print("Failed to find outgoing packet for connection \(connectionID)")
+//                    continue
+//                }
+//
+//                /// DEBUG
+//                print("\n### Outpacket count = \(String(outPacket.count))")
+//                if outPacket.count < 100
+//                {
+//                    print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
+//                }
+//                ///
+//
+//                // Increment the score of this particular outgoing packet length
+//                let newOutScore = outgoingLengthSet.incrementScore(ofField: String(outPacket.count), byIncrement: 1)
+//                if newOutScore == nil
+//                {
+//                    print("Error incrementing score for allowed out length of \(outPacket.count) for connection ID \(connectionID)")
+//                    print(outPacket.string)
+//                }
+//
+//                // Get the in packet that corresponds with this connection ID
+//                guard let inPacket = inPacketDictionary[connectionID]
+//                    else
+//                {
+//                    print("Failed to find incoming packet for connection \(connectionID)")
+//                    return
+//                }
+//
+//                /// DEBUG
+//                print("\n### Inpacket count = \(String(inPacket.count))\n")
+//                if inPacket.count < 100
+//                {
+//                    print("\n⁉️  We got a weird in packet size... \(String(describing: String(data: outPacket, encoding: .utf8))) <---\n")
+//                }
+//                ///
+//
+//                // Increment the score of this particular incoming packet length
+//                let newInScore = incomingLengthSet.incrementScore(ofField: String(inPacket.count), byIncrement: 1)
+//                if newInScore == nil
+//                {
+//                    print("Error incrementing score for allowed incoming length of \(inPacket.count) for connection ID \(connectionID)")
+//                }
+//
+//                // Increment Packets Analyzed Field as we are done analyzing this connection
+//                let _ = packetsAnalyzedDictionary.increment(field: packetsAnalyzedKey)
+//
+//                // Get values to show in Text Labels
+//                let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+//
+//                // Allowed Packets Analyzed
+//                if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
+//                {
+//                    DispatchQueue.main.async
+//                    {
+//                        self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
+//                    }
+//                }
+//
+//                // Blocked Packets Analyzed
+//                if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
+//                {
+//                    DispatchQueue.main.async
+//                    {
+//                        self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
+//                    }
+//                }
+//
+//                // Blocked Packets Seen
+//                if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
+//                {
+//                    DispatchQueue.main.async
+//                    {
+//                        self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
+//                    }
+//                }
+//
+//                // Allowed Packets Seen
+//                if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+//                {
+//                    DispatchQueue.main.async
+//                    {
+//                        self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
+//                    }
+//                }
+//            }
+//
+//            print("\n EXITED ANALYSIS LOOP. Connections in list: \(connectionList.count)")
+//        }
+//    }
 
 }
 

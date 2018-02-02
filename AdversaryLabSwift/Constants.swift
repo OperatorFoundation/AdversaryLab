@@ -27,3 +27,15 @@ let blockedIncomingLengthsKey = "Blocked:Incoming:Lengths"
 let blockedOutgoingLengthsKey = "Blocked:Outgoing:Lengths"
 let blockedPacketsSeenKey = "Blocked:Packets:Seen"
 let blockedPacketsAnalyzedKey = "Blocked:Packets:Analyzed"
+
+let newAllowedConnectionMessage = "NewAllowedConnectionAdded"
+let newBlockedConnectionMessage = "NewBlockedConnectionAdded"
+let analysisQueue = DispatchQueue(label: "AnalysisQueue")
+
+enum PacketLengthError: Error
+{
+    case noOutPacketForConnection(String)
+    case noInPacketForConnection(String)
+    case unableToIncremementScore(packetSize: Int, connectionID: String)
+    case invalidInput(String)
+}

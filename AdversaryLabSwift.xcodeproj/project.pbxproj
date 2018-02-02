@@ -14,6 +14,13 @@
 		4651A16F20083BF700037D31 /* AdversaryLabSwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A16E20083BF700037D31 /* AdversaryLabSwiftUITests.swift */; };
 		4651A1A82009403800037D31 /* AdversaryLabSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A1A72009403800037D31 /* AdversaryLabSwiftTests.swift */; };
 		467E493A2017F166008B19E3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467E49392017F166008B19E3 /* Constants.swift */; };
+		468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512B201FE4B50052DF49 /* Auburn.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512B201FE4B50052DF49 /* Auburn.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		468B26482023C092000A2B5D /* RedShot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; };
+		468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		468B264C2023C099000A2B5D /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
+		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,6 +37,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4651A14C20083BF700037D31;
 			remoteInfo = AdversaryLabSwift;
+		};
+		468B26462023C082000A2B5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = "Auburn::Auburn";
+			remoteInfo = Auburn;
+		};
+		468B264A2023C092000A2B5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = "RedShot::RedShot";
+			remoteInfo = RedShot;
+		};
+		468B264E2023C099000A2B5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = "Datable::Datable";
+			remoteInfo = Datable;
 		};
 		46D85126201FE4B50052DF49 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -75,6 +103,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */,
+				468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */,
+				468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +127,8 @@
 		4651A17020083BF700037D31 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4651A1A72009403800037D31 /* AdversaryLabSwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdversaryLabSwiftTests.swift; sourceTree = "<group>"; };
 		467E49392017F166008B19E3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		468B26232023B609000A2B5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		468B26512023D016000A2B5D /* ObservedConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservedConnections.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +136,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				468B26482023C092000A2B5D /* RedShot.framework in Frameworks */,
+				468B264C2023C099000A2B5D /* Datable.framework in Frameworks */,
+				468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +166,7 @@
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
 				4651A16D20083BF700037D31 /* AdversaryLabSwiftUITests */,
 				4651A14E20083BF700037D31 /* Products */,
+				468B26402023BBB6000A2B5D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,6 +183,7 @@
 		4651A14F20083BF700037D31 /* AdversaryLabSwift */ = {
 			isa = PBXGroup;
 			children = (
+				468B26502023CFF8000A2B5D /* Models */,
 				46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */,
 				4651A15020083BF700037D31 /* AppDelegate.swift */,
 				4651A15220083BF700037D31 /* ViewController.swift */,
@@ -171,8 +209,24 @@
 			isa = PBXGroup;
 			children = (
 				4651A1A72009403800037D31 /* AdversaryLabSwiftTests.swift */,
+				468B26232023B609000A2B5D /* Info.plist */,
 			);
 			path = AdversaryLabSwiftTests;
+			sourceTree = "<group>";
+		};
+		468B26402023BBB6000A2B5D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		468B26502023CFF8000A2B5D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				468B26512023D016000A2B5D /* ObservedConnections.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		46D8511A201FE4B50052DF49 /* Products */ = {
@@ -202,6 +256,9 @@
 			buildRules = (
 			);
 			dependencies = (
+				468B26472023C082000A2B5D /* PBXTargetDependency */,
+				468B264B2023C092000A2B5D /* PBXTargetDependency */,
+				468B264F2023C099000A2B5D /* PBXTargetDependency */,
 			);
 			name = AdversaryLabSwift;
 			productName = AdversaryLabSwift;
@@ -366,6 +423,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
+				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
 				467E493A2017F166008B19E3 /* Constants.swift in Sources */,
 			);
@@ -399,6 +457,21 @@
 			isa = PBXTargetDependency;
 			target = 4651A14C20083BF700037D31 /* AdversaryLabSwift */;
 			targetProxy = 4651A16B20083BF700037D31 /* PBXContainerItemProxy */;
+		};
+		468B26472023C082000A2B5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Auburn;
+			targetProxy = 468B26462023C082000A2B5D /* PBXContainerItemProxy */;
+		};
+		468B264B2023C092000A2B5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = RedShot;
+			targetProxy = 468B264A2023C092000A2B5D /* PBXContainerItemProxy */;
+		};
+		468B264F2023C099000A2B5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Datable;
+			targetProxy = 468B264E2023C099000A2B5D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -523,11 +596,12 @@
 		4651A17420083BF800037D31 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -537,11 +611,12 @@
 		4651A17520083BF800037D31 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -553,12 +628,15 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdversaryLabSwift.app/Contents/MacOS/AdversaryLabSwift";
 			};
@@ -569,12 +647,15 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdversaryLabSwift.app/Contents/MacOS/AdversaryLabSwift";
 			};
@@ -586,6 +667,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftUITests;
@@ -601,6 +683,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftUITests;
