@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */; };
+		46175B6C202CE3DB009311D6 /* Entropy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B6B202CE3DB009311D6 /* Entropy.swift */; };
+		46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B74202D2CDE009311D6 /* ConnectionInspector.swift */; };
+		46175B78202D4545009311D6 /* PacketLengths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B77202D4545009311D6 /* PacketLengths.swift */; };
+		46175B7A202D466A009311D6 /* Timing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B79202D466A009311D6 /* Timing.swift */; };
+		46175B7C202D46AF009311D6 /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B7B202D46AF009311D6 /* Sequences.swift */; };
 		4651A15120083BF700037D31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15020083BF700037D31 /* AppDelegate.swift */; };
 		4651A15320083BF700037D31 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15220083BF700037D31 /* ViewController.swift */; };
 		4651A15520083BF700037D31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4651A15420083BF700037D31 /* Assets.xcassets */; };
@@ -114,6 +120,12 @@
 
 /* Begin PBXFileReference section */
 		46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AdversaryLabSwiftPackage.xcodeproj; path = ../AdversaryLabSwiftPackage/AdversaryLabSwiftPackage.xcodeproj; sourceTree = "<group>"; };
+		46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeConnectionGenerator.swift; sourceTree = "<group>"; };
+		46175B6B202CE3DB009311D6 /* Entropy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entropy.swift; sourceTree = "<group>"; };
+		46175B74202D2CDE009311D6 /* ConnectionInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInspector.swift; sourceTree = "<group>"; };
+		46175B77202D4545009311D6 /* PacketLengths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketLengths.swift; sourceTree = "<group>"; };
+		46175B79202D466A009311D6 /* Timing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timing.swift; sourceTree = "<group>"; };
+		46175B7B202D46AF009311D6 /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		4651A14D20083BF700037D31 /* AdversaryLabSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdversaryLabSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4651A15020083BF700037D31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4651A15220083BF700037D31 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -159,6 +171,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		46175B6020253F33009311D6 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */,
+				46175B74202D2CDE009311D6 /* ConnectionInspector.swift */,
+				46175B77202D4545009311D6 /* PacketLengths.swift */,
+				46175B79202D466A009311D6 /* Timing.swift */,
+				46175B6B202CE3DB009311D6 /* Entropy.swift */,
+				46175B7B202D46AF009311D6 /* Sequences.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		46175B76202D2DBE009311D6 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				467E49392017F166008B19E3 /* Constants.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		4651A14420083BF700037D31 = {
 			isa = PBXGroup;
 			children = (
@@ -183,6 +216,8 @@
 		4651A14F20083BF700037D31 /* AdversaryLabSwift */ = {
 			isa = PBXGroup;
 			children = (
+				46175B76202D2DBE009311D6 /* Helpers */,
+				46175B6020253F33009311D6 /* Controllers */,
 				468B26502023CFF8000A2B5D /* Models */,
 				46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */,
 				4651A15020083BF700037D31 /* AppDelegate.swift */,
@@ -191,7 +226,6 @@
 				4651A15620083BF700037D31 /* Main.storyboard */,
 				4651A15920083BF700037D31 /* Info.plist */,
 				4651A15A20083BF700037D31 /* AdversaryLabSwift.entitlements */,
-				467E49392017F166008B19E3 /* Constants.swift */,
 			);
 			path = AdversaryLabSwift;
 			sourceTree = "<group>";
@@ -423,8 +457,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
+				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
+				46175B6C202CE3DB009311D6 /* Entropy.swift in Sources */,
+				46175B78202D4545009311D6 /* PacketLengths.swift in Sources */,
+				46175B7A202D466A009311D6 /* Timing.swift in Sources */,
+				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
+				46175B7C202D46AF009311D6 /* Sequences.swift in Sources */,
 				467E493A2017F166008B19E3 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
