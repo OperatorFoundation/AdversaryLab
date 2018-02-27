@@ -61,17 +61,22 @@ class ConnectionInspector
                 
                 self.analyze(connection: blockedConnection)
             }
+            
+            self.scoreConnections()
         }
-        
+
+        // New Data Available for UI
         print("Analysis loop complete: SENDING UI UPDATE NOTIFICATION")
         NotificationCenter.default.post(name: .updateStats, object: nil)
-        
-        // New Data Available for UI
-        DispatchQueue.main.async
-            {
-                print("Analysis loop complete: SENDING UI UPDATE NOTIFICATION")
-                NotificationCenter.default.post(name: .updateStats, object: nil)
-        }
+    }
+    
+    func scoreConnections()
+    {
+        scoreAllPacketLengths()
+        scoreAllFloatSequences()
+        scoreAllEntropy()
+        scoreAllTiming()
+        NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
     func analyze(connection: ObservedConnection)
@@ -119,11 +124,7 @@ class ConnectionInspector
         }
         
         // New Data Available for UI
-        ///DispatchQueue.main.async{
-            print("SENDING UI UPDATE NOTIFICATION")
-            NotificationCenter.default.post(name: .updateStats, object: nil)
-        ///}
-
+        NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
 }

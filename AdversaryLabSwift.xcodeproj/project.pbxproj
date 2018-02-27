@@ -171,15 +171,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4612DCDB203B5C9D007F798E /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				46175B77202D4545009311D6 /* PacketLengths.swift */,
+				46175B79202D466A009311D6 /* Timing.swift */,
+				46175B6B202CE3DB009311D6 /* Entropy.swift */,
+				46175B7B202D46AF009311D6 /* Sequences.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
 		46175B6020253F33009311D6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */,
 				46175B74202D2CDE009311D6 /* ConnectionInspector.swift */,
-				46175B77202D4545009311D6 /* PacketLengths.swift */,
-				46175B79202D466A009311D6 /* Timing.swift */,
-				46175B6B202CE3DB009311D6 /* Entropy.swift */,
-				46175B7B202D46AF009311D6 /* Sequences.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -216,6 +223,7 @@
 		4651A14F20083BF700037D31 /* AdversaryLabSwift */ = {
 			isa = PBXGroup;
 			children = (
+				4612DCDB203B5C9D007F798E /* Features */,
 				46175B76202D2DBE009311D6 /* Helpers */,
 				46175B6020253F33009311D6 /* Controllers */,
 				468B26502023CFF8000A2B5D /* Models */,

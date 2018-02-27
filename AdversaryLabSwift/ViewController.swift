@@ -22,6 +22,38 @@ class ViewController: NSViewController
     @objc dynamic var blockedPacketsSeen = "Loading..."
     @objc dynamic var blockedPacketsAnalyzed = "Loading..."
     
+    @objc dynamic var requiredTiming = "--"
+    @objc dynamic var requiredTimeAcc = "--"
+    @objc dynamic var forbiddenTiming = "--"
+    @objc dynamic var forbiddenTimingAcc = "--"
+    
+    @objc dynamic var requiredOutLength = "--"
+    @objc dynamic var requiredOutLengthAcc = "--"
+    @objc dynamic var forbiddenOutLength = "--"
+    @objc dynamic var forbiddenOutLengthAcc = "--"
+    @objc dynamic var requiredInLength = "--"
+    @objc dynamic var requiredInLengthAcc = "--"
+    @objc dynamic var forbiddenInLength = "--"
+    @objc dynamic var forbiddenInLengthAcc = "--"
+    
+    @objc dynamic var requiredOutEntropy = "--"
+    @objc dynamic var requiredOutEntropyAcc = "--"
+    @objc dynamic var forbiddenOutEntropy = "--"
+    @objc dynamic var forbiddenOutEntropyAcc = "--"
+    @objc dynamic var requiredInEntropy = "--"
+    @objc dynamic var requiredInEntropyAcc = "--"
+    @objc dynamic var forbiddenInEntropy = "--"
+    @objc dynamic var forbiddenInEntropyAcc = "--"
+    
+    @objc dynamic var requiredOutSequence = "--"
+    @objc dynamic var requiredOutSequenceAcc = "--"
+    @objc dynamic var forbiddenOutSequence = "--"
+    @objc dynamic var forbiddenOutSequenceAcc = "--"
+    @objc dynamic var requiredInSequence = "--"
+    @objc dynamic var requiredInSequenceAcc = "--"
+    @objc dynamic var forbiddenInSequence = "--"
+    @objc dynamic var forbiddenInSequenceAcc = "--"
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -39,7 +71,6 @@ class ViewController: NSViewController
     @IBAction func runClick(_ sender: NSButton)
     {
         self.connectionInspector.analyzeConnections()
-        
         self.loadLabelData()
     }
     
@@ -59,49 +90,149 @@ class ViewController: NSViewController
     func streamConnections()
     {
         analysisQueue.async
-            {
-        while self.streaming == true
         {
-            
-            let connectionGenerator = FakeConnectionGenerator()
-            connectionGenerator.addConnections()
-                    
-                    DispatchQueue.main.async {
-                        self.loadLabelData()
-                    }
+            while self.streaming == true
+            {
+                let connectionGenerator = FakeConnectionGenerator()
+                connectionGenerator.addConnections()
+                
+                DispatchQueue.main.async
+                {
+                    self.loadLabelData()
+                }
             }
-            
         }
     }
     
     @objc func loadLabelData()
     {
-        DispatchQueue.main.async {
-        let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-        
-        // Allowed Packets Seen
-        if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+        DispatchQueue.main.async
         {
-            self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
-        }
-        
-        // Allowed Packets Analyzed
-        if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
-        {
-            self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
-        }
-        
-        // Blocked Packets Seen
-        if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
-        {
-            self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
-        }
-        
-        //Blocked Packets Analyzed
-        if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
-        {
-            self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
-        }
+            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+            
+            // Allowed Packets Seen
+            if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+            {
+                self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
+            }
+            
+            // Allowed Packets Analyzed
+            if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
+            {
+                self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
+            }
+            
+            // Blocked Packets Seen
+            if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
+            {
+                self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
+            }
+            
+            //Blocked Packets Analyzed
+            if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
+            {
+                self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
+            }
+            
+            // Scores
+            let requiredTimingSet: RSortedSet<Int> = RSortedSet(key: requiredTimeDiffKey)
+            if let (rtMember, rtScore) = requiredTimingSet.last
+            {
+                self.requiredTiming = "\(rtMember)"
+                self.requiredTimeAcc = "\(rtScore)"
+            }
+            
+            let forbiddenTimingSet: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
+            if let (ftMember, ftScore) = forbiddenTimingSet.last
+            {
+                self.forbiddenTiming = "\(ftMember)"
+                self.forbiddenTimingAcc = "\(ftScore)"
+            }
+            
+            let requiredOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredLengthsKey)
+            if let (rolMember, rolScore) = requiredOutLengthSet.last
+            {
+                self.requiredOutLength = "\(rolMember)"
+                self.requiredOutLengthAcc = "\(rolScore)"
+            }
+            
+            let forbiddenOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenLengthsKey)
+            if let (folMember, folScore) = forbiddenOutLengthSet.last
+            {
+                self.forbiddenOutLength = "\(folMember)"
+                self.forbiddenOutLengthAcc = "\(folScore)"
+            }
+            
+            let requiredInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingRequiredLengthsKey)
+            if let (rilMember, rilScore) = requiredInLengthSet.last
+            {
+                self.requiredInLength = "\(rilMember)"
+                self.requiredInLengthAcc = "\(rilScore)"
+            }
+            
+            let forbiddenInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenLengthsKey)
+            if let (filMember, filScore) = forbiddenInLengthSet.last
+            {
+                self.forbiddenInLength = "\(filMember)"
+                self.forbiddenInLengthAcc = "\(filScore)"
+            }
+            
+            let requiredOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredEntropyKey)
+            if let (roeMember, roeScore) = requiredOutEntropySet.last
+            {
+                self.requiredOutEntropy = "\(roeMember)"
+                self.requiredOutEntropyAcc = "\(roeScore)"
+            }
+            
+            let forbiddenOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenEntropyKey)
+            if let (foeMember, foeScore) = forbiddenOutEntropySet.last
+            {
+                self.forbiddenOutEntropy = "\(foeMember)"
+                self.forbiddenOutEntropyAcc = "\(foeScore)"
+            }
+            
+            let requiredInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingRequiredEntropyKey)
+            if let (rieMember, rieScore) = requiredInEntropySet.last
+            {
+                self.requiredInEntropy = "\(rieMember)"
+                self.requiredInEntropyAcc = "\(rieScore)"
+            }
+            
+            let forbiddenInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenEntropyKey)
+            if let (fieMember, fieScore) = forbiddenInEntropySet.last
+            {
+                self.forbiddenInEntropy = "\(fieMember)"
+                self.forbiddenInEntropyAcc = "\(fieScore)"
+            }
+            
+            let requiredOutSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredSequencesKey)
+            if let (rosMember, rosScore) = requiredOutSequenceSet.last
+            {
+                self.requiredOutSequence = "\(rosMember)"
+                self.requiredOutSequenceAcc = "\(rosScore)"
+            }
+            
+            let forbiddenOutSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenSequencesKey)
+            if let (fosMember, fosScore) = forbiddenOutSequenceSet.last
+            {
+                self.forbiddenOutSequence = "\(fosMember)"
+                self.forbiddenOutSequenceAcc = "\(fosScore)"
+            }
+            
+            let requiredInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredSequencesKey)
+            if let (risMemeber, risScore) = requiredInSequenceSet.last
+            {
+                self.requiredInSequence = "\(risMemeber)"
+                self.requiredInSequenceAcc = "\(risScore)"
+            }
+            
+            let forbiddenInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenSequencesKey)
+            if let (fisMember, fisScore) = forbiddenInSequenceSet.last
+            {
+                self.forbiddenInSequence = "\(fisMember)"
+                self.forbiddenInSequenceAcc = "\(fisScore)"
+            }
+            
         }
     }
     

@@ -24,12 +24,14 @@ let allowedIncomingLengthsKey = "Allowed:Incoming:Lengths"
 let allowedOutgoingLengthsKey = "Allowed:Outgoing:Lengths"
 
 let allowedIncomingOffsetSequencesKey = "Allowed:Incoming:OffsetSequence:"
-let allowedOutgoingOffsetSequencesKey = "Allowed:Outgoing:OffsetSequence"
+let allowedOutgoingOffsetSequencesKey = "Allowed:Outgoing:OffsetSequence:"
 let allowedIncomingFloatingSequencesKey = "Allowed:Incoming:FloatingSequence"
 let allowedOutgoingFloatingSequencesKey = "Allowed:Outgoing:FloatingSequence"
 
 let allowedIncomingEntropyKey = "Allowed:Incoming:Entropy"
 let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
+let allowedIncomingEntropyBinsKey = "Allowed:Incoming:EntropyBins"
+let allowedOutgoingEntropyBinsKey = "Allowed:Outgoing:EntropyBins"
 
 let allowedPacketsSeenKey = "Allowed:Connections:Seen"
 let allowedPacketsAnalyzedKey = "Allowed:Connections:Analyzed"
@@ -53,9 +55,32 @@ let blockedOutgoingFloatingSequencesKey = "Blocked:Outgoing:FloatingSequence"
 
 let blockedIncomingEntropyKey = "Blocked:Incoming:Entropy"
 let blockedOutgoingEntropyKey = "Blocked:Outgoing:Entropy"
+let blockedIncomingEntropyBinsKey = "Blocked:Incoming:EntropyBins"
+let blockedOutgoingEntropyBinsKey = "Blocked:Outgoing:EntropyBins"
 
 let blockedPacketsSeenKey = "Blocked:Connections:Seen"
 let blockedPacketsAnalyzedKey = "Blocked:Connections:Analyzed"
+
+/// Scores
+let incomingRequiredLengthsKey = "Incoming:Required:Lengths"
+let incomingForbiddenLengthsKey = "Incoming:Forbidden:Lengths"
+let outgoingRequiredLengthsKey = "Outgoing:Required:Lengths"
+let outgoingForbiddenLengthsKey = "Outgoing:Forbidden:Lengths"
+
+let incomingRequiredSequencesKey = "Incoming:Required:Sequences"
+let incomingForbiddenSequencesKey = "Incoming:Forbidden:Sequences"
+let outgoingRequiredSequencesKey = "Outgoing:Required:Sequences"
+let outgoingForbiddenSequencesKey = "Outgoing:Forbidden:Sequences"
+
+let incomingRequiredEntropyKey = "Incoming:Required:Entropy"
+let incomingForbiddenEntropyKey = "Incoming:Forbidden:Entropy"
+let outgoingRequiredEntropyKey = "Outgoing:Required:Entropy"
+let outgoingForbiddenEntropyKey = "Outgoing:Forbidden:Entropy"
+
+let allowedConnectionsTimeDiffBinsKey = "Allowed:Connections:TimeDifferenceBins"
+let blockedConnectionsTimeDiffBinsKey = "Blocked:Connections:TimeDifferenceBins"
+let requiredTimeDiffKey = "Required:TimeDifference"
+let forbiddenTimeDiffKey = "Forbidden:TimeDifference"
 
 ///
 let newConnectionMessage = "NewConnectionAdded"
