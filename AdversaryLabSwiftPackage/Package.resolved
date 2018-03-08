@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Auburn.git",
         "state": {
           "branch": null,
-          "revision": "ca9039ba18368e516be7d22644fe5c83bfcccc69",
-          "version": "0.1.5"
+          "revision": "15fabc3398aae9e82dc6c2ee97622e0537f7f562",
+          "version": "0.1.6"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
         "state": {
           "branch": null,
-          "revision": "30e202d33747684c46836aaf056e349f519ce4db",
-          "version": "0.3.2"
+          "revision": "f7a5fca7932d9b2c311d654b9e939404aaa166a0",
+          "version": "0.3.3"
         }
       }
     ]
