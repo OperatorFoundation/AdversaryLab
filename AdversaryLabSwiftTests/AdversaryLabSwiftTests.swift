@@ -12,5 +12,16 @@ import XCTest
 
 class AdversaryLabSwiftTests: XCTestCase
 {
+    let connectionGenerator = FakeConnectionGenerator()
+    
+    func testAddAllowedPackets()
+    {
+        connectionGenerator.addAllowedPackets()
+    }
+    
+    func testAddblockedPackets()
+    {
+        connectionGenerator.addblockedPackets()
+    }
 
 }
