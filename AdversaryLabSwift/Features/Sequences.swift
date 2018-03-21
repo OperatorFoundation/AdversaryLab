@@ -61,7 +61,7 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
 func scoreAllFloatSequences()
 {
     // Outgoing
-    scoreSequences(allowedFloatSequenceKey: allowedOutgoingFloatingSequencesKey, blockedFloatSequenceKey: blockedOutgoingFloatingSequencesKey, requiredSequencesKey: outgoingRequiredSequencesKey, forbiddenSequencesKey: outgoingForbiddenLengthsKey)
+    scoreSequences(allowedFloatSequenceKey: allowedOutgoingFloatingSequencesKey, blockedFloatSequenceKey: blockedOutgoingFloatingSequencesKey, requiredSequencesKey: outgoingRequiredSequencesKey, forbiddenSequencesKey: outgoingForbiddenSequencesKey)
     
     //Incoming
     scoreSequences(allowedFloatSequenceKey: allowedIncomingFloatingSequencesKey, blockedFloatSequenceKey: blockedIncomingFloatingSequencesKey, requiredSequencesKey: incomingRequiredSequencesKey, forbiddenSequencesKey: incomingForbiddenSequencesKey)
@@ -128,7 +128,7 @@ func scoreSequences(allowedFloatSequenceKey: String, blockedFloatSequenceKey: St
         
         let forbiddenSequences: RSortedSet<Data> = RSortedSet(key: forbiddenSequencesKey)
         let forbiddenScore = forbiddenSequences.incrementScore(ofField: sequence, byIncrement: forbiddenAccuracy)
-        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for sequence \(String(describing: sequence))")
+        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for sequence \(String(describing: sequence)) to \(forbiddenSequencesKey)")
     }
 }
 

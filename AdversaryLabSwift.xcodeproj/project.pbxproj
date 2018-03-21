@@ -13,6 +13,7 @@
 		46175B78202D4545009311D6 /* PacketLengths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B77202D4545009311D6 /* PacketLengths.swift */; };
 		46175B7A202D466A009311D6 /* Timing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B79202D466A009311D6 /* Timing.swift */; };
 		46175B7C202D46AF009311D6 /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B7B202D46AF009311D6 /* Sequences.swift */; };
+		462271F72049021A00F21D08 /* DataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462271F62049021A00F21D08 /* DataHelper.swift */; };
 		4651A15120083BF700037D31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15020083BF700037D31 /* AppDelegate.swift */; };
 		4651A15320083BF700037D31 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15220083BF700037D31 /* ViewController.swift */; };
 		4651A15520083BF700037D31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4651A15420083BF700037D31 /* Assets.xcassets */; };
@@ -126,6 +127,7 @@
 		46175B77202D4545009311D6 /* PacketLengths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketLengths.swift; sourceTree = "<group>"; };
 		46175B79202D466A009311D6 /* Timing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timing.swift; sourceTree = "<group>"; };
 		46175B7B202D46AF009311D6 /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
+		462271F62049021A00F21D08 /* DataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHelper.swift; sourceTree = "<group>"; };
 		4651A14D20083BF700037D31 /* AdversaryLabSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdversaryLabSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4651A15020083BF700037D31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4651A15220083BF700037D31 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				467E49392017F166008B19E3 /* Constants.swift */,
+				462271F62049021A00F21D08 /* DataHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -471,6 +474,7 @@
 				46175B7A202D466A009311D6 /* Timing.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
+				462271F72049021A00F21D08 /* DataHelper.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
 				46175B7C202D46AF009311D6 /* Sequences.swift in Sources */,
 				467E493A2017F166008B19E3 /* Constants.swift in Sources */,

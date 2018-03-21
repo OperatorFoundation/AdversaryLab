@@ -72,10 +72,15 @@ class ConnectionInspector
     
     func scoreConnections()
     {
+        sleep(1)
         scoreAllPacketLengths()
+        sleep(1)
         scoreAllFloatSequences()
+        sleep(1)
         scoreAllEntropy()
+        sleep(1)
         scoreAllTiming()
+        sleep(1)
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
