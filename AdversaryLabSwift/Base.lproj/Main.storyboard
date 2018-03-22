@@ -1557,7 +1557,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
                                 <rect key="frame" x="418" y="674" width="209" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="oLi-vs-yls">
+                                <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="oLi-vs-yls">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>

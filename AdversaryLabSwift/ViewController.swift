@@ -93,6 +93,22 @@ class ViewController: NSViewController
             }
         }
     }
+
+    var removePackets: Bool
+    {
+        get
+        {
+            switch removePacketsCheck.state
+            {
+            case .on:
+                return true
+            case .off:
+                return false
+            default: //No Mixed State
+                return false
+            }
+        }
+    }
     
     override func viewDidLoad()
     {
@@ -110,7 +126,7 @@ class ViewController: NSViewController
     
     @IBAction func runClick(_ sender: NSButton)
     {
-        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
+        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis, removePackets: removePackets)
         self.loadLabelData()
     }
     
@@ -319,7 +335,7 @@ class ViewController: NSViewController
                         continue
                     }
 
-                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis, enableTLSAnalysis: self.enableTLSAnalysis)
+                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis, enableTLSAnalysis: self.enableTLSAnalysis, removePackets: self.removePackets)
                 }
             }
         }

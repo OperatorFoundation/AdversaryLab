@@ -11,55 +11,111 @@ import Auburn
 
 class ConnectionInspector
 {
-    func analyzeConnections(enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool)
+    func analyzeConnections(enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool, removePackets: Bool)
     {
         analysisQueue.async
         {
             // Allowed Connections
-            let allowedConnectionList: RList<String> = RList(key: allowedConnectionsKey)
-            while allowedConnectionList.count != 0
-            {
-                print("Analyzing an allowed connection async. Allowed connections left:\(allowedConnectionList.count)")
-                // Get the first connection ID from the list
-                guard let allowedConnectionID = allowedConnectionList.removeFirst()
-                    else
+            if removePackets {
+                NSLog("Analyzed packets and removing")
+                let allowedConnectionList: RList<String> = RList(key: allowedConnectionsKey)
+                while allowedConnectionList.count != 0
                 {
-                    continue
+                    print("Analyzing an allowed connection async. Allowed connections left:\(allowedConnectionList.count)")
+                    // Get the first connection ID from the list
+                    guard let allowedConnectionID = allowedConnectionList.removeFirst()
+                        else
+                    {
+                        continue
+                    }
+                    
+                    print("\nPopped Allowed Connection: \(allowedConnectionID)")
+                    
+                    if "\(type(of: allowedConnectionID))" == "NSNull"
+                    {
+                        continue
+                    }
+                    
+                    let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
+                    
+                    self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
                 }
                 
-                print("\nPopped Allowed Connection: \(allowedConnectionID)")
-                
-                if "\(type(of: allowedConnectionID))" == "NSNull"
+                // Blocked Connections
+                let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
+                while blockedConnectionList.count != 0
                 {
-                    continue
+                    print("Analyzing a blocked connection async. Blocked connections left: \(blockedConnectionList.count)")
+                    // Get the first connection ID from the list
+                    guard let blockedConnectionID = blockedConnectionList.removeFirst()
+                        else
+                    {
+                        continue
+                    }
+                    print("\nPopped Blocked Connection: \(blockedConnectionID)")
+                    
+                    if "\(type(of: blockedConnectionID))" == "NSNull"
+                    {
+                        continue
+                    }
+                    
+                    let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
+                    
+                    self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
+                }
+            } else {
+                NSLog("Analyzed packets and retaining")
+                let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
+                packetsAnalyzedDictionary[allowedPacketsAnalyzedKey]=0
+                packetsAnalyzedDictionary[blockedPacketsAnalyzedKey]=0
+                NotificationCenter.default.post(name: .updateStats, object: nil)
+
+                let allowedConnectionList: RList<String> = RList(key: allowedConnectionsKey)
+                print("Analyzing allowed connections \(allowedConnectionList.count)")
+                for index in 0..<allowedConnectionList.count
+                {
+                    print("Analyzing an allowed connection async. \(index)/\(allowedConnectionList.count)")
+                    // Get the first connection ID from the list
+                    guard let allowedConnectionID = allowedConnectionList[index]
+                        else
+                    {
+                        continue
+                    }
+                    
+                    print("\nIndexed Allowed Connection: \(allowedConnectionID)")
+                    
+                    if "\(type(of: allowedConnectionID))" == "NSNull"
+                    {
+                        continue
+                    }
+                    
+                    let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
+                    
+                    self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
                 }
                 
-                let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
-                
-                self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
-            }
-            
-            // Blocked Connections
-            let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
-            while blockedConnectionList.count != 0
-            {
-                print("Analyzing a blocked connection async. Blocked connections left: \(blockedConnectionList.count)")
-                // Get the first connection ID from the list
-                guard let blockedConnectionID = blockedConnectionList.removeFirst()
-                    else
+                // Blocked Connections
+                let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
+                print("Analyzing blocked connections \(blockedConnectionList.count)")
+                for index in 0..<blockedConnectionList.count
                 {
-                    continue
+                    print("Analyzing a blocked connection async. \(index)/\(allowedConnectionList.count)")
+                    // Get the first connection ID from the list
+                    guard let blockedConnectionID = blockedConnectionList[index]
+                        else
+                    {
+                        continue
+                    }
+
+                    if "\(type(of: blockedConnectionID))" == "NSNull"
+                    {
+                        continue
+                    }
+                    
+                    let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
+                    
+                    self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
                 }
-                print("\nPopped Blocked Connection: \(blockedConnectionID)")
-                
-                if "\(type(of: blockedConnectionID))" == "NSNull"
-                {
-                    continue
-                }
-                
-                let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
-                
-                self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
             }
             
             self.scoreConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
