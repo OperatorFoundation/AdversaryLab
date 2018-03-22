@@ -119,16 +119,16 @@ func scorePacketLengths(allowedLengthsKey: String, blockedLengthsKey: String, re
         let forbiddenFP = 1 - bProb
         let forbiddenTN = bProb
         let forbiddenFN = aProb
-        let forbiddenAccuracy: Double = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
+        let forbiddenAccuracy = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
         
         /// Save Scores
         let requiredLengths: RSortedSet<Int> = RSortedSet(key: requiredLengthsKey)
-        let requiredScore = requiredLengths.incrementScore(ofField: length, byIncrement: requiredAccuracy)
-        print("\nSaved required accuracy of |\(String(describing: requiredScore))| for length \(length)")
+        let (rlInserted, newRL) = requiredLengths.insert((length, Float(requiredAccuracy)))
+        print("\nSaved required accuracy for length \(length): |\(rlInserted): \(newRL)| <----------")
         
         let forbiddenLengths: RSortedSet<Int> = RSortedSet(key: forbiddenLengthsKey)
-        let forbiddenScore = forbiddenLengths.incrementScore(ofField: length, byIncrement: forbiddenAccuracy)
-        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for length \(length)")
+        let (flInserted, newFL) = forbiddenLengths.insert((length, Float(forbiddenAccuracy)))
+        print("Saved forbidden accuracy for length \(length):  |\(flInserted): \(newFL)| <----------")
     }
 }
 
