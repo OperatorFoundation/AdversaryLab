@@ -1565,7 +1565,7 @@
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
                                 <rect key="frame" x="418" y="624" width="144" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="m3M-iX-HUs">
+                                <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m3M-iX-HUs">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>

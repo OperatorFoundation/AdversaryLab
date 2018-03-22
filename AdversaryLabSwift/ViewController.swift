@@ -77,6 +77,23 @@ class ViewController: NSViewController
             }
         }
     }
+    
+    var enableTLSAnalysis: Bool
+    {
+        get
+        {
+            switch enableTLSCheck.state
+            {
+            case .on:
+                return true
+            case .off:
+                return false
+            default: //No Mixed State
+                return false
+            }
+        }
+    }
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -93,7 +110,7 @@ class ViewController: NSViewController
     
     @IBAction func runClick(_ sender: NSButton)
     {
-        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis)
+        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
         self.loadLabelData()
     }
     
@@ -302,7 +319,7 @@ class ViewController: NSViewController
                         continue
                     }
 
-                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis)
+                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis, enableTLSAnalysis: self.enableTLSAnalysis)
                 }
             }
         }

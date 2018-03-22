@@ -11,7 +11,7 @@ import Auburn
 
 class ConnectionInspector
 {
-    func analyzeConnections(enableSequenceAnalysis: Bool)
+    func analyzeConnections(enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool)
     {
         analysisQueue.async
         {
@@ -36,7 +36,7 @@ class ConnectionInspector
                 
                 let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                 
-                self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis)
+                self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
             }
             
             // Blocked Connections
@@ -59,10 +59,10 @@ class ConnectionInspector
                 
                 let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
                 
-                self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis)
+                self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
             }
             
-            self.scoreConnections()
+            self.scoreConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
         }
 
         // New Data Available for UI
@@ -70,13 +70,16 @@ class ConnectionInspector
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
-    func scoreConnections()
+    func scoreConnections(enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool)
     {
         sleep(1)
         scoreAllPacketLengths()
         sleep(1)
-        scoreAllFloatSequences()
-        sleep(1)
+        if enableSequenceAnalysis
+        {
+            scoreAllFloatSequences()
+            sleep(1)
+        }
         scoreAllEntropy()
         sleep(1)
         scoreAllTiming()
@@ -84,7 +87,7 @@ class ConnectionInspector
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
-    func analyze(connection: ObservedConnection, enableSequenceAnalysis: Bool)
+    func analyze(connection: ObservedConnection, enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool)
     {
         print("Analyzing a new connection: \(connection.connectionID)")
         // Process Packet Lengths
@@ -130,11 +133,13 @@ class ConnectionInspector
             }
         }
         
-        if let knownProtocol = detectKnownProtocol(connection: connection) {
-            NSLog("It's TLS!")
-            processKnownProtocol(knownProtocol, connection)
-        } else {
-            NSLog("Not TLS.")
+        if enableTLSAnalysis {
+            if let knownProtocol = detectKnownProtocol(connection: connection) {
+                NSLog("It's TLS!")
+                processKnownProtocol(knownProtocol, connection)
+            } else {
+                NSLog("Not TLS.")
+            }
         }
     }
 }
