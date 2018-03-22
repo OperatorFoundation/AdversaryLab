@@ -58,6 +58,25 @@ class ViewController: NSViewController
     @objc dynamic var forbiddenInSequenceCount = "--"
     @objc dynamic var forbiddenInSequenceAcc = "--"
     
+    @IBOutlet weak var removePacketsCheck: NSButton!
+    @IBOutlet weak var enableSequencesCheck: NSButton!
+    @IBOutlet weak var enableTLSCheck: NSButton!
+    
+    var enableSequenceAnalysis: Bool
+    {
+        get
+        {
+            switch enableSequencesCheck.state
+            {
+            case .on:
+                return true
+            case .off:
+                return false
+            default: //No Mixed State
+                return false
+            }
+        }
+    }
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -74,7 +93,7 @@ class ViewController: NSViewController
     
     @IBAction func runClick(_ sender: NSButton)
     {
-        self.connectionInspector.analyzeConnections()
+        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis)
         self.loadLabelData()
     }
     
@@ -283,7 +302,7 @@ class ViewController: NSViewController
                         continue
                     }
 
-                    self.connectionInspector.analyzeConnections()
+                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis)
                 }
             }
         }

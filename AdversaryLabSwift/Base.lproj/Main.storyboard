@@ -1546,8 +1546,37 @@
                                     <binding destination="XfG-lQ-9wD" name="value" keyPath="self.forbiddenOutSequenceAcc" id="GNu-Bw-DNN"/>
                                 </connections>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ygH-l3-SnY">
+                                <rect key="frame" x="418" y="649" width="181" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Enable Sequence Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="njV-0D-nD0">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
+                                <rect key="frame" x="418" y="674" width="209" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="oLi-vs-yls">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
+                                <rect key="frame" x="418" y="624" width="144" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="m3M-iX-HUs">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                            </button>
                         </subviews>
                     </view>
+                    <connections>
+                        <outlet property="enableSequencesCheck" destination="ygH-l3-SnY" id="xVv-jo-Ld1"/>
+                        <outlet property="enableTLSCheck" destination="qWY-FO-Xfj" id="lsC-YF-YZ5"/>
+                        <outlet property="removePacketsCheck" destination="l29-wR-vQY" id="tZw-T4-v0X"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="bzY-MI-M55"/>
