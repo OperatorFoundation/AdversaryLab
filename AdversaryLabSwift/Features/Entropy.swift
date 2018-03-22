@@ -41,13 +41,16 @@ func processEntropy(forConnection connection: ObservedConnection) -> (processsed
 
 func calculateEntropy(for packet: Data) -> Double
 {
-    let probabilityDictionary: [UInt8: Double] = calculateProbabilities(for: packet)
+    NSLog("Entropy for \(packet as! NSData)")
+    let probabilities: [Double] = calculateProbabilities(for: packet)
     var entropy: Double = 0
     
-    for probability in probabilityDictionary
+    for probability in probabilities
     {
-        let plog2 = log2(probability.value)
-        entropy += (plog2 * probability.value)
+        if probability != 0 {
+            let plog2 = log2(probability)
+            entropy += (plog2 * probability)
+        }
     }
     entropy = -entropy
     
@@ -55,34 +58,25 @@ func calculateEntropy(for packet: Data) -> Double
 }
 
 /// Calculates the probability of each byte in the data packet
-/// and returns them in a dictionary where key is the byte and value is the probability
-private func calculateProbabilities(for packet: Data) -> [UInt8: Double]
+/// and returns them in an array where the index is the byte and value is the probability
+private func calculateProbabilities(for packet: Data) -> [Double]
 {
     let packetArray = [UInt8](packet)
-    let packetSet = Set(packetArray)
-    var probabilityDictionary = [UInt8: Double]()
-    var countArray = Array(repeating: 1.0, count: 256)
-    
-    for uniqueByte in packetSet
-    {
-        let uniqueByteInt = Int(uniqueByte)
-        
-        for value in packetArray
-        {
-            if value == uniqueByte
-            {
-                countArray[uniqueByteInt] = countArray[uniqueByteInt]+1
-            }
-        }
+    var countArray = Array(repeating: 0.0, count: 256)
+ 
+    for byte in packetArray {
+        let index = Int(byte)
+        countArray[index] += 1
     }
     
     for (index, countValue) in countArray.enumerated()
     {
-        let probability = Double(countValue)/Double(256 + packetArray.count)
-        probabilityDictionary[UInt8(index)] = probability
+        if countValue != 0 {
+            countArray[index] /= Double(packet.count)
+        }
     }
     
-    return probabilityDictionary
+    return countArray
 }
 
 func scoreAllEntropy()
