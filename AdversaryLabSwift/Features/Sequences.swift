@@ -61,7 +61,7 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
 func scoreAllFloatSequences()
 {
     // Outgoing
-    scoreSequences(allowedFloatSequenceKey: allowedOutgoingFloatingSequencesKey, blockedFloatSequenceKey: blockedOutgoingFloatingSequencesKey, requiredSequencesKey: outgoingRequiredSequencesKey, forbiddenSequencesKey: outgoingForbiddenLengthsKey)
+    scoreSequences(allowedFloatSequenceKey: allowedOutgoingFloatingSequencesKey, blockedFloatSequenceKey: blockedOutgoingFloatingSequencesKey, requiredSequencesKey: outgoingRequiredSequencesKey, forbiddenSequencesKey: outgoingForbiddenSequencesKey)
     
     //Incoming
     scoreSequences(allowedFloatSequenceKey: allowedIncomingFloatingSequencesKey, blockedFloatSequenceKey: blockedIncomingFloatingSequencesKey, requiredSequencesKey: incomingRequiredSequencesKey, forbiddenSequencesKey: incomingForbiddenSequencesKey)
@@ -123,12 +123,14 @@ func scoreSequences(allowedFloatSequenceKey: String, blockedFloatSequenceKey: St
         
         /// Save Scores
         let requiredSequences: RSortedSet<Data> = RSortedSet(key: requiredSequencesKey)
-        let requiredScore = requiredSequences.incrementScore(ofField: sequence, byIncrement: requiredAccuracy)
-        print("\nSaved required accuracy of |\(String(describing: requiredScore))| for sequence \(String(describing: sequence))")
+        let (newRSInserted, returnedRS) = requiredSequences.insert((sequence, Float(requiredAccuracy)))
+        print("\nSaved required accuracy \(requiredAccuracy) for sequence \(String(describing: sequence))")
+        print("\(newRSInserted): \(returnedRS)")
         
         let forbiddenSequences: RSortedSet<Data> = RSortedSet(key: forbiddenSequencesKey)
-        let forbiddenScore = forbiddenSequences.incrementScore(ofField: sequence, byIncrement: forbiddenAccuracy)
-        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for sequence \(String(describing: sequence))")
+        let (newFSInserted, returnedFS) = forbiddenSequences.insert((sequence, Float(forbiddenAccuracy)))
+        print("Saved forbidden accuracy \(forbiddenAccuracy) for sequence \(String(describing: sequence)) to \(forbiddenSequencesKey)")
+        print("\(newFSInserted): \(returnedFS)")
     }
 }
 

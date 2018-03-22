@@ -11,7 +11,7 @@ import Auburn
 
 class ConnectionInspector
 {
-    func analyzeConnections()
+    func analyzeConnections(enableSequenceAnalysis: Bool)
     {
         analysisQueue.async
         {
@@ -36,7 +36,7 @@ class ConnectionInspector
                 
                 let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                 
-                self.analyze(connection: allowedConnection)
+                self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis)
             }
             
             // Blocked Connections
@@ -59,7 +59,7 @@ class ConnectionInspector
                 
                 let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
                 
-                self.analyze(connection: blockedConnection)
+                self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis)
             }
             
             self.scoreConnections()
@@ -72,14 +72,19 @@ class ConnectionInspector
     
     func scoreConnections()
     {
+        sleep(1)
         scoreAllPacketLengths()
+        sleep(1)
         scoreAllFloatSequences()
+        sleep(1)
         scoreAllEntropy()
+        sleep(1)
         scoreAllTiming()
+        sleep(1)
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
-    func analyze(connection: ObservedConnection)
+    func analyze(connection: ObservedConnection, enableSequenceAnalysis: Bool)
     {
         print("Analyzing a new connection: \(connection.connectionID)")
         // Process Packet Lengths
@@ -89,13 +94,20 @@ class ConnectionInspector
         let (timingProcessed, maybePacketTimingError) = processTiming(forConnection: connection)
         
         // Process Offset Sequences
-        let (offsetSequenceProcessed, maybeOffsetError) = processOffsetSequences(forConnection: connection)
+        var offsetSequenceNoErrors = true
+        var maybeOffsetError: Error? = nil
+        if enableSequenceAnalysis
+        {
+            let (offsetSequenceProcessed, maybeOffsetErrorResponse) = processOffsetSequences(forConnection: connection)
+            offsetSequenceNoErrors = offsetSequenceProcessed
+            maybeOffsetError = maybeOffsetErrorResponse
+        }
         
         // Process Entropy
         let (entropyProcessed, maybeEntropyError) = processEntropy(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
-        if packetLengthProcessed, timingProcessed, offsetSequenceProcessed, entropyProcessed
+        if packetLengthProcessed, timingProcessed, offsetSequenceNoErrors, entropyProcessed
         {
             let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
             let _ = packetsAnalyzedDictionary.increment(field: connection.packetsAnalyzedKey)
@@ -116,15 +128,13 @@ class ConnectionInspector
             {
                 print(offsetError)
             }
-
-            if let entropyError = maybeEntropyError
-            {
-                print(entropyError)
-            }
         }
         
-        // New Data Available for UI
-        NotificationCenter.default.post(name: .updateStats, object: nil)
+        if let knownProtocol = detectKnownProtocol(connection: connection) {
+            NSLog("It's TLS!")
+            processKnownProtocol(knownProtocol, connection)
+        } else {
+            NSLog("Not TLS.")
+        }
     }
-    
 }

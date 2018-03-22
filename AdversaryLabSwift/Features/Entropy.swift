@@ -207,12 +207,15 @@ func scoreEntropy(allowedEntropyKey: String, allowedEntropyBinsKey: String, bloc
         
         /// Save Scores
         let requiredEntropy: RSortedSet<Int> = RSortedSet(key: requiredEntropyKey)
-        let requiredScore = requiredEntropy.incrementScore(ofField: entropy, byIncrement: requiredAccuracy)
-        print("\nSaved required accuracy of |\(String(describing: requiredScore))| for entropy \(entropy)")
+        let (newREInserted, returnedRE) = requiredEntropy.insert((entropy, Float(requiredAccuracy)))
+        print("\nSaved required accuracy \(requiredAccuracy) for entropy \(entropy)")
+        print("\(newREInserted): (field, score) = \(returnedRE) ****")
         
+        //TODO: RSortedSet.insert displays notes for Set as provided by apple, this is inaccurate for sorted set and is confusing.
         let forbiddenEntropy: RSortedSet<Int> = RSortedSet(key: forbiddenEntropyKey)
-        let forbiddenScore = forbiddenEntropy.incrementScore(ofField: entropy, byIncrement: forbiddenAccuracy)
-        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for entropy \(entropy)")
+        let (newFEInserted, returnedFE) = forbiddenEntropy.insert((entropy, Float(forbiddenAccuracy)))
+        print("Saved forbidden accuracy \(forbiddenAccuracy) for entropy \(entropy)")
+        print("\(newFEInserted): (field, score) = \(returnedFE) ****")
     }
 }
 

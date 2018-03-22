@@ -155,11 +155,11 @@ func scoreTiming(allowedTimeDifferenceKey: String, allowedTimeDifferenceBinsKey:
         
         /// Save Scores
         let requiredTiming: RSortedSet<Int> = RSortedSet(key: requiredTimeDifferenceKey)
-        let requiredScore = requiredTiming.incrementScore(ofField: timeDifference, byIncrement: requiredAccuracy)
-        print("\nSaved required accuracy of |\(String(describing: requiredScore))| for time difference \(timeDifference)")
+        let (rtInserted, newRT) = requiredTiming.insert((timeDifference, Float(requiredAccuracy)))
+        print("\nSaved required accuracy \(requiredAccuracy) for time difference \(timeDifference) |\(rtInserted): (field, score) = \(newRT)| <------------")
         
         let forbiddenTiming: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDifferenceKey)
-        let forbiddenScore = forbiddenTiming.incrementScore(ofField: timeDifference, byIncrement: forbiddenAccuracy)
-        print("Saved forbidden accuracy of |\(String(describing: forbiddenScore))| for time difference \(timeDifference)")
+        let (ftInserted, newFT) = forbiddenTiming.insert((timeDifference, Float(forbiddenAccuracy)))
+        print("Saved forbidden accuracy for time difference |\(ftInserted): \(newFT)| <------------")
     }
 }

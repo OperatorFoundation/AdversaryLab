@@ -92,6 +92,10 @@ extension Notification.Name
     static let updateStats = Notification.Name("UpdatedConnectionStats")
 }
 
+enum KnownProtocolType {
+    case TLS12 // TLS 1.2
+}
+
 enum PacketLengthError: Error
 {
     case noOutPacketForConnection(String)
