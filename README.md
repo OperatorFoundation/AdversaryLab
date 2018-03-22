@@ -18,22 +18,46 @@ For instance, a simulated adversary could allow HTTP, but block HTTPS. By traini
 
 ### Prerequisites
 
-Swift 4.0
+Swift 4.0, included in Xcode 9
 
-Install and run Redis. Refer to the [Redis documentation](https://redis.io/download) to install and run Redis.
+Install and run Redis.
+
+You can install it with Homebrew
+
+```
+brew install redis
+brew services start redis
+```
+
+Or refer to the [Redis documentation](https://redis.io/download) to install it manually.
 
 ### Installing
 
-Or check out directly
+Check out the project from Github
 
 ```
 git clone https://github.com/OperatorFoundation/AdversaryLab
 cd AdversaryLab
 ```
 
+Install the Swift Package used by the graphical interface
+
+```
+cd AdversaryLabSwiftPackage
+swift package update
+swift package generate-xcodeproj
+cd ..
+```
+
+Open the graphical interface project in code
+
+```
+open AdversaryLabSwift.xcodeproj
+```
+
 ## Deployment
 
-Open the Xcode project and click the Run button to run the Adversary Lab graphical interface.
+Open the Xcode project and click the Run button to run the Adversary Lab graphical interface. Make sure Redis is already running, as Adversary Lab will  not start Redis for you.
 
 To add network traffic to Adversary Lab for analysis, you need the AdversaryLabClient command line tool. For the [installation
 instructions](https://github.com/OperatorFoundation/AdversaryLabClient) to install and use the command line tool.

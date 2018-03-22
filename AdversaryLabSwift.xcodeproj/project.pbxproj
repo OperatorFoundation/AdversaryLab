@@ -27,6 +27,7 @@
 		468B264C2023C099000A2B5D /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
 		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
+		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +142,7 @@
 		467E49392017F166008B19E3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		468B26232023B609000A2B5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		468B26512023D016000A2B5D /* ObservedConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservedConnections.swift; sourceTree = "<group>"; };
+		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +204,7 @@
 		4651A14420083BF700037D31 = {
 			isa = PBXGroup;
 			children = (
+				CA727CD32050A3580051A01B /* README.md */,
 				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
 				4651A16D20083BF700037D31 /* AdversaryLabSwiftUITests */,
@@ -438,6 +441,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA727CD42050A3580051A01B /* README.md in Resources */,
 				4651A15520083BF700037D31 /* Assets.xcassets in Resources */,
 				4651A15820083BF700037D31 /* Main.storyboard in Resources */,
 			);
@@ -646,12 +650,15 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -661,12 +668,15 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
