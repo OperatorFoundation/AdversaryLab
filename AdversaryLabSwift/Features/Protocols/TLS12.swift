@@ -43,7 +43,7 @@ func isTls12(forConnection connection: ObservedConnection) -> Bool
         return false
     }
     
-    NSLog("Found TLS: \(requestRange) \(responseRange)")
+    NSLog("Found TLS: \(requestRange) \(responseRange) \(outPacket.count)")
     
     return true
 }
@@ -63,6 +63,7 @@ func processTls12(_ connection: ObservedConnection) {
     let maybeBegin = findCommonNameStart(outPacket)
     guard let begin = maybeBegin else {
         NSLog("No common name beginning found \(outPacket as! NSData)")
+        NSLog("\(connection.outgoingKey) \(connection.connectionID) \(outPacket.count)")
         return
     }
     
