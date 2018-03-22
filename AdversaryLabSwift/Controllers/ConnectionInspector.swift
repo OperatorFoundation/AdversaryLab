@@ -128,15 +128,13 @@ class ConnectionInspector
             {
                 print(offsetError)
             }
-
-            if let entropyError = maybeEntropyError
-            {
-                print(entropyError)
-            }
         }
         
-        // New Data Available for UI
-        NotificationCenter.default.post(name: .updateStats, object: nil)
+        if let knownProtocol = detectKnownProtocol(connection: connection) {
+            NSLog("It's TLS!")
+            processKnownProtocol(knownProtocol, connection)
+        } else {
+            NSLog("Not TLS.")
+        }
     }
-    
 }
