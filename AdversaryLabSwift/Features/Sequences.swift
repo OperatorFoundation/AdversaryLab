@@ -123,14 +123,10 @@ func scoreSequences(allowedFloatSequenceKey: String, blockedFloatSequenceKey: St
         
         /// Save Scores
         let requiredSequences: RSortedSet<Data> = RSortedSet(key: requiredSequencesKey)
-        let (newRSInserted, returnedRS) = requiredSequences.insert((sequence, Float(requiredAccuracy)))
-        print("\nSaved required accuracy \(requiredAccuracy) for sequence \(String(describing: sequence))")
-        print("\(newRSInserted): \(returnedRS)")
+        let _ = requiredSequences.insert((sequence, Float(requiredAccuracy)))
         
         let forbiddenSequences: RSortedSet<Data> = RSortedSet(key: forbiddenSequencesKey)
-        let (newFSInserted, returnedFS) = forbiddenSequences.insert((sequence, Float(forbiddenAccuracy)))
-        print("Saved forbidden accuracy \(forbiddenAccuracy) for sequence \(String(describing: sequence)) to \(forbiddenSequencesKey)")
-        print("\(newFSInserted): \(returnedFS)")
+        let _ = forbiddenSequences.insert((sequence, Float(forbiddenAccuracy)))
     }
 }
 

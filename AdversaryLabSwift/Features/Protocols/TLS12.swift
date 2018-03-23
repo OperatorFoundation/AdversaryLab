@@ -33,20 +33,23 @@ func isTls12(forConnection connection: ObservedConnection) -> Bool
     let maybeRequestRange = inPacket.range(of: tlsRequestStart, options: .anchored, in: nil)
     let maybeResponseRange = outPacket.range(of: tlsResponseStart, options: .anchored, in: nil)
 
-    guard let requestRange = maybeRequestRange else {
-        NSLog("TLS request not found \(inPacket as! NSData)")
+    guard maybeRequestRange != nil
+    else
+    {
+        NSLog("TLS request not found \(inPacket as NSData)")
         return false
     }
     
-    guard let responseRange = maybeResponseRange else {
-        NSLog("TLS response not found \(outPacket as! NSData)")
+    guard maybeResponseRange != nil else {
+        NSLog("TLS response not found \(outPacket as NSData)")
         return false
     }
         
     return true
 }
 
-func processTls12(_ connection: ObservedConnection) {
+func processTls12(_ connection: ObservedConnection)
+{
     let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
     let tlsCommonNameSet: RSortedSet<String> = RSortedSet(key: connection.outgoingTlsCommonNameKey)
 
@@ -78,6 +81,72 @@ func processTls12(_ connection: ObservedConnection) {
     let _ = tlsCommonNameSet.incrementScore(ofField: commonName, byIncrement: 1)
 }
 
+func scoreTls12()
+{
+    let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+    
+    /// |A| is the number of Allowed TLS Names analyzed - Allowed:Outgoing:TLS:CommonName
+    var allowedPacketsAnalyzed = 0.0
+    if let allowedConnectionsAnalyzedCount: Int = packetStatsDict[allowedPacketsAnalyzedKey]
+    {
+        allowedPacketsAnalyzed = Double(allowedConnectionsAnalyzedCount)
+    }
+    
+    /// |B| is the number of Blocked TLS Names analyzed - Blocked:Outgoing:TLS:CommonName
+    var blockedPacketsAnalyzed = 0.0
+    if let blockedConnectionsAnalyzedCount: Int = packetStatsDict[blockedPacketsAnalyzedKey]
+    {
+        blockedPacketsAnalyzed = Double(blockedConnectionsAnalyzedCount)
+    }
+    
+    /// A is the sorted set of TLS names for the Allowed traffic
+    let allowedTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+    /// B is the sorted set of TLS names for the Blocked traffic
+    let blockedTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+    /// L is the union of the keys for A and B (without the scores)
+    let allTLSNamesSet = newStringSet(from: [allowedTLSNamesSet, blockedTLSNamesSet])
+    
+    /// for name in Names
+    for tlsName in allTLSNamesSet
+    {
+        let aCount = Double(allowedTLSNamesSet[tlsName] ?? 0.0)
+        let bCount = Double(blockedTLSNamesSet[tlsName] ?? 0.0)
+        
+        let aProb = aCount/allowedPacketsAnalyzed
+        let bProb = bCount/blockedPacketsAnalyzed
+        
+        /// Required
+        // True Positive
+        let requiredTP = aProb
+        // False Positive
+        let requiredFP = bProb
+        // True Negative
+        let requiredTN = 1 - bProb
+        // False Negative
+        let requiredFN = 1 - aProb
+        // Accuracy
+        let requiredAccuracy = (requiredTP + requiredTN)/(requiredTP + requiredTN + requiredFP + requiredFN)
+        
+        /// Forbidden
+        let forbiddenTP = 1 - aProb
+        let forbiddenFP = 1 - bProb
+        let forbiddenTN = bProb
+        let forbiddenFN = aProb
+        let forbiddenAccuracy: Double = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
+        
+        /// Save Scores
+        let requiredTLSNames: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+        let (newRSInserted, returnedRS) = requiredTLSNames.insert((tlsName, Float(requiredAccuracy)))
+        print("\nSaved required accuracy \(requiredAccuracy) for TLS name \(tlsName)")
+        print("\(newRSInserted): \(returnedRS)")
+        
+        let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+        let (newFSInserted, returnedFS) = forbiddenTLSNames.insert((tlsName, Float(forbiddenAccuracy)))
+        print("Saved forbidden accuracy \(forbiddenAccuracy) for TLS name \(tlsName) to \(blockedTlsCommonNameKey)")
+        print("\(newFSInserted): \(returnedFS)")
+    }
+}
+
 private func findCommonNameStart(_ outPacket: Data) -> Int? {
     let maybeRange = outPacket.range(of: commonNameStart)
     guard let range = maybeRange else {
@@ -99,6 +168,23 @@ private func findCommonNameEnd(_ outPacket: Data, _ begin: Int) -> Int? {
     }
     
     return range.lowerBound
+}
+
+func newStringSet(from redisSets:[RSortedSet<String>]) -> Set<String>
+{
+    var swiftSet = Set<String>()
+    for set in redisSets
+    {
+        for i in 0 ..< set.count
+        {
+            if let newMember: String = set[i]
+            {
+                swiftSet.insert(newMember)
+            }
+        }
+    }
+    
+    return swiftSet
 }
 
 private func extract(_ outPacket: Data, _ begin: Int, _ end: Int) -> Data {
