@@ -23,17 +23,17 @@ class FakeConnectionGenerator
     
     func addConnections()
     {
-        guard let redis = try? Redis(hostname: "localhost", port: 6379)
-            else
-        {
-            return
-        }
-        
         addAllowedPackets()
         addblockedPackets()
         
         NotificationCenter.default.post(name: .updateStats, object: nil)
         
+//        guard let redis = try? Redis(hostname: "localhost", port: 6379)
+//            else
+//        {
+//            return
+//        }
+//
 //        analysisQueue.sync
 //        {
 //            addAllowedPackets()

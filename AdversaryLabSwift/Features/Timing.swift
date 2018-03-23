@@ -30,7 +30,7 @@ func processTiming(forConnection connection: ObservedConnection) -> (processed: 
     }
     
     // Add the time difference for this connection to the database
-    let timeDifference = (outTimeInterval - inTimeInterval) * 1000000
+    let timeDifference = (outTimeInterval - inTimeInterval)
     timeDifferenceList.append(timeDifference)
     
     return (true, nil)
@@ -155,11 +155,9 @@ func scoreTiming(allowedTimeDifferenceKey: String, allowedTimeDifferenceBinsKey:
         
         /// Save Scores
         let requiredTiming: RSortedSet<Int> = RSortedSet(key: requiredTimeDifferenceKey)
-        let (rtInserted, newRT) = requiredTiming.insert((timeDifference, Float(requiredAccuracy)))
-        print("\nSaved required accuracy \(requiredAccuracy) for time difference \(timeDifference) |\(rtInserted): (field, score) = \(newRT)| <------------")
+        let _ = requiredTiming.insert((timeDifference, Float(requiredAccuracy)))
         
         let forbiddenTiming: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDifferenceKey)
-        let (ftInserted, newFT) = forbiddenTiming.insert((timeDifference, Float(forbiddenAccuracy)))
-        print("Saved forbidden accuracy for time difference |\(ftInserted): \(newFT)| <------------")
+        let _ = forbiddenTiming.insert((timeDifference, Float(forbiddenAccuracy)))
     }
 }

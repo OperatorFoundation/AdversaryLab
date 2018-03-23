@@ -192,18 +192,18 @@ class ViewController: NSViewController
             
             /// Scores
             
-            // Timing (microseconds)
+            // Timing (milliseconds)
             let requiredTimingSet: RSortedSet<Int> = RSortedSet(key: requiredTimeDiffKey)
             if let (rtMember, rtScore) = requiredTimingSet.last
             {
-                self.requiredTiming = "\(rtMember) μs"
+                self.requiredTiming = "\(rtMember) ms"
                 self.requiredTimeAcc = "\(rtScore)"
             }
             
             let forbiddenTimingSet: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
             if let (ftMember, ftScore) = forbiddenTimingSet.last
             {
-                self.forbiddenTiming = "\(ftMember) μs"
+                self.forbiddenTiming = "\(ftMember) ms"
                 self.forbiddenTimingAcc = "\(ftScore)"
             }
             

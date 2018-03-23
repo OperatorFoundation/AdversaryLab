@@ -123,12 +123,10 @@ func scorePacketLengths(allowedLengthsKey: String, blockedLengthsKey: String, re
         
         /// Save Scores
         let requiredLengths: RSortedSet<Int> = RSortedSet(key: requiredLengthsKey)
-        let (rlInserted, newRL) = requiredLengths.insert((length, Float(requiredAccuracy)))
-        print("\nSaved required accuracy for length \(length): |\(rlInserted): \(newRL)| <----------")
+        let _ = requiredLengths.insert((length, Float(requiredAccuracy)))
         
         let forbiddenLengths: RSortedSet<Int> = RSortedSet(key: forbiddenLengthsKey)
-        let (flInserted, newFL) = forbiddenLengths.insert((length, Float(forbiddenAccuracy)))
-        print("Saved forbidden accuracy for length \(length):  |\(flInserted): \(newFL)| <----------")
+        let _ = forbiddenLengths.insert((length, Float(forbiddenAccuracy)))
     }
 }
 

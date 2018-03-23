@@ -163,7 +163,7 @@ class ConnectionInspector
         }
         
         // Process Entropy
-        let (entropyProcessed, maybeEntropyError) = processEntropy(forConnection: connection)
+        let (entropyProcessed, _) = processEntropy(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
         if packetLengthProcessed, timingProcessed, offsetSequenceNoErrors, entropyProcessed

@@ -41,7 +41,7 @@ func processEntropy(forConnection connection: ObservedConnection) -> (processsed
 
 func calculateEntropy(for packet: Data) -> Double
 {
-    NSLog("Entropy for \(packet as! NSData)")
+    NSLog("Entropy for \(packet as NSData)")
     let probabilities: [Double] = calculateProbabilities(for: packet)
     var entropy: Double = 0
     
@@ -201,15 +201,11 @@ func scoreEntropy(allowedEntropyKey: String, allowedEntropyBinsKey: String, bloc
         
         /// Save Scores
         let requiredEntropy: RSortedSet<Int> = RSortedSet(key: requiredEntropyKey)
-        let (newREInserted, returnedRE) = requiredEntropy.insert((entropy, Float(requiredAccuracy)))
-        print("\nSaved required accuracy \(requiredAccuracy) for entropy \(entropy)")
-        print("\(newREInserted): (field, score) = \(returnedRE) ****")
+        let _ = requiredEntropy.insert((entropy, Float(requiredAccuracy)))
         
         //TODO: RSortedSet.insert displays notes for Set as provided by apple, this is inaccurate for sorted set and is confusing.
         let forbiddenEntropy: RSortedSet<Int> = RSortedSet(key: forbiddenEntropyKey)
-        let (newFEInserted, returnedFE) = forbiddenEntropy.insert((entropy, Float(forbiddenAccuracy)))
-        print("Saved forbidden accuracy \(forbiddenAccuracy) for entropy \(entropy)")
-        print("\(newFEInserted): (field, score) = \(returnedFE) ****")
+        let _ = forbiddenEntropy.insert((entropy, Float(forbiddenAccuracy)))
     }
 }
 
