@@ -82,6 +82,9 @@ let blockedConnectionsTimeDiffBinsKey = "Blocked:Connections:TimeDifferenceBins"
 let requiredTimeDiffKey = "Required:TimeDifference"
 let forbiddenTimeDiffKey = "Forbidden:TimeDifference"
 
+let allowedTlsCommonNameKey = "Allowed:Outgoing:TLS:CommonName"
+let blockedTlsCommonNameKey = "Blocked:Outgoing:TLS:CommonName"
+
 ///
 let newConnectionMessage = "NewConnectionAdded"
 

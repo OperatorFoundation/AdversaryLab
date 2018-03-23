@@ -41,7 +41,6 @@ func processEntropy(forConnection connection: ObservedConnection) -> (processsed
 
 func calculateEntropy(for packet: Data) -> Double
 {
-    NSLog("Entropy for \(packet as NSData)")
     let probabilities: [Double] = calculateProbabilities(for: packet)
     var entropy: Double = 0
     

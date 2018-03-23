@@ -26,6 +26,7 @@ struct ObservedConnection
     let outgoingFloatingSequencesKey: String
     let incomingEntropyKey: String
     let outgoingEntropyKey: String
+    let outgoingTlsCommonNameKey: String
     
     let connectionID: String
     
@@ -52,6 +53,7 @@ struct ObservedConnection
                 outgoingFloatingSequencesKey = allowedOutgoingFloatingSequencesKey
                 incomingEntropyKey = allowedIncomingEntropyKey
                 outgoingEntropyKey = allowedOutgoingEntropyKey
+                outgoingTlsCommonNameKey = allowedTlsCommonNameKey
             case .blocked:
                 connectionsKey = blockedConnectionsKey
                 incomingKey = blockedIncomingKey
@@ -69,6 +71,7 @@ struct ObservedConnection
                 outgoingFloatingSequencesKey = blockedOutgoingFloatingSequencesKey
                 incomingEntropyKey = blockedIncomingEntropyKey
                 outgoingEntropyKey = blockedOutgoingEntropyKey
+                outgoingTlsCommonNameKey = blockedTlsCommonNameKey
         }
     }
 }

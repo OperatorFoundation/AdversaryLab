@@ -42,16 +42,14 @@ func isTls12(forConnection connection: ObservedConnection) -> Bool
         NSLog("TLS response not found \(outPacket as! NSData)")
         return false
     }
-    
-    NSLog("Found TLS: \(requestRange) \(responseRange) \(outPacket.count)")
-    
+        
     return true
 }
 
 func processTls12(_ connection: ObservedConnection) {
-    NSLog("Processing TLS")
     let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
-    
+    let tlsCommonNameSet: RSortedSet<String> = RSortedSet(key: connection.outgoingTlsCommonNameKey)
+
     // Get the out packet that corresponds with this connection ID
     guard let outPacket: Data = outPacketHash[connection.connectionID]
         else
@@ -62,7 +60,7 @@ func processTls12(_ connection: ObservedConnection) {
     
     let maybeBegin = findCommonNameStart(outPacket)
     guard let begin = maybeBegin else {
-        NSLog("No common name beginning found \(outPacket as! NSData)")
+        NSLog("No common name beginning found")
         NSLog("\(connection.outgoingKey) \(connection.connectionID) \(outPacket.count)")
         return
     }
@@ -73,9 +71,11 @@ func processTls12(_ connection: ObservedConnection) {
         return
     }
     
-    let commonData = extract(outPacket, begin+commonNameStart.count, end)
+    let commonData = extract(outPacket, begin+commonNameStart.count, end-1)
     let commonName = commonData.string
-    NSLog("Found TLS 1.2 common name: \(commonName)")
+    NSLog("Found TLS 1.2 common name: \(commonName) \(commonName.count) \(begin) \(end)")
+    
+    let _ = tlsCommonNameSet.incrementScore(ofField: commonName, byIncrement: 1)
 }
 
 private func findCommonNameStart(_ outPacket: Data) -> Int? {
@@ -84,7 +84,12 @@ private func findCommonNameStart(_ outPacket: Data) -> Int? {
         return nil
     }
     
-    return range.lowerBound
+    let maybeNextRange = outPacket.range(of: commonNameStart, options: [], in: range.upperBound..<outPacket.count)
+    guard let nextRange = maybeNextRange else {
+        return nil
+    }
+    
+    return nextRange.lowerBound
 }
 
 private func findCommonNameEnd(_ outPacket: Data, _ begin: Int) -> Int? {
