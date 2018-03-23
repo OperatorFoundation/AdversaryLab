@@ -27,6 +27,11 @@ class ViewController: NSViewController
     @objc dynamic var forbiddenTiming = "--"
     @objc dynamic var forbiddenTimingAcc = "--"
     
+    @objc dynamic var requiredTLSName = "--"
+    @objc dynamic var requiredTLSNameAcc = "--"
+    @objc dynamic var forbiddenTLSName = "--"
+    @objc dynamic var forbiddenTLSNameAcc = "--"
+    
     @objc dynamic var requiredOutLength = "--"
     @objc dynamic var requiredOutLengthAcc = "--"
     @objc dynamic var forbiddenOutLength = "--"
@@ -205,6 +210,22 @@ class ViewController: NSViewController
             {
                 self.forbiddenTiming = "\(ftMember) ms"
                 self.forbiddenTimingAcc = "\(ftScore)"
+            }
+            
+            // TLS Common Names
+            
+            let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+            if let (rTLSMember, rTLSScore) = requiredTLSNamesSet.last
+            {
+                self.requiredTLSName = rTLSMember
+                self.requiredTLSNameAcc = "\(rTLSScore)"
+            }
+            
+            let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+            if let (fTLSMember, fTLSScore) = forbiddenTLSNamesSet.last
+            {
+                self.forbiddenTLSName = fTLSMember
+                self.forbiddenTLSNameAcc = "\(fTLSScore)"
             }
             
             // Lengths
