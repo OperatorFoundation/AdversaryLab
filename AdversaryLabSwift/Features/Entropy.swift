@@ -108,7 +108,7 @@ func scoreEntropy(allowedEntropyKey: String, allowedEntropyBinsKey: String, bloc
     /// A is the sorted set of Entropy for the Allowed traffic
     let allowedEntropyList: RList<Double> = RList(key: allowedEntropyKey)
     let allowedEntropyBinsRSet: RSortedSet<Int> = RSortedSet(key: allowedEntropyBinsKey)
-    //let allowedEntropySet = newDoubletSet(from: [allowedEntropyRSet])
+    
     //Sort into bins
     for entropyIndex in 0 ..< allowedEntropyList.count
     {
@@ -139,7 +139,7 @@ func scoreEntropy(allowedEntropyKey: String, allowedEntropyBinsKey: String, bloc
     /// B is the sorted set of Entropy for the Blocked traffic
     let blockedEntropyList: RList<Double> = RList(key: blockedEntropyKey)
     let blockedEntropyBinsRSet: RSortedSet<Int> = RSortedSet(key: blockedEntropyBinsKey)
-    //let blockedEntropySet = newDoubletSet(from: [blockedEntropyRSet])
+    
     //Sort into bins
     for entropyIndex in 0 ..< blockedEntropyList.count
     {

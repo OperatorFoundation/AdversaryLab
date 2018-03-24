@@ -172,25 +172,25 @@ class ViewController: NSViewController
             let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
             
             // Allowed Packets Seen
-            if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], allowedPacketsSeenValue != 0
+            if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey]
             {
                 self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
             }
             
             // Allowed Packets Analyzed
-            if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey], allowedPacketsAnalyzedValue != 0
+            if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey]
             {
                 self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
             }
             
             // Blocked Packets Seen
-            if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey], blockedPacketsSeenValue != 0
+            if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey]
             {
                 self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
             }
             
             // Blocked Packets Analyzed
-            if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey], blockedPacketsAnalyzedValue != 0
+            if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey]
             {
                 self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
             }
@@ -204,12 +204,22 @@ class ViewController: NSViewController
                 self.requiredTiming = "\(rtMember) ms"
                 self.requiredTimeAcc = "\(rtScore)"
             }
+            else
+            {
+                self.requiredTiming = "--"
+                self.requiredTimeAcc = "--"
+            }
             
             let forbiddenTimingSet: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
             if let (ftMember, ftScore) = forbiddenTimingSet.last
             {
                 self.forbiddenTiming = "\(ftMember) ms"
                 self.forbiddenTimingAcc = "\(ftScore)"
+            }
+            else
+            {
+                self.forbiddenTiming = "--"
+                self.forbiddenTimingAcc = "--"
             }
             
             // TLS Common Names
@@ -220,12 +230,22 @@ class ViewController: NSViewController
                 self.requiredTLSName = rTLSMember
                 self.requiredTLSNameAcc = "\(rTLSScore)"
             }
+            else
+            {
+                self.requiredTLSName = "--"
+                self.requiredTLSNameAcc = "--"
+            }
             
             let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
             if let (fTLSMember, fTLSScore) = forbiddenTLSNamesSet.last
             {
                 self.forbiddenTLSName = fTLSMember
                 self.forbiddenTLSNameAcc = "\(fTLSScore)"
+            }
+            else
+            {
+                self.forbiddenTLSName = "--"
+                self.forbiddenTLSNameAcc = "--"
             }
             
             // Lengths
@@ -235,12 +255,22 @@ class ViewController: NSViewController
                 self.requiredOutLength = "\(rolMember)"
                 self.requiredOutLengthAcc = "\(rolScore)"
             }
+            else
+            {
+                self.requiredOutLength = "--"
+                self.requiredOutLengthAcc = "--"
+            }
             
             let forbiddenOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenLengthsKey)
             if let (folMember, folScore) = forbiddenOutLengthSet.last
             {
                 self.forbiddenOutLength = "\(folMember)"
                 self.forbiddenOutLengthAcc = "\(folScore)"
+            }
+            else
+            {
+                self.forbiddenOutLength = "--"
+                self.forbiddenOutLengthAcc = "--"
             }
             
             let requiredInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingRequiredLengthsKey)
@@ -249,12 +279,22 @@ class ViewController: NSViewController
                 self.requiredInLength = "\(rilMember)"
                 self.requiredInLengthAcc = "\(rilScore)"
             }
+            else
+            {
+                self.requiredInLength = "--"
+                self.requiredInLengthAcc = "--"
+            }
             
             let forbiddenInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenLengthsKey)
             if let (filMember, filScore) = forbiddenInLengthSet.last
             {
                 self.forbiddenInLength = "\(filMember)"
                 self.forbiddenInLengthAcc = "\(filScore)"
+            }
+            else
+            {
+                self.forbiddenInLength = "--"
+                self.forbiddenInLengthAcc = "--"
             }
             
             // Entropy
@@ -264,12 +304,22 @@ class ViewController: NSViewController
                 self.requiredOutEntropy = "\(roeMember)"
                 self.requiredOutEntropyAcc = "\(roeScore)"
             }
+            else
+            {
+                self.requiredOutEntropy = "--"
+                self.requiredOutEntropyAcc = "--"
+            }
             
             let forbiddenOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenEntropyKey)
             if let (foeMember, foeScore) = forbiddenOutEntropySet.last
             {
                 self.forbiddenOutEntropy = "\(foeMember)"
                 self.forbiddenOutEntropyAcc = "\(foeScore)"
+            }
+            else
+            {
+                self.forbiddenOutEntropy = "--"
+                self.forbiddenOutEntropyAcc = "--"
             }
             
             let requiredInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingRequiredEntropyKey)
@@ -278,12 +328,22 @@ class ViewController: NSViewController
                 self.requiredInEntropy = "\(rieMember)"
                 self.requiredInEntropyAcc = "\(rieScore)"
             }
+            else
+            {
+                self.requiredInEntropy = "--"
+                self.requiredInEntropyAcc = "--"
+            }
             
             let forbiddenInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenEntropyKey)
             if let (fieMember, fieScore) = forbiddenInEntropySet.last
             {
                 self.forbiddenInEntropy = "\(fieMember)"
                 self.forbiddenInEntropyAcc = "\(fieScore)"
+            }
+            else
+            {
+                self.forbiddenInEntropy = "--"
+                self.forbiddenInEntropyAcc = "--"
             }
             
             // Subsequences
@@ -294,6 +354,12 @@ class ViewController: NSViewController
                 self.requiredOutSequenceCount = "\(rosMember)"
                 self.requiredOutSequenceAcc = "\(rosScore)"
             }
+            else
+            {
+                self.requiredOutSequence = "--"
+                self.requiredOutSequenceCount = "--"
+                self.requiredOutSequenceAcc = "--"
+            }
             
             let forbiddenOutSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenSequencesKey)
             if let (fosMember, fosScore) = forbiddenOutSequenceSet.last
@@ -301,6 +367,12 @@ class ViewController: NSViewController
                 self.forbiddenOutSequence = "\(fosMember.hexEncodedString())"
                 self.forbiddenOutSequenceCount = "\(fosMember)"
                 self.forbiddenOutSequenceAcc = "\(fosScore)"
+            }
+            else
+            {
+                self.forbiddenOutSequence = "--"
+                self.forbiddenOutSequenceCount = "--"
+                self.forbiddenOutSequenceAcc = "--"
             }
             
             let requiredInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredSequencesKey)
@@ -310,6 +382,12 @@ class ViewController: NSViewController
                 self.requiredInSequenceCount = "\(risMemeber)"
                 self.requiredInSequenceAcc = "\(risScore)"
             }
+            else
+            {
+                self.requiredInSequence = "--"
+                self.requiredInSequenceCount = "--"
+                self.requiredInSequenceAcc = "--"
+            }
             
             let forbiddenInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenSequencesKey)
             if let (fisMember, fisScore) = forbiddenInSequenceSet.last
@@ -317,6 +395,12 @@ class ViewController: NSViewController
                 self.forbiddenInSequence = "\(fisMember.hexEncodedString())"
                 self.forbiddenInSequenceCount = "\(fisMember)"
                 self.forbiddenInSequenceAcc = "\(fisScore)"
+            }
+            else
+            {
+                self.forbiddenInSequence = "--"
+                self.forbiddenInSequenceCount = "--"
+                self.forbiddenInSequenceAcc = "--"
             }
             
         }
