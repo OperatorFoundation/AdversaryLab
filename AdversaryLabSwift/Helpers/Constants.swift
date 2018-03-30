@@ -85,10 +85,14 @@ let forbiddenTimeDiffKey = "Forbidden:TimeDifference"
 let allowedTlsCommonNameKey = "Allowed:Outgoing:TLS:CommonName"
 let blockedTlsCommonNameKey = "Blocked:Outgoing:TLS:CommonName"
 
+let allowedTlsScoreKey = "Allowed:Outgoing:TLS:Score"
+let blockedTlsScoreKey = "Blocked:Outgoing:TLS:Score"
+
 ///
 let newConnectionMessage = "NewConnectionAdded"
 
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
+let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
 extension Notification.Name
 {

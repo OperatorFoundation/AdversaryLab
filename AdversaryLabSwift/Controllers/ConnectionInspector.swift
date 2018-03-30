@@ -9,6 +9,9 @@
 import Foundation
 import Auburn
 
+// TODO: Notification to interrupt processing
+// TODO: Update Stats notification in loop
+
 class ConnectionInspector
 {
     func analyzeConnections(enableSequenceAnalysis: Bool, enableTLSAnalysis: Bool, removePackets: Bool)
@@ -175,6 +178,7 @@ class ConnectionInspector
                     let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                     
                     self.analyze(connection: allowedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
+                    NotificationCenter.default.post(name: .updateStats, object: nil)
                 }
                 
                 // Blocked Connections
@@ -198,6 +202,7 @@ class ConnectionInspector
                     let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
                     
                     self.analyze(connection: blockedConnection, enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis)
+                    NotificationCenter.default.post(name: .updateStats, object: nil)
                 }
             }
             

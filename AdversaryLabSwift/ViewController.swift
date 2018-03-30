@@ -176,11 +176,19 @@ class ViewController: NSViewController
             {
                 self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
             }
+            else
+            {
+                self.allowedPacketsSeen = "Loading..."
+            }
             
             // Allowed Packets Analyzed
             if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey]
             {
                 self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
+            }
+            else
+            {
+                self.allowedPacketsAnalyzed = "Loading..."
             }
             
             // Blocked Packets Seen
@@ -188,11 +196,19 @@ class ViewController: NSViewController
             {
                 self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
             }
+            else
+            {
+                self.blockedPacketsSeen = "Loading..."
+            }
             
             // Blocked Packets Analyzed
             if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey]
             {
                 self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
+            }
+            else
+            {
+                self.blockedPacketsAnalyzed = "Loading..."
             }
             
             /// Scores
@@ -224,7 +240,7 @@ class ViewController: NSViewController
             
             // TLS Common Names
             
-            let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+            let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
             if let (rTLSMember, rTLSScore) = requiredTLSNamesSet.last
             {
                 self.requiredTLSName = rTLSMember
@@ -236,7 +252,7 @@ class ViewController: NSViewController
                 self.requiredTLSNameAcc = "--"
             }
             
-            let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+            let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
             if let (fTLSMember, fTLSScore) = forbiddenTLSNamesSet.last
             {
                 self.forbiddenTLSName = fTLSMember
