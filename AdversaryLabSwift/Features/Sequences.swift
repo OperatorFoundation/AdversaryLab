@@ -8,6 +8,7 @@
 
 import Foundation
 import Auburn
+import RedShot
 
 func processOffsetSequences(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
 {
@@ -18,20 +19,10 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
     {
         return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID))
     }
-    
-    for (index, _) in outPacket.enumerated()
-    {
-        let outOffsetSequenceSetKey = "\(connection.outgoingOffsetSequencesKey)\(index)"
-        let outOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: outOffsetSequenceSetKey)
-        let outFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.outgoingFloatingSequencesKey)
-        
-        for x in index..<outPacket.count
-        {
-            let sequence = outPacket[index...x]
-            let _ = outOffsetSequenceSet.incrementScore(ofField:sequence, byIncrement: 1)
-            let _ = outFloatingSequenceSet.incrementScore(ofField: sequence, byIncrement: 1)
-        }
-    }
+
+    let outFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.outgoingFloatingSequencesKey)
+    let outCount = outFloatingSequenceSet.addSubsequences(sequence: outPacket)
+    NSLog("Added \(outCount) outgoing subsequences")
     
     // Get the in packet that corresponds with this connection ID
     let inPacketHash: RMap<String, Data> = RMap(key: connection.incomingKey)
@@ -40,21 +31,11 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
     {
         return(false, PacketLengthError.noInPacketForConnection(connection.connectionID))
     }
-    
-    for (index, _) in inPacket.enumerated()
-    {
-        let inOffsetSequenceKey = "\(connection.incomingOffsetSequencesKey)\(index)"
-        let inOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: inOffsetSequenceKey)
-        let inFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.incomingFloatingSequencesKey)
-        
-        for x in index ..< inPacket.count
-        {
-            let sequence = inPacket[index...x]
-            let _ = inOffsetSequenceSet.incrementScore(ofField: sequence, byIncrement: 1)
-            let _ = inFloatingSequenceSet.incrementScore(ofField: sequence, byIncrement: 1)
-        }
-    }
-    
+
+    let inFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.incomingFloatingSequencesKey)
+    let inCount = inFloatingSequenceSet.addSubsequences(sequence: inPacket)
+    NSLog("Added \(inCount) incoming subsequences")
+
     return (true, nil)
 }
 
