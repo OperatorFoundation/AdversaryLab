@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "AdversaryLabSwiftPackage",
     dependencies: [
-         .package(url: "https://github.com/OperatorFoundation/Auburn.git", from: "0.1.13"),
+         .package(url: "https://github.com/OperatorFoundation/Auburn.git", from: "0.1.14"),
     ],
     targets: [
         .target(
