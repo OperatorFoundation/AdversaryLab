@@ -135,12 +135,12 @@ func scoreTls12()
         let forbiddenAccuracy: Double = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
         
         /// Save Scores
-        let requiredTLSNames: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+        let requiredTLSNames: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
         let (newRSInserted, returnedRS) = requiredTLSNames.insert((tlsName, Float(requiredAccuracy)))
         print("\nSaved required accuracy \(requiredAccuracy) for TLS name \(tlsName)")
         print("\(newRSInserted): \(returnedRS)")
         
-        let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+        let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
         let (newFSInserted, returnedFS) = forbiddenTLSNames.insert((tlsName, Float(forbiddenAccuracy)))
         print("Saved forbidden accuracy \(forbiddenAccuracy) for TLS name \(tlsName) to \(blockedTlsCommonNameKey)")
         print("\(newFSInserted): \(returnedFS)")
