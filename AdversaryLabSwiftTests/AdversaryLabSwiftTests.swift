@@ -30,8 +30,8 @@ class AdversaryLabSwiftTests: XCTestCase
         goTo(urlPath: "https://github.com")
         goTo(urlPath: "https://www.clcboats.com")
         goTo(urlPath: "https://imgur.com")
-        goTo(urlPath: "https://www.nasa.gov")
-        goTo(urlPath: "https://hyperboleandahalf.blogspot.com")
+        goTo(urlPath: "https://www.cooksillustrated.com")
+        goTo(urlPath: "https://www.npr.org")
         goTo(urlPath: "https://store.dftba.com")
         goTo(urlPath: "https://www.livescience.com/countdowns")
     }

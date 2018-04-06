@@ -9,16 +9,31 @@
 import Cocoa
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate
+{
 
-
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    func applicationWillBecomeActive(_ notification: Notification)
+    {
+        // Launch Redis Server
+        print("Launching Redis Server!")
+        RedisServerController.sharedInstance.launchRedisServer()
+    }
+    
+    func applicationDidFinishLaunching(_ aNotification: Notification)
+    {
+        
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        // Quit Redis Server
+        print("TERMINATE Redis Server. 🤖")
+        RedisServerController.sharedInstance.shutdownRedisServer()
+        sleep(1)
+        return NSApplication.TerminateReply.terminateNow
+    }
+    func applicationWillTerminate(_ aNotification: Notification)
+    {
+        
     }
 
 

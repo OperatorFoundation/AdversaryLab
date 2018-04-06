@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		460CF7DA20758D2C00FB3723 /* redis-server in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7D220758D2C00FB3723 /* redis-server */; };
+		460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */; };
+		460CF7E62076C3D800FB3723 /* LaunchRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */; };
+		460CF7E82076C76D00FB3723 /* ShutdownRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */; };
+		460CF7EA2076EB0800FB3723 /* redis.conf in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E92076EB0800FB3723 /* redis.conf */; };
+		460CF7EC2076F75A00FB3723 /* redis-cli in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7EB2076F75A00FB3723 /* redis-cli */; };
 		46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */; };
 		46175B6C202CE3DB009311D6 /* Entropy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B6B202CE3DB009311D6 /* Entropy.swift */; };
 		46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B74202D2CDE009311D6 /* ConnectionInspector.swift */; };
@@ -124,6 +130,12 @@
 
 /* Begin PBXFileReference section */
 		46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AdversaryLabSwiftPackage.xcodeproj; path = ../AdversaryLabSwiftPackage/AdversaryLabSwiftPackage.xcodeproj; sourceTree = "<group>"; };
+		460CF7D220758D2C00FB3723 /* redis-server */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "redis-server"; sourceTree = "<group>"; };
+		460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedisServerController.swift; sourceTree = "<group>"; };
+		460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = LaunchRedisServerScript.sh; sourceTree = "<group>"; };
+		460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = ShutdownRedisServerScript.sh; sourceTree = "<group>"; };
+		460CF7E92076EB0800FB3723 /* redis.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = redis.conf; sourceTree = "<group>"; };
+		460CF7EB2076F75A00FB3723 /* redis-cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "redis-cli"; sourceTree = "<group>"; };
 		46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeConnectionGenerator.swift; sourceTree = "<group>"; };
 		46175B6B202CE3DB009311D6 /* Entropy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entropy.swift; sourceTree = "<group>"; };
 		46175B74202D2CDE009311D6 /* ConnectionInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInspector.swift; sourceTree = "<group>"; };
@@ -196,6 +208,7 @@
 			children = (
 				46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */,
 				46175B74202D2CDE009311D6 /* ConnectionInspector.swift */,
+				460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -212,6 +225,11 @@
 		4651A14420083BF700037D31 = {
 			isa = PBXGroup;
 			children = (
+				460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */,
+				460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */,
+				460CF7E92076EB0800FB3723 /* redis.conf */,
+				460CF7D220758D2C00FB3723 /* redis-server */,
+				460CF7EB2076F75A00FB3723 /* redis-cli */,
 				CA727CD32050A3580051A01B /* README.md */,
 				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
@@ -460,7 +478,12 @@
 			files = (
 				CA727CD42050A3580051A01B /* README.md in Resources */,
 				4651A15520083BF700037D31 /* Assets.xcassets in Resources */,
+				460CF7E62076C3D800FB3723 /* LaunchRedisServerScript.sh in Resources */,
 				4651A15820083BF700037D31 /* Main.storyboard in Resources */,
+				460CF7E82076C76D00FB3723 /* ShutdownRedisServerScript.sh in Resources */,
+				460CF7EC2076F75A00FB3723 /* redis-cli in Resources */,
+				460CF7DA20758D2C00FB3723 /* redis-server in Resources */,
+				460CF7EA2076EB0800FB3723 /* redis.conf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +512,7 @@
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
 				46175B6C202CE3DB009311D6 /* Entropy.swift in Sources */,
 				46175B78202D4545009311D6 /* PacketLengths.swift in Sources */,
+				460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */,
 				46175B7A202D466A009311D6 /* Timing.swift in Sources */,
 				CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
