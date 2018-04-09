@@ -18,17 +18,24 @@ class RedisServerController: NSObject
     {
         let bundle = Bundle.main
         
-        guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
-            else
-        {
-            print("Unable to launch Redis server. Could not find terraform executable.")
-            return
-        }
-        
         guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
             else
         {
-            print("Unable to launch Redis server. Could not find terraform executable.")
+            print("Unable to launch Redis server: could not find terraform executable.")
+            return
+        }
+        
+        guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
+            else
+        {
+            print("Unable to launch Redis server: could not find terraform executable.")
+            return
+        }
+        
+        guard let redisModulePath = bundle.path(forResource: "subsequences", ofType: "so")
+            else
+        {
+            print("Unable to launch Redis server: could not find the needed module.")
             return
         }
         
@@ -42,7 +49,7 @@ class RedisServerController: NSObject
         print("\n👇👇 Running Script 👇👇:\n")
         print("Path 🚶‍♀️: \n\(path)\n")
         print("Arguments: \n\(redisPath)\n\(redisConfigPath)\n")
-        runRedisScript(path: path, arguments: [redisPath, redisConfigPath])
+        runRedisScript(path: path, arguments: [redisPath, redisConfigPath, redisModulePath])
         {
             (hasCompleted) in
             

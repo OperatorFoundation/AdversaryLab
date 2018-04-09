@@ -24,13 +24,15 @@ class AppDelegate: NSObject, NSApplicationDelegate
         
     }
 
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply
+    {
         // Quit Redis Server
         print("TERMINATE Redis Server. 🤖")
         RedisServerController.sharedInstance.shutdownRedisServer()
         sleep(1)
         return NSApplication.TerminateReply.terminateNow
     }
+    
     func applicationWillTerminate(_ aNotification: Notification)
     {
         

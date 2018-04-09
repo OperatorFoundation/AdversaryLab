@@ -23,12 +23,12 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
 
     let outFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.outgoingFloatingSequencesKey)
     let outCount = outFloatingSequenceSet.addSubsequences(sequence: outPacket)
-    NSLog("Added \(outCount) outgoing subsequences")
+    NSLog("Added \(String(describing: outCount)) outgoing subsequences")
     for offset in 0..<outPacket.count {
         let offsetKey = connection.outgoingOffsetSequencesKey + ":" + offset.string
         let outOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
         let outOffCount = outOffsetSequenceSet.addSubsequences(sequence: outPacket)
-        NSLog("Added \(outOffCount) outgoing subsequences for offset \(offset)")
+        NSLog("Added \(String(describing: outOffCount)) outgoing subsequences for offset \(offset)")
     }
     
     // Get the in packet that corresponds with this connection ID
@@ -41,12 +41,12 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
 
     let inFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.incomingFloatingSequencesKey)
     let inCount = inFloatingSequenceSet.addSubsequences(sequence: inPacket)
-    NSLog("Added \(inCount) incoming subsequences")
+    NSLog("Added \(String(describing: inCount)) incoming subsequences")
     for offset in 0..<inPacket.count {
         let offsetKey = connection.incomingOffsetSequencesKey + ":" + offset.string
         let inOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
         let inOffCount = inOffsetSequenceSet.addSubsequences(sequence: inPacket)
-        NSLog("Added \(inOffCount) incoming subsequences for offset \(offset)")
+        NSLog("Added \(String(describing: inOffCount)) incoming subsequences for offset \(offset)")
     }
     
     return (true, nil)
