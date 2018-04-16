@@ -47,8 +47,7 @@ class RedisServerController: NSObject
         }
         
         print("\n👇👇 Running Script 👇👇:\n")
-        print("Path 🚶‍♀️: \n\(path)\n")
-        print("Arguments: \n\(redisPath)\n\(redisConfigPath)\n")
+        
         runRedisScript(path: path, arguments: [redisPath, redisConfigPath, redisModulePath])
         {
             (hasCompleted) in
@@ -82,7 +81,6 @@ class RedisServerController: NSObject
         }
         
         print("\n👇👇 Running Script 👇👇:\n")
-        print("Path 🚶‍♀️: \n\(path)\n")
         
         runRedisScript(path: path, arguments: [redisPath])
         {

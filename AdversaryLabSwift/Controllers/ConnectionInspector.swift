@@ -93,22 +93,40 @@ class ConnectionInspector
                 let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthsKey)
                 blockedInLengthsSet.delete()
                 
-                let incomingRequiredSequences: RSortedSet<Data> = RSortedSet(key: incomingRequiredSequencesKey)
-                incomingRequiredSequences.delete()
-                let incomingForbiddenSequences: RSortedSet<Data> = RSortedSet(key: incomingForbiddenSequencesKey)
-                incomingForbiddenSequences.delete()
-                let outgoingRequiredSequences: RSortedSet<Data> = RSortedSet(key: outgoingRequiredSequencesKey)
-                outgoingRequiredSequences.delete()
-                let outgoingForbiddenSequences: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenSequencesKey)
-                outgoingForbiddenSequences.delete()
-                let allowedInSequencesSet: RSortedSet<Data> = RSortedSet(key: allowedIncomingFloatingSequencesKey)
-                allowedInSequencesSet.delete()
-                let blockedInSequencesSet: RSortedSet<Data> = RSortedSet(key: blockedIncomingFloatingSequencesKey)
-                blockedInSequencesSet.delete()
-                let allowedOutSequencesSet: RSortedSet<Data> = RSortedSet(key: allowedOutgoingFloatingSequencesKey)
-                allowedOutSequencesSet.delete()
-                let blockedOutSequencesSet: RSortedSet<Data> = RSortedSet(key: blockedOutgoingFloatingSequencesKey)
-                blockedOutSequencesSet.delete()
+                let inRequiredFloats: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
+                inRequiredFloats.delete()
+                let inForbiddenFloats: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
+                inForbiddenFloats.delete()
+                let outRequiredFloats: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
+                outRequiredFloats.delete()
+                let outForbiddenFloats: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenFloatSequencesKey)
+                outForbiddenFloats.delete()
+                let allowedInFloats: RSortedSet<Data> = RSortedSet(key: allowedIncomingFloatingSequencesKey)
+                allowedInFloats.delete()
+                let blockedInFloats: RSortedSet<Data> = RSortedSet(key: blockedIncomingFloatingSequencesKey)
+                blockedInFloats.delete()
+                let allowedOutFloats: RSortedSet<Data> = RSortedSet(key: allowedOutgoingFloatingSequencesKey)
+                allowedOutFloats.delete()
+                let blockedOutFloats: RSortedSet<Data> = RSortedSet(key: blockedOutgoingFloatingSequencesKey)
+                blockedOutFloats.delete()
+                
+                let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
+                outRequiredOffsetHash.delete()
+                let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
+                inRequiredOffsetHash.delete()
+                let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
+                outForbiddenOffsetHash.delete()
+                let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
+                inForbiddenOffsetHash.delete()
+                
+                let allowedInOffsets: RSortedSet<Data> = RSortedSet(key: allowedIncomingOffsetSequencesKey)
+                allowedInOffsets.delete()
+                let blockedInOffsets: RSortedSet<Data> = RSortedSet(key: blockedIncomingOffsetSequencesKey)
+                blockedInOffsets.delete()
+                let allowedOutOffsets: RSortedSet<Data> = RSortedSet(key: allowedOutgoingOffsetSequencesKey)
+                allowedOutOffsets.delete()
+                let blockedOutOffsets: RSortedSet<Data> = RSortedSet(key: blockedOutgoingOffsetSequencesKey)
+                blockedOutOffsets.delete()
                 
                 let incomingRequiredEntropy: RSortedSet<Int> = RSortedSet(key: incomingRequiredEntropyKey)
                 incomingRequiredEntropy.delete()
@@ -227,6 +245,7 @@ class ConnectionInspector
         if enableSequenceAnalysis
         {
             scoreAllFloatSequences()
+            scoreAllOffsetSequenes()
             sleep(1)
         }
         
@@ -248,21 +267,21 @@ class ConnectionInspector
         // Process Packet Timing
         let (timingProcessed, maybePacketTimingError) = processTiming(forConnection: connection)
         
-        // Process Offset Sequences
-        var offsetSequenceNoErrors = true
-        var maybeOffsetError: Error? = nil
+        // Process Offset and Float Sequences
+        var subsequenceNoErrors = true
+        var maybeSubsequenceError: Error? = nil
         if enableSequenceAnalysis
         {
-            let (offsetSequenceProcessed, maybeOffsetErrorResponse) = processOffsetSequences(forConnection: connection)
-            offsetSequenceNoErrors = offsetSequenceProcessed
-            maybeOffsetError = maybeOffsetErrorResponse
+            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(forConnection: connection)
+            subsequenceNoErrors = subsequenceProcessed
+            maybeSubsequenceError = maybeSubsequenceErrorResponse
         }
         
         // Process Entropy
         let (entropyProcessed, _) = processEntropy(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
-        if packetLengthProcessed, timingProcessed, offsetSequenceNoErrors, entropyProcessed
+        if packetLengthProcessed, timingProcessed, subsequenceNoErrors, entropyProcessed
         {
             let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
             let _ = packetsAnalyzedDictionary.increment(field: connection.packetsAnalyzedKey)
@@ -279,7 +298,7 @@ class ConnectionInspector
                 print(packetTimingError)
             }
 
-            if let offsetError = maybeOffsetError
+            if let offsetError = maybeSubsequenceError
             {
                 print(offsetError)
             }

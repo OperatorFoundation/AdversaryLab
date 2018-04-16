@@ -63,6 +63,24 @@ class ViewController: NSViewController
     @objc dynamic var forbiddenInSequenceCount = "--"
     @objc dynamic var forbiddenInSequenceAcc = "--"
     
+    @objc dynamic var requiredOutOffset = "--"
+    @objc dynamic var requiredOutOffsetCount = "--"
+    @objc dynamic var requiredOutOffsetIndex = "--"
+    @objc dynamic var requiredOutOffsetAcc = "--"
+    @objc dynamic var forbiddenOutOffset = "--"
+    @objc dynamic var forbiddenOutOffsetCount = "--"
+    @objc dynamic var forbiddenOutOffsetIndex = "--"
+    @objc dynamic var forbiddenOutOffsetAcc = "--"
+    
+    @objc dynamic var requiredInOffset = "--"
+    @objc dynamic var requiredInOffsetCount = "--"
+    @objc dynamic var requiredInOffsetIndex = "--"
+    @objc dynamic var requiredInOffsetAcc = "--"
+    @objc dynamic var forbiddenInOffset = "--"
+    @objc dynamic var forbiddenInOffsetCount = "--"
+    @objc dynamic var forbiddenInOffsetIndex = "--"
+    @objc dynamic var forbiddenInOffsetAcc = "--"
+    
     @IBOutlet weak var removePacketsCheck: NSButton!
     @IBOutlet weak var enableSequencesCheck: NSButton!
     @IBOutlet weak var enableTLSCheck: NSButton!
@@ -362,13 +380,13 @@ class ViewController: NSViewController
                 self.forbiddenInEntropyAcc = "--"
             }
             
-            // Subsequences
-            let requiredOutSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredSequencesKey)
-            if let (rosMember, rosScore) = requiredOutSequenceSet.last
+            //Float Subsequences
+            let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
+            if let (roFloatSeqMember, roFloatSeqScore) = requiredOutFloatSequenceSet.last
             {
-                self.requiredOutSequence = "\(rosMember.hexEncodedString())"
-                self.requiredOutSequenceCount = "\(rosMember)"
-                self.requiredOutSequenceAcc = "\(rosScore)"
+                self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
+                self.requiredOutSequenceCount = "\(roFloatSeqMember)"
+                self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
             }
             else
             {
@@ -377,12 +395,12 @@ class ViewController: NSViewController
                 self.requiredOutSequenceAcc = "--"
             }
             
-            let forbiddenOutSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenSequencesKey)
-            if let (fosMember, fosScore) = forbiddenOutSequenceSet.last
+            let forbiddenOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenFloatSequencesKey)
+            if let (foFloatSeqMember, foFloatSeqScore) = forbiddenOutFloatSequenceSet.last
             {
-                self.forbiddenOutSequence = "\(fosMember.hexEncodedString())"
-                self.forbiddenOutSequenceCount = "\(fosMember)"
-                self.forbiddenOutSequenceAcc = "\(fosScore)"
+                self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
+                self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
+                self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
             }
             else
             {
@@ -391,12 +409,12 @@ class ViewController: NSViewController
                 self.forbiddenOutSequenceAcc = "--"
             }
             
-            let requiredInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredSequencesKey)
-            if let (risMemeber, risScore) = requiredInSequenceSet.last
+            let requiredInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
+            if let (riFloatSeqMemeber, riFloatSeqScore) = requiredInFloatSequenceSet.last
             {
-                self.requiredInSequence = "\(risMemeber.hexEncodedString())"
-                self.requiredInSequenceCount = "\(risMemeber)"
-                self.requiredInSequenceAcc = "\(risScore)"
+                self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
+                self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
+                self.requiredInSequenceAcc = "\(riFloatSeqScore)"
             }
             else
             {
@@ -405,12 +423,12 @@ class ViewController: NSViewController
                 self.requiredInSequenceAcc = "--"
             }
             
-            let forbiddenInSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenSequencesKey)
-            if let (fisMember, fisScore) = forbiddenInSequenceSet.last
+            let forbiddenInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
+            if let (fiFloatSeqMember, fiFloatSeqScore) = forbiddenInFloatSequenceSet.last
             {
-                self.forbiddenInSequence = "\(fisMember.hexEncodedString())"
-                self.forbiddenInSequenceCount = "\(fisMember)"
-                self.forbiddenInSequenceAcc = "\(fisScore)"
+                self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
+                self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
+                self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
             }
             else
             {
@@ -418,6 +436,26 @@ class ViewController: NSViewController
                 self.forbiddenInSequenceCount = "--"
                 self.forbiddenInSequenceAcc = "--"
             }
+            
+            // Offset Subsequences
+            let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
+            self.requiredOutSequence = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            self.requiredOutOffsetAcc = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
+
+            let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
+            self.forbiddenOutOffset = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+            self.forbiddenOutOffsetCount = "--"
+            self.forbiddenOutOffsetAcc = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
+                        
+            let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
+            self.requiredInOffset = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            self.requiredInOffsetCount = "--"
+            self.requiredInOffsetAcc = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
+            
+            let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
+            self.forbiddenInOffset = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+            self.forbiddenInOffsetCount = "--"
+            self.forbiddenInOffsetAcc = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
         }
     }

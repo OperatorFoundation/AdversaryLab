@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Auburn.git",
         "state": {
           "branch": null,
-          "revision": "58a0f25fa8e04d3ba7798b49fc6c098e9da06a62",
-          "version": "0.1.14"
+          "revision": "7c6b3bb33c6c8874bca5ed5e1cb11835c5375b06",
+          "version": "0.1.18"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Datable.git",
         "state": {
           "branch": null,
-          "revision": "9cf64c12e22e08ea76a60190fb2ef3017d31a31d",
-          "version": "0.0.9"
+          "revision": "a70d277ddda3189965a979724e0486dadd702a0c",
+          "version": "0.0.10"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
         "state": {
           "branch": null,
-          "revision": "d1dea764c6e7abe69cd7d31188f27f0a690d16a9",
-          "version": "0.3.7"
+          "revision": "96a797f503b546174baf4c9aad75b79d70b7284e",
+          "version": "0.3.8"
         }
       }
     ]

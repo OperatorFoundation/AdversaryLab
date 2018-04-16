@@ -11,7 +11,7 @@ import Auburn
 import RedShot
 import Datable
 
-func processOffsetSequences(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
+func processSequences(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
 {
     // Get the out packet that corresponds with this connection ID
     let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
@@ -22,15 +22,16 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
     }
 
     let outFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.outgoingFloatingSequencesKey)
-    let outCount = outFloatingSequenceSet.addSubsequences(sequence: outPacket)
-    NSLog("Added \(String(describing: outCount)) outgoing subsequences")
-    for offset in 0..<outPacket.count {
-        let offsetKey = connection.outgoingOffsetSequencesKey + ":" + offset.string
-        let outOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
-        let outOffCount = outOffsetSequenceSet.addSubsequences(sequence: outPacket)
-        NSLog("Added \(String(describing: outOffCount)) outgoing subsequences for offset \(offset)")
-    }
+    let _ = outFloatingSequenceSet.addSubsequences(offsetPrefix: connection.outgoingOffsetSequencesKey, sequence: outPacket)
     
+//    //NSLog("Added \(String(describing: outCount)) outgoing subsequences")
+//    for offset in 0..<outPacket.count {
+//        let offsetKey = connection.outgoingOffsetSequencesKey + ":" + offset.string
+//        let outOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
+//        let outOffCount = outOffsetSequenceSet.addSubsequences(sequence: outPacket)
+//        //NSLog("Added \(outOffCount!) outgoing subsequences for offset \(offset)")
+//    }
+//
     // Get the in packet that corresponds with this connection ID
     let inPacketHash: RMap<String, Data> = RMap(key: connection.incomingKey)
     guard let inPacket = inPacketHash[connection.connectionID]
@@ -40,14 +41,15 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
     }
 
     let inFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.incomingFloatingSequencesKey)
-    let inCount = inFloatingSequenceSet.addSubsequences(sequence: inPacket)
-    NSLog("Added \(String(describing: inCount)) incoming subsequences")
-    for offset in 0..<inPacket.count {
-        let offsetKey = connection.incomingOffsetSequencesKey + ":" + offset.string
-        let inOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
-        let inOffCount = inOffsetSequenceSet.addSubsequences(sequence: inPacket)
-        NSLog("Added \(String(describing: inOffCount)) incoming subsequences for offset \(offset)")
-    }
+    let _ = inFloatingSequenceSet.addSubsequences(offsetPrefix: connection.incomingOffsetSequencesKey, sequence: inPacket)
+    
+//    //NSLog("Added \(inCount!) incoming subsequences")
+//    for offset in 0..<inPacket.count {
+//        let offsetKey = connection.incomingOffsetSequencesKey + ":" + offset.string
+//        let inOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
+//        let inOffCount = inOffsetSequenceSet.addSubsequences(sequence: inPacket)
+//        //NSLog("Added \(inOffCount!) incoming subsequences for offset \(offset)")
+//    }
     
     return (true, nil)
 }
@@ -55,88 +57,198 @@ func processOffsetSequences(forConnection connection: ObservedConnection) -> (pr
 func scoreAllFloatSequences()
 {
     // Outgoing
-    scoreSequences(allowedFloatSequenceKey: allowedOutgoingFloatingSequencesKey, blockedFloatSequenceKey: blockedOutgoingFloatingSequencesKey, requiredSequencesKey: outgoingRequiredSequencesKey, forbiddenSequencesKey: outgoingForbiddenSequencesKey)
+    scoreFloatSequences(allowedFloatKey: allowedOutgoingFloatingSequencesKey,
+                        blockedFloatKey: blockedOutgoingFloatingSequencesKey,
+                        requiredFloatKey: outgoingRequiredFloatSequencesKey,
+                        forbiddenFloatKey: outgoingForbiddenFloatSequencesKey,
+                        floatScoresKey: outgoingFloatSequenceScoresKey)
     
-    //Incoming
-    scoreSequences(allowedFloatSequenceKey: allowedIncomingFloatingSequencesKey, blockedFloatSequenceKey: blockedIncomingFloatingSequencesKey, requiredSequencesKey: incomingRequiredSequencesKey, forbiddenSequencesKey: incomingForbiddenSequencesKey)
+    // Incoming
+    scoreFloatSequences(allowedFloatKey: allowedIncomingFloatingSequencesKey,
+                        blockedFloatKey: blockedIncomingFloatingSequencesKey,
+                        requiredFloatKey: incomingRequiredFloatSequencesKey,
+                        forbiddenFloatKey: incomingForbiddenFloatSequencesKey,
+                        floatScoresKey: incomingFloatSequenceScoresKey)
 }
 
+func scoreAllOffsetSequenes()
+{
+    // Outgoing
+    scoreOffsetSequences(allowedOffsetKey: allowedOutgoingOffsetSequencesKey, blockedOffsetKey: blockedOutgoingOffsetSequencesKey, requiredOffsetKey: outgoingRequiredOffsetKey, forbiddenOffsetKey: outgoingForbiddenOffsetKey)
+    
+    // Incoming
+    scoreOffsetSequences(allowedOffsetKey: allowedIncomingOffsetSequencesKey, blockedOffsetKey: blockedIncomingOffsetSequencesKey, requiredOffsetKey: incomingRequiredOffsetKey, forbiddenOffsetKey: incomingForbiddenOffsetKey)
+}
 
-func scoreSequences(allowedFloatSequenceKey: String, blockedFloatSequenceKey: String, requiredSequencesKey: String, forbiddenSequencesKey: String)
+func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, requiredOffsetKey: String, forbiddenOffsetKey: String)
 {
     let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
     
-    /// |A| is the number of Allowed packets analyzed - Allowed:Connections:Analyzed
-    var allowedPacketsAnalyzed = 0.0
+    /// Ta is the number of Allowed connections analyzed (Allowed:Connections:Analyzed)
+    var allowedConnectionsAnalyzed = 0.0
     if let allowedConnectionsAnalyzedCount: Int = packetStatsDict[allowedPacketsAnalyzedKey]
     {
-        allowedPacketsAnalyzed = Double(allowedConnectionsAnalyzedCount)
+        allowedConnectionsAnalyzed = Double(allowedConnectionsAnalyzedCount)
     }
     
-    /// |B| is the number of Blocked packets analyzed - Blocked:Connections:Analyzed
-    var blockedPacketsAnalyzed = 0.0
+    /// Tb is the number of Blocked connections analyzed (Blocked:Connections:Analyzed)
+    var blockedConnectionsAnalyzed = 0.0
     if let blockedConnectionsAnalyzedCount: Int = packetStatsDict[blockedPacketsAnalyzedKey]
     {
-        blockedPacketsAnalyzed = Double(blockedConnectionsAnalyzedCount)
+        blockedConnectionsAnalyzed = Double(blockedConnectionsAnalyzedCount)
     }
     
-    /// A is the sorted set of lengths for the Allowed traffic
-    let allowedSequencesSet: RSortedSet<Data> = RSortedSet(key: allowedFloatSequenceKey)
-    /// B is the sorted set of lengths for the Blocked traffic
-    let blockedSequencesSet: RSortedSet<Data> = RSortedSet(key: blockedFloatSequenceKey)
-    /// L is the union of the keys for A and B (without the scores)
-    let allSequencesSet = newDataSet(from: [allowedSequencesSet, blockedSequencesSet])
+    /// A is the sorted set of sequences for the Allowed traffic (key: allowedFloatSequenceKey)
+    /// B is the sorted set of sequences for the Blocked traffic (key: blockedFloatSequenceKey)
     
-    /// for len in L
-    for sequence in allSequencesSet
+    //Form union for each float:index and add to one big set before moving on with scoring
+    var offsetIndex = 0
+    var topOffsetScore: Float?
+    var topOffsetIndex: Int?
+    var topOffsetSequence: Data?
+    
+    var bottomOffsetIndex: Int?
+    var bottomOffsetSequence: Data?
+    var bottomOffsetScore: Float?
+    
+    while true
     {
-        let aCount = Double(allowedSequencesSet[sequence] ?? 0.0)
-        let bCount = Double(blockedSequencesSet[sequence] ?? 0.0)
+        let tempOffsetScoresKey = "tempOffsetScores"
+        /// Returns a new sorted set with the correct scoring
+        let tempOffsetScores: RSortedSet<Data> = RSortedSet(unionOf: allowedOffsetKey + ":\(offsetIndex)", scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedOffsetKey + ":\(offsetIndex)", scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: tempOffsetScoresKey)
         
-        let aProb = aCount/allowedPacketsAnalyzed
-        let bProb = bCount/blockedPacketsAnalyzed
-        
-        /// Required
-        // True Positive
-        let requiredTP = aProb
-        // False Positive
-        let requiredFP = bProb
-        // True Negative
-        let requiredTN = 1 - bProb
-        // False Negative
-        let requiredFN = 1 - aProb
-        // Accuracy
-        let requiredAccuracy = (requiredTP + requiredTN)/(requiredTP + requiredTN + requiredFP + requiredFN)
-        
-        /// Forbidden
-        let forbiddenTP = 1 - aProb
-        let forbiddenFP = 1 - bProb
-        let forbiddenTN = bProb
-        let forbiddenFN = aProb
-        let forbiddenAccuracy: Double = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
-        
-        /// Save Scores
-        let requiredSequences: RSortedSet<Data> = RSortedSet(key: requiredSequencesKey)
-        let _ = requiredSequences.insert((sequence, Float(requiredAccuracy)))
-        
-        let forbiddenSequences: RSortedSet<Data> = RSortedSet(key: forbiddenSequencesKey)
-        let _ = forbiddenSequences.insert((sequence, Float(forbiddenAccuracy)))
-    }
-}
-
-func newDataSet(from redisSets:[RSortedSet<Data>]) -> Set<Data>
-{
-    var swiftSet = Set<Data>()
-    for set in redisSets
-    {
-        for i in 0 ..< set.count
+        if tempOffsetScores.count < 1
         {
-            if let newMember: Data = set[i]
+            print("\n-------->Offset union returned empty list, breaking list.<--------------\n")
+            break
+        }
+
+        guard let (thisTopOffsetSequence, thisTopOffsetScore) = tempOffsetScores.first
+            else
+        {
+            break
+        }
+        
+        guard let (thisBottomOffsetSequence, thisBottomOffsetScore) = tempOffsetScores.last
+            else
+        {
+            break
+        }
+
+        
+        if let (thisTopOffsetSequence, thisTopOffsetScore) = tempOffsetScores.first
+        {
+            if topOffsetScore != nil
             {
-                swiftSet.insert(newMember)
+                if thisTopOffsetScore > topOffsetScore!
+                {
+                    topOffsetScore = thisTopOffsetScore
+                    topOffsetSequence = thisTopOffsetSequence
+                    topOffsetIndex = offsetIndex
+                }
+            }
+            else
+            {
+                topOffsetScore = thisTopOffsetScore
+                topOffsetSequence = thisTopOffsetSequence
+                topOffsetIndex = offsetIndex
             }
         }
+        
+        if let (thisBottomOffsetSequence, thisBottomOffsetScore) = tempOffsetScores.last
+        {
+            if bottomOffsetScore != nil
+            {
+                if thisBottomOffsetScore < bottomOffsetScore!
+                {
+                    bottomOffsetScore = thisBottomOffsetScore
+                    bottomOffsetIndex = offsetIndex
+                    bottomOffsetSequence = thisBottomOffsetSequence
+                }
+            }
+            else
+            {
+                bottomOffsetScore = thisBottomOffsetScore
+                bottomOffsetIndex = offsetIndex
+                bottomOffsetSequence = thisBottomOffsetSequence
+            }
+        }
+
+        tempOffsetScores.delete()
+        offsetIndex += 1
+    }
+
+    /// Top score is the required rule
+    /// Divide the score by Ta * Tb to get the accuracy
+    let requiredOffsetRuleAccuracy = abs(topOffsetScore!)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
+    
+    let requiredOffsetHash: RMap = [requiredOffsetSequenceKey: topOffsetSequence!.hexEncodedString(), requiredOffsetAccuracyKey: "\(requiredOffsetRuleAccuracy)", requiredOffsetIndexKey: topOffsetIndex!.string]
+    requiredOffsetHash.key = requiredOffsetKey
+
+    /// Bottom score is the forbidden rule
+    
+    /// Divide the score by Ta * Tb to get the accuracy
+    let forbiddenOffsetRuleAccuracy = abs(bottomOffsetScore!)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
+    let forbiddenOffsetHash: RMap = [forbiddenOffsetSequenceKey: bottomOffsetSequence!.hexEncodedString(), forbiddenOffsetAccuracyKey: "\(forbiddenOffsetRuleAccuracy)", forbiddenOffsetIndexKey: bottomOffsetIndex!.string]
+    forbiddenOffsetHash.key = forbiddenOffsetKey
+}
+
+
+func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requiredFloatKey: String, forbiddenFloatKey: String, floatScoresKey: String)
+{
+    let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+    
+    /// Ta is the number of Allowed connections analyzed (Allowed:Connections:Analyzed)
+    var allowedConnectionsAnalyzed = 0.0
+    if let allowedConnectionsAnalyzedCount: Int = packetStatsDict[allowedPacketsAnalyzedKey]
+    {
+        allowedConnectionsAnalyzed = Double(allowedConnectionsAnalyzedCount)
     }
     
-    return swiftSet
+    /// Tb is the number of Blocked connections analyzed (Blocked:Connections:Analyzed)
+    var blockedConnectionsAnalyzed = 0.0
+    if let blockedConnectionsAnalyzedCount: Int = packetStatsDict[blockedPacketsAnalyzedKey]
+    {
+        blockedConnectionsAnalyzed = Double(blockedConnectionsAnalyzedCount)
+    }
+    
+    /// A is the sorted set of sequences for the Allowed traffic (key: allowedFloatSequenceKey)
+    /// B is the sorted set of sequences for the Blocked traffic (key: blockedFloatSequenceKey)
+    
+    /// Returns a new sorted set with the correct scoring (key: sequenceScoresKey)
+    let oldSequenceScoresSet: RSortedSet<Data> = RSortedSet(key: floatScoresKey)
+    oldSequenceScoresSet.delete()
+    let sequenceScoresSet: RSortedSet<Data> = RSortedSet(unionOf: allowedFloatKey, scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedFloatKey, scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: floatScoresKey)
+    
+    /// Bottom score is the required rule
+    guard let (requiredSequence, requiredSequenceScore) = sequenceScoresSet.last
+    else
+    {
+        print("😮  Unable to get a required rule for float sequences.")
+        return
+    }
+    
+    //TODO: There's some hopping around between float and double that could be cleaned up
+    /// Divide the score by Ta * Tb to get the accuracy
+    let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
+    let requiredSequenceSet: RSortedSet<Data> = RSortedSet(key: requiredFloatKey)
+    requiredSequenceSet.delete()
+    _ = requiredSequenceSet.insert((requiredSequence, requiredSequenceRuleAccuracy))
+    
+    /// Top score is the forbidden rule
+    guard let (forbiddenSequence, forbiddenSequenceScore) = sequenceScoresSet.first
+    else
+    {
+        print("😮  Unable to get a forbidden rule for float sequences.")
+        return
+    }
+    
+    //TODO: There's some hopping around between float and double that could be cleaned up
+    /// Divide the score by Ta * Tb to get the accuracy
+    let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
+    let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
+    forbiddenSequenceSet.delete()
+    _ = forbiddenSequenceSet.insert((forbiddenSequence, forbiddenSequenceRuleAccuracy))
+    
 }
+
