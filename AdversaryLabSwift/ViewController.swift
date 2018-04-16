@@ -137,6 +137,10 @@ class ViewController: NSViewController
     {
         super.viewDidLoad()
         
+        // Launch Redis Server
+        print("Launching Redis Server!")
+        RedisServerController.sharedInstance.launchRedisServer()
+        
         // Subscribe to pubsub to know when to inspect a new connection
         //subscribeToNewConnectionsChannel()
         

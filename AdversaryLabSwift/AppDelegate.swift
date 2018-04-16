@@ -11,14 +11,6 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate
 {
-
-    func applicationWillBecomeActive(_ notification: Notification)
-    {
-        // Launch Redis Server
-        print("Launching Redis Server!")
-        RedisServerController.sharedInstance.launchRedisServer()
-    }
-    
     func applicationDidFinishLaunching(_ aNotification: Notification)
     {
         
