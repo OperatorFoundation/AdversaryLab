@@ -23,15 +23,7 @@ func processSequences(forConnection connection: ObservedConnection) -> (processe
 
     let outFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.outgoingFloatingSequencesKey)
     let _ = outFloatingSequenceSet.addSubsequences(offsetPrefix: connection.outgoingOffsetSequencesKey, sequence: outPacket)
-    
-//    //NSLog("Added \(String(describing: outCount)) outgoing subsequences")
-//    for offset in 0..<outPacket.count {
-//        let offsetKey = connection.outgoingOffsetSequencesKey + ":" + offset.string
-//        let outOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
-//        let outOffCount = outOffsetSequenceSet.addSubsequences(sequence: outPacket)
-//        //NSLog("Added \(outOffCount!) outgoing subsequences for offset \(offset)")
-//    }
-//
+
     // Get the in packet that corresponds with this connection ID
     let inPacketHash: RMap<String, Data> = RMap(key: connection.incomingKey)
     guard let inPacket = inPacketHash[connection.connectionID]
@@ -42,14 +34,6 @@ func processSequences(forConnection connection: ObservedConnection) -> (processe
 
     let inFloatingSequenceSet: RSortedSet<Data> = RSortedSet(key: connection.incomingFloatingSequencesKey)
     let _ = inFloatingSequenceSet.addSubsequences(offsetPrefix: connection.incomingOffsetSequencesKey, sequence: inPacket)
-    
-//    //NSLog("Added \(inCount!) incoming subsequences")
-//    for offset in 0..<inPacket.count {
-//        let offsetKey = connection.incomingOffsetSequencesKey + ":" + offset.string
-//        let inOffsetSequenceSet: RSortedSet<Data> = RSortedSet(key: offsetKey)
-//        let inOffCount = inOffsetSequenceSet.addSubsequences(sequence: inPacket)
-//        //NSLog("Added \(inOffCount!) incoming subsequences for offset \(offset)")
-//    }
     
     return (true, nil)
 }
@@ -135,43 +119,36 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             break
         }
 
-        
-        if let (thisTopOffsetSequence, thisTopOffsetScore) = tempOffsetScores.first
+        if topOffsetScore != nil
         {
-            if topOffsetScore != nil
-            {
-                if thisTopOffsetScore > topOffsetScore!
-                {
-                    topOffsetScore = thisTopOffsetScore
-                    topOffsetSequence = thisTopOffsetSequence
-                    topOffsetIndex = offsetIndex
-                }
-            }
-            else
+            if thisTopOffsetScore > topOffsetScore!
             {
                 topOffsetScore = thisTopOffsetScore
                 topOffsetSequence = thisTopOffsetSequence
                 topOffsetIndex = offsetIndex
             }
         }
-        
-        if let (thisBottomOffsetSequence, thisBottomOffsetScore) = tempOffsetScores.last
+        else
         {
-            if bottomOffsetScore != nil
-            {
-                if thisBottomOffsetScore < bottomOffsetScore!
-                {
-                    bottomOffsetScore = thisBottomOffsetScore
-                    bottomOffsetIndex = offsetIndex
-                    bottomOffsetSequence = thisBottomOffsetSequence
-                }
-            }
-            else
+            topOffsetScore = thisTopOffsetScore
+            topOffsetSequence = thisTopOffsetSequence
+            topOffsetIndex = offsetIndex
+        }
+
+        if bottomOffsetScore != nil
+        {
+            if thisBottomOffsetScore < bottomOffsetScore!
             {
                 bottomOffsetScore = thisBottomOffsetScore
                 bottomOffsetIndex = offsetIndex
                 bottomOffsetSequence = thisBottomOffsetSequence
             }
+        }
+        else
+        {
+            bottomOffsetScore = thisBottomOffsetScore
+            bottomOffsetIndex = offsetIndex
+            bottomOffsetSequence = thisBottomOffsetSequence
         }
 
         tempOffsetScores.delete()
@@ -182,14 +159,14 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
     /// Divide the score by Ta * Tb to get the accuracy
     let requiredOffsetRuleAccuracy = abs(topOffsetScore!)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     
-    let requiredOffsetHash: RMap = [requiredOffsetSequenceKey: topOffsetSequence!.hexEncodedString(), requiredOffsetAccuracyKey: "\(requiredOffsetRuleAccuracy)", requiredOffsetIndexKey: topOffsetIndex!.string]
+    let requiredOffsetHash: RMap = [requiredOffsetSequenceKey: topOffsetSequence!.hexEncodedString(), requiredOffsetAccuracyKey: "\(requiredOffsetRuleAccuracy)", requiredOffsetIndexKey: topOffsetIndex!.string, requiredOffsetByteCountKey: String(describing: topOffsetSequence!)]
     requiredOffsetHash.key = requiredOffsetKey
 
     /// Bottom score is the forbidden rule
     
     /// Divide the score by Ta * Tb to get the accuracy
     let forbiddenOffsetRuleAccuracy = abs(bottomOffsetScore!)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
-    let forbiddenOffsetHash: RMap = [forbiddenOffsetSequenceKey: bottomOffsetSequence!.hexEncodedString(), forbiddenOffsetAccuracyKey: "\(forbiddenOffsetRuleAccuracy)", forbiddenOffsetIndexKey: bottomOffsetIndex!.string]
+    let forbiddenOffsetHash: RMap = [forbiddenOffsetSequenceKey: bottomOffsetSequence!.hexEncodedString(), forbiddenOffsetAccuracyKey: "\(forbiddenOffsetRuleAccuracy)", forbiddenOffsetIndexKey: bottomOffsetIndex!.string, forbiddenOffsetByteCountKey: String(describing: bottomOffsetSequence!)]
     forbiddenOffsetHash.key = forbiddenOffsetKey
 }
 
@@ -220,8 +197,8 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     oldSequenceScoresSet.delete()
     let sequenceScoresSet: RSortedSet<Data> = RSortedSet(unionOf: allowedFloatKey, scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedFloatKey, scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: floatScoresKey)
     
-    /// Bottom score is the required rule
-    guard let (requiredSequence, requiredSequenceScore) = sequenceScoresSet.last
+    /// Top score is the required rule
+    guard let (requiredSequence, requiredSequenceScore) = sequenceScoresSet.first
     else
     {
         print("😮  Unable to get a required rule for float sequences.")
@@ -235,8 +212,8 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     requiredSequenceSet.delete()
     _ = requiredSequenceSet.insert((requiredSequence, requiredSequenceRuleAccuracy))
     
-    /// Top score is the forbidden rule
-    guard let (forbiddenSequence, forbiddenSequenceScore) = sequenceScoresSet.first
+    /// Bottom score is the forbidden rule
+    guard let (forbiddenSequence, forbiddenSequenceScore) = sequenceScoresSet.last
     else
     {
         print("😮  Unable to get a forbidden rule for float sequences.")

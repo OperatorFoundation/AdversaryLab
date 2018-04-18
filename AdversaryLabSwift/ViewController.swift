@@ -443,22 +443,27 @@ class ViewController: NSViewController
             
             // Offset Subsequences
             let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
-            self.requiredOutSequence = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            self.requiredOutOffset = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            self.requiredOutOffsetCount = outRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+            self.requiredOutOffsetIndex = outRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
             self.requiredOutOffsetAcc = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
 
             let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
             self.forbiddenOutOffset = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            self.forbiddenOutOffsetCount = "--"
+            self.forbiddenOutOffsetCount = outForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+            self.forbiddenOutOffsetIndex = outForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
             self.forbiddenOutOffsetAcc = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
                         
             let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
             self.requiredInOffset = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
-            self.requiredInOffsetCount = "--"
+            self.requiredInOffsetCount = inRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+            self.requiredInOffsetIndex = inRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
             self.requiredInOffsetAcc = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
             
             let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
             self.forbiddenInOffset = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            self.forbiddenInOffsetCount = "--"
+            self.forbiddenInOffsetCount = inForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+            self.forbiddenInOffsetIndex = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
             self.forbiddenInOffsetAcc = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
         }

@@ -79,10 +79,12 @@ let outgoingFloatSequenceScoresKey = "Outgoing:FloatSequence:Scores"
 
 // Offset Sequences
 let requiredOffsetSequenceKey = "Incoming:Required:OffsetSequence"
+let requiredOffsetByteCountKey = "Incoming:Required:OffsetByteCount"
 let requiredOffsetIndexKey = "Incoming:Required:OffsetIndex"
 let requiredOffsetAccuracyKey = "Incoming:Required:OffsetAccuracy"
 
 let forbiddenOffsetSequenceKey = "Incoming:Forbidden:OffsetSequence"
+let forbiddenOffsetByteCountKey = "Incoming:Forbidden:OffsetByteCount"
 let forbiddenOffsetIndexKey = "Incoming:Forbidden:OffsetIndex"
 let forbiddenOffsetAccuracyKey = "Incoming:Forbidden:OffsetAccuracy"
 
