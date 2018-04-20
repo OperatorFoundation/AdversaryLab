@@ -138,7 +138,6 @@ class ViewController: NSViewController
         super.viewDidLoad()
         
         // Launch Redis Server
-        print("Launching Redis Server!")
         RedisServerController.sharedInstance.launchRedisServer()
         
         // Subscribe to pubsub to know when to inspect a new connection
@@ -189,283 +188,310 @@ class ViewController: NSViewController
     
     @objc func loadLabelData()
     {
-        DispatchQueue.main.async
+        DispatchQueue.global(qos: .utility).async
         {
             let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            
-            // Allowed Packets Seen
-            if let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey]
-            {
-                self.allowedPacketsSeen = "\(allowedPacketsSeenValue)"
-            }
-            else
-            {
-                self.allowedPacketsSeen = "Loading..."
-            }
-            
-            // Allowed Packets Analyzed
-            if let allowedPacketsAnalyzedValue: Int = packetStatsDict[allowedPacketsAnalyzedKey]
-            {
-                self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue)"
-            }
-            else
-            {
-                self.allowedPacketsAnalyzed = "Loading..."
-            }
-            
-            // Blocked Packets Seen
-            if let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey]
-            {
-                self.blockedPacketsSeen = "\(blockedPacketsSeenValue)"
-            }
-            else
-            {
-                self.blockedPacketsSeen = "Loading..."
-            }
-            
-            // Blocked Packets Analyzed
-            if let blockedPacketsAnalyzedValue: Int = packetStatsDict[blockedPacketsAnalyzedKey]
-            {
-                self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue)"
-            }
-            else
-            {
-                self.blockedPacketsAnalyzed = "Loading..."
-            }
+            let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
+            let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
+            let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
+            let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
             
             /// Scores
             
+            // Offset Subsequences
+            let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
+            let requiredOutOffsetString = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            let requiredOutOffsetCountString = outRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+            let requiredOutOffsetIndexString = outRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
+            let requiredOutOffsetAccString = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
+            
+            let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
+            let forbiddenOutOffsetString = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+            let forbiddenOutOffsetCountString = outForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+            let forbiddenOutOffsetIndexString = outForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
+            let forbiddenOutOffsetAccString = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
+            
+            let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
+            let requiredInOffsetString = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+            let requiredInOffsetCountString = inRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+            let requiredInOffsetIndexString = inRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
+            let requiredInOffsetAccString = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
+            
+            let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
+            let forbiddenInOffsetString: String = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+            let forbiddenInOffsetCountString = inForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+            let forbiddenInOffsetIndexString = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
+            let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
+            
             // Timing (milliseconds)
             let requiredTimingSet: RSortedSet<Int> = RSortedSet(key: requiredTimeDiffKey)
-            if let (rtMember, rtScore) = requiredTimingSet.last
-            {
-                self.requiredTiming = "\(rtMember) ms"
-                self.requiredTimeAcc = "\(rtScore)"
-            }
-            else
-            {
-                self.requiredTiming = "--"
-                self.requiredTimeAcc = "--"
-            }
-            
+            let requiredTimingTuple: (Int, Float)? = requiredTimingSet.last
             let forbiddenTimingSet: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
-            if let (ftMember, ftScore) = forbiddenTimingSet.last
-            {
-                self.forbiddenTiming = "\(ftMember) ms"
-                self.forbiddenTimingAcc = "\(ftScore)"
-            }
-            else
-            {
-                self.forbiddenTiming = "--"
-                self.forbiddenTimingAcc = "--"
-            }
+            let forbiddenTimingTuple: (Int, Float)? = forbiddenTimingSet.last
             
             // TLS Common Names
-            
             let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
-            if let (rTLSMember, rTLSScore) = requiredTLSNamesSet.last
-            {
-                self.requiredTLSName = rTLSMember
-                self.requiredTLSNameAcc = "\(rTLSScore)"
-            }
-            else
-            {
-                self.requiredTLSName = "--"
-                self.requiredTLSNameAcc = "--"
-            }
+            let requiredTLSNamesTuple: (String, Float)? = requiredTLSNamesSet.last
             
             let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
-            if let (fTLSMember, fTLSScore) = forbiddenTLSNamesSet.last
-            {
-                self.forbiddenTLSName = fTLSMember
-                self.forbiddenTLSNameAcc = "\(fTLSScore)"
-            }
-            else
-            {
-                self.forbiddenTLSName = "--"
-                self.forbiddenTLSNameAcc = "--"
-            }
+            let forbiddenTLSNamesTuple: (String, Float)? = forbiddenTLSNamesSet.last
             
             // Lengths
             let requiredOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredLengthsKey)
-            if let (rolMember, rolScore) = requiredOutLengthSet.last
-            {
-                self.requiredOutLength = "\(rolMember)"
-                self.requiredOutLengthAcc = "\(rolScore)"
-            }
-            else
-            {
-                self.requiredOutLength = "--"
-                self.requiredOutLengthAcc = "--"
-            }
+            let requiredOutLengthTuple: (Int, Float)? = requiredOutLengthSet.last
             
             let forbiddenOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenLengthsKey)
-            if let (folMember, folScore) = forbiddenOutLengthSet.last
-            {
-                self.forbiddenOutLength = "\(folMember)"
-                self.forbiddenOutLengthAcc = "\(folScore)"
-            }
-            else
-            {
-                self.forbiddenOutLength = "--"
-                self.forbiddenOutLengthAcc = "--"
-            }
+            let forbiddenOutLengthTuple: (Int, Float)? = forbiddenOutLengthSet.last
             
             let requiredInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingRequiredLengthsKey)
-            if let (rilMember, rilScore) = requiredInLengthSet.last
-            {
-                self.requiredInLength = "\(rilMember)"
-                self.requiredInLengthAcc = "\(rilScore)"
-            }
-            else
-            {
-                self.requiredInLength = "--"
-                self.requiredInLengthAcc = "--"
-            }
+            let requiredInLengthTuple: (Int, Float)? = requiredInLengthSet.last
             
             let forbiddenInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenLengthsKey)
-            if let (filMember, filScore) = forbiddenInLengthSet.last
-            {
-                self.forbiddenInLength = "\(filMember)"
-                self.forbiddenInLengthAcc = "\(filScore)"
-            }
-            else
-            {
-                self.forbiddenInLength = "--"
-                self.forbiddenInLengthAcc = "--"
-            }
+            let forbiddenInLengthTuple: (Int, Float)? = forbiddenInLengthSet.last
             
             // Entropy
             let requiredOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredEntropyKey)
-            if let (roeMember, roeScore) = requiredOutEntropySet.last
-            {
-                self.requiredOutEntropy = "\(roeMember)"
-                self.requiredOutEntropyAcc = "\(roeScore)"
-            }
-            else
-            {
-                self.requiredOutEntropy = "--"
-                self.requiredOutEntropyAcc = "--"
-            }
+            let requiredOutEntropyTuple: (Int, Float)? = requiredOutEntropySet.last
             
             let forbiddenOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenEntropyKey)
-            if let (foeMember, foeScore) = forbiddenOutEntropySet.last
-            {
-                self.forbiddenOutEntropy = "\(foeMember)"
-                self.forbiddenOutEntropyAcc = "\(foeScore)"
-            }
-            else
-            {
-                self.forbiddenOutEntropy = "--"
-                self.forbiddenOutEntropyAcc = "--"
-            }
+            let forbiddenOutEntropyTuple: (Int, Float)? = forbiddenOutEntropySet.last
             
             let requiredInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingRequiredEntropyKey)
-            if let (rieMember, rieScore) = requiredInEntropySet.last
-            {
-                self.requiredInEntropy = "\(rieMember)"
-                self.requiredInEntropyAcc = "\(rieScore)"
-            }
-            else
-            {
-                self.requiredInEntropy = "--"
-                self.requiredInEntropyAcc = "--"
-            }
+            let requiredInEntropyTuple: (Int, Float)? = requiredInEntropySet.last
             
             let forbiddenInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenEntropyKey)
-            if let (fieMember, fieScore) = forbiddenInEntropySet.last
-            {
-                self.forbiddenInEntropy = "\(fieMember)"
-                self.forbiddenInEntropyAcc = "\(fieScore)"
-            }
-            else
-            {
-                self.forbiddenInEntropy = "--"
-                self.forbiddenInEntropyAcc = "--"
-            }
+            let forbiddenInEntropyTuple: (Int, Float)? = forbiddenInEntropySet.last
             
             //Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
-            if let (roFloatSeqMember, roFloatSeqScore) = requiredOutFloatSequenceSet.last
-            {
-                self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
-                self.requiredOutSequenceCount = "\(roFloatSeqMember)"
-                self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
-            }
-            else
-            {
-                self.requiredOutSequence = "--"
-                self.requiredOutSequenceCount = "--"
-                self.requiredOutSequenceAcc = "--"
-            }
+            let requiredOutFloatSequenceTuple: (Data, Float)? = requiredOutFloatSequenceSet.last
             
             let forbiddenOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenFloatSequencesKey)
-            if let (foFloatSeqMember, foFloatSeqScore) = forbiddenOutFloatSequenceSet.last
-            {
-                self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
-                self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
-                self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
-            }
-            else
-            {
-                self.forbiddenOutSequence = "--"
-                self.forbiddenOutSequenceCount = "--"
-                self.forbiddenOutSequenceAcc = "--"
-            }
+            let forbiddenOutFloatSequenceTuple: (Data, Float)? = forbiddenOutFloatSequenceSet.last
             
             let requiredInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
-            if let (riFloatSeqMemeber, riFloatSeqScore) = requiredInFloatSequenceSet.last
-            {
-                self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
-                self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
-                self.requiredInSequenceAcc = "\(riFloatSeqScore)"
-            }
-            else
-            {
-                self.requiredInSequence = "--"
-                self.requiredInSequenceCount = "--"
-                self.requiredInSequenceAcc = "--"
-            }
+            let requiredInFloatSequenceTuple: (Data, Float)? = requiredInFloatSequenceSet.last
             
             let forbiddenInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
-            if let (fiFloatSeqMember, fiFloatSeqScore) = forbiddenInFloatSequenceSet.last
-            {
-                self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
-                self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
-                self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
+            let forbiddenInFloatSequenceTuple: (Data, Float)? = forbiddenInFloatSequenceSet.last
+            
+            DispatchQueue.main.async
+                {
+                    self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
+                    self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
+                    self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
+                    self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
+                    
+                    // Offset Subsequences
+                    self.requiredOutOffset = requiredOutOffsetString
+                    self.requiredOutOffsetCount = requiredOutOffsetCountString
+                    self.requiredOutOffsetIndex = requiredOutOffsetIndexString
+                    self.requiredOutOffsetAcc = requiredOutOffsetAccString
+                    
+                    self.forbiddenOutOffset = forbiddenOutOffsetString
+                    self.forbiddenOutOffsetCount = forbiddenOutOffsetCountString
+                    self.forbiddenOutOffsetIndex = forbiddenOutOffsetIndexString
+                    self.forbiddenOutOffsetAcc = forbiddenOutOffsetAccString
+                    
+                    self.requiredInOffset = requiredInOffsetString
+                    self.requiredInOffsetCount = requiredInOffsetCountString
+                    self.requiredInOffsetIndex = requiredInOffsetIndexString
+                    self.requiredInOffsetAcc = requiredInOffsetAccString
+                    
+                    self.forbiddenInOffset = forbiddenInOffsetString
+                    self.forbiddenInOffsetCount = forbiddenInOffsetCountString
+                    self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
+                    self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
+                    
+                    // Timing (milliseconds)
+                    if let rtMember: Int = requiredTimingTuple?.0, let rtScore: Float = requiredTimingTuple?.1
+                    {
+                        self.requiredTiming = "\(rtMember) ms"
+                        self.requiredTimeAcc = "\(rtScore)"
+                    }
+                    else
+                    {
+                        self.requiredTiming = "--"
+                        self.requiredTimeAcc = "--"
+                    }
+                    
+                    if let ftMember = forbiddenTimingTuple?.0, let ftScore = forbiddenTimingTuple?.1
+                    {
+                        self.forbiddenTiming = "\(ftMember) ms"
+                        self.forbiddenTimingAcc = "\(ftScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenTiming = "--"
+                        self.forbiddenTimingAcc = "--"
+                    }
+                    
+                    // TLS Common Names
+                    if let rTLSMember = requiredTLSNamesTuple?.0, let rTLSScore = requiredTLSNamesTuple?.1
+                    {
+                        self.requiredTLSName = rTLSMember
+                        self.requiredTLSNameAcc = "\(rTLSScore)"
+                    }
+                    else
+                    {
+                        self.requiredTLSName = "--"
+                        self.requiredTLSNameAcc = "--"
+                    }
+                    
+                    if let fTLSMember = forbiddenTLSNamesTuple?.0, let fTLSScore = forbiddenTLSNamesTuple?.1
+                    {
+                        self.forbiddenTLSName = fTLSMember
+                        self.forbiddenTLSNameAcc = "\(fTLSScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenTLSName = "--"
+                        self.forbiddenTLSNameAcc = "--"
+                    }
+                    
+                    // Lengths
+                    if let rolMember = requiredOutLengthTuple?.0, let rolScore = requiredOutLengthTuple?.1
+                    {
+                        self.requiredOutLength = "\(rolMember)"
+                        self.requiredOutLengthAcc = "\(rolScore)"
+                    }
+                    else
+                    {
+                        self.requiredOutLength = "--"
+                        self.requiredOutLengthAcc = "--"
+                    }
+                    
+                    if let folMember = forbiddenOutLengthTuple?.0, let folScore = forbiddenOutLengthTuple?.1
+                    {
+                        self.forbiddenOutLength = "\(folMember)"
+                        self.forbiddenOutLengthAcc = "\(folScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenOutLength = "--"
+                        self.forbiddenOutLengthAcc = "--"
+                    }
+                    
+                    if let rilMember = requiredInLengthTuple?.0, let rilScore = requiredInLengthTuple?.1
+                    {
+                        self.requiredInLength = "\(rilMember)"
+                        self.requiredInLengthAcc = "\(rilScore)"
+                    }
+                    else
+                    {
+                        self.requiredInLength = "--"
+                        self.requiredInLengthAcc = "--"
+                    }
+                    
+                    if let filMember = forbiddenInLengthTuple?.0, let filScore = forbiddenInLengthTuple?.1
+                    {
+                        self.forbiddenInLength = "\(filMember)"
+                        self.forbiddenInLengthAcc = "\(filScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenInLength = "--"
+                        self.forbiddenInLengthAcc = "--"
+                    }
+                    
+                    // Entropy
+                    if let roeMember = requiredOutEntropyTuple?.0, let roeScore = requiredOutEntropyTuple?.1
+                    {
+                        self.requiredOutEntropy = "\(roeMember)"
+                        self.requiredOutEntropyAcc = "\(roeScore)"
+                    }
+                    else
+                    {
+                        self.requiredOutEntropy = "--"
+                        self.requiredOutEntropyAcc = "--"
+                    }
+                    
+                    if let foeMember = forbiddenOutEntropyTuple?.0, let foeScore = forbiddenOutEntropyTuple?.1
+                    {
+                        self.forbiddenOutEntropy = "\(foeMember)"
+                        self.forbiddenOutEntropyAcc = "\(foeScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenOutEntropy = "--"
+                        self.forbiddenOutEntropyAcc = "--"
+                    }
+                    
+                    if let rieMember = requiredInEntropyTuple?.0, let rieScore = requiredInEntropyTuple?.1
+                    {
+                        self.requiredInEntropy = "\(rieMember)"
+                        self.requiredInEntropyAcc = "\(rieScore)"
+                    }
+                    else
+                    {
+                        self.requiredInEntropy = "--"
+                        self.requiredInEntropyAcc = "--"
+                    }
+                    
+                    if let fieMember = forbiddenInEntropyTuple?.0, let fieScore = forbiddenInEntropyTuple?.1
+                    {
+                        self.forbiddenInEntropy = "\(fieMember)"
+                        self.forbiddenInEntropyAcc = "\(fieScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenInEntropy = "--"
+                        self.forbiddenInEntropyAcc = "--"
+                    }
+                    
+                    //Float Subsequences
+                    if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
+                    {
+                        self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
+                        self.requiredOutSequenceCount = "\(roFloatSeqMember)"
+                        self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
+                    }
+                    else
+                    {
+                        self.requiredOutSequence = "--"
+                        self.requiredOutSequenceCount = "--"
+                        self.requiredOutSequenceAcc = "--"
+                    }
+                    
+                    if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
+                    {
+                        self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
+                        self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
+                        self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenOutSequence = "--"
+                        self.forbiddenOutSequenceCount = "--"
+                        self.forbiddenOutSequenceAcc = "--"
+                    }
+                    
+                    if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
+                    {
+                        self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
+                        self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
+                        self.requiredInSequenceAcc = "\(riFloatSeqScore)"
+                    }
+                    else
+                    {
+                        self.requiredInSequence = "--"
+                        self.requiredInSequenceCount = "--"
+                        self.requiredInSequenceAcc = "--"
+                    }
+                    
+                    if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
+                    {
+                        self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
+                        self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
+                        self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
+                    }
+                    else
+                    {
+                        self.forbiddenInSequence = "--"
+                        self.forbiddenInSequenceCount = "--"
+                        self.forbiddenInSequenceAcc = "--"
+                    }
             }
-            else
-            {
-                self.forbiddenInSequence = "--"
-                self.forbiddenInSequenceCount = "--"
-                self.forbiddenInSequenceAcc = "--"
-            }
-            
-            // Offset Subsequences
-            let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
-            self.requiredOutOffset = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
-            self.requiredOutOffsetCount = outRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
-            self.requiredOutOffsetIndex = outRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
-            self.requiredOutOffsetAcc = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
-
-            let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
-            self.forbiddenOutOffset = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            self.forbiddenOutOffsetCount = outForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
-            self.forbiddenOutOffsetIndex = outForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
-            self.forbiddenOutOffsetAcc = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
-                        
-            let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
-            self.requiredInOffset = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
-            self.requiredInOffsetCount = inRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
-            self.requiredInOffsetIndex = inRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
-            self.requiredInOffsetAcc = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
-            
-            let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
-            self.forbiddenInOffset = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            self.forbiddenInOffsetCount = inForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
-            self.forbiddenInOffsetIndex = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
-            self.forbiddenInOffsetAcc = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
-            
         }
     }
     
