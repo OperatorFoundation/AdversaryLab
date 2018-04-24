@@ -35,6 +35,8 @@
 		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
 		468EF6B6207FEDA40007D0DF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 468EF6B5207FEDA40007D0DF /* subsequences.so */; };
+		5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */; };
+		5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */; };
 		539110FF2089246800960308 /* CheckRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 539110F72089246800960308 /* CheckRedisServerScript.sh */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
@@ -161,6 +163,8 @@
 		468B26232023B609000A2B5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		468B26512023D016000A2B5D /* ObservedConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservedConnections.swift; sourceTree = "<group>"; };
 		468EF6B5207FEDA40007D0DF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
+		5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingConfigurationModel.swift; sourceTree = "<group>"; };
+		5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PauseBot.swift; path = AdversaryLabSwift/Models/PauseBot.swift; sourceTree = SOURCE_ROOT; };
 		539110F72089246800960308 /* CheckRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerScript.sh; sourceTree = "<group>"; };
 		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KnownProtocols.swift; sourceTree = "<group>"; };
@@ -301,7 +305,9 @@
 		468B26502023CFF8000A2B5D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */,
 				468B26512023D016000A2B5D /* ObservedConnections.swift */,
+				5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -525,8 +531,10 @@
 				CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
+				5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */,
 				462271F72049021A00F21D08 /* DataHelper.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
+				5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */,
 				CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */,
 				46175B7C202D46AF009311D6 /* Sequences.swift in Sources */,
 				467E493A2017F166008B19E3 /* Constants.swift in Sources */,

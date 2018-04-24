@@ -809,14 +809,20 @@
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="enableSequenceAnalysisClicked:" target="XfG-lQ-9wD" id="zIU-Lr-Oor"/>
+                                            </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
+                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
                                             <rect key="frame" x="429" y="50" width="209" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="oLi-vs-yls">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="removePacketsClicked:" target="XfG-lQ-9wD" id="0HC-mX-IVK"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
                                             <rect key="frame" x="429" y="8" width="144" height="18"/>
@@ -825,6 +831,9 @@
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="enableTLSAnslysisClicked:" target="XfG-lQ-9wD" id="lvP-wz-OBV"/>
+                                            </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
                                             <rect key="frame" x="420" y="70" width="132" height="19"/>
@@ -1369,14 +1378,14 @@
                                             <rect key="frame" x="648" y="13" width="140" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Process Packets" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="runClick:" target="XfG-lQ-9wD" id="eZM-It-fdq"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DZy-kb-ZFq">
+                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DZy-kb-ZFq">
                                             <rect key="frame" x="14" y="13" width="135" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Stream Packets" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Hf-4f-Xfq">
@@ -2930,6 +2939,7 @@
                     <connections>
                         <outlet property="enableSequencesCheck" destination="ygH-l3-SnY" id="xVv-jo-Ld1"/>
                         <outlet property="enableTLSCheck" destination="qWY-FO-Xfj" id="lsC-YF-YZ5"/>
+                        <outlet property="processPacketsButton" destination="PUo-Tn-R9n" id="3MA-Oc-mj9"/>
                         <outlet property="removePacketsCheck" destination="l29-wR-vQY" id="tZw-T4-v0X"/>
                     </connections>
                 </viewController>

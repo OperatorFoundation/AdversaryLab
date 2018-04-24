@@ -36,12 +36,12 @@ func isTls12(forConnection connection: ObservedConnection) -> Bool
     guard maybeRequestRange != nil
     else
     {
-        NSLog("TLS request not found \(inPacket as NSData)")
+        //NSLog("TLS request not found \(inPacket as NSData)")
         return false
     }
     
     guard maybeResponseRange != nil else {
-        NSLog("TLS response not found \(outPacket as NSData)")
+        //NSLog("TLS response not found \(outPacket as NSData)")
         return false
     }
         
@@ -136,14 +136,12 @@ func scoreTls12()
         
         /// Save Scores
         let requiredTLSNames: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
-        let (newRSInserted, returnedRS) = requiredTLSNames.insert((tlsName, Float(requiredAccuracy)))
+        let (_, _) = requiredTLSNames.insert((tlsName, Float(requiredAccuracy)))
         print("\nSaved required accuracy \(requiredAccuracy) for TLS name \(tlsName)")
-        print("\(newRSInserted): \(returnedRS)")
         
         let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
-        let (newFSInserted, returnedFS) = forbiddenTLSNames.insert((tlsName, Float(forbiddenAccuracy)))
+        let (_, _) = forbiddenTLSNames.insert((tlsName, Float(forbiddenAccuracy)))
         print("Saved forbidden accuracy \(forbiddenAccuracy) for TLS name \(tlsName) to \(blockedTlsCommonNameKey)")
-        print("\(newFSInserted): \(returnedFS)")
     }
 }
 

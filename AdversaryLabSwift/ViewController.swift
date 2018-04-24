@@ -84,58 +84,15 @@ class ViewController: NSViewController
     @IBOutlet weak var removePacketsCheck: NSButton!
     @IBOutlet weak var enableSequencesCheck: NSButton!
     @IBOutlet weak var enableTLSCheck: NSButton!
+    @IBOutlet weak var processPacketsButton: NSButton!
     
-    var enableSequenceAnalysis: Bool
-    {
-        get
-        {
-            switch enableSequencesCheck.state
-            {
-            case .on:
-                return true
-            case .off:
-                return false
-            default: //No Mixed State
-                return false
-            }
-        }
-    }
-    
-    var enableTLSAnalysis: Bool
-    {
-        get
-        {
-            switch enableTLSCheck.state
-            {
-            case .on:
-                return true
-            case .off:
-                return false
-            default: //No Mixed State
-                return false
-            }
-        }
-    }
-
-    var removePackets: Bool
-    {
-        get
-        {
-            switch removePacketsCheck.state
-            {
-            case .on:
-                return true
-            case .off:
-                return false
-            default: //No Mixed State
-                return false
-            }
-        }
-    }
+    var configModel = ProcessingConfigurationModel()
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        
+        updateConfigModel()
         
         // Launch Redis Server
         RedisServerController.sharedInstance.launchRedisServer()
@@ -152,8 +109,33 @@ class ViewController: NSViewController
     
     @IBAction func runClick(_ sender: NSButton)
     {
-        self.connectionInspector.analyzeConnections(enableSequenceAnalysis: enableSequenceAnalysis, enableTLSAnalysis: enableTLSAnalysis, removePackets: removePackets)
+        print("\nYou clicked the process packets button 👻")
+        updateConfigModel()
+        if sender.state == .on
+        {
+            print("Time to analyze some things.")
+            self.connectionInspector.analyzeConnections(configModel: configModel)
+        }
+        else
+        {
+            print("Pause bot engage!! 🤖")
+        }
         self.loadLabelData()
+    }
+    
+    @IBAction func removePacketsClicked(_ sender: NSButton)
+    {
+        updateConfigModel()
+    }
+    
+    @IBAction func enableSequenceAnalysisClicked(_ sender: NSButton)
+    {
+        updateConfigModel()
+    }
+    
+    @IBAction func enableTLSAnslysisClicked(_ sender: NSButton)
+    {
+        updateConfigModel()
     }
     
     @IBAction func streamPacketsClicked(_ sender: NSButton)
@@ -167,6 +149,15 @@ class ViewController: NSViewController
             streaming = true
             streamConnections()
         }
+    }
+    
+    func updateConfigModel()
+    {
+        // Update Configuration Model based on button states
+        configModel.enableSequenceAnalysis = self.enableSequencesCheck.state == .on
+        configModel.enableTLSAnalysis = self.enableTLSCheck.state == .on
+        configModel.removePackets = self.removePacketsCheck.state == .on
+        configModel.processingEnabled = self.processPacketsButton.state == .on
     }
     
     func streamConnections()
@@ -188,6 +179,8 @@ class ViewController: NSViewController
     
     @objc func loadLabelData()
     {
+        // Get redis data in the utility clue and update the labels with the data in the main queue
+        
         DispatchQueue.global(qos: .utility).async
         {
             let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
@@ -529,7 +522,7 @@ class ViewController: NSViewController
                         continue
                     }
 
-                    self.connectionInspector.analyzeConnections(enableSequenceAnalysis: self.enableSequenceAnalysis, enableTLSAnalysis: self.enableTLSAnalysis, removePackets: self.removePackets)
+                    self.connectionInspector.analyzeConnections(configModel: self.configModel)
                 }
             }
         }
