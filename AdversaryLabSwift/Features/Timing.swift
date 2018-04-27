@@ -125,9 +125,20 @@ func scoreTiming(allowedTimeDifferenceKey: String, allowedTimeDifferenceBinsKey:
     /// L is the union of the keys for A and B (without the scores)
     let allTimeDifferencesSet = newIntSet(from: [allowedTimeDifferenceBinsRSet, blockedTimeDifferenceBinsRSet])
     
+    var currentTimeDifferenceCount = 0
+    
     /// for TimeDifference in L
     for timeDifference in allTimeDifferencesSet
     {
+        // Progress Indicator Info
+        currentTimeDifferenceCount += 1
+        DispatchQueue.main.async {
+            ProgressBot.sharedInstance.currentProgress = currentTimeDifferenceCount
+            ProgressBot.sharedInstance.totalToAnalyze = allTimeDifferencesSet.count
+            ProgressBot.sharedInstance.progressMessage = "\(scoringPacketTimingString) \(currentTimeDifferenceCount) of \(allTimeDifferencesSet.count)"
+        }
+        
+        ///
         let aCount = Double(allowedTimeDifferenceBinsRSet[timeDifference] ?? 0.0)
         let bCount = Double(blockedTimeDifferenceBinsRSet[timeDifference] ?? 0.0)
         

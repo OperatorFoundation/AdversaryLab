@@ -119,6 +119,8 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             break
         }
 
+        
+        
         if topOffsetScore != nil
         {
             if thisTopOffsetScore > topOffsetScore!
@@ -151,8 +153,16 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             bottomOffsetSequence = thisBottomOffsetSequence
         }
 
-        tempOffsetScores.delete()
         offsetIndex += 1
+        
+        // Progress Indicator Info
+        DispatchQueue.main.async {
+            ProgressBot.sharedInstance.currentProgress = offsetIndex
+            ProgressBot.sharedInstance.totalToAnalyze = tempOffsetScores.count
+            ProgressBot.sharedInstance.progressMessage = "\(scoringOffsetsString) \(offsetIndex)"
+        }
+        //
+        tempOffsetScores.delete()
     }
 
     /// Top score is the required rule
@@ -173,6 +183,10 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
 
 func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requiredFloatKey: String, forbiddenFloatKey: String, floatScoresKey: String)
 {
+    ProgressBot.sharedInstance.currentProgress = 0
+    ProgressBot.sharedInstance.totalToAnalyze = 3
+    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(0) of \(3)"
+    
     let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
     
     /// Ta is the number of Allowed connections analyzed (Allowed:Connections:Analyzed)
@@ -205,6 +219,9 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
         return
     }
     
+    ProgressBot.sharedInstance.currentProgress = 1
+    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(1) of \(3)"
+    
     //TODO: There's some hopping around between float and double that could be cleaned up
     /// Divide the score by Ta * Tb to get the accuracy
     let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
@@ -220,12 +237,18 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
         return
     }
     
+    ProgressBot.sharedInstance.currentProgress = 2
+    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(2) of \(3)"
+    
     //TODO: There's some hopping around between float and double that could be cleaned up
     /// Divide the score by Ta * Tb to get the accuracy
     let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
     forbiddenSequenceSet.delete()
     _ = forbiddenSequenceSet.insert((forbiddenSequence, forbiddenSequenceRuleAccuracy))
+    
+    ProgressBot.sharedInstance.currentProgress = 3
+    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(3) of \(3)"
     
 }
 

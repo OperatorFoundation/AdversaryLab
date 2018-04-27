@@ -106,9 +106,20 @@ func scoreTls12()
     /// L is the union of the keys for A and B (without the scores)
     let allTLSNamesSet = newStringSet(from: [allowedTLSNamesSet, blockedTLSNamesSet])
     
+    var currentNameCount = 0
+    
     /// for name in Names
     for tlsName in allTLSNamesSet
     {
+        // Progress Indicator Info
+        currentNameCount += 1
+        DispatchQueue.main.async {
+            ProgressBot.sharedInstance.currentProgress = currentNameCount
+            ProgressBot.sharedInstance.totalToAnalyze = allTLSNamesSet.count
+            ProgressBot.sharedInstance.progressMessage = "\(scoringTLSNamesString) \(currentNameCount) of \(allTLSNamesSet.count)"
+        }
+        
+        ///
         let aCount = Double(allowedTLSNamesSet[tlsName] ?? 0.0)
         let bCount = Double(blockedTLSNamesSet[tlsName] ?? 0.0)
         

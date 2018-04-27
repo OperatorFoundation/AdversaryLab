@@ -13,10 +13,6 @@ import Datable
 
 class ViewController: NSViewController
 {
-    let connectionInspector = ConnectionInspector()
-    
-    var streaming: Bool = false
-    
     @objc dynamic var allowedPacketsSeen = "Loading..."
     @objc dynamic var allowedPacketsAnalyzed = "Loading..."
     @objc dynamic var blockedPacketsSeen = "Loading..."
@@ -56,6 +52,7 @@ class ViewController: NSViewController
     @objc dynamic var forbiddenOutSequence = "--"
     @objc dynamic var forbiddenOutSequenceCount = "--"
     @objc dynamic var forbiddenOutSequenceAcc = "--"
+    
     @objc dynamic var requiredInSequence = "--"
     @objc dynamic var requiredInSequenceCount = "--"
     @objc dynamic var requiredInSequenceAcc = "--"
@@ -81,11 +78,17 @@ class ViewController: NSViewController
     @objc dynamic var forbiddenInOffsetIndex = "--"
     @objc dynamic var forbiddenInOffsetAcc = "--"
     
+    @objc dynamic var processingMessage = ""
+    
     @IBOutlet weak var removePacketsCheck: NSButton!
     @IBOutlet weak var enableSequencesCheck: NSButton!
     @IBOutlet weak var enableTLSCheck: NSButton!
     @IBOutlet weak var processPacketsButton: NSButton!
+    @IBOutlet weak var progressIndicator: NSProgressIndicator!
     
+    let connectionInspector = ConnectionInspector()
+    
+    var streaming: Bool = false
     var configModel = ProcessingConfigurationModel()
     
     override func viewDidLoad()
@@ -100,17 +103,20 @@ class ViewController: NSViewController
         // Subscribe to pubsub to know when to inspect a new connection
         //subscribeToNewConnectionsChannel()
         
-        // Update Labels
+        // Update Labels and Progress Indicator
         loadLabelData()
+        updateProgressIndicator()
         
-        // Also update labels when new data is available
+        // Also update labels and progress indicator when new data is available
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateProgressIndicator), name: .updateProgressIndicator, object: nil)
     }
     
     @IBAction func runClick(_ sender: NSButton)
     {
         print("\nYou clicked the process packets button 👻")
         updateConfigModel()
+        
         if sender.state == .on
         {
             print("Time to analyze some things.")
@@ -119,7 +125,12 @@ class ViewController: NSViewController
         else
         {
             print("Pause bot engage!! 🤖")
+            self.processingMessage = ""
+            self.progressIndicator.maxValue = 0
+            self.progressIndicator.doubleValue = 0
+            self.progressIndicator.stopAnimation(self)
         }
+        
         self.loadLabelData()
     }
     
@@ -158,6 +169,23 @@ class ViewController: NSViewController
         configModel.enableTLSAnalysis = self.enableTLSCheck.state == .on
         configModel.removePackets = self.removePacketsCheck.state == .on
         configModel.processingEnabled = self.processPacketsButton.state == .on
+    }
+    
+    @objc func updateProgressIndicator()
+    {
+        DispatchQueue.main.async
+        {
+            self.progressIndicator.maxValue = Double(ProgressBot.sharedInstance.totalToAnalyze)
+            self.progressIndicator.doubleValue = Double(ProgressBot.sharedInstance.currentProgress)
+            self.processingMessage = ProgressBot.sharedInstance.progressMessage
+            
+            if ProgressBot.sharedInstance.analysisComplete
+            {
+                self.processingMessage = ""
+                self.progressIndicator.stopAnimation(self)
+                self.processPacketsButton.state = .off
+            }
+        }
     }
     
     func streamConnections()

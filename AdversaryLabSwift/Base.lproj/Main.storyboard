@@ -802,8 +802,17 @@
                                                 <binding destination="XfG-lQ-9wD" name="value" keyPath="self.blockedPacketsAnalyzed" id="8qL-uh-Y3Y"/>
                                             </connections>
                                         </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
+                                            <rect key="frame" x="413" y="73" width="132" height="19"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Optional Settings" id="inq-Xy-mpx">
+                                                <font key="font" metaFont="systemBold"/>
+                                                <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ygH-l3-SnY">
-                                            <rect key="frame" x="429" y="29" width="181" height="18"/>
+                                            <rect key="frame" x="425" y="53" width="181" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Enable Sequence Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="njV-0D-nD0">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -814,7 +823,7 @@
                                             </connections>
                                         </button>
                                         <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
-                                            <rect key="frame" x="429" y="50" width="209" height="18"/>
+                                            <rect key="frame" x="425" y="14" width="209" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="oLi-vs-yls">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -825,7 +834,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
-                                            <rect key="frame" x="429" y="8" width="144" height="18"/>
+                                            <rect key="frame" x="425" y="34" width="144" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="m3M-iX-HUs">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -835,15 +844,6 @@
                                                 <action selector="enableTLSAnslysisClicked:" target="XfG-lQ-9wD" id="lvP-wz-OBV"/>
                                             </connections>
                                         </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
-                                            <rect key="frame" x="420" y="70" width="132" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Optional Settings" id="inq-Xy-mpx">
-                                                <font key="font" metaFont="systemBold"/>
-                                                <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
                                     </subviews>
                                 </view>
                                 <color key="fillColor" red="0.25098039215686274" green="0.38039215686274508" blue="0.50196078431372548" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1386,7 +1386,7 @@
                                             </connections>
                                         </button>
                                         <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DZy-kb-ZFq">
-                                            <rect key="frame" x="14" y="13" width="135" height="32"/>
+                                            <rect key="frame" x="14" y="53" width="135" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Stream Packets" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Hf-4f-Xfq">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -2831,6 +2831,22 @@
                                                 <real value="3.4028234663852886e+38"/>
                                             </customSpacing>
                                         </stackView>
+                                        <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
+                                            <rect key="frame" x="18" y="-1" width="764" height="20"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        </progressIndicator>
+                                        <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-D3-1sv">
+                                            <rect key="frame" x="16" y="20" width="616" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Loading message...." id="MUp-XL-wa4">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.processingMessage" id="9Fm-g7-IqM"/>
+                                            </connections>
+                                        </textField>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="FbD-V0-Jft" firstAttribute="leading" secondItem="tdj-ZI-A0X" secondAttribute="leading" id="0iP-vk-JGH"/>
@@ -2940,6 +2956,7 @@
                         <outlet property="enableSequencesCheck" destination="ygH-l3-SnY" id="xVv-jo-Ld1"/>
                         <outlet property="enableTLSCheck" destination="qWY-FO-Xfj" id="lsC-YF-YZ5"/>
                         <outlet property="processPacketsButton" destination="PUo-Tn-R9n" id="3MA-Oc-mj9"/>
+                        <outlet property="progressIndicator" destination="SuX-tc-4bk" id="3wB-0k-5b0"/>
                         <outlet property="removePacketsCheck" destination="l29-wR-vQY" id="tZw-T4-v0X"/>
                     </connections>
                 </viewController>

@@ -115,12 +115,24 @@ let blockedTlsScoreKey = "Blocked:Outgoing:TLS:Score"
 ///
 let newConnectionMessage = "NewConnectionAdded"
 
+// Human Reaable Strings
+let analyzingAllowedConnectionsString = "Analyzing allowed connection"
+let analyzingBlockedConnectionString = "Analyzing blocked connection"
+let scoringPacketLengthsString = "Scoring packet lengths"
+let scoringPacketTimingString = "Scoring packet timing"
+let scoringEntropyString = "Scoring entropy"
+let scoringTLSNamesString = "Scoring TLS names"
+let scoringOffsetsString = "Scoring offset sequences"
+let scoringFloatSequencesString = "Scoring float sequences"
+
+//
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
 let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
 extension Notification.Name
 {
     static let updateStats = Notification.Name("UpdatedConnectionStats")
+    static let updateProgressIndicator = Notification.Name("UpdatedProgress")
 }
 
 enum KnownProtocolType {

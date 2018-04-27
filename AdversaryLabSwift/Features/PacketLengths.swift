@@ -94,8 +94,15 @@ func scorePacketLengths(allowedLengthsKey: String, blockedLengthsKey: String, re
     let allLengthsSet = newIntSet(from: [allowedLengthsSet, blockedLengthsSet])
     
     /// for len in L
+    var currentLengthCount = 0
     for length in allLengthsSet
     {
+        currentLengthCount += 1
+        DispatchQueue.main.async {
+            ProgressBot.sharedInstance.currentProgress = currentLengthCount
+            ProgressBot.sharedInstance.totalToAnalyze = allLengthsSet.count
+            ProgressBot.sharedInstance.progressMessage = "\(scoringPacketLengthsString) \(currentLengthCount) of \(allLengthsSet.count)"
+        }
         let aCount = Double(allowedLengthsSet[length] ?? 0.0)
         let bCount = Double(blockedLengthsSet[length] ?? 0.0)
         

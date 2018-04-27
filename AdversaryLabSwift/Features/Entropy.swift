@@ -170,9 +170,18 @@ func scoreEntropy(allowedEntropyKey: String, allowedEntropyBinsKey: String, bloc
     /// L is the union of the keys for A and B (without the scores)
     let allEntropySet = newIntSet(from: [allowedEntropyBinsRSet, blockedEntropyBinsRSet])
 
+    var currentEntropyCount = 0
     /// for entropy in L
     for entropy in allEntropySet
     {
+        // Progress Indicator Info
+        currentEntropyCount += 1
+        DispatchQueue.main.async {
+            ProgressBot.sharedInstance.currentProgress = currentEntropyCount
+            ProgressBot.sharedInstance.totalToAnalyze = allEntropySet.count
+            ProgressBot.sharedInstance.progressMessage = "\(scoringEntropyString) \(currentEntropyCount) of \(allEntropySet.count)"
+        }
+        
         let aCount = Double(allowedEntropyBinsRSet[entropy] ?? 0.0)
         let bCount = Double(blockedEntropyBinsRSet[entropy] ?? 0.0)
         

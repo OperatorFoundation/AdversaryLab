@@ -9,21 +9,21 @@
 import Foundation
 import Auburn
 
-// TODO: Notification to interrupt processing
-// TODO: Update Stats notification in loop
-
 class ConnectionInspector
 {
     var pauseBuddy = PauseBot()
-    
+
     func analyzeConnections(configModel: ProcessingConfigurationModel)
     {
+        ProgressBot.sharedInstance.analysisComplete = false
+        
         analysisQueue.async
         {
             // Allowed Connections
             if configModel.removePackets
             {
                 let allowedConnectionList: RList<String> = RList(key: allowedConnectionsKey)
+                var numberOfAllowedAnalyzed = 0
                 while allowedConnectionList.count != 0, configModel.processingEnabled
                 {
                     // Get the first connection ID from the list
@@ -38,6 +38,18 @@ class ConnectionInspector
                         continue
                     }
                     
+                    // Progress Indicator Info
+                    numberOfAllowedAnalyzed += 1
+                    let totalAllowedConnections = allowedConnectionList.count
+                    
+                    DispatchQueue.main.async
+                    {
+                        ProgressBot.sharedInstance.totalToAnalyze = totalAllowedConnections
+                        ProgressBot.sharedInstance.currentProgress = numberOfAllowedAnalyzed
+                        ProgressBot.sharedInstance.progressMessage = "\(analyzingAllowedConnectionsString) \(numberOfAllowedAnalyzed) of \(totalAllowedConnections)"
+                    }
+                    
+                    // Analyze this connection
                     let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                     
                     self.analyze(connection: allowedConnection, configModel: configModel)
@@ -45,6 +57,7 @@ class ConnectionInspector
                 
                 // Blocked Connections
                 let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
+                var numberOfBlockedAnalyzed = 0
                 while blockedConnectionList.count != 0, configModel.processingEnabled
                 {
                     // Get the first connection ID from the list
@@ -57,6 +70,16 @@ class ConnectionInspector
                     if "\(type(of: blockedConnectionID))" == "NSNull"
                     {
                         continue
+                    }
+                    
+                    // Progress Indicator Info
+                    numberOfBlockedAnalyzed += 1
+                    let totalBlockedConnections = blockedConnectionList.count
+                    
+                    DispatchQueue.main.async {
+                        ProgressBot.sharedInstance.totalToAnalyze = totalBlockedConnections
+                        ProgressBot.sharedInstance.currentProgress = numberOfBlockedAnalyzed
+                        ProgressBot.sharedInstance.progressMessage = "\(analyzingBlockedConnectionString) \(numberOfBlockedAnalyzed) of \(totalBlockedConnections)"
                     }
                     
                     let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
@@ -76,12 +99,11 @@ class ConnectionInspector
                 if self.pauseBuddy.processingAllowedConnections
                 {
                     let allowedConnectionList: RList<String> = RList(key: allowedConnectionsKey)
+                    
                     for index in self.pauseBuddy.currentIndex ..< allowedConnectionList.count
                     {
                         if configModel.processingEnabled
                         {
-                            print("Analyzing an allowed connection async. \(index)/\(allowedConnectionList.count)")
-                            
                             // Get the first connection ID from the list
                             guard let allowedConnectionID = allowedConnectionList[index]
                                 else
@@ -89,17 +111,28 @@ class ConnectionInspector
                                 continue
                             }
                             
-                            print("\nIndexed Allowed Connection: \(allowedConnectionID)")
-                            
                             if "\(type(of: allowedConnectionID))" == "NSNull"
                             {
                                 continue
                             }
                             
+                            // Progress Indicator Stuff
+                            let totalAllowedConnections = allowedConnectionList.count
+                            DispatchQueue.main.async
+                            {
+                                ProgressBot.sharedInstance.totalToAnalyze = totalAllowedConnections
+                                ProgressBot.sharedInstance.currentProgress = index + 1
+                                ProgressBot.sharedInstance.progressMessage = "\(analyzingAllowedConnectionsString) \(index + 1) of \(totalAllowedConnections)"
+                            }
+                            
+                            // Analyze the connection
                             let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                             self.analyze(connection: allowedConnection, configModel: configModel)
-                            NotificationCenter.default.post(name: .updateStats, object: nil)
-                            self.pauseBuddy.currentIndex = index + 1
+                            
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: .updateStats, object: nil)
+                                self.pauseBuddy.currentIndex = index + 1
+                            }
                         }
                         else
                         {
@@ -118,7 +151,6 @@ class ConnectionInspector
                 {
                     if configModel.processingEnabled
                     {
-                        print("Analyzing a blocked connection async. \(index)/\(blockedConnectionList.count)")
                         // Get the first connection ID from the list
                         guard let blockedConnectionID = blockedConnectionList[index]
                             else
@@ -131,9 +163,20 @@ class ConnectionInspector
                             continue
                         }
                         
-                        let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
+                        // Progress Indicator Stuff
+                        let totalBlockedConnections = blockedConnectionList.count
+                        DispatchQueue.main.async
+                        {
+                            ProgressBot.sharedInstance.totalToAnalyze = totalBlockedConnections
+                            ProgressBot.sharedInstance.currentProgress = index + 1
+                            ProgressBot.sharedInstance.progressMessage = "\(analyzingBlockedConnectionString) \(index + 1) of \(totalBlockedConnections)"
+                        }
                         
+                        // Analyze the connection
+                        let blockedConnection = ObservedConnection(connectionType: .blocked, connectionID: blockedConnectionID)
                         self.analyze(connection: blockedConnection, configModel: configModel)
+                        
+                        // Let the UI know it needs an update
                         NotificationCenter.default.post(name: .updateStats, object: nil)
                         self.pauseBuddy.currentIndex = index + 1
                     }
@@ -147,12 +190,18 @@ class ConnectionInspector
                 }
             }
             
-            self.scoreConnections(configModel: configModel)
+            if configModel.processingEnabled
+            {
+                self.scoreConnections(configModel: configModel)
+            }
+            
             self.pauseBuddy.processingComplete = true
+            DispatchQueue.main.async
+            {
+                ProgressBot.sharedInstance.analysisComplete = true
+                NotificationCenter.default.post(name: .updateStats, object: nil)
+            }
         }
-
-        // New Data Available for UI
-        NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
     func scoreConnections(configModel: ProcessingConfigurationModel)
@@ -183,14 +232,22 @@ class ConnectionInspector
     
     func analyze(connection: ObservedConnection, configModel: ProcessingConfigurationModel)
     {
-        print("Analyzing a new connection: \(connection.connectionID)")
         // Process Packet Lengths
+        DispatchQueue.main.async{
+            ProgressBot.sharedInstance.progressMessage = "Analyzing packet lengths for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+        }
         let (packetLengthProcessed, maybePacketlengthError) =  processPacketLengths(forConnection: connection)
         
         // Process Packet Timing
+        DispatchQueue.main.async{
+            ProgressBot.sharedInstance.progressMessage = "Analyzing Packet Timing for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+        }
         let (timingProcessed, maybePacketTimingError) = processTiming(forConnection: connection)
         
         // Process Offset and Float Sequences
+        DispatchQueue.main.async{
+            ProgressBot.sharedInstance.progressMessage = "Analyzing Subsequences for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+        }
         var subsequenceNoErrors = true
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
@@ -201,6 +258,9 @@ class ConnectionInspector
         }
         
         // Process Entropy
+        DispatchQueue.main.async{
+            ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+        }
         let (entropyProcessed, _) = processEntropy(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
@@ -228,6 +288,9 @@ class ConnectionInspector
         }
         
         if configModel.enableTLSAnalysis {
+            DispatchQueue.main.async{
+                ProgressBot.sharedInstance.progressMessage = "Analyzing TLS Names for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+            }
             if let knownProtocol = detectKnownProtocol(connection: connection) {
                 NSLog("It's TLS!")
                 processKnownProtocol(knownProtocol, connection)
