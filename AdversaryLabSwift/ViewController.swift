@@ -121,14 +121,12 @@ class ViewController: NSViewController
         {
             print("Time to analyze some things.")
             self.connectionInspector.analyzeConnections(configModel: configModel)
+            updateProgressIndicator()
         }
         else
         {
             print("Pause bot engage!! 🤖")
-            self.processingMessage = ""
-            self.progressIndicator.maxValue = 0
-            self.progressIndicator.doubleValue = 0
-            self.progressIndicator.stopAnimation(self)
+            updateProgressIndicator()
         }
         
         self.loadLabelData()

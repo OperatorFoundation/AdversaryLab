@@ -99,7 +99,12 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
     {
         let tempOffsetScoresKey = "tempOffsetScores"
         /// Returns a new sorted set with the correct scoring
-        let tempOffsetScores: RSortedSet<Data> = RSortedSet(unionOf: allowedOffsetKey + ":\(offsetIndex)", scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedOffsetKey + ":\(offsetIndex)", scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: tempOffsetScoresKey)
+        let tempOffsetScores: RSortedSet<Data> = RSortedSet(
+            unionOf: allowedOffsetKey + ":\(offsetIndex)",
+            scoresMultipliedBy: blockedConnectionsAnalyzed,
+            secondSetKey: blockedOffsetKey + ":\(offsetIndex)",
+            scoresMultipliedBy: -allowedConnectionsAnalyzed,
+            newSetKey: tempOffsetScoresKey)
         
         if tempOffsetScores.count < 1
         {
@@ -107,50 +112,67 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             break
         }
 
-        guard let (thisTopOffsetSequence, thisTopOffsetScore) = tempOffsetScores.first
+        guard let (_, thisTopOffsetScore) = tempOffsetScores.first
             else
         {
             break
         }
         
-        guard let (thisBottomOffsetSequence, thisBottomOffsetScore) = tempOffsetScores.last
-            else
+        // Get the top score and then fetch all results that have this score
+        guard let allTopOffsets: Array <Data> = tempOffsetScores.getElements(withMinScore: Double(thisTopOffsetScore), andMaxScore: Double(thisTopOffsetScore)), let longestTopOffset = allTopOffsets.max(by: {$1.count > $0.count})
+        else
         {
+            print("\nFailed to find the longest top offset sequence.")
             break
         }
-
         
-        
+        // Save the top scoring, longest offset
         if topOffsetScore != nil
         {
             if thisTopOffsetScore > topOffsetScore!
             {
                 topOffsetScore = thisTopOffsetScore
-                topOffsetSequence = thisTopOffsetSequence
+                topOffsetSequence = longestTopOffset
                 topOffsetIndex = offsetIndex
             }
         }
         else
         {
             topOffsetScore = thisTopOffsetScore
-            topOffsetSequence = thisTopOffsetSequence
+            topOffsetSequence = longestTopOffset
             topOffsetIndex = offsetIndex
         }
+        
+        // Get the bottom scoring sequence and score
+        guard let (_, thisBottomOffsetScore) = tempOffsetScores.last
+            else
+        {
+            break
+        }
 
+        // Use this bottom score to fetch all results with this score and choose the longest
+        guard let allBottomOffsets: Array<Data> = tempOffsetScores.getElements(withMinScore: Double(thisBottomOffsetScore), andMaxScore: Double(thisBottomOffsetScore)), let longestBottomOffset = allBottomOffsets.max(by: {$1.count > $0.count})
+        else
+        {
+            print("\nFailed to find the longest bottom offset sequence.")
+            break
+        }
+        
+        // Save the lowest scoring, longest, offset sequence
         if bottomOffsetScore != nil
         {
             if thisBottomOffsetScore < bottomOffsetScore!
             {
                 bottomOffsetScore = thisBottomOffsetScore
                 bottomOffsetIndex = offsetIndex
-                bottomOffsetSequence = thisBottomOffsetSequence
+                bottomOffsetSequence = longestBottomOffset
             }
         }
         else
         {
             bottomOffsetScore = thisBottomOffsetScore
             bottomOffsetIndex = offsetIndex
-            bottomOffsetSequence = thisBottomOffsetSequence
+            bottomOffsetSequence = longestBottomOffset
         }
 
         offsetIndex += 1
@@ -212,10 +234,18 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     let sequenceScoresSet: RSortedSet<Data> = RSortedSet(unionOf: allowedFloatKey, scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedFloatKey, scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: floatScoresKey)
     
     /// Top score is the required rule
-    guard let (requiredSequence, requiredSequenceScore) = sequenceScoresSet.first
+    guard let (_, requiredSequenceScore) = sequenceScoresSet.first
     else
     {
         print("😮  Unable to get a required rule for float sequences.")
+        return
+    }
+    
+    // Get all sequences with this top score
+    guard let allTopSequences: Array<Data> = sequenceScoresSet.getElements(withMinScore: Double(requiredSequenceScore), andMaxScore: Double(requiredSequenceScore)), let longestRequiredSequence = allTopSequences.max(by: {$1.count > $0.count})
+    else
+    {
+        print("Unable to find the longest top float sequence.")
         return
     }
     
@@ -227,13 +257,20 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let requiredSequenceSet: RSortedSet<Data> = RSortedSet(key: requiredFloatKey)
     requiredSequenceSet.delete()
-    _ = requiredSequenceSet.insert((requiredSequence, requiredSequenceRuleAccuracy))
+    _ = requiredSequenceSet.insert((longestRequiredSequence, requiredSequenceRuleAccuracy))
     
     /// Bottom score is the forbidden rule
-    guard let (forbiddenSequence, forbiddenSequenceScore) = sequenceScoresSet.last
+    guard let (_, forbiddenSequenceScore) = sequenceScoresSet.last
     else
     {
         print("😮  Unable to get a forbidden rule for float sequences.")
+        return
+    }
+    
+    guard let allBottomSequences: Array <Data> = sequenceScoresSet.getElements(withMinScore: Double(forbiddenSequenceScore), andMaxScore: Double(forbiddenSequenceScore)), let longestForbiddenSequence = allBottomSequences.max(by: {$1.count > $0.count})
+    else
+    {
+        print("\nFailed to get the longest forbidden float sequence.")
         return
     }
     
@@ -245,7 +282,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
     forbiddenSequenceSet.delete()
-    _ = forbiddenSequenceSet.insert((forbiddenSequence, forbiddenSequenceRuleAccuracy))
+    _ = forbiddenSequenceSet.insert((longestForbiddenSequence, forbiddenSequenceRuleAccuracy))
     
     ProgressBot.sharedInstance.currentProgress = 3
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(3) of \(3)"
