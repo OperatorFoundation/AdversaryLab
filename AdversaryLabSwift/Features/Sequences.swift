@@ -118,13 +118,13 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             break
         }
         
-        // Get the top score and then fetch all results that have this score
-        guard let allTopOffsets: Array <Data> = tempOffsetScores.getElements(withMinScore: Double(thisTopOffsetScore), andMaxScore: Double(thisTopOffsetScore)), let longestTopOffset = allTopOffsets.max(by: {$1.count > $0.count})
-        else
+        guard let longestTopSequence: Data = tempOffsetScores.getLongestSequence(withScore: Double(thisTopOffsetScore))
+            else
         {
             print("\nFailed to find the longest top offset sequence.")
             break
         }
+        
         
         // Save the top scoring, longest offset
         if topOffsetScore != nil
@@ -132,14 +132,14 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             if thisTopOffsetScore > topOffsetScore!
             {
                 topOffsetScore = thisTopOffsetScore
-                topOffsetSequence = longestTopOffset
+                topOffsetSequence = longestTopSequence
                 topOffsetIndex = offsetIndex
             }
         }
         else
         {
             topOffsetScore = thisTopOffsetScore
-            topOffsetSequence = longestTopOffset
+            topOffsetSequence = longestTopSequence
             topOffsetIndex = offsetIndex
         }
         
@@ -151,7 +151,7 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
         }
 
         // Use this bottom score to fetch all results with this score and choose the longest
-        guard let allBottomOffsets: Array<Data> = tempOffsetScores.getElements(withMinScore: Double(thisBottomOffsetScore), andMaxScore: Double(thisBottomOffsetScore)), let longestBottomOffset = allBottomOffsets.max(by: {$1.count > $0.count})
+        guard let longestBottomSequence: Data = tempOffsetScores.getLongestSequence(withScore: Double(thisBottomOffsetScore))
         else
         {
             print("\nFailed to find the longest bottom offset sequence.")
@@ -165,14 +165,14 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
             {
                 bottomOffsetScore = thisBottomOffsetScore
                 bottomOffsetIndex = offsetIndex
-                bottomOffsetSequence = longestBottomOffset
+                bottomOffsetSequence = longestBottomSequence
             }
         }
         else
         {
             bottomOffsetScore = thisBottomOffsetScore
             bottomOffsetIndex = offsetIndex
-            bottomOffsetSequence = longestBottomOffset
+            bottomOffsetSequence = longestBottomSequence
         }
 
         offsetIndex += 1

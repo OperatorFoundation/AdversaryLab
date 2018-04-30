@@ -35,11 +35,11 @@
 		468B264C2023C099000A2B5D /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
 		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
-		468EF6B6207FEDA40007D0DF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 468EF6B5207FEDA40007D0DF /* subsequences.so */; };
 		46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */ = {isa = PBXBuildFile; fileRef = 46CD66032093B100009E1141 /* AdversaryLabClient */; };
 		5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */; };
 		5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */; };
 		539110FF2089246800960308 /* CheckRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 539110F72089246800960308 /* CheckRedisServerScript.sh */; };
+		53C9A3262097BB7A00F813FF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 53C9A3252097BB7A00F813FF /* subsequences.so */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
 		CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */; };
@@ -165,11 +165,11 @@
 		467E49392017F166008B19E3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		468B26232023B609000A2B5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		468B26512023D016000A2B5D /* ObservedConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservedConnections.swift; sourceTree = "<group>"; };
-		468EF6B5207FEDA40007D0DF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
 		46CD66032093B100009E1141 /* AdversaryLabClient */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AdversaryLabClient; sourceTree = "<group>"; };
 		5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingConfigurationModel.swift; sourceTree = "<group>"; };
 		5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PauseBot.swift; path = AdversaryLabSwift/Models/PauseBot.swift; sourceTree = SOURCE_ROOT; };
 		539110F72089246800960308 /* CheckRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerScript.sh; sourceTree = "<group>"; };
+		53C9A3252097BB7A00F813FF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
 		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KnownProtocols.swift; sourceTree = "<group>"; };
 		CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLS12.swift; sourceTree = "<group>"; };
@@ -241,10 +241,10 @@
 				460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */,
 				460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */,
 				460CF7E92076EB0800FB3723 /* redis.conf */,
-				468EF6B5207FEDA40007D0DF /* subsequences.so */,
 				460CF7D220758D2C00FB3723 /* redis-server */,
 				460CF7EB2076F75A00FB3723 /* redis-cli */,
 				46CD66032093B100009E1141 /* AdversaryLabClient */,
+				53C9A3252097BB7A00F813FF /* subsequences.so */,
 				CA727CD32050A3580051A01B /* README.md */,
 				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
@@ -497,11 +497,11 @@
 				CA727CD42050A3580051A01B /* README.md in Resources */,
 				4651A15520083BF700037D31 /* Assets.xcassets in Resources */,
 				460CF7E62076C3D800FB3723 /* LaunchRedisServerScript.sh in Resources */,
+				53C9A3262097BB7A00F813FF /* subsequences.so in Resources */,
 				46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */,
 				539110FF2089246800960308 /* CheckRedisServerScript.sh in Resources */,
 				4651A15820083BF700037D31 /* Main.storyboard in Resources */,
 				460CF7E82076C76D00FB3723 /* ShutdownRedisServerScript.sh in Resources */,
-				468EF6B6207FEDA40007D0DF /* subsequences.so in Resources */,
 				460CF7EC2076F75A00FB3723 /* redis-cli in Resources */,
 				460CF7DA20758D2C00FB3723 /* redis-server in Resources */,
 				460CF7EA2076EB0800FB3723 /* redis.conf in Resources */,
