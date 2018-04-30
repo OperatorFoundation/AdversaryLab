@@ -242,7 +242,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     }
     
     // Get all sequences with this top score
-    guard let allTopSequences: Array<Data> = sequenceScoresSet.getElements(withMinScore: Double(requiredSequenceScore), andMaxScore: Double(requiredSequenceScore)), let longestRequiredSequence = allTopSequences.max(by: {$1.count > $0.count})
+    guard let longestTopSequence: Data = sequenceScoresSet.getLongestSequence(withScore: Double(requiredSequenceScore))
     else
     {
         print("Unable to find the longest top float sequence.")
@@ -257,7 +257,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let requiredSequenceSet: RSortedSet<Data> = RSortedSet(key: requiredFloatKey)
     requiredSequenceSet.delete()
-    _ = requiredSequenceSet.insert((longestRequiredSequence, requiredSequenceRuleAccuracy))
+    _ = requiredSequenceSet.insert((longestTopSequence, requiredSequenceRuleAccuracy))
     
     /// Bottom score is the forbidden rule
     guard let (_, forbiddenSequenceScore) = sequenceScoresSet.last
@@ -267,7 +267,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
         return
     }
     
-    guard let allBottomSequences: Array <Data> = sequenceScoresSet.getElements(withMinScore: Double(forbiddenSequenceScore), andMaxScore: Double(forbiddenSequenceScore)), let longestForbiddenSequence = allBottomSequences.max(by: {$1.count > $0.count})
+    guard let longestBottomSequence: Data = sequenceScoresSet.getLongestSequence(withScore: Double(forbiddenSequenceScore))
     else
     {
         print("\nFailed to get the longest forbidden float sequence.")
@@ -282,7 +282,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
     forbiddenSequenceSet.delete()
-    _ = forbiddenSequenceSet.insert((longestForbiddenSequence, forbiddenSequenceRuleAccuracy))
+    _ = forbiddenSequenceSet.insert((longestBottomSequence, forbiddenSequenceRuleAccuracy))
     
     ProgressBot.sharedInstance.currentProgress = 3
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(3) of \(3)"
