@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "AdversaryLabSwiftPackage",
     dependencies: [
-         .package(url: "https://github.com/OperatorFoundation/Auburn.git", from: "0.1.16"),
-         .package(url: "https://github.com/OperatorFoundation/Datable.git", from: "0.0.10"),
+         .package(url: "https://github.com/OperatorFoundation/Auburn.git", from: "0.1.23"),
+         .package(url: "https://github.com/OperatorFoundation/Datable.git", from: "1.0.5")
     ],
     targets: [
         .target(
@@ -14,6 +14,6 @@ let package = Package(
             dependencies: ["Auburn", "Datable"]),
         .testTarget(
             name: "AdversaryLabSwiftPackageTests",
-            dependencies: ["AdversaryLabSwiftPackage", "Auburn"]),
+            dependencies: ["AdversaryLabSwiftPackage"]),
     ]
 )
