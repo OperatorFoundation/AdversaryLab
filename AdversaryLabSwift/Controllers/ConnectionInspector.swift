@@ -12,6 +12,7 @@ import Auburn
 class ConnectionInspector
 {
     var pauseBuddy = PauseBot()
+    
 
     func analyzeConnections(configModel: ProcessingConfigurationModel)
     {
@@ -207,7 +208,7 @@ class ConnectionInspector
     func scoreConnections(configModel: ProcessingConfigurationModel)
     {
         sleep(1)
-        scoreAllPacketLengths()
+        PacketLengthsCoreML().scoreAllPacketLengths()
         sleep(1)
         scoreAllEntropy()
         sleep(1)
@@ -236,7 +237,7 @@ class ConnectionInspector
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing packet lengths for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (packetLengthProcessed, maybePacketlengthError) =  processPacketLengths(forConnection: connection)
+        let (packetLengthProcessed, maybePacketlengthError) =  PacketLengthsCoreML().processPacketLengths(forConnection: connection)
         
         // Process Packet Timing
         DispatchQueue.main.async{
