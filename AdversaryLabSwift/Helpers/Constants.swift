@@ -152,3 +152,18 @@ enum PacketTimingError: Error
     case noInPacketDateForConnection(String)
     case unableToAddTimeDifference(timeDifference: TimeInterval, connectionID: String)
 }
+
+enum ClassificationLabel: String
+{
+    case allowed = "allowed"
+    case blocked = "blocked"
+}
+
+enum ColumnLabel: String
+{
+    case length = "length"
+    case entropy = "entropy"
+    case timeDifference = "timeDifference"
+    case tlsNames = "tlsNames"
+    case classification = "classification"
+}

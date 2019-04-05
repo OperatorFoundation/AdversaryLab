@@ -72,29 +72,11 @@ class PacketLengthsCoreML
         scorePacketLengths(allowedLengthsKey: allowedIncomingLengthsKey, blockedLengthsKey: blockedIncomingLengthsKey, requiredLengthsKey: incomingRequiredLengthsKey, forbiddenLengthsKey: incomingForbiddenLengthsKey)
     }
     
-    
-    
     func scorePacketLengths(allowedLengthsKey: String, blockedLengthsKey: String, requiredLengthsKey: String, forbiddenLengthsKey: String)
     {
         var lengths = [Int]()
         var classificationLabel = [String]()
 
-        let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-        
-        /// |A| is the number of Allowed packets analyzed - Allowed:Connections:Analyzed
-        var allowedPacketsAnalyzed = 0.0
-        if let allowedConnectionsAnalyzedCount: Int = packetStatsDict[allowedPacketsAnalyzedKey]
-        {
-            allowedPacketsAnalyzed = Double(allowedConnectionsAnalyzedCount)
-        }
-        
-        /// |B| is the number of Blocked packets analyzed - Blocked:Connections:Analyzed
-        var blockedPacketsAnalyzed = 0.0
-        if let blockedConnectionsAnalyzedCount: Int = packetStatsDict[blockedPacketsAnalyzedKey]
-        {
-            blockedPacketsAnalyzed = Double(blockedConnectionsAnalyzedCount)
-        }
-        
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
         let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
@@ -136,6 +118,7 @@ class PacketLengthsCoreML
             }
         }
         
+        // Create the Lengths Table
         var lengthsTable = MLDataTable()
         let lengthsColumn = MLDataColumn(lengths)
         let classyLabelColumn = MLDataColumn(classificationLabel)
@@ -163,7 +146,6 @@ class PacketLengthsCoreML
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: lengthsEvaluationTable)
             
-            // TODO: This number is important for the UI (Accuracy)
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
             let evaluationAccuracy = (1.0 - evaluationError) * 100
@@ -171,7 +153,6 @@ class PacketLengthsCoreML
             
             do
             {
-                
                 let regressor = try MLRegressor(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.length.rawValue)
                 
                 // The largest distance between predictions and expected values
@@ -218,7 +199,6 @@ class PacketLengthsCoreML
                                     return
                                 }
                                 
-                                // TODO: This should now populate the UI
                                 let predictedAllowedLength = allowedLengths[0]
                                 let predictedBlockedLength = blockedLengths[0]
                                 print("\nPredicted Allowed Length = \(predictedAllowedLength)")
@@ -260,45 +240,6 @@ class PacketLengthsCoreML
         {
             print("\nError creating the classifier for lengths:\(error)")
         }
-        
-        
-//        /// for len in L
-//        var currentLengthCount = 0
-//        for length in allLengthsSet
-//        {
-//            currentLengthCount += 1
-//            DispatchQueue.main.async {
-//                ProgressBot.sharedInstance.currentProgress = currentLengthCount
-//                ProgressBot.sharedInstance.totalToAnalyze = allLengthsSet.count
-//                ProgressBot.sharedInstance.progressMessage = "\(scoringPacketLengthsString) \(currentLengthCount) of \(allLengthsSet.count)"
-//            }
-//
-//            let aCount = Double(allowedLengthsSet[length] ?? 0.0)
-//            let bCount = Double(blockedLengthsSet[length] ?? 0.0)
-//
-//            let aProb = aCount/allowedPacketsAnalyzed
-//            let bProb = bCount/blockedPacketsAnalyzed
-//
-//            /// Required
-//            // True Positive
-//            let requiredTP = aProb
-//            // False Positive
-//            let requiredFP = bProb
-//            // True Negative
-//            let requiredTN = 1 - bProb
-//            // False Negative
-//            let requiredFN = 1 - aProb
-//            // Accuracy
-//            let requiredAccuracy = (requiredTP + requiredTN)/(requiredTP + requiredTN + requiredFP + requiredFN)
-//
-//            /// Forbidden
-//            let forbiddenTP = 1 - aProb
-//            let forbiddenFP = 1 - bProb
-//            let forbiddenTN = bProb
-//            let forbiddenFN = aProb
-//            let forbiddenAccuracy = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
-//
-//        }
     }
     
     func newIntSet(from redisSets:[RSortedSet<Int>]) -> Set<Int>
@@ -337,15 +278,5 @@ class PacketLengthsCoreML
     }
 }
 
-enum ClassificationLabel: String
-{
-    case allowed = "allowed"
-    case blocked = "blocked"
-}
 
-enum ColumnLabel: String
-{
-    case length = "length"
-    case classification = "classification"
-}
 

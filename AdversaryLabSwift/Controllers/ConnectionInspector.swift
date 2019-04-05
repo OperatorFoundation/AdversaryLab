@@ -210,21 +210,21 @@ class ConnectionInspector
         sleep(1)
         PacketLengthsCoreML().scoreAllPacketLengths()
         sleep(1)
-        scoreAllEntropy()
+        EntropyCoreML().scoreAllEntropy()
         sleep(1)
-        scoreAllTiming()
+        TimingCoreML().scoreAllTiming()
         sleep(1)
         
         if configModel.enableSequenceAnalysis
         {
-            scoreAllFloatSequences()
-            scoreAllOffsetSequenes()
+            SequencesCoreML().scoreAllFloatSequences()
+            SequencesCoreML().scoreAllOffsetSequenes()
             sleep(1)
         }
         
         if configModel.enableTLSAnalysis
         {
-            scoreTls12()
+            TLS12CoreML().scoreTls12()
             sleep(1)
         }
         
@@ -243,7 +243,7 @@ class ConnectionInspector
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing Packet Timing for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (timingProcessed, maybePacketTimingError) = processTiming(forConnection: connection)
+        let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(forConnection: connection)
         
         // Process Offset and Float Sequences
         DispatchQueue.main.async{
@@ -253,7 +253,7 @@ class ConnectionInspector
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
         {
-            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(forConnection: connection)
+            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = SequencesCoreML().processSequences(forConnection: connection)
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }
@@ -262,7 +262,7 @@ class ConnectionInspector
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (entropyProcessed, _) = processEntropy(forConnection: connection)
+        let (entropyProcessed, _) = EntropyCoreML().processEntropy(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
         if packetLengthProcessed, timingProcessed, subsequenceNoErrors, entropyProcessed

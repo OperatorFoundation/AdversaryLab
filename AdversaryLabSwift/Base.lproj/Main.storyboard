@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
-        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
-        <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -687,7 +684,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Adversary Lab" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Adversary Lab" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="804" height="666"/>
@@ -1374,9 +1371,12 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
                                             <rect key="frame" x="648" y="13" width="140" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="128" id="Yps-No-gqn"/>
+                                                <constraint firstAttribute="height" constant="21" id="cX8-Jn-k8j"/>
+                                            </constraints>
                                             <buttonCell key="cell" type="push" title="Process Packets" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -2831,9 +2831,11 @@
                                                 <real value="3.4028234663852886e+38"/>
                                             </customSpacing>
                                         </stackView>
-                                        <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
+                                        <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
                                             <rect key="frame" x="18" y="-1" width="764" height="20"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="18" id="B47-s1-W43"/>
+                                            </constraints>
                                         </progressIndicator>
                                         <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-D3-1sv">
                                             <rect key="frame" x="16" y="20" width="616" height="17"/>
@@ -2847,15 +2849,27 @@
                                                 <binding destination="XfG-lQ-9wD" name="value" keyPath="self.processingMessage" id="9Fm-g7-IqM"/>
                                             </connections>
                                         </textField>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
+                                            <rect key="frame" x="508" y="13" width="140" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="loadDataClicked:" target="XfG-lQ-9wD" id="ypH-uk-wiR"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="FbD-V0-Jft" firstAttribute="leading" secondItem="tdj-ZI-A0X" secondAttribute="leading" id="0iP-vk-JGH"/>
+                                        <constraint firstAttribute="trailing" secondItem="PUo-Tn-R9n" secondAttribute="trailing" constant="12" id="1Lr-07-IOH"/>
                                         <constraint firstItem="WLd-t4-1zi" firstAttribute="leading" secondItem="Dud-MU-uBR" secondAttribute="leading" id="271-Sm-hDl"/>
                                         <constraint firstItem="eN9-L5-tJW" firstAttribute="top" secondItem="tdj-ZI-A0X" secondAttribute="bottom" constant="7" id="2LD-CK-F8V"/>
                                         <constraint firstItem="DhJ-dN-N45" firstAttribute="trailing" secondItem="TnU-63-4qv" secondAttribute="trailing" id="2xx-s6-y9t"/>
                                         <constraint firstAttribute="trailing" secondItem="TWq-1a-BzH" secondAttribute="trailing" constant="12" id="3Hz-F2-Ecu"/>
                                         <constraint firstItem="TnU-63-4qv" firstAttribute="leading" secondItem="rEU-zU-uAX" secondAttribute="leading" constant="20" id="3K5-hJ-ywW"/>
                                         <constraint firstItem="Z01-0p-3NI" firstAttribute="top" secondItem="DhJ-dN-N45" secondAttribute="bottom" constant="8" id="3a5-Nj-CRc"/>
+                                        <constraint firstAttribute="bottom" secondItem="SuX-tc-4bk" secondAttribute="bottom" id="3uH-7T-nB8"/>
                                         <constraint firstItem="m5b-nm-hR2" firstAttribute="leading" secondItem="EWK-ce-T20" secondAttribute="leading" id="6jb-p9-0XN"/>
                                         <constraint firstItem="clM-FW-HoR" firstAttribute="trailing" secondItem="WLd-t4-1zi" secondAttribute="trailing" id="7BY-LW-ggK"/>
                                         <constraint firstItem="DhJ-dN-N45" firstAttribute="top" secondItem="TnU-63-4qv" secondAttribute="bottom" constant="8" id="7cg-s9-M3e"/>
@@ -2877,12 +2891,16 @@
                                         <constraint firstItem="TnU-63-4qv" firstAttribute="top" secondItem="Rqn-T9-rMf" secondAttribute="bottom" id="IiE-cr-ydZ"/>
                                         <constraint firstItem="q7T-1z-Vem" firstAttribute="top" secondItem="NTz-p4-SCG" secondAttribute="bottom" constant="6" id="KPg-ro-Jmn"/>
                                         <constraint firstItem="TWq-1a-BzH" firstAttribute="centerY" secondItem="NTz-p4-SCG" secondAttribute="centerY" id="KWZ-Wu-khK"/>
+                                        <constraint firstItem="PUo-Tn-R9n" firstAttribute="leading" secondItem="xh2-hi-Cpw" secondAttribute="trailing" constant="12" id="LQu-TQ-iWF"/>
                                         <constraint firstItem="Z01-0p-3NI" firstAttribute="leading" secondItem="Rqn-T9-rMf" secondAttribute="leading" id="Mkp-f8-if7"/>
                                         <constraint firstItem="jly-WH-Pag" firstAttribute="leading" secondItem="WLd-t4-1zi" secondAttribute="leading" id="MmU-gQ-lI1"/>
                                         <constraint firstItem="Tei-Ib-ZQM" firstAttribute="leading" secondItem="a4y-6U-AHW" secondAttribute="leading" id="Mut-FK-fwG"/>
+                                        <constraint firstItem="SuX-tc-4bk" firstAttribute="leading" secondItem="rEU-zU-uAX" secondAttribute="leading" constant="18" id="Nch-vQ-8Eh"/>
                                         <constraint firstItem="DhJ-dN-N45" firstAttribute="leading" secondItem="rEU-zU-uAX" secondAttribute="leading" constant="30" id="Nk3-Ol-nia"/>
                                         <constraint firstItem="TWq-1a-BzH" firstAttribute="leading" secondItem="jly-WH-Pag" secondAttribute="leading" id="On4-G1-k2e"/>
                                         <constraint firstItem="Tsr-T0-wl7" firstAttribute="leading" secondItem="q7T-1z-Vem" secondAttribute="leading" id="Pj3-US-bjX"/>
+                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="width" secondItem="PUo-Tn-R9n" secondAttribute="width" id="QFh-qY-hrC"/>
+                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="height" secondItem="PUo-Tn-R9n" secondAttribute="height" id="QJp-9d-U35"/>
                                         <constraint firstItem="a4y-6U-AHW" firstAttribute="top" secondItem="clM-FW-HoR" secondAttribute="bottom" constant="8" id="QKK-NB-1UD"/>
                                         <constraint firstItem="9H5-zb-xZh" firstAttribute="top" secondItem="FbD-V0-Jft" secondAttribute="bottom" constant="8" id="QVp-Vo-4hi"/>
                                         <constraint firstItem="RKz-sv-7wo" firstAttribute="leading" secondItem="Tsr-T0-wl7" secondAttribute="trailing" constant="4" id="Qey-0A-zDM"/>
@@ -2916,6 +2934,7 @@
                                         <constraint firstItem="clM-FW-HoR" firstAttribute="leading" secondItem="Dud-MU-uBR" secondAttribute="leading" constant="8" id="noc-EA-gS4"/>
                                         <constraint firstItem="NTz-p4-SCG" firstAttribute="leading" secondItem="TnU-63-4qv" secondAttribute="leading" id="oA3-Iu-agn"/>
                                         <constraint firstItem="UGy-NA-dol" firstAttribute="top" secondItem="RKz-sv-7wo" secondAttribute="bottom" constant="8" id="oMe-Nt-K3d"/>
+                                        <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="PUo-Tn-R9n" secondAttribute="bottom" constant="2" id="osk-M0-HAy"/>
                                         <constraint firstItem="EWK-ce-T20" firstAttribute="top" secondItem="dfJ-qg-wD5" secondAttribute="bottom" constant="8" id="pDv-rO-OAh"/>
                                         <constraint firstItem="zqP-1H-DVS" firstAttribute="width" secondItem="TnU-63-4qv" secondAttribute="width" id="pLK-l0-bco"/>
                                         <constraint firstItem="EWK-ce-T20" firstAttribute="leading" secondItem="dfJ-qg-wD5" secondAttribute="leading" id="pTX-SO-fWN"/>
@@ -2924,6 +2943,8 @@
                                         <constraint firstItem="zqP-1H-DVS" firstAttribute="top" secondItem="Z01-0p-3NI" secondAttribute="bottom" constant="2" id="qvk-KH-ItJ"/>
                                         <constraint firstItem="8jI-x3-WZT" firstAttribute="leading" secondItem="r3b-jF-8Ln" secondAttribute="leading" id="sEC-Sb-ADu"/>
                                         <constraint firstAttribute="trailing" secondItem="jly-WH-Pag" secondAttribute="trailing" constant="12" id="sQj-Ov-hgd"/>
+                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="bottom" secondItem="PUo-Tn-R9n" secondAttribute="bottom" id="syS-Hc-b4e"/>
+                                        <constraint firstAttribute="trailing" secondItem="SuX-tc-4bk" secondAttribute="trailing" constant="12" id="t8h-Wv-8vO"/>
                                         <constraint firstItem="NTz-p4-SCG" firstAttribute="width" secondItem="TnU-63-4qv" secondAttribute="width" id="t9t-nF-VdS"/>
                                         <constraint firstAttribute="trailing" secondItem="WLd-t4-1zi" secondAttribute="trailing" constant="12" id="u68-fU-XRP"/>
                                         <constraint firstItem="Tei-Ib-ZQM" firstAttribute="centerY" secondItem="gua-Ec-IdB" secondAttribute="centerY" id="uSE-iN-Luo"/>
@@ -2953,6 +2974,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="LoadDataButton" destination="7Xs-aF-0F3" id="kaT-nr-G2p"/>
                         <outlet property="enableSequencesCheck" destination="ygH-l3-SnY" id="xVv-jo-Ld1"/>
                         <outlet property="enableTLSCheck" destination="qWY-FO-Xfj" id="lsC-YF-YZ5"/>
                         <outlet property="processPacketsButton" destination="PUo-Tn-R9n" id="3MA-Oc-mj9"/>

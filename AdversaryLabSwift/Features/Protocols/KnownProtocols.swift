@@ -10,7 +10,7 @@ import Foundation
 import Auburn
 
 func detectKnownProtocol(connection: ObservedConnection) -> KnownProtocolType? {
-    if isTls12(forConnection: connection) {
+    if TLS12CoreML().isTls12(forConnection: connection) {
         return KnownProtocolType.TLS12
     } else {
         return nil
@@ -20,7 +20,7 @@ func detectKnownProtocol(connection: ObservedConnection) -> KnownProtocolType? {
 func processKnownProtocol(_ prot: KnownProtocolType, _ connection: ObservedConnection) {
     switch prot {
         case .TLS12:
-            processTls12(connection)
+            TLS12CoreML().processTls12(connection)
     }
 }
 

@@ -85,6 +85,7 @@ class ViewController: NSViewController
     @IBOutlet weak var enableTLSCheck: NSButton!
     @IBOutlet weak var processPacketsButton: NSButton!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
+    @IBOutlet weak var LoadDataButton: NSButtonCell!
     
     let connectionInspector = ConnectionInspector()
     
@@ -157,6 +158,25 @@ class ViewController: NSViewController
         {
             streaming = true
             streamConnections()
+        }
+    }
+    
+    @IBAction func loadDataClicked(_ sender: NSButton)
+    {
+        guard let window = view.window
+            else { return }
+        
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        
+        panel.beginSheetModal(for: window)
+        {
+            (result) in
+            
+            let selectedFile = panel.urls[0]
+            print("\nFile selected: \(selectedFile.path)")
         }
     }
     
@@ -243,10 +263,10 @@ class ViewController: NSViewController
             let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
             // Timing (milliseconds)
-            let requiredTimingSet: RSortedSet<Int> = RSortedSet(key: requiredTimeDiffKey)
-            let requiredTimingTuple: (Int, Float)? = requiredTimingSet.last
-            let forbiddenTimingSet: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
-            let forbiddenTimingTuple: (Int, Float)? = forbiddenTimingSet.last
+            let requiredTimingSet: RSortedSet<Double> = RSortedSet(key: requiredTimeDiffKey)
+            let requiredTimingTuple: (Double, Float)? = requiredTimingSet.last
+            let forbiddenTimingSet: RSortedSet<Double> = RSortedSet(key: forbiddenTimeDiffKey)
+            let forbiddenTimingTuple: (Double, Float)? = forbiddenTimingSet.last
             
             // TLS Common Names
             let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
@@ -269,17 +289,17 @@ class ViewController: NSViewController
             let forbiddenInLengthTuple: (Int, Float)? = forbiddenInLengthSet.last
             
             // Entropy
-            let requiredOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredEntropyKey)
-            let requiredOutEntropyTuple: (Int, Float)? = requiredOutEntropySet.last
+            let requiredOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingRequiredEntropyKey)
+            let requiredOutEntropyTuple: (Double, Float)? = requiredOutEntropySet.last
             
-            let forbiddenOutEntropySet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenEntropyKey)
-            let forbiddenOutEntropyTuple: (Int, Float)? = forbiddenOutEntropySet.last
+            let forbiddenOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingForbiddenEntropyKey)
+            let forbiddenOutEntropyTuple: (Double, Float)? = forbiddenOutEntropySet.last
             
-            let requiredInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingRequiredEntropyKey)
-            let requiredInEntropyTuple: (Int, Float)? = requiredInEntropySet.last
+            let requiredInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingRequiredEntropyKey)
+            let requiredInEntropyTuple: (Double, Float)? = requiredInEntropySet.last
             
-            let forbiddenInEntropySet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenEntropyKey)
-            let forbiddenInEntropyTuple: (Int, Float)? = forbiddenInEntropySet.last
+            let forbiddenInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingForbiddenEntropyKey)
+            let forbiddenInEntropyTuple: (Double, Float)? = forbiddenInEntropySet.last
             
             //Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
@@ -323,7 +343,7 @@ class ViewController: NSViewController
                     self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
                     
                     // Timing (milliseconds)
-                    if let rtMember: Int = requiredTimingTuple?.0, let rtScore: Float = requiredTimingTuple?.1
+                    if let rtMember: Double = requiredTimingTuple?.0, let rtScore: Float = requiredTimingTuple?.1
                     {
                         self.requiredTiming = "\(rtMember) ms"
                         self.requiredTimeAcc = "\(rtScore)"
@@ -416,7 +436,7 @@ class ViewController: NSViewController
                     // Entropy
                     if let roeMember = requiredOutEntropyTuple?.0, let roeScore = requiredOutEntropyTuple?.1
                     {
-                        self.requiredOutEntropy = "\(roeMember)"
+                        self.requiredOutEntropy = String(format: "%.3f", roeMember)
                         self.requiredOutEntropyAcc = "\(roeScore)"
                     }
                     else
@@ -427,7 +447,7 @@ class ViewController: NSViewController
                     
                     if let foeMember = forbiddenOutEntropyTuple?.0, let foeScore = forbiddenOutEntropyTuple?.1
                     {
-                        self.forbiddenOutEntropy = "\(foeMember)"
+                        self.forbiddenOutEntropy = String(format: "%.3f", foeMember)
                         self.forbiddenOutEntropyAcc = "\(foeScore)"
                     }
                     else
@@ -438,7 +458,7 @@ class ViewController: NSViewController
                     
                     if let rieMember = requiredInEntropyTuple?.0, let rieScore = requiredInEntropyTuple?.1
                     {
-                        self.requiredInEntropy = "\(rieMember)"
+                        self.requiredInEntropy = String(format: "%.3f", rieMember)
                         self.requiredInEntropyAcc = "\(rieScore)"
                     }
                     else
@@ -449,7 +469,7 @@ class ViewController: NSViewController
                     
                     if let fieMember = forbiddenInEntropyTuple?.0, let fieScore = forbiddenInEntropyTuple?.1
                     {
-                        self.forbiddenInEntropy = "\(fieMember)"
+                        self.forbiddenInEntropy = String(format: "%.3f", fieMember)
                         self.forbiddenInEntropyAcc = "\(fieScore)"
                     }
                     else
