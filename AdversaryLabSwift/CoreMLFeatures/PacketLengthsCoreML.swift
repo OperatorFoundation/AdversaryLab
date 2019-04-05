@@ -13,6 +13,9 @@ import CoreML
 
 class PacketLengthsCoreML
 {
+    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
+    
     func processPacketLengths(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
@@ -210,6 +213,9 @@ class PacketLengthsCoreML
                                 
                                 let forbiddenLengths: RSortedSet<Int> = RSortedSet(key: forbiddenLengthsKey)
                                 let _ = forbiddenLengths.insert((Int(predictedBlockedLength), Float(evaluationAccuracy)))
+                                
+                                // Save the models to a file
+                                FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.length.rawValue)
                             }
                             catch let blockedPredictionError
                             {

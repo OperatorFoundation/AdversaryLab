@@ -210,7 +210,7 @@ class ConnectionInspector
         sleep(1)
         PacketLengthsCoreML().scoreAllPacketLengths()
         sleep(1)
-        EntropyCoreML().scoreAllEntropy()
+        EntropyCoreML().scoreAllEntropyInDatabase()
         sleep(1)
         TimingCoreML().scoreAllTiming()
         sleep(1)

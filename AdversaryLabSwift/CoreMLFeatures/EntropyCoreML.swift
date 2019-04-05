@@ -12,6 +12,9 @@ import CreateML
 
 class EntropyCoreML
 {
+    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
+    
     func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, error: Error?)
     {
         let inPacketsEntropyList: RList<Double> = RList(key: connection.incomingEntropyKey)
@@ -81,23 +84,25 @@ class EntropyCoreML
         return countArray
     }
     
-    func scoreAllEntropy()
+    func scoreAllEntropyInDatabase()
     {
         // Outgoing
-        scoreEntropy(allowedEntropyKey: allowedOutgoingEntropyKey, blockedEntropyKey: blockedOutgoingEntropyKey, requiredEntropyKey: outgoingRequiredEntropyKey, forbiddenEntropyKey: outgoingForbiddenEntropyKey)
+        let outEntropyTable = createEntropyTable(allowedEntropyKey: allowedOutgoingEntropyKey, blockedEntropyKey: blockedOutgoingEntropyKey)
+        scoreEntropy(table: outEntropyTable, requiredEntropyKey: outgoingRequiredEntropyKey, forbiddenEntropyKey: outgoingForbiddenEntropyKey)
         
         // Incoming
-        scoreEntropy(allowedEntropyKey: allowedIncomingEntropyKey, blockedEntropyKey: blockedIncomingEntropyKey, requiredEntropyKey: incomingRequiredEntropyKey, forbiddenEntropyKey: incomingForbiddenEntropyKey)
+        let inEntropyTable = createEntropyTable(allowedEntropyKey: allowedIncomingEntropyKey, blockedEntropyKey: blockedIncomingEntropyKey)
+        scoreEntropy(table: inEntropyTable, requiredEntropyKey: incomingRequiredEntropyKey, forbiddenEntropyKey: incomingForbiddenEntropyKey)
     }
     
-    func scoreEntropy(allowedEntropyKey: String, blockedEntropyKey: String, requiredEntropyKey: String, forbiddenEntropyKey: String)
+    func createEntropyTable(allowedEntropyKey: String, blockedEntropyKey: String) -> MLDataTable
     {
         var entropyList = [Double]()
         var classificationLabels = [String]()
         
         // Allowed Traffic
         let allowedEntropyList: RList<Double> = RList(key: allowedEntropyKey)
-
+        
         for entropyIndex in 0 ..< allowedEntropyList.count
         {
             guard let aEntropy = allowedEntropyList[entropyIndex]
@@ -131,6 +136,29 @@ class EntropyCoreML
         entropyTable.addColumn(entropyColumn, named: ColumnLabel.entropy.rawValue)
         entropyTable.addColumn(classificationColumn, named: ColumnLabel.classification.rawValue)
         
+        return entropyTable
+    }
+    
+    // TODO: Creation of dataTable should be centralized
+    func createEntropyTable(fromFile fileURL: URL) -> MLDataTable?
+    {
+        do
+        {
+            let dataTable = try MLDataTable(contentsOf: fileURL)
+            let entropyColumns = [ColumnLabel.entropy.rawValue, ColumnLabel.classification.rawValue]
+            let entropyTable = dataTable[entropyColumns]
+            
+            return entropyTable
+        }
+        catch let tableFromFileError
+        {
+            print("\nError creating entropy MLDataTable from file: \(tableFromFileError)")
+            return nil
+        }
+    }
+    
+    func scoreEntropy(table entropyTable: MLDataTable, requiredEntropyKey: String, forbiddenEntropyKey: String)
+    {
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (entropyEvaluationTable, entropyTrainingTable) = entropyTable.randomSplit(by: 0.20)
         
@@ -231,6 +259,9 @@ class EntropyCoreML
                         // Save Scores
                         let forbiddenEntropy: RSortedSet<Double> = RSortedSet(key: forbiddenEntropyKey)
                         let _ = forbiddenEntropy.insert((predictedBlockedEntropy, Float(evaluationAccuracy)))
+                        
+                        // Save the models
+                        FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.entropy.rawValue)
                     }
                     catch let blockedColumnError
                     {

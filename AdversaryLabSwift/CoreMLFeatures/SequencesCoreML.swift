@@ -14,6 +14,8 @@ import Datable
 
 class SequencesCoreML
 {
+    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+    
     func processSequences(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         // Get the out packet that corresponds with this connection ID

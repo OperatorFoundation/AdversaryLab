@@ -12,6 +12,9 @@ import CreateML
 
 class TimingCoreML
 {
+    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
+    
     func processTiming(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         let outPacketDateHash: RMap<String, Double> = RMap(key: connection.outgoingDateKey)
@@ -188,6 +191,9 @@ class TimingCoreML
                         /// Save Scores
                         let forbiddenTiming: RSortedSet<Double> = RSortedSet(key: forbiddenTimeDifferenceKey)
                         let _ = forbiddenTiming.insert((predictedBlockedTimeDifference, Float(evaluationAccuracy)))
+                        
+                        // Save the models
+                        FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.timeDifference.rawValue)
                     }
                     catch let blockedColumnError
                     {

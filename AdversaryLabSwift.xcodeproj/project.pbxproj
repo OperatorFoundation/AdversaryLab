@@ -37,6 +37,7 @@
 		5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */; };
 		539110FF2089246800960308 /* CheckRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 539110F72089246800960308 /* CheckRedisServerScript.sh */; };
 		53C9A3262097BB7A00F813FF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 53C9A3252097BB7A00F813FF /* subsequences.so */; };
+		AE1AC6FA2258020500555456 /* FeatureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* FeatureController.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
 		AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */; };
@@ -169,6 +170,7 @@
 		5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PauseBot.swift; path = AdversaryLabSwift/Models/PauseBot.swift; sourceTree = SOURCE_ROOT; };
 		539110F72089246800960308 /* CheckRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerScript.sh; sourceTree = "<group>"; };
 		53C9A3252097BB7A00F813FF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
+		AE1AC6F92258020500555456 /* FeatureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureController.swift; sourceTree = "<group>"; };
 		AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketLengthsCoreML.swift; sourceTree = "<group>"; };
 		AE85902D2253E178003B21C0 /* TimingCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingCoreML.swift; sourceTree = "<group>"; };
 		AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntropyCoreML.swift; sourceTree = "<group>"; };
@@ -340,6 +342,7 @@
 				AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */,
 				AE8590532256549A003B21C0 /* SequencesCoreML.swift */,
 				AE859055225656B3003B21C0 /* TLS12CoreML.swift */,
+				AE1AC6F92258020500555456 /* FeatureController.swift */,
 			);
 			path = CoreMLFeatures;
 			sourceTree = "<group>";
@@ -552,6 +555,7 @@
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
 				460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */,
 				AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */,
+				AE1AC6FA2258020500555456 /* FeatureController.swift in Sources */,
 				CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,

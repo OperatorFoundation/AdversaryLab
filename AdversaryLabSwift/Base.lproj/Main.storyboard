@@ -1372,12 +1372,11 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
-                                            <rect key="frame" x="648" y="13" width="140" height="32"/>
+                                            <rect key="frame" x="623" y="13" width="165" height="32"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="128" id="Yps-No-gqn"/>
                                                 <constraint firstAttribute="height" constant="21" id="cX8-Jn-k8j"/>
                                             </constraints>
-                                            <buttonCell key="cell" type="push" title="Process Packets" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
+                                            <buttonCell key="cell" type="push" title="Process Stored Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -2850,8 +2849,8 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
-                                            <rect key="frame" x="508" y="13" width="140" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
+                                            <rect key="frame" x="458" y="13" width="165" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Process File Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>

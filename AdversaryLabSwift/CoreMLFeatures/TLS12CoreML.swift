@@ -18,6 +18,9 @@ let commonNameEnd=Data(bytes: [0x30])
 
 class TLS12CoreML
 {
+    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden tls name for a Connection", version: "1.0")
+    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a tls name is from an allowed or blocked connection.", version: "1.0")
+    
     func isTls12(forConnection connection: ObservedConnection) -> Bool
     {
         // Get the in packet that corresponds with this connection ID
@@ -220,6 +223,9 @@ class TLS12CoreML
                         /// Save Scores
                         let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
                         let (_, _) = forbiddenTLSNames.insert((predictedBlockedTLSName, Float(evaluationAccuracy)))
+                        
+                        // Save the model
+                        FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.tlsNames.rawValue)
                     }
                     catch let blockedTLSColumnError
                     {
@@ -234,54 +240,13 @@ class TLS12CoreML
             catch let regressorError
             {
                 print("\nError creating the tls regressor: \(regressorError)")
+                print("TLS Table:\n\(tlsTable)\n")
             }
         }
         catch let classifierError
         {
             print("Error creating tls classifier: \(classifierError)")
         }
-        
-//        var currentNameCount = 0
-//
-//        /// for name in Names
-//        for tlsName in allTLSNamesSet
-//        {
-//            // Progress Indicator Info
-//            currentNameCount += 1
-//            DispatchQueue.main.async {
-//                ProgressBot.sharedInstance.currentProgress = currentNameCount
-//                ProgressBot.sharedInstance.totalToAnalyze = allTLSNamesSet.count
-//                ProgressBot.sharedInstance.progressMessage = "\(scoringTLSNamesString) \(currentNameCount) of \(allTLSNamesSet.count)"
-//            }
-//
-//            ///
-//            let aCount = Double(allowedTLSNamesSet[tlsName] ?? 0.0)
-//            let bCount = Double(blockedTLSNamesSet[tlsName] ?? 0.0)
-//
-//            let aProb = aCount/allowedPacketsAnalyzed
-//            let bProb = bCount/blockedPacketsAnalyzed
-//
-//            /// Required
-//            // True Positive
-//            let requiredTP = aProb
-//            // False Positive
-//            let requiredFP = bProb
-//            // True Negative
-//            let requiredTN = 1 - bProb
-//            // False Negative
-//            let requiredFN = 1 - aProb
-//            // Accuracy
-//            let requiredAccuracy = (requiredTP + requiredTN)/(requiredTP + requiredTN + requiredFP + requiredFN)
-//
-//            /// Forbidden
-//            let forbiddenTP = 1 - aProb
-//            let forbiddenFP = 1 - bProb
-//            let forbiddenTN = bProb
-//            let forbiddenFN = aProb
-//            let forbiddenAccuracy: Double = (forbiddenTP + forbiddenTN)/(forbiddenTP + forbiddenTN + forbiddenFP + forbiddenFN)
-//
-//
-//        }
     }
     
     private func findCommonNameStart(_ outPacket: Data) -> Int? {
