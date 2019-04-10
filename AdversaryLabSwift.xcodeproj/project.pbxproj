@@ -37,11 +37,11 @@
 		5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */; };
 		539110FF2089246800960308 /* CheckRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 539110F72089246800960308 /* CheckRedisServerScript.sh */; };
 		53C9A3262097BB7A00F813FF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 53C9A3252097BB7A00F813FF /* subsequences.so */; };
-		AE1AC6FA2258020500555456 /* FeatureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* FeatureController.swift */; };
+		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
+		AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
 		AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */; };
-		AE8590542256549A003B21C0 /* SequencesCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590532256549A003B21C0 /* SequencesCoreML.swift */; };
 		AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE859055225656B3003B21C0 /* TLS12CoreML.swift */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
@@ -170,11 +170,12 @@
 		5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PauseBot.swift; path = AdversaryLabSwift/Models/PauseBot.swift; sourceTree = SOURCE_ROOT; };
 		539110F72089246800960308 /* CheckRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerScript.sh; sourceTree = "<group>"; };
 		53C9A3252097BB7A00F813FF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
-		AE1AC6F92258020500555456 /* FeatureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureController.swift; sourceTree = "<group>"; };
+		AE1AC6F92258020500555456 /* MLModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLModelController.swift; sourceTree = "<group>"; };
+		AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = exampleData.csv; sourceTree = "<group>"; };
+		AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllFeatures.swift; sourceTree = "<group>"; };
 		AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketLengthsCoreML.swift; sourceTree = "<group>"; };
 		AE85902D2253E178003B21C0 /* TimingCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingCoreML.swift; sourceTree = "<group>"; };
 		AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntropyCoreML.swift; sourceTree = "<group>"; };
-		AE8590532256549A003B21C0 /* SequencesCoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequencesCoreML.swift; sourceTree = "<group>"; };
 		AE859055225656B3003B21C0 /* TLS12CoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLS12CoreML.swift; sourceTree = "<group>"; };
 		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KnownProtocols.swift; sourceTree = "<group>"; };
@@ -270,6 +271,7 @@
 		4651A14F20083BF700037D31 /* AdversaryLabSwift */ = {
 			isa = PBXGroup;
 			children = (
+				AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */,
 				AE859022225288C2003B21C0 /* CoreMLFeatures */,
 				4612DCDB203B5C9D007F798E /* Features */,
 				46175B76202D2DBE009311D6 /* Helpers */,
@@ -340,9 +342,9 @@
 				AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */,
 				AE85902D2253E178003B21C0 /* TimingCoreML.swift */,
 				AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */,
-				AE8590532256549A003B21C0 /* SequencesCoreML.swift */,
 				AE859055225656B3003B21C0 /* TLS12CoreML.swift */,
-				AE1AC6F92258020500555456 /* FeatureController.swift */,
+				AE1AC6F92258020500555456 /* MLModelController.swift */,
+				AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */,
 			);
 			path = CoreMLFeatures;
 			sourceTree = "<group>";
@@ -549,18 +551,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,
 				462E73A72091421400C59B80 /* ProgressBot.swift in Sources */,
 				AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */,
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
 				460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */,
 				AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */,
-				AE1AC6FA2258020500555456 /* FeatureController.swift in Sources */,
+				AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */,
 				CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
 				5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */,
-				AE8590542256549A003B21C0 /* SequencesCoreML.swift in Sources */,
 				AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */,
 				462271F72049021A00F21D08 /* DataHelper.swift in Sources */,
 				AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */,

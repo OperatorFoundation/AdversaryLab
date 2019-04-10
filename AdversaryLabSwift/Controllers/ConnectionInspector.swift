@@ -217,8 +217,8 @@ class ConnectionInspector
         
         if configModel.enableSequenceAnalysis
         {
-            SequencesCoreML().scoreAllFloatSequences()
-            SequencesCoreML().scoreAllOffsetSequenes()
+            scoreAllFloatSequences()
+            scoreAllOffsetSequenes()
             sleep(1)
         }
         
@@ -246,14 +246,15 @@ class ConnectionInspector
         let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(forConnection: connection)
         
         // Process Offset and Float Sequences
-        DispatchQueue.main.async{
+        DispatchQueue.main.async
+        {
             ProgressBot.sharedInstance.progressMessage = "Analyzing Subsequences for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
         var subsequenceNoErrors = true
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
         {
-            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = SequencesCoreML().processSequences(forConnection: connection)
+            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(forConnection: connection)
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }

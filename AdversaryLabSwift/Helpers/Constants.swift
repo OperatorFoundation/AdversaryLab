@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CreateML
 
 let packetStatsKey = "Packet:Stats"
 let newConnectionsChannel = "New:Connections:Channel"
@@ -129,6 +130,15 @@ let scoringFloatSequencesString = "Scoring float sequences"
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
 let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
+let entropyRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+let entropyClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
+let timingRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+let timingClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
+let lengthsRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
+let lengthsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
+let tlsRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden tls name for a Connection", version: "1.0")
+let tlsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a tls name is from an allowed or blocked connection.", version: "1.0")
+
 extension Notification.Name
 {
     static let updateStats = Notification.Name("UpdatedConnectionStats")
@@ -166,4 +176,5 @@ enum ColumnLabel: String
     case timeDifference = "timeDifference"
     case tlsNames = "tlsNames"
     case classification = "classification"
+    case direction = "direction"
 }

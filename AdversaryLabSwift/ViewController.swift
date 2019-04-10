@@ -175,8 +175,11 @@ class ViewController: NSViewController
         {
             (result) in
             
-            let selectedFile = panel.urls[0]
-            print("\nFile selected: \(selectedFile.path)")
+//            if let selectedFile = panel.urls[0]
+//            {
+//                print("\nFile selected: \(selectedFile.path)")
+//            }
+            
         }
     }
     

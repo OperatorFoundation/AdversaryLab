@@ -18,9 +18,6 @@ let commonNameEnd=Data(bytes: [0x30])
 
 class TLS12CoreML
 {
-    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden tls name for a Connection", version: "1.0")
-    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a tls name is from an allowed or blocked connection.", version: "1.0")
-    
     func isTls12(forConnection connection: ObservedConnection) -> Bool
     {
         // Get the in packet that corresponds with this connection ID
@@ -225,7 +222,7 @@ class TLS12CoreML
                         let (_, _) = forbiddenTLSNames.insert((predictedBlockedTLSName, Float(evaluationAccuracy)))
                         
                         // Save the model
-                        FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.tlsNames.rawValue)
+                        MLModelController().saveModel(classifier: classifier, classifierMetadata: tlsClassifierMetadata, regressor: regressor, regressorMetadata: tlsRegressorMetadata, name: ColumnLabel.tlsNames.rawValue)
                     }
                     catch let blockedTLSColumnError
                     {

@@ -9,7 +9,7 @@
 import Foundation
 import CreateML
 
-class FeatureController
+class MLModelController
 {
     func saveModel(classifier: MLClassifier, classifierMetadata: MLModelMetadata, regressor: MLRegressor, regressorMetadata: MLModelMetadata, name: String)
     {

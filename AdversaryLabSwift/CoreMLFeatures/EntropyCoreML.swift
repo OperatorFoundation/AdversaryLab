@@ -12,9 +12,6 @@ import CreateML
 
 class EntropyCoreML
 {
-    let regressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
-    let classifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
-    
     func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, error: Error?)
     {
         let inPacketsEntropyList: RList<Double> = RList(key: connection.incomingEntropyKey)
@@ -140,15 +137,30 @@ class EntropyCoreML
     }
     
     // TODO: Creation of dataTable should be centralized
-    func createEntropyTable(fromFile fileURL: URL) -> MLDataTable?
+    func createEntropyTable(fromFile fileURL: URL) -> (inTable: MLDataTable, outTable: MLDataTable)?
     {
         do
         {
             let dataTable = try MLDataTable(contentsOf: fileURL)
-            let entropyColumns = [ColumnLabel.entropy.rawValue, ColumnLabel.classification.rawValue]
-            let entropyTable = dataTable[entropyColumns]
             
-            return entropyTable
+            guard let directionColumn = dataTable["direction", String.self]
+            else
+            {
+                print("\nMissing or invalid direction column in table.")
+                return nil
+            }
+            
+            let incomingMask = directionColumn == "incoming"
+            let outgoingMask = directionColumn == "outgoing"
+            
+            let incomingTable = dataTable[incomingMask]
+            let outgoingTable = dataTable[outgoingMask]
+            
+            let entropyColumns = [ColumnLabel.entropy.rawValue, ColumnLabel.classification.rawValue]
+            let inEntropyTable = incomingTable[entropyColumns]
+            let outEntropyTable = outgoingTable[entropyColumns]
+            
+            return (inEntropyTable, outEntropyTable)
         }
         catch let tableFromFileError
         {
@@ -261,7 +273,7 @@ class EntropyCoreML
                         let _ = forbiddenEntropy.insert((predictedBlockedEntropy, Float(evaluationAccuracy)))
                         
                         // Save the models
-                        FeatureController().saveModel(classifier: classifier, classifierMetadata: classifierMetadata, regressor: regressor, regressorMetadata: regressorMetadata, name: ColumnLabel.entropy.rawValue)
+                        MLModelController().saveModel(classifier: classifier, classifierMetadata: entropyClassifierMetadata, regressor: regressor, regressorMetadata: entropyRegressorMetadata, name: ColumnLabel.entropy.rawValue)
                     }
                     catch let blockedColumnError
                     {
