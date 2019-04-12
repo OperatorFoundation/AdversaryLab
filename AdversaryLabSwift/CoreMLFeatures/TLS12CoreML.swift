@@ -164,6 +164,15 @@ class TLS12CoreML
                 print("Worst Validation Error: \(worstValidationError)")
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
+                // Save our results accuracy
+                let tlsAccuracy: RMap <String, Double> = RMap(key: tlsAccuracyKey)
+                tlsAccuracy[tlsTAccKey] = trainingAccuracy
+                tlsAccuracy[tlsVAccKey] = validationAccuracy
+                tlsAccuracy[tlsEAccKey] = evaluationAccuracy
+                
+                // This is the dictionary where we will save our predictions
+                let tlsResults: RMap <String, String> = RMap(key: tlsResultsKey)
+                
                 // Allowed TLS Names
                 do
                 {
@@ -183,10 +192,9 @@ class TLS12CoreML
                         let predictedAllowedTLSName = allowedTLSNames[0]
                         print("\nPredicted allowed TLS Name = \(predictedAllowedTLSName)")
                         
-                        // TODO: This is only one result?
-                        /// Save Scores
-                        let requiredTLSNames: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
-                        let (_, _) = requiredTLSNames.insert((predictedAllowedTLSName, Float(evaluationAccuracy)))
+                        // TODO: This is only one result
+                        /// Save Prediction
+                       tlsResults[requiredTLSKey] = predictedAllowedTLSName
                     }
                     catch let allowedTLSColumnError
                     {
@@ -218,8 +226,7 @@ class TLS12CoreML
                         print("\nPredicted blocked tls name = \(predictedBlockedTLSName)")
                         
                         /// Save Scores
-                        let forbiddenTLSNames: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
-                        let (_, _) = forbiddenTLSNames.insert((predictedBlockedTLSName, Float(evaluationAccuracy)))
+                        tlsResults[forbiddenTLSKey] = predictedBlockedTLSName
                         
                         // Save the model
                         MLModelController().saveModel(classifier: classifier, classifierMetadata: tlsClassifierMetadata, regressor: regressor, regressorMetadata: tlsRegressorMetadata, name: ColumnLabel.tlsNames.rawValue)

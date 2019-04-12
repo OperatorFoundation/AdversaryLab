@@ -212,7 +212,7 @@ class ConnectionInspector
         sleep(1)
         EntropyCoreML().scoreAllEntropyInDatabase()
         sleep(1)
-        TimingCoreML().scoreAllTiming()
+        TimingCoreML().scoreTiming()
         sleep(1)
         
         if configModel.enableSequenceAnalysis
@@ -310,14 +310,8 @@ class ConnectionInspector
         packetsAnalyzedDictionary[blockedPacketsAnalyzedKey] = 0
         
         // Delete all current scores
-        let incomingRequiredLengths: RSortedSet<Int> = RSortedSet(key: incomingRequiredLengthsKey)
-        incomingRequiredLengths.delete()
-        let incomingForbiddenLengths: RSortedSet<Int> = RSortedSet(key: incomingForbiddenLengthsKey)
-        incomingForbiddenLengths.delete()
-        let outgoingRequiredLengths: RSortedSet<Int> = RSortedSet(key: outgoingRequiredLengthsKey)
-        outgoingRequiredLengths.delete()
-        let outgoingForbiddenLengths: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenLengthsKey)
-        outgoingForbiddenLengths.delete()
+        let packetLengthsResults: RMap<String, Double> = RMap(key: packetLengthsResultsKey)
+        packetLengthsResults.delete()
         let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthsKey)
         allowedOutLengthsSet.delete()
         let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthsKey)
@@ -387,18 +381,12 @@ class ConnectionInspector
         let blockedOutEntropyBinsRSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingEntropyBinsKey)
         blockedOutEntropyBinsRSet.delete()
         
-        let requiredTimeDiff: RSortedSet<Int> = RSortedSet(key: requiredTimeDiffKey)
-        requiredTimeDiff.delete()
-        let forbiddenTimeDiff: RSortedSet<Int> = RSortedSet(key: forbiddenTimeDiffKey)
-        forbiddenTimeDiff.delete()
+        let timeDifferenceResults: RMap<String, Double> = RMap(key: timeDifferenceResultsKey)
+        timeDifferenceResults.delete()
         let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
         allowedTimeDifferenceList.delete()
         let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
         blockedTimeDifferenceList.delete()
-        let allowedTimeDifferenceBinsRSet: RSortedSet<Int> = RSortedSet(key: allowedConnectionsTimeDiffBinsKey)
-        allowedTimeDifferenceBinsRSet.delete()
-        let blockedTimeDifferenceBinsRSet: RSortedSet<Int> = RSortedSet(key: blockedConnectionsTimeDiffBinsKey)
-        blockedTimeDifferenceBinsRSet.delete()
         
         let allowedTlsCommonNames: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
         allowedTlsCommonNames.delete()

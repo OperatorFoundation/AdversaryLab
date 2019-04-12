@@ -84,16 +84,29 @@ class EntropyCoreML
     func scoreAllEntropyInDatabase()
     {
         // Outgoing
-        let outEntropyTable = createEntropyTable(allowedEntropyKey: allowedOutgoingEntropyKey, blockedEntropyKey: blockedOutgoingEntropyKey)
-        scoreEntropy(table: outEntropyTable, requiredEntropyKey: outgoingRequiredEntropyKey, forbiddenEntropyKey: outgoingForbiddenEntropyKey)
+        let outEntropyTable = createEntropyTable(connectionDirection: .outgoing)
+        scoreEntropy(table: outEntropyTable, connectionDirection: .outgoing)
         
         // Incoming
-        let inEntropyTable = createEntropyTable(allowedEntropyKey: allowedIncomingEntropyKey, blockedEntropyKey: blockedIncomingEntropyKey)
-        scoreEntropy(table: inEntropyTable, requiredEntropyKey: incomingRequiredEntropyKey, forbiddenEntropyKey: incomingForbiddenEntropyKey)
+        let inEntropyTable = createEntropyTable(connectionDirection: .incoming)
+        scoreEntropy(table: inEntropyTable, connectionDirection: .incoming)
     }
     
-    func createEntropyTable(allowedEntropyKey: String, blockedEntropyKey: String) -> MLDataTable
+    func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
+        let allowedEntropyKey: String
+        let blockedEntropyKey: String
+        
+        switch connectionDirection
+        {
+        case .outgoing:
+            allowedEntropyKey = allowedOutgoingEntropyKey
+            blockedEntropyKey = blockedOutgoingEntropyKey
+        case .incoming:
+            allowedEntropyKey = allowedIncomingEntropyKey
+            blockedEntropyKey = blockedIncomingEntropyKey
+        }
+        
         var entropyList = [Double]()
         var classificationLabels = [String]()
         
@@ -136,41 +149,30 @@ class EntropyCoreML
         return entropyTable
     }
     
-    // TODO: Creation of dataTable should be centralized
-    func createEntropyTable(fromFile fileURL: URL) -> (inTable: MLDataTable, outTable: MLDataTable)?
+    func scoreEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection)
     {
-        do
+        let requiredEntropyKey: String
+        let forbiddenEntropyKey: String
+        let entropyTAccKey: String
+        let entropyVAccKey: String
+        let entropyEAccKey: String
+        
+        switch connectionDirection
         {
-            let dataTable = try MLDataTable(contentsOf: fileURL)
-            
-            guard let directionColumn = dataTable["direction", String.self]
-            else
-            {
-                print("\nMissing or invalid direction column in table.")
-                return nil
-            }
-            
-            let incomingMask = directionColumn == "incoming"
-            let outgoingMask = directionColumn == "outgoing"
-            
-            let incomingTable = dataTable[incomingMask]
-            let outgoingTable = dataTable[outgoingMask]
-            
-            let entropyColumns = [ColumnLabel.entropy.rawValue, ColumnLabel.classification.rawValue]
-            let inEntropyTable = incomingTable[entropyColumns]
-            let outEntropyTable = outgoingTable[entropyColumns]
-            
-            return (inEntropyTable, outEntropyTable)
+        case .outgoing:
+            requiredEntropyKey = outgoingRequiredEntropyKey
+            forbiddenEntropyKey = outgoingForbiddenEntropyKey
+            entropyTAccKey = outgoingEntropyTAccKey
+            entropyVAccKey = outgoingEntropyVAccKey
+            entropyEAccKey = outgoingEntropyEAccKey
+        case .incoming:
+            requiredEntropyKey = incomingRequiredEntropyKey
+            forbiddenEntropyKey = incomingForbiddenEntropyKey
+            entropyTAccKey = incomingEntropyTAccKey
+            entropyVAccKey = incomingEntropyVAccKey
+            entropyEAccKey = incomingEntropyEAccKey
         }
-        catch let tableFromFileError
-        {
-            print("\nError creating entropy MLDataTable from file: \(tableFromFileError)")
-            return nil
-        }
-    }
-    
-    func scoreEntropy(table entropyTable: MLDataTable, requiredEntropyKey: String, forbiddenEntropyKey: String)
-    {
+        
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (entropyEvaluationTable, entropyTrainingTable) = entropyTable.randomSplit(by: 0.20)
         
@@ -217,6 +219,9 @@ class EntropyCoreML
                 print("Worst Validation Error: \(worstValidationError)")
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
+                // This is the dictionary we will save our results to
+                let entropyResults: RMap<String,Double> = RMap(key: entropyResultsKey)
+                
                 // Allowed Entropy
                 do
                 {
@@ -236,9 +241,11 @@ class EntropyCoreML
                         let predictedAllowedEntropy = allowedEntropies[0]
                         print("\nPredicted allowed entropy = \(predictedAllowedEntropy)")
                         
-                        /// Save Scores
-                        let requiredEntropy: RSortedSet<Double> = RSortedSet(key: requiredEntropyKey)
-                        let _ = requiredEntropy.insert((predictedAllowedEntropy, Float(evaluationAccuracy)))
+                        /// Save Results
+                        entropyResults[requiredEntropyKey] = predictedAllowedEntropy
+                        entropyResults[entropyTAccKey] = trainingAccuracy
+                        entropyResults[entropyVAccKey] = validationAccuracy
+                        entropyResults[entropyEAccKey] = evaluationAccuracy
                     }
                     catch let allowedColumnError
                     {
@@ -269,8 +276,7 @@ class EntropyCoreML
                         print("\nPredicted blocked entropy = \(predictedBlockedEntropy)")
                         
                         // Save Scores
-                        let forbiddenEntropy: RSortedSet<Double> = RSortedSet(key: forbiddenEntropyKey)
-                        let _ = forbiddenEntropy.insert((predictedBlockedEntropy, Float(evaluationAccuracy)))
+                        entropyResults[forbiddenEntropyKey] = predictedBlockedEntropy
                         
                         // Save the models
                         MLModelController().saveModel(classifier: classifier, classifierMetadata: entropyClassifierMetadata, regressor: regressor, regressorMetadata: entropyRegressorMetadata, name: ColumnLabel.entropy.rawValue)

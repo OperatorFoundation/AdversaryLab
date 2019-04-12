@@ -39,19 +39,19 @@ class TimingCoreML
         return (true, nil)
     }
     
-    func scoreAllTiming()
-    {
-        scoreTiming(allowedTimeDifferenceKey: allowedConnectionsTimeDiffKey, allowedTimeDifferenceBinsKey: allowedConnectionsTimeDiffBinsKey, blockedTimeDifferenceKey: blockedConnectionsTimeDiffKey, blockedTimeDifferenceBinsKey: blockedConnectionsTimeDiffBinsKey, requiredTimeDifferenceKey: requiredTimeDiffKey, forbiddenTimeDifferenceKey: forbiddenTimeDiffKey)
-    }
+//    func scoreAllTiming()
+//    {
+//        scoreTiming(allowedTimeDifferenceKey: allowedConnectionsTimeDiffKey, blockedTimeDifferenceKey: blockedConnectionsTimeDiffKey, requiredTimeDifferenceKey: requiredTimeDiffKey, requiredTimeDifferenceAccKey: requiredTimeDiffAccKey, forbiddenTimeDifferenceKey: forbiddenTimeDiffKey, forbiddenTimeDifferenceAccKey: forbiddenTimeDiffAccKey)
+//    }
     
     
-    func scoreTiming(allowedTimeDifferenceKey: String, allowedTimeDifferenceBinsKey: String, blockedTimeDifferenceKey: String, blockedTimeDifferenceBinsKey: String, requiredTimeDifferenceKey: String, forbiddenTimeDifferenceKey: String)
+    func scoreTiming()
     {
         var timeDifferenceList = [Double]()
         var classificationLabels = [String]()
         
         /// TimeDifferences for the Allowed traffic
-        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedTimeDifferenceKey)
+        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
         
         for timeDifferenceIndex in 0 ..< allowedTimeDifferenceList.count
         {
@@ -66,7 +66,7 @@ class TimingCoreML
         }
         
         /// TimeDifferences for the Blocked traffic
-        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedTimeDifferenceKey)
+        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
         
         for timeDifferenceIndex in 0 ..< blockedTimeDifferenceList.count
         {
@@ -133,6 +133,9 @@ class TimingCoreML
                 print("Worst Validation Error: \(worstValidationError)")
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
+                // This is the dictionary where we will save our results
+                let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceResultsKey)
+                
                 // Allowed Connection Time Differences
                 do
                 {
@@ -153,9 +156,10 @@ class TimingCoreML
                         print("\n Predicted allowed time difference = \(predictedAllowedTimeDifference)")
                         
                         // Save scores
-                        let requiredTiming: RSortedSet<Double> = RSortedSet(key: requiredTimeDifferenceKey)
-                        let _ = requiredTiming.insert((predictedAllowedTimeDifference, Float(evaluationAccuracy)))
-                        
+                        timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
+                        timingDictionary[timeDiffEAccKey] = evaluationAccuracy
+                        timingDictionary[timeDiffTAccKey] = trainingAccuracy
+                        timingDictionary[timeDiffVAccKey] = validationAccuracy
                     }
                     catch let allowedColumnError
                     {
@@ -185,9 +189,8 @@ class TimingCoreML
                         let predictedBlockedTimeDifference = blockedTimeDifferences[0]
                         print("\nPredicted blocked time difference = \(predictedBlockedTimeDifference)")
                         
-                        /// Save Scores
-                        let forbiddenTiming: RSortedSet<Double> = RSortedSet(key: forbiddenTimeDifferenceKey)
-                        let _ = forbiddenTiming.insert((predictedBlockedTimeDifference, Float(evaluationAccuracy)))
+                        /// Save Predicted Time Difference
+                        timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
                         
                         // Save the models
                         MLModelController().saveModel(classifier: classifier, classifierMetadata: timingClassifierMetadata, regressor: regressor, regressorMetadata: timingRegressorMetadata, name: ColumnLabel.timeDifference.rawValue)

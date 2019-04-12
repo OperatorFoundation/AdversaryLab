@@ -19,32 +19,39 @@ class ViewController: NSViewController
     @objc dynamic var blockedPacketsAnalyzed = "Loading..."
     
     @objc dynamic var requiredTiming = "--"
-    @objc dynamic var requiredTimeAcc = "--"
     @objc dynamic var forbiddenTiming = "--"
-    @objc dynamic var forbiddenTimingAcc = "--"
+    @objc dynamic var timeTAcc = "--"
+    @objc dynamic var timeVAcc = "--"
+    @objc dynamic var timeEAcc = "--"
     
     @objc dynamic var requiredTLSName = "--"
-    @objc dynamic var requiredTLSNameAcc = "--"
     @objc dynamic var forbiddenTLSName = "--"
-    @objc dynamic var forbiddenTLSNameAcc = "--"
+    @objc dynamic var tlsTAcc = "--"
+    @objc dynamic var tlsVAcc = "--"
+    @objc dynamic var tlsEAcc = "--"
     
     @objc dynamic var requiredOutLength = "--"
-    @objc dynamic var requiredOutLengthAcc = "--"
     @objc dynamic var forbiddenOutLength = "--"
-    @objc dynamic var forbiddenOutLengthAcc = "--"
+    @objc dynamic var outLengthTAcc = "--"
+    @objc dynamic var outLengthVAcc = "--"
+    @objc dynamic var outLengthEAcc = "--"
+    
     @objc dynamic var requiredInLength = "--"
-    @objc dynamic var requiredInLengthAcc = "--"
     @objc dynamic var forbiddenInLength = "--"
-    @objc dynamic var forbiddenInLengthAcc = "--"
+    @objc dynamic var inLengthTAcc = "--"
+    @objc dynamic var inLengthVAcc = "--"
+    @objc dynamic var inLengthEAcc = "--"
     
     @objc dynamic var requiredOutEntropy = "--"
-    @objc dynamic var requiredOutEntropyAcc = "--"
     @objc dynamic var forbiddenOutEntropy = "--"
-    @objc dynamic var forbiddenOutEntropyAcc = "--"
+    @objc dynamic var outEntropyTAcc = "--"
+    @objc dynamic var outEntropyVAcc = "--"
+    @objc dynamic var outEntropyEAcc = "--"
     @objc dynamic var requiredInEntropy = "--"
-    @objc dynamic var requiredInEntropyAcc = "--"
     @objc dynamic var forbiddenInEntropy = "--"
-    @objc dynamic var forbiddenInEntropyAcc = "--"
+    @objc dynamic var inEntropyTAcc = "--"
+    @objc dynamic var inEntropyVAcc = "--"
+    @objc dynamic var inEntropyEAcc = "--"
     
     @objc dynamic var requiredOutSequence = "--"
     @objc dynamic var requiredOutSequenceCount = "--"
@@ -80,6 +87,7 @@ class ViewController: NSViewController
     
     @objc dynamic var processingMessage = ""
     
+    @IBOutlet weak var databaseNameLabel: NSTextField!
     @IBOutlet weak var removePacketsCheck: NSButton!
     @IBOutlet weak var enableSequencesCheck: NSButton!
     @IBOutlet weak var enableTLSCheck: NSButton!
@@ -111,6 +119,13 @@ class ViewController: NSViewController
         // Also update labels and progress indicator when new data is available
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateProgressIndicator), name: .updateProgressIndicator, object: nil)
+    }
+    
+    override func viewWillAppear()
+    {
+        super.viewWillAppear()
+        
+        self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
     }
     
     @IBAction func runClick(_ sender: NSButton)
@@ -266,43 +281,28 @@ class ViewController: NSViewController
             let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
             // Timing (milliseconds)
-            let requiredTimingSet: RSortedSet<Double> = RSortedSet(key: requiredTimeDiffKey)
-            let requiredTimingTuple: (Double, Float)? = requiredTimingSet.last
-            let forbiddenTimingSet: RSortedSet<Double> = RSortedSet(key: forbiddenTimeDiffKey)
-            let forbiddenTimingTuple: (Double, Float)? = forbiddenTimingSet.last
+            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceResultsKey)
             
             // TLS Common Names
-            let requiredTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsScoreKey)
-            let requiredTLSNamesTuple: (String, Float)? = requiredTLSNamesSet.last
-            
-            let forbiddenTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsScoreKey)
-            let forbiddenTLSNamesTuple: (String, Float)? = forbiddenTLSNamesSet.last
-            
+            let tlsResults: RMap <String, String> = RMap(key: tlsResultsKey)
+            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsAccuracyKey)
+
             // Lengths
-            let requiredOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingRequiredLengthsKey)
-            let requiredOutLengthTuple: (Int, Float)? = requiredOutLengthSet.last
-            
-            let forbiddenOutLengthSet: RSortedSet<Int> = RSortedSet(key: outgoingForbiddenLengthsKey)
-            let forbiddenOutLengthTuple: (Int, Float)? = forbiddenOutLengthSet.last
-            
-            let requiredInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingRequiredLengthsKey)
-            let requiredInLengthTuple: (Int, Float)? = requiredInLengthSet.last
-            
-            let forbiddenInLengthSet: RSortedSet<Int> = RSortedSet(key: incomingForbiddenLengthsKey)
-            let forbiddenInLengthTuple: (Int, Float)? = forbiddenInLengthSet.last
+            let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsResultsKey)
             
             // Entropy
-            let requiredOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingRequiredEntropyKey)
-            let requiredOutEntropyTuple: (Double, Float)? = requiredOutEntropySet.last
-            
-            let forbiddenOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingForbiddenEntropyKey)
-            let forbiddenOutEntropyTuple: (Double, Float)? = forbiddenOutEntropySet.last
-            
-            let requiredInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingRequiredEntropyKey)
-            let requiredInEntropyTuple: (Double, Float)? = requiredInEntropySet.last
-            
-            let forbiddenInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingForbiddenEntropyKey)
-            let forbiddenInEntropyTuple: (Double, Float)? = forbiddenInEntropySet.last
+            let entropyResults: RMap <String, Double> = RMap(key: entropyResultsKey)
+//            let requiredOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingRequiredEntropyKey)
+//            let requiredOutEntropyTuple: (Double, Float)? = requiredOutEntropySet.last
+//
+//            let forbiddenOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingForbiddenEntropyKey)
+//            let forbiddenOutEntropyTuple: (Double, Float)? = forbiddenOutEntropySet.last
+//
+//            let requiredInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingRequiredEntropyKey)
+//            let requiredInEntropyTuple: (Double, Float)? = requiredInEntropySet.last
+//
+//            let forbiddenInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingForbiddenEntropyKey)
+//            let forbiddenInEntropyTuple: (Double, Float)? = forbiddenInEntropySet.last
             
             //Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
@@ -346,139 +346,133 @@ class ViewController: NSViewController
                     self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
                     
                     // Timing (milliseconds)
-                    if let rtMember: Double = requiredTimingTuple?.0, let rtScore: Float = requiredTimingTuple?.1
+                    if let rTiming = timingDictionary[requiredTimeDiffKey],
+                        let fTiming = timingDictionary[forbiddenTimeDiffKey],
+                        let timeDiffTAcc = timingDictionary[timeDiffTAccKey],
+                        let timeDiffVAcc = timingDictionary[timeDiffVAccKey],
+                        let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
                     {
-                        self.requiredTiming = "\(rtMember) ms"
-                        self.requiredTimeAcc = "\(rtScore)"
+                        self.requiredTiming = String(format: "%.2f", rTiming) + "ms"
+                        self.forbiddenTiming = String(format: "%.2f", fTiming) + "ms"
+                        self.timeTAcc = String(format: "%.2f", timeDiffTAcc)
+                        self.timeVAcc = String(format: "%.2f", timeDiffVAcc)
+                        self.timeEAcc = String(format: "%.2f", timeDiffEAcc)
                     }
                     else
                     {
                         self.requiredTiming = "--"
-                        self.requiredTimeAcc = "--"
-                    }
-                    
-                    if let ftMember = forbiddenTimingTuple?.0, let ftScore = forbiddenTimingTuple?.1
-                    {
-                        self.forbiddenTiming = "\(ftMember) ms"
-                        self.forbiddenTimingAcc = "\(ftScore)"
-                    }
-                    else
-                    {
                         self.forbiddenTiming = "--"
-                        self.forbiddenTimingAcc = "--"
+                        self.timeTAcc = "--"
+                        self.timeVAcc = "--"
+                        self.timeEAcc = "--"
                     }
                     
                     // TLS Common Names
-                    if let rTLSMember = requiredTLSNamesTuple?.0, let rTLSScore = requiredTLSNamesTuple?.1
+                    if let rTLS = tlsResults[requiredTLSKey],
+                        let fTLS = tlsResults[forbiddenTLSKey],
+                        let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey],
+                        let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey],
+                        let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
                     {
-                        self.requiredTLSName = rTLSMember
-                        self.requiredTLSNameAcc = "\(rTLSScore)"
+                        self.requiredTLSName = rTLS
+                        self.forbiddenTLSName = fTLS
+                        self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy)
+                        self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy)
+                        self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy)
                     }
                     else
                     {
                         self.requiredTLSName = "--"
-                        self.requiredTLSNameAcc = "--"
-                    }
-                    
-                    if let fTLSMember = forbiddenTLSNamesTuple?.0, let fTLSScore = forbiddenTLSNamesTuple?.1
-                    {
-                        self.forbiddenTLSName = fTLSMember
-                        self.forbiddenTLSNameAcc = "\(fTLSScore)"
-                    }
-                    else
-                    {
                         self.forbiddenTLSName = "--"
-                        self.forbiddenTLSNameAcc = "--"
+                        self.tlsTAcc = "--"
+                        self.tlsVAcc = "--"
+                        self.tlsEAcc = "--"
                     }
                     
                     // Lengths
-                    if let rolMember = requiredOutLengthTuple?.0, let rolScore = requiredOutLengthTuple?.1
+                    if let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey],
+                        let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey],
+                        let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey],
+                        let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey],
+                        let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
                     {
-                        self.requiredOutLength = "\(rolMember)"
-                        self.requiredOutLengthAcc = "\(rolScore)"
+                        self.requiredOutLength = String(format: "%.2f", outRequiredLength)
+                        self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength)
+                        self.outLengthTAcc = String(format: "%.2f", outTrainingAcc)
+                        self.outLengthVAcc = String(format: "%.2f", outValidationAcc)
+                        self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc)
                     }
                     else
                     {
                         self.requiredOutLength = "--"
-                        self.requiredOutLengthAcc = "--"
-                    }
-                    
-                    if let folMember = forbiddenOutLengthTuple?.0, let folScore = forbiddenOutLengthTuple?.1
-                    {
-                        self.forbiddenOutLength = "\(folMember)"
-                        self.forbiddenOutLengthAcc = "\(folScore)"
-                    }
-                    else
-                    {
                         self.forbiddenOutLength = "--"
-                        self.forbiddenOutLengthAcc = "--"
+                        self.outLengthTAcc = "--"
+                        self.outLengthVAcc = "--"
+                        self.outLengthEAcc = "--"
                     }
                     
-                    if let rilMember = requiredInLengthTuple?.0, let rilScore = requiredInLengthTuple?.1
+                    if let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey],
+                        let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey],
+                        let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey],
+                        let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey],
+                        let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
                     {
-                        self.requiredInLength = "\(rilMember)"
-                        self.requiredInLengthAcc = "\(rilScore)"
+                        self.requiredInLength = String(format: "%.2f", inRequiredLength)
+                        self.forbiddenInLength = String(format: "%.2f", inForbiddenLength)
+                        self.inLengthTAcc = String(format: "%.2f", inTrainingAcc)
+                        self.inLengthVAcc = String(format: "%.2f", inValidationAcc)
+                        self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc)
                     }
                     else
                     {
                         self.requiredInLength = "--"
-                        self.requiredInLengthAcc = "--"
-                    }
-                    
-                    if let filMember = forbiddenInLengthTuple?.0, let filScore = forbiddenInLengthTuple?.1
-                    {
-                        self.forbiddenInLength = "\(filMember)"
-                        self.forbiddenInLengthAcc = "\(filScore)"
-                    }
-                    else
-                    {
                         self.forbiddenInLength = "--"
-                        self.forbiddenInLengthAcc = "--"
+                        self.inLengthTAcc = "--"
+                        self.inLengthVAcc = "--"
+                        self.inLengthEAcc = "--"
                     }
                     
                     // Entropy
-                    if let roeMember = requiredOutEntropyTuple?.0, let roeScore = requiredOutEntropyTuple?.1
+                    if let rOutEntropy = entropyResults[outgoingRequiredEntropyKey],
+                        let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey],
+                        let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey],
+                        let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey],
+                        let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
                     {
-                        self.requiredOutEntropy = String(format: "%.3f", roeMember)
-                        self.requiredOutEntropyAcc = "\(roeScore)"
+                        self.requiredOutEntropy = String(format: "%.2f", rOutEntropy)
+                        self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy)
+                        self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy)
+                        self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy)
+                        self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy)
                     }
                     else
                     {
                         self.requiredOutEntropy = "--"
-                        self.requiredOutEntropyAcc = "--"
-                    }
-                    
-                    if let foeMember = forbiddenOutEntropyTuple?.0, let foeScore = forbiddenOutEntropyTuple?.1
-                    {
-                        self.forbiddenOutEntropy = String(format: "%.3f", foeMember)
-                        self.forbiddenOutEntropyAcc = "\(foeScore)"
-                    }
-                    else
-                    {
                         self.forbiddenOutEntropy = "--"
-                        self.forbiddenOutEntropyAcc = "--"
+                        self.outEntropyTAcc = "--"
+                        self.outEntropyVAcc = "--"
+                        self.outEntropyEAcc = "--"
                     }
                     
-                    if let rieMember = requiredInEntropyTuple?.0, let rieScore = requiredInEntropyTuple?.1
+                    if let rInEntropy = entropyResults[incomingRequiredEntropyKey],
+                        let fInEntropy = entropyResults[incomingForbiddenEntropyKey],
+                        let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey],
+                        let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey],
+                        let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
                     {
-                        self.requiredInEntropy = String(format: "%.3f", rieMember)
-                        self.requiredInEntropyAcc = "\(rieScore)"
+                        self.requiredInEntropy = String(format: "%.2f", rInEntropy)
+                        self.forbiddenInEntropy = String(format: "%.2f", fInEntropy)
+                        self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy)
+                        self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy)
+                        self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy)
                     }
                     else
                     {
                         self.requiredInEntropy = "--"
-                        self.requiredInEntropyAcc = "--"
-                    }
-                    
-                    if let fieMember = forbiddenInEntropyTuple?.0, let fieScore = forbiddenInEntropyTuple?.1
-                    {
-                        self.forbiddenInEntropy = String(format: "%.3f", fieMember)
-                        self.forbiddenInEntropyAcc = "\(fieScore)"
-                    }
-                    else
-                    {
                         self.forbiddenInEntropy = "--"
-                        self.forbiddenInEntropyAcc = "--"
+                        self.inEntropyTAcc = "--"
+                        self.inEntropyVAcc = "--"
+                        self.inEntropyEAcc = "--"
                     }
                     
                     //Float Subsequences

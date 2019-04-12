@@ -81,3 +81,9 @@ enum ConnectionType
     case allowed
     case blocked
 }
+
+enum ConnectionDirection
+{
+    case incoming
+    case outgoing
+}

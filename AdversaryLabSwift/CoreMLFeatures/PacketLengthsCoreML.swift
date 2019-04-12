@@ -66,16 +66,44 @@ class PacketLengthsCoreML
     func scoreAllPacketLengths()
     {
         // Outgoing Lengths Scoring
-        scorePacketLengths(allowedLengthsKey: allowedOutgoingLengthsKey, blockedLengthsKey: blockedOutgoingLengthsKey, requiredLengthsKey: outgoingRequiredLengthsKey, forbiddenLengthsKey: outgoingForbiddenLengthsKey)
+        scorePacketLengths(connectionDirection: .outgoing)
         
         //Incoming Lengths Scoring
-        scorePacketLengths(allowedLengthsKey: allowedIncomingLengthsKey, blockedLengthsKey: blockedIncomingLengthsKey, requiredLengthsKey: incomingRequiredLengthsKey, forbiddenLengthsKey: incomingForbiddenLengthsKey)
+        scorePacketLengths(connectionDirection: .incoming)
     }
     
-    func scorePacketLengths(allowedLengthsKey: String, blockedLengthsKey: String, requiredLengthsKey: String, forbiddenLengthsKey: String)
+    func scorePacketLengths(connectionDirection: ConnectionDirection)
     {
         var lengths = [Int]()
         var classificationLabel = [String]()
+        
+        let allowedLengthsKey: String
+        let blockedLengthsKey: String
+        let requiredLengthKey: String
+        let forbiddenLengthKey: String
+        let lengthsTAccKey: String
+        let lengthsVAccKey: String
+        let lengthsEAccKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            allowedLengthsKey = allowedIncomingLengthsKey
+            blockedLengthsKey = blockedIncomingLengthsKey
+            requiredLengthKey = incomingRequiredLengthKey
+            forbiddenLengthKey = incomingForbiddenLengthKey
+            lengthsTAccKey = incomingLengthsTAccKey
+            lengthsVAccKey = incomingLengthsVAccKey
+            lengthsEAccKey = incomingLengthsEAccKey
+        case .outgoing:
+            allowedLengthsKey = allowedOutgoingLengthsKey
+            blockedLengthsKey = blockedOutgoingLengthsKey
+            requiredLengthKey = outgoingRequiredLengthKey
+            forbiddenLengthKey = outgoingForbiddenLengthKey
+            lengthsTAccKey = outgoingLengthsTAccKey
+            lengthsVAccKey = outgoingLengthsVAccKey
+            lengthsEAccKey = outgoingLengthsEAccKey
+        }
 
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
@@ -205,11 +233,12 @@ class PacketLengthsCoreML
                                 print("Predicted Blocked Length = \(predictedBlockedLength)")
                                 
                                 /// Save Scores
-                                let requiredLengths: RSortedSet<Int> = RSortedSet(key: requiredLengthsKey)
-                                let _ = requiredLengths.insert((Int(predictedAllowedLength), Float(evaluationAccuracy)))
-                                
-                                let forbiddenLengths: RSortedSet<Int> = RSortedSet(key: forbiddenLengthsKey)
-                                let _ = forbiddenLengths.insert((Int(predictedBlockedLength), Float(evaluationAccuracy)))
+                                let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsResultsKey)
+                                lengthsDictionary[requiredLengthKey] = predictedAllowedLength
+                                lengthsDictionary[forbiddenLengthKey] = predictedBlockedLength
+                                lengthsDictionary[lengthsTAccKey] = trainingAccuracy
+                                lengthsDictionary[lengthsVAccKey] = validationAccuracy
+                                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
                                 
                                 // Save the models to a file
                                 MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, regressor: regressor, regressorMetadata: lengthsRegressorMetadata, name: ColumnLabel.length.rawValue)
