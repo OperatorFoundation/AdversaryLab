@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Auburn
 
 class RedisServerController: NSObject
 {
@@ -14,7 +15,7 @@ class RedisServerController: NSObject
     
     var redisProcess:Process!
     
-    func launchRedisServer()
+    func launchRedisServer(completion:@escaping (_ completion:Bool) -> Void)
     {
         isRedisServerRunning
         {
@@ -22,6 +23,7 @@ class RedisServerController: NSObject
             
             if serverIsRunning
             {
+                completion(false)
                 return
             }
             else
@@ -32,6 +34,7 @@ class RedisServerController: NSObject
                     else
                 {
                     print("Unable to launch Redis server: could not find terraform executable.")
+                    completion(false)
                     return
                 }
                 
@@ -39,6 +42,7 @@ class RedisServerController: NSObject
                     else
                 {
                     print("Unable to launch Redis server: could not find terraform executable.")
+                    completion(false)
                     return
                 }
                 
@@ -46,6 +50,7 @@ class RedisServerController: NSObject
                     else
                 {
                     print("Unable to launch Redis server: could not find the needed module.")
+                    completion(false)
                     return
                 }
                 
@@ -53,6 +58,7 @@ class RedisServerController: NSObject
                     else
                 {
                     print("Unable to launch Redis server. Could not find the script.")
+                    completion(false)
                     return
                 }
                 
@@ -62,11 +68,11 @@ class RedisServerController: NSObject
                 {
                     (hasCompleted) in
                     
-                    print("🚀 Launch Redis Server Script Complete 🚀")
+                    print("\n🚀 Launch Redis Server Script Complete 🚀")
+                    completion(hasCompleted)
                 }
             }
         }
-        
     }
     
     func shutdownRedisServer()
@@ -100,7 +106,7 @@ class RedisServerController: NSObject
             (taskCompleted) in
             
             print("Server has been 🤖 TERMINATED 🤖")
-        }
+        }        
     }
     
     func isRedisServerRunning(completion:@escaping (_ completion:Bool) -> Void)
@@ -128,6 +134,7 @@ class RedisServerController: NSObject
         process.terminationHandler =
         {
             (task) in
+            
             // Get the data
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
@@ -147,6 +154,73 @@ class RedisServerController: NSObject
         }
         process.waitUntilExit()
         process.launch()
+    }
+    
+    // Redis considers switching databases to be switching between numbered partitions within the same db file.
+    // We will be switching instead to a database represented by a completely different file.
+    func switchDatabaseFile(withFile fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
+    {
+        let fileManager = FileManager.default
+        let currentDirectory = fileManager.currentDirectoryPath
+        let newDBName = fileURL.lastPathComponent
+        let destinationURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(newDBName)
+        
+        // Rewrite redis.conf to use the dbfilename for the name of the new .rdb file
+        // Setting the dbFilename calls config rewrite with the new name in Redis
+        Auburn.dbfilename = newDBName
+        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
+        
+        // Issue a SHUTDOWN command to the Redis server
+        Auburn.shutdownRedis()
+        //Auburn.restartRedis()
+        
+        // Copy the .rdb file into the Redis working directory, as specified in redis.conf (defaults to ./, which is the directory the Redis server was run from)
+        /*
+        # The working directory.
+        #
+        # The DB will be written inside this directory, with the filename specified
+        # above using the 'dbfilename' configuration directive.
+        #
+        # The Append Only File will also be created inside this directory.
+        #
+        # Note that you must specify a directory here, not a file name.
+         dir ./
+         */
+
+        do
+        {
+            if fileManager.fileExists(atPath: destinationURL.path)
+            {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            
+            try fileManager.copyItem(at: fileURL, to: destinationURL)
+            
+            print("\n📂  Copied file from: \n\(fileURL)\nto:\n\(destinationURL)\n")
+            // Start Redis
+            launchRedisServer
+            {
+                (success) in
+                
+                completion(success)
+            }
+        }
+        catch let copyError
+        {
+            print("\nError copying redis DB file from \(fileURL) to \(currentDirectory):\n\(copyError)")
+            // Start Redis
+            launchRedisServer
+            {
+                (success) in
+                
+                completion(success)
+            }
+            
+            // Reset dbfilename to the default as we failed to copy the new file over
+            Auburn.dbfilename = "dump.rdb"
+        }
+
+        
     }
     
     func runRedisScript(path: String, arguments: [String]?, completion:@escaping (_ completion:Bool) -> Void)

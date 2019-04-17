@@ -43,6 +43,13 @@
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
 		AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */; };
 		AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE859055225656B3003B21C0 /* TLS12CoreML.swift */; };
+		AE92971B22651B11005C1FBB /* AdversaryLabServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */; };
+		AE92972322651B16005C1FBB /* AdversaryLabServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D55622651810008F32F2 /* AdversaryLabServiceDelegate.swift */; };
+		AE929725226521F6005C1FBB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
+		AE92972622652218005C1FBB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
+		AEC9D55A22651810008F32F2 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D55922651810008F32F2 /* main.swift */; };
+		AEC9D55E22651810008F32F2 /* AdversaryLabService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = AEC9D55322651810008F32F2 /* AdversaryLabService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AEC9D56322651901008F32F2 /* AdversaryLabService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D56222651901008F32F2 /* AdversaryLabService.swift */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
 		CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */; };
@@ -119,6 +126,13 @@
 			remoteGlobalIDString = "Datable::Datable::Product";
 			remoteInfo = Datable;
 		};
+		AEC9D55C22651810008F32F2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4651A14520083BF700037D31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEC9D55222651810008F32F2;
+			remoteInfo = AdversaryLabService;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -133,6 +147,17 @@
 				468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEC9D54E2265154C008F32F2 /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				AEC9D55E22651810008F32F2 /* AdversaryLabService.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -177,6 +202,13 @@
 		AE85902D2253E178003B21C0 /* TimingCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingCoreML.swift; sourceTree = "<group>"; };
 		AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntropyCoreML.swift; sourceTree = "<group>"; };
 		AE859055225656B3003B21C0 /* TLS12CoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLS12CoreML.swift; sourceTree = "<group>"; };
+		AE929724226521F6005C1FBB /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		AEC9D55322651810008F32F2 /* AdversaryLabService.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = AdversaryLabService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdversaryLabServiceProtocol.swift; sourceTree = "<group>"; };
+		AEC9D55622651810008F32F2 /* AdversaryLabServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdversaryLabServiceDelegate.swift; sourceTree = "<group>"; };
+		AEC9D55922651810008F32F2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		AEC9D55B22651810008F32F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AEC9D56222651901008F32F2 /* AdversaryLabService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdversaryLabService.swift; sourceTree = "<group>"; };
 		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KnownProtocols.swift; sourceTree = "<group>"; };
 		CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLS12.swift; sourceTree = "<group>"; };
@@ -201,6 +233,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4651A16720083BF700037D31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEC9D55022651810008F32F2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -234,6 +273,7 @@
 			children = (
 				467E49392017F166008B19E3 /* Constants.swift */,
 				462271F62049021A00F21D08 /* DataHelper.swift */,
+				AE929724226521F6005C1FBB /* Globals.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -253,6 +293,7 @@
 				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
 				4651A16D20083BF700037D31 /* AdversaryLabSwiftUITests */,
+				AEC9D55422651810008F32F2 /* AdversaryLabService */,
 				4651A14E20083BF700037D31 /* Products */,
 				468B26402023BBB6000A2B5D /* Frameworks */,
 			);
@@ -264,6 +305,7 @@
 				4651A14D20083BF700037D31 /* AdversaryLabSwift.app */,
 				4651A15F20083BF700037D31 /* AdversaryLabSwiftTests.xctest */,
 				4651A16A20083BF700037D31 /* AdversaryLabSwiftUITests.xctest */,
+				AEC9D55322651810008F32F2 /* AdversaryLabService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -349,6 +391,18 @@
 			path = CoreMLFeatures;
 			sourceTree = "<group>";
 		};
+		AEC9D55422651810008F32F2 /* AdversaryLabService */ = {
+			isa = PBXGroup;
+			children = (
+				AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */,
+				AEC9D55622651810008F32F2 /* AdversaryLabServiceDelegate.swift */,
+				AEC9D56222651901008F32F2 /* AdversaryLabService.swift */,
+				AEC9D55922651810008F32F2 /* main.swift */,
+				AEC9D55B22651810008F32F2 /* Info.plist */,
+			);
+			path = AdversaryLabService;
+			sourceTree = "<group>";
+		};
 		CAA6C97920642A2D00EE8DF1 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
@@ -369,6 +423,7 @@
 				4651A14A20083BF700037D31 /* Frameworks */,
 				4651A14B20083BF700037D31 /* Resources */,
 				4651A19F20093CBA00037D31 /* Embed Frameworks */,
+				AEC9D54E2265154C008F32F2 /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
@@ -376,6 +431,7 @@
 				468B26472023C082000A2B5D /* PBXTargetDependency */,
 				468B264B2023C092000A2B5D /* PBXTargetDependency */,
 				468B264F2023C099000A2B5D /* PBXTargetDependency */,
+				AEC9D55D22651810008F32F2 /* PBXTargetDependency */,
 			);
 			name = AdversaryLabSwift;
 			productName = AdversaryLabSwift;
@@ -418,6 +474,23 @@
 			productReference = 4651A16A20083BF700037D31 /* AdversaryLabSwiftUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		AEC9D55222651810008F32F2 /* AdversaryLabService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AEC9D55F22651810008F32F2 /* Build configuration list for PBXNativeTarget "AdversaryLabService" */;
+			buildPhases = (
+				AEC9D54F22651810008F32F2 /* Sources */,
+				AEC9D55022651810008F32F2 /* Frameworks */,
+				AEC9D55122651810008F32F2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AdversaryLabService;
+			productName = AdversaryLabService;
+			productReference = AEC9D55322651810008F32F2 /* AdversaryLabService.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -445,6 +518,11 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = 4651A14C20083BF700037D31;
 					};
+					AEC9D55222651810008F32F2 = {
+						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 4651A14820083BF700037D31 /* Build configuration list for PBXProject "AdversaryLabSwift" */;
@@ -469,6 +547,7 @@
 				4651A14C20083BF700037D31 /* AdversaryLabSwift */,
 				4651A15E20083BF700037D31 /* AdversaryLabSwiftTests */,
 				4651A16920083BF700037D31 /* AdversaryLabSwiftUITests */,
+				AEC9D55222651810008F32F2 /* AdversaryLabService */,
 			);
 		};
 /* End PBXProject section */
@@ -544,6 +623,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AEC9D55122651810008F32F2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -556,6 +642,7 @@
 				AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */,
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
+				AE929725226521F6005C1FBB /* Globals.swift in Sources */,
 				460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */,
 				AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */,
 				AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */,
@@ -590,6 +677,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AEC9D54F22651810008F32F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE92972322651B16005C1FBB /* AdversaryLabServiceDelegate.swift in Sources */,
+				AE92971B22651B11005C1FBB /* AdversaryLabServiceProtocol.swift in Sources */,
+				AEC9D55A22651810008F32F2 /* main.swift in Sources */,
+				AE92972622652218005C1FBB /* Globals.swift in Sources */,
+				AEC9D56322651901008F32F2 /* AdversaryLabService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -617,6 +716,11 @@
 			isa = PBXTargetDependency;
 			name = Datable;
 			targetProxy = 468B264E2023C099000A2B5D /* PBXContainerItemProxy */;
+		};
+		AEC9D55D22651810008F32F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AEC9D55222651810008F32F2 /* AdversaryLabService */;
+			targetProxy = AEC9D55C22651810008F32F2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -848,6 +952,46 @@
 			};
 			name = Release;
 		};
+		AEC9D56022651810008F32F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
+				INFOPLIST_FILE = AdversaryLabService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		AEC9D56122651810008F32F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
+				INFOPLIST_FILE = AdversaryLabService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -883,6 +1027,15 @@
 			buildConfigurations = (
 				4651A17A20083BF800037D31 /* Debug */,
 				4651A17B20083BF800037D31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AEC9D55F22651810008F32F2 /* Build configuration list for PBXNativeTarget "AdversaryLabService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AEC9D56022651810008F32F2 /* Debug */,
+				AEC9D56122651810008F32F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

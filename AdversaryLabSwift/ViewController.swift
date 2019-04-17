@@ -107,18 +107,27 @@ class ViewController: NSViewController
         updateConfigModel()
         
         // Launch Redis Server
-        RedisServerController.sharedInstance.launchRedisServer()
+        RedisServerController.sharedInstance.launchRedisServer
+        {
+            (success) in
+            
+            // Update Labels and Progress Indicator
+            self.loadLabelData()
+            self.updateProgressIndicator()
+        }
         
         // Subscribe to pubsub to know when to inspect a new connection
         //subscribeToNewConnectionsChannel()
-        
-        // Update Labels and Progress Indicator
-        loadLabelData()
-        updateProgressIndicator()
-        
+
         // Also update labels and progress indicator when new data is available
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateProgressIndicator), name: .updateProgressIndicator, object: nil)
+        
+        // FIXME: getting the filename after switching files jams us up
+        NotificationCenter.default.addObserver(forName: .updateDBFilename, object: nil, queue: .main)
+        { (notification) in
+            self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "unknown"
+        }
     }
     
     override func viewWillAppear()
@@ -185,16 +194,26 @@ class ViewController: NSViewController
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
+        panel.allowedFileTypes = ["rdb"]
         
         panel.beginSheetModal(for: window)
         {
             (result) in
             
-//            if let selectedFile = panel.urls[0]
-//            {
-//                print("\nFile selected: \(selectedFile.path)")
-//            }
+            guard result == NSApplication.ModalResponse.OK
+                else { return }
             
+            let selectedFileURL = panel.urls[0]
+            
+            RedisServerController.sharedInstance.switchDatabaseFile(withFile: selectedFileURL, completion:
+            {
+                (success) in
+                
+                self.updateConfigModel()
+                print("\n📊  Time to analyze some things.\n")
+                self.connectionInspector.analyzeConnections(configModel: self.configModel)
+                self.updateProgressIndicator()
+            })            
         }
     }
     

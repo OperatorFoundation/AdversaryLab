@@ -167,6 +167,7 @@ let tlsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: 
 
 extension Notification.Name
 {
+    static let updateDBFilename = Notification.Name("UpdateDatabaseFilename")
     static let updateStats = Notification.Name("UpdatedConnectionStats")
     static let updateProgressIndicator = Notification.Name("UpdatedProgress")
 }
