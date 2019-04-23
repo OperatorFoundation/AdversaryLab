@@ -9,11 +9,11 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>org.operatorFoundation.AdversaryLabService</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>org.operatorFoundation.AdversaryLabService</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,10 +22,9 @@
 	<string>1</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2019 Operator Foundation. All rights reserved.</string>
-	<key>XPCService</key>
-	<dict>
-		<key>ServiceType</key>
-		<string>Application</string>
-	</dict>
+	<key>SMAuthorizedClients</key>
+	<array>
+		<string>identifier &quot;org.operatorFoundation.AdversaryLabSwift&quot; and anchor apple generic and certificate leaf[subject.CN] = &quot;Mac Developer: Adelita Schule (MZ3MR7KVAN)&quot; and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+	</array>
 </dict>
 </plist>

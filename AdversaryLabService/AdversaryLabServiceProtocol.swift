@@ -8,7 +8,8 @@
 
 import Foundation
 
-@objc public protocol AdversaryLabServiceProtocol
+@objc (AdversaryLabServiceProtocol)
+public protocol AdversaryLabServiceProtocol
 {
     func startAdversaryLabClient(allowBlock: String, port: String, configFileName: String)
     func stopAdversaryLabClient()

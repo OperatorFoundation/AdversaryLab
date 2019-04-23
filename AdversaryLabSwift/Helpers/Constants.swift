@@ -31,8 +31,6 @@ let allowedOutgoingFloatingSequencesKey = "Allowed:Outgoing:FloatingSequence"
 
 let allowedIncomingEntropyKey = "Allowed:Incoming:Entropy"
 let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
-let allowedIncomingEntropyBinsKey = "Allowed:Incoming:EntropyBins"
-let allowedOutgoingEntropyBinsKey = "Allowed:Outgoing:EntropyBins"
 
 let allowedPacketsSeenKey = "Allowed:Connections:Seen"
 let allowedPacketsAnalyzedKey = "Allowed:Connections:Analyzed"
@@ -56,8 +54,6 @@ let blockedOutgoingFloatingSequencesKey = "Blocked:Outgoing:FloatingSequence"
 
 let blockedIncomingEntropyKey = "Blocked:Incoming:Entropy"
 let blockedOutgoingEntropyKey = "Blocked:Outgoing:Entropy"
-let blockedIncomingEntropyBinsKey = "Blocked:Incoming:EntropyBins"
-let blockedOutgoingEntropyBinsKey = "Blocked:Outgoing:EntropyBins"
 
 let blockedPacketsSeenKey = "Blocked:Connections:Seen"
 let blockedPacketsAnalyzedKey = "Blocked:Connections:Analyzed"
@@ -165,6 +161,8 @@ let lengthsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescripti
 let tlsRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden tls name for a Connection", version: "1.0")
 let tlsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a tls name is from an allowed or blocked connection.", version: "1.0")
 
+let helperToolName = "org.operatorFoundation.AdversaryLabService"
+
 extension Notification.Name
 {
     static let updateDBFilename = Notification.Name("UpdateDatabaseFilename")
@@ -204,4 +202,11 @@ enum ColumnLabel: String
     case tlsNames = "tlsNames"
     case classification = "classification"
     case direction = "direction"
+}
+
+enum ServerPortIsAvailableResult
+{
+    case available(String?)
+    case redisRunning(pid: String)
+    case otherProcessRunning(name: String)
 }

@@ -17,15 +17,15 @@ class AppDelegate: NSObject, NSApplicationDelegate
     {
         createAppSupportDirectory()
         
-//        //Install God-Mode Helper
-//        if !HelperAppInstaller.blessHelper(label: "org.OperatorFoundation.MoonbounceHelperTool")
-//        {
-//            print("Could not install MoonbounceHelperTool")
-//        }
-//        else
-//        {
-//            helperClient = HelperAppController.connectToXPCService()
-//        }
+        //Install God-Mode Helper
+        if !HelperAppInstaller.blessHelper(label: helperToolName)
+        {
+            print("Could not install AdversaryLab Helper App")
+        }
+        else
+        {
+            helperClient = HelperAppController.connectToXPCService()
+        }
     }
     
     func createAppSupportDirectory()

@@ -157,6 +157,21 @@ class ViewController: NSViewController
         self.loadLabelData()
     }
     
+    @IBAction func liveCaptureClick(_ sender: NSButton)
+    {
+        print("\n⏺  You clicked the live capture button 👻")
+        
+        if sender.state == .on
+        {
+            print("Time to record some packets.")
+            showCaptureAlert()
+        }
+        else
+        {
+            print("🛑  Stop recording!! 🛑")
+        }
+    }
+    
     @IBAction func removePacketsClicked(_ sender: NSButton)
     {
         updateConfigModel()
@@ -209,11 +224,55 @@ class ViewController: NSViewController
             {
                 (success) in
                 
-                self.updateConfigModel()
-                print("\n📊  Time to analyze some things.\n")
-                self.connectionInspector.analyzeConnections(configModel: self.configModel)
-                self.updateProgressIndicator()
-            })            
+                self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
+                self.loadLabelData()
+            })
+        }
+    }
+    
+    // TODO: Call this when there is no appropriate data to be processed in the rdb file
+    func showNoDataAlert()
+    {
+        let alert = NSAlert()
+        alert.messageText = "No Packets to Process"
+        alert.informativeText = "There is no valid data in the selected database file to process."
+        alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
+    }
+    
+    func showCaptureAlert()
+    {
+        let alert = NSAlert()
+        alert.messageText = "Please enter your capture options"
+        alert.informativeText = "Enter the desired port to listen on and choose whether this is an allowed or a blocked connection."
+        
+        let textfield = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 21))
+        textfield.placeholderString = "Port Number"
+        alert.accessoryView = textfield
+        alert.addButton(withTitle: "Capture Allowed Traffic")
+        alert.addButton(withTitle: "Capture Blocked Traffic")
+        alert.addButton(withTitle: "Cancel")
+        
+        let response = alert.runModal()
+        
+        guard textfield.stringValue != ""
+        else
+        {
+            return
+        }
+        
+        switch response
+        {
+        case .alertFirstButtonReturn:
+            // Allowed Traffic
+            print("\nCapture requested for allowed connection on port:\(textfield.stringValue)")
+
+        case .alertSecondButtonReturn:
+            // Blocked traffic
+            print("\nCapture requested for blocked connection on port:\(textfield.stringValue)")
+
+        default:
+            // Cancel Button
+            return
         }
     }
     
@@ -252,10 +311,7 @@ class ViewController: NSViewController
                 let connectionGenerator = FakeConnectionGenerator()
                 connectionGenerator.addConnections()
                 
-                DispatchQueue.main.async
-                {
-                    self.loadLabelData()
-                }
+               self.loadLabelData()
             }
         }
     }
@@ -311,17 +367,6 @@ class ViewController: NSViewController
             
             // Entropy
             let entropyResults: RMap <String, Double> = RMap(key: entropyResultsKey)
-//            let requiredOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingRequiredEntropyKey)
-//            let requiredOutEntropyTuple: (Double, Float)? = requiredOutEntropySet.last
-//
-//            let forbiddenOutEntropySet: RSortedSet<Double> = RSortedSet(key: outgoingForbiddenEntropyKey)
-//            let forbiddenOutEntropyTuple: (Double, Float)? = forbiddenOutEntropySet.last
-//
-//            let requiredInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingRequiredEntropyKey)
-//            let requiredInEntropyTuple: (Double, Float)? = requiredInEntropySet.last
-//
-//            let forbiddenInEntropySet: RSortedSet<Double> = RSortedSet(key: incomingForbiddenEntropyKey)
-//            let forbiddenInEntropyTuple: (Double, Float)? = forbiddenInEntropySet.last
             
             //Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)

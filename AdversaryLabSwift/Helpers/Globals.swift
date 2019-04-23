@@ -8,4 +8,5 @@
 
 import Foundation
 
+var helperClient: AdversaryLabServiceProtocol?
 var appDirectory = ""

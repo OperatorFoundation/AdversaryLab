@@ -14,7 +14,7 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
     var verbosity = 3
     
     let logPath = NSHomeDirectory()+"/Documents/debug.log"
-    let fixInternetPath = "Helpers/fixInternet.sh"
+    //let fixInternetPath = "Helpers/fixInternet.sh"
     
     fileprivate var listener:NSXPCListener
     fileprivate let kHelperToolMachServiceName = "org.operatorFoundation.AdversaryLabService"
@@ -67,7 +67,7 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
         
         _ = runAdversaryLabClientScript(arguments: adversaryLabeClientArgs)
         
-        writeToLog(logDirectory: appDirectory, content: "START Adversary Lab ClientEND OF FUNCTION")
+        writeToLog(logDirectory: appDirectory, content: "START Adversary Lab Client END OF FUNCTION")
     }
     
     func stopAdversaryLabClient()
@@ -79,7 +79,7 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
             AdversaryLabService.connectTask!.terminate()
         }
         
-        //killAll(processToKill: "openvpn")
+        //killAll(processToKill: "")
     }
     
     private func runAdversaryLabClientScript(arguments: [String]) -> Bool
@@ -133,16 +133,3 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
         }
     }
 }
-
-
-//#import "AdversaryLabService.h"
-//
-//@implementation AdversaryLabService
-//
-//// This implements the example protocol. Replace the body of this class with the implementation of this service's protocol.
-//- (void)upperCaseString:(NSString *)aString withReply:(void (^)(NSString *))reply {
-//    NSString *response = [aString uppercaseString];
-//    reply(response);
-//}
-//
-//@end

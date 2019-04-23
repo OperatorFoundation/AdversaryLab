@@ -1,13 +1,13 @@
 //
-//  main.m
+//  main.swift
 //  AdversaryLabService
 //
-//  Created by Mafalda on 4/15/19.
+//  Created by Mafalda on 4/19/19.
 //  Copyright © 2019 Operator Foundation. All rights reserved.
 //
 
 import Foundation
 
-NSLog( "\nLaunching Adversary Lab Service...")
-let adversaryLabService = AdversaryLabService()
-adversaryLabService.run()
+NSLog( "Launching AdversaryLab Helper...")
+let helperTool = AdversaryLabService()
+helperTool.run()

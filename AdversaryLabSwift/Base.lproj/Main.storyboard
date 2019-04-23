@@ -2704,7 +2704,7 @@
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
                                             <rect key="frame" x="458" y="13" width="165" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Process File Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
+                                            <buttonCell key="cell" type="push" title="Load Database" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -3102,6 +3102,16 @@
                                                 <constraint firstAttribute="width" constant="363" id="9QT-44-vDc"/>
                                             </constraints>
                                         </box>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OUu-jG-iwO">
+                                            <rect key="frame" x="293" y="13" width="165" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Live Capture" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfp-qe-CeD">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="liveCaptureClick:" target="XfG-lQ-9wD" id="haC-JR-qYU"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="FbD-V0-Jft" firstAttribute="leading" secondItem="tdj-ZI-A0X" secondAttribute="leading" id="0iP-vk-JGH"/>
@@ -3115,6 +3125,7 @@
                                         <constraint firstItem="Z01-0p-3NI" firstAttribute="top" secondItem="DhJ-dN-N45" secondAttribute="bottom" constant="8" id="3a5-Nj-CRc"/>
                                         <constraint firstAttribute="bottom" secondItem="SuX-tc-4bk" secondAttribute="bottom" id="3uH-7T-nB8"/>
                                         <constraint firstItem="q7T-1z-Vem" firstAttribute="leading" secondItem="hsB-wb-1DH" secondAttribute="leading" id="42E-g0-x2v"/>
+                                        <constraint firstItem="OUu-jG-iwO" firstAttribute="width" secondItem="xh2-hi-Cpw" secondAttribute="width" id="4Wm-K8-unN"/>
                                         <constraint firstItem="OYu-D3-1sv" firstAttribute="top" secondItem="DZy-kb-ZFq" secondAttribute="bottom" constant="1" id="5f6-nW-EYP"/>
                                         <constraint firstItem="NTz-p4-SCG" firstAttribute="top" secondItem="gua-Ec-IdB" secondAttribute="bottom" constant="2" id="5vs-li-Hw6"/>
                                         <constraint firstItem="m5b-nm-hR2" firstAttribute="leading" secondItem="EWK-ce-T20" secondAttribute="leading" id="6jb-p9-0XN"/>
@@ -3176,6 +3187,7 @@
                                         <constraint firstItem="fH4-g3-Hs9" firstAttribute="leading" secondItem="m5b-nm-hR2" secondAttribute="trailing" constant="4" id="kKs-HH-umD"/>
                                         <constraint firstItem="dfJ-qg-wD5" firstAttribute="top" secondItem="TWq-1a-BzH" secondAttribute="bottom" constant="6" id="kOh-B4-Hqr"/>
                                         <constraint firstItem="xh2-hi-Cpw" firstAttribute="leading" secondItem="OYu-D3-1sv" secondAttribute="trailing" constant="8" id="kmj-ZP-9ws"/>
+                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="leading" secondItem="OUu-jG-iwO" secondAttribute="trailing" constant="12" id="mKg-Ed-5T2"/>
                                         <constraint firstItem="clM-FW-HoR" firstAttribute="leading" secondItem="Dud-MU-uBR" secondAttribute="leading" constant="8" id="noc-EA-gS4"/>
                                         <constraint firstItem="NTz-p4-SCG" firstAttribute="leading" secondItem="TnU-63-4qv" secondAttribute="leading" id="oA3-Iu-agn"/>
                                         <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="OYu-D3-1sv" secondAttribute="bottom" constant="2" id="ok1-hb-S8t"/>
@@ -3197,6 +3209,7 @@
                                         <constraint firstAttribute="trailing" secondItem="SuX-tc-4bk" secondAttribute="trailing" constant="12" id="t8h-Wv-8vO"/>
                                         <constraint firstItem="NTz-p4-SCG" firstAttribute="width" secondItem="TnU-63-4qv" secondAttribute="width" id="t9t-nF-VdS"/>
                                         <constraint firstItem="a4y-6U-AHW" firstAttribute="trailing" secondItem="jly-WH-Pag" secondAttribute="trailing" id="tJR-sl-nJh"/>
+                                        <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="OUu-jG-iwO" secondAttribute="bottom" constant="2" id="thR-ie-PBl"/>
                                         <constraint firstAttribute="trailing" secondItem="WLd-t4-1zi" secondAttribute="trailing" constant="12" id="u68-fU-XRP"/>
                                         <constraint firstItem="GvF-jE-Qqu" firstAttribute="leading" secondItem="dIg-Jl-uF8" secondAttribute="leading" id="v2j-O7-0JZ"/>
                                         <constraint firstItem="8jI-x3-WZT" firstAttribute="leading" secondItem="r3b-jF-8Ln" secondAttribute="leading" id="wDl-Na-7LB"/>

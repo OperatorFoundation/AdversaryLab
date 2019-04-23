@@ -28,6 +28,20 @@ class RedisServerController: NSObject
             }
             else
             {
+                self.checkServerPortIsAvailable(completion:
+                {
+                    (result) in
+                    
+                    switch result
+                    {
+                    case .available(let _):
+                        print("\nServer port is available")
+                    case .otherProcessRunning(let name):
+                        print("\nAnother process is using our port.")
+                    case .redisRunning(let pid):
+                        print("\nBroken redis is already using our port.")
+                    }
+                })
                 let bundle = Bundle.main
                 
                 guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
@@ -118,6 +132,7 @@ class RedisServerController: NSObject
             completion(false)
             return
         }
+        
         guard let path = Bundle.main.path(forResource: "CheckRedisServerScript", ofType: "sh")
             else
         {
@@ -156,6 +171,70 @@ class RedisServerController: NSObject
         process.launch()
     }
     
+    func checkServerPortIsAvailable(completion:@escaping (_ completion: ServerPortIsAvailableResult) -> Void)
+    {
+        guard let path = Bundle.main.path(forResource: "CheckRedisServerPortScript", ofType: "sh")
+            else
+        {
+            print("Unable to check the Redis server port. Could not find the script.")
+            completion(.available(nil))
+            return
+        }
+        
+        let process = Process()
+        process.launchPath = path
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.terminationHandler =
+        {
+            (task) in
+            
+            // Get the data
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: String.Encoding.utf8)
+
+            if output == ""
+            {
+                print("\nOur port is empty")
+                completion(.available(nil))
+            }
+            else
+            {
+                print("\nReceived a response for our port with lsof: \(output ?? "no output")")
+                guard let responseString = output
+                else
+                {
+                    print("\nlsof response could not be interpreted as a string.")
+                    completion(.available(nil))
+                    return
+                }
+                
+                let responseArray = responseString.split(separator: " ")
+                guard responseArray.count > 1
+                else
+                {
+                    completion(.available(nil))
+                    return
+                }
+                
+                let processName = String(responseArray[0])
+                let pid = String(responseArray[1])
+                
+                if processName == "redis-ser"
+                {
+                    completion(.redisRunning(pid: pid))
+                }
+                else
+                {
+                    completion(.otherProcessRunning(name: processName))
+                }
+            }
+        }
+        
+        process.launch()
+        process.waitUntilExit()
+    }
+    
     // Redis considers switching databases to be switching between numbered partitions within the same db file.
     // We will be switching instead to a database represented by a completely different file.
     func switchDatabaseFile(withFile fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
@@ -168,11 +247,11 @@ class RedisServerController: NSObject
         // Rewrite redis.conf to use the dbfilename for the name of the new .rdb file
         // Setting the dbFilename calls config rewrite with the new name in Redis
         Auburn.dbfilename = newDBName
-        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
+//        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
         
         // Issue a SHUTDOWN command to the Redis server
         Auburn.shutdownRedis()
-        //Auburn.restartRedis()
+        Auburn.restartRedis()
         
         // Copy the .rdb file into the Redis working directory, as specified in redis.conf (defaults to ./, which is the directory the Redis server was run from)
         /*
