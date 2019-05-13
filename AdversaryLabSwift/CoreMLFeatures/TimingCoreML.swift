@@ -45,7 +45,7 @@ class TimingCoreML
 //    }
     
     
-    func scoreTiming()
+    func scoreTiming(modelName: String)
     {
         var timeDifferenceList = [Double]()
         var classificationLabels = [String]()
@@ -193,7 +193,7 @@ class TimingCoreML
                         timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
                         
                         // Save the models
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: timingClassifierMetadata, regressor: regressor, regressorMetadata: timingRegressorMetadata, name: ColumnLabel.timeDifference.rawValue)
+                        MLModelController().saveModel(classifier: classifier, classifierMetadata: timingClassifierMetadata, regressor: regressor, regressorMetadata: timingRegressorMetadata, fileName: ColumnLabel.timeDifference.rawValue, groupName: modelName)
                     }
                     catch let blockedColumnError
                     {

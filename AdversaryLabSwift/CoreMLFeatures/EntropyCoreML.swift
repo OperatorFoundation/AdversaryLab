@@ -12,7 +12,7 @@ import CreateML
 
 class EntropyCoreML
 {
-    func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, error: Error?)
+    func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, inEntropy: Double?, outEntropy: Double?, error: Error?)
     {
         let inPacketsEntropyList: RList<Double> = RList(key: connection.incomingEntropyKey)
         let outPacketsEntropyList: RList<Double> = RList(key: connection.outgoingEntropyKey)
@@ -22,7 +22,7 @@ class EntropyCoreML
         guard let outPacket: Data = outPacketHash[connection.connectionID]
             else
         {
-            return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID))
+            return (false, nil, nil, PacketLengthError.noOutPacketForConnection(connection.connectionID))
         }
         
         let outPacketEntropy = calculateEntropy(for: outPacket)
@@ -33,13 +33,13 @@ class EntropyCoreML
         guard let inPacket = inPacketHash[connection.connectionID]
             else
         {
-            return(false, PacketLengthError.noInPacketForConnection(connection.connectionID))
+            return(false, nil, nil, PacketLengthError.noInPacketForConnection(connection.connectionID))
         }
         
         let inPacketEntropy = calculateEntropy(for: inPacket)
         inPacketsEntropyList.append(inPacketEntropy)
         
-        return (true, nil)
+        return (true, inPacketEntropy, outPacketEntropy, nil)
     }
     
     func calculateEntropy(for packet: Data) -> Double
@@ -81,15 +81,15 @@ class EntropyCoreML
         return countArray
     }
     
-    func scoreAllEntropyInDatabase()
+    func scoreAllEntropyInDatabase(modelName: String)
     {
         // Outgoing
         let outEntropyTable = createEntropyTable(connectionDirection: .outgoing)
-        scoreEntropy(table: outEntropyTable, connectionDirection: .outgoing)
+        scoreEntropy(table: outEntropyTable, connectionDirection: .outgoing, modelName: modelName)
         
         // Incoming
         let inEntropyTable = createEntropyTable(connectionDirection: .incoming)
-        scoreEntropy(table: inEntropyTable, connectionDirection: .incoming)
+        scoreEntropy(table: inEntropyTable, connectionDirection: .incoming, modelName: modelName)
     }
     
     func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
@@ -149,7 +149,7 @@ class EntropyCoreML
         return entropyTable
     }
     
-    func scoreEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection)
+    func scoreEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
     {
         let requiredEntropyKey: String
         let forbiddenEntropyKey: String
@@ -279,7 +279,7 @@ class EntropyCoreML
                         entropyResults[forbiddenEntropyKey] = predictedBlockedEntropy
                         
                         // Save the models
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: entropyClassifierMetadata, regressor: regressor, regressorMetadata: entropyRegressorMetadata, name: ColumnLabel.entropy.rawValue)
+                        MLModelController().saveModel(classifier: classifier, classifierMetadata: entropyClassifierMetadata, regressor: regressor, regressorMetadata: entropyRegressorMetadata, fileName: ColumnLabel.entropy.rawValue, groupName: modelName)
                     }
                     catch let blockedColumnError
                     {

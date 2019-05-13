@@ -15,7 +15,7 @@ class RedisServerController: NSObject
     
     var redisProcess:Process!
     
-    func launchRedisServer(completion:@escaping (_ completion:Bool) -> Void)
+    func launchRedisServer(completion:@escaping (_ completion: ServerCheckResult) -> Void)
     {
         isRedisServerRunning
         {
@@ -23,7 +23,7 @@ class RedisServerController: NSObject
             
             if serverIsRunning
             {
-                completion(false)
+                completion(.okay(nil))
                 return
             }
             else
@@ -34,57 +34,64 @@ class RedisServerController: NSObject
                     
                     switch result
                     {
-                    case .available(let _):
+                    case .okay(let _):
                         print("\nServer port is available")
-                    case .otherProcessRunning(let name):
-                        print("\nAnother process is using our port.")
-                    case .redisRunning(let pid):
-                        print("\nBroken redis is already using our port.")
+                        
+                        let bundle = Bundle.main
+                        
+                        guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
+                            else
+                        {
+                            print("Unable to launch Redis server: could not find terraform executable.")
+                            completion(.failure("Unable to launch Redis server: could not find terraform executable."))
+                            return
+                        }
+                        
+                        guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
+                            else
+                        {
+                            print("Unable to launch Redis server: could not find terraform executable.")
+                            completion(.failure("Unable to launch Redis server: could not find terraform executable."))
+                            return
+                        }
+                        
+                        guard let redisModulePath = bundle.path(forResource: "subsequences", ofType: "so")
+                            else
+                        {
+                            print("Unable to launch Redis server: could not find the needed module.")
+                            completion(.failure("Unable to launch Redis server: could not find the needed module."))
+                            return
+                        }
+                        
+                        guard let path = bundle.path(forResource: "LaunchRedisServerScript", ofType: "sh")
+                            else
+                        {
+                            print("Unable to launch Redis server. Could not find the script.")
+                            completion(.failure("Unable to launch Redis server. Could not find the script."))
+                            return
+                        }
+                        
+                        print("\n👇👇 Running Script 👇👇:\n")
+                        
+                        self.runRedisScript(path: path, arguments: [redisPath, redisConfigPath, redisModulePath])
+                        {
+                            (hasCompleted) in
+                            
+                            print("\n🚀 Launch Redis Server Script Complete 🚀")
+                            completion(.okay(nil))
+                        }
+                        
+                    case .otherProcessOnPort(let name):
+                        print("\nAnother process is using our port. Process name: \(name)")
+                        completion(result)
+                    case .corruptRedisOnPort(let pid):
+                        print("\nBroken redis is already using our port. PID: \(pid)")
+                        completion(result)
+                    case .failure(let failureString):
+                        print("\nFailed to check server port: \(failureString ?? "")")
+                        completion(result)
                     }
                 })
-                let bundle = Bundle.main
-                
-                guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
-                    else
-                {
-                    print("Unable to launch Redis server: could not find terraform executable.")
-                    completion(false)
-                    return
-                }
-                
-                guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
-                    else
-                {
-                    print("Unable to launch Redis server: could not find terraform executable.")
-                    completion(false)
-                    return
-                }
-                
-                guard let redisModulePath = bundle.path(forResource: "subsequences", ofType: "so")
-                    else
-                {
-                    print("Unable to launch Redis server: could not find the needed module.")
-                    completion(false)
-                    return
-                }
-                
-                guard let path = bundle.path(forResource: "LaunchRedisServerScript", ofType: "sh")
-                    else
-                {
-                    print("Unable to launch Redis server. Could not find the script.")
-                    completion(false)
-                    return
-                }
-                
-                print("\n👇👇 Running Script 👇👇:\n")
-                
-                self.runRedisScript(path: path, arguments: [redisPath, redisConfigPath, redisModulePath])
-                {
-                    (hasCompleted) in
-                    
-                    print("\n🚀 Launch Redis Server Script Complete 🚀")
-                    completion(hasCompleted)
-                }
             }
         }
     }
@@ -121,6 +128,30 @@ class RedisServerController: NSObject
             
             print("Server has been 🤖 TERMINATED 🤖")
         }        
+    }
+    
+    func killProcess(pid: String, completion:@escaping (_ completion:Bool) -> Void)
+    {
+        guard let path = Bundle.main.path(forResource: "KillRedisServerScript", ofType: "sh")
+            else
+        {
+            print("Unable to kill Redis server. Could not find the script.")
+            completion(false)
+            return
+        }
+        
+        let process = Process()
+        process.launchPath = path
+        process.arguments = [pid]
+        process.terminationHandler =
+        {
+            (task) in
+            
+            completion(true)
+        }
+        
+        process.launch()
+        process.waitUntilExit()
     }
     
     func isRedisServerRunning(completion:@escaping (_ completion:Bool) -> Void)
@@ -171,13 +202,13 @@ class RedisServerController: NSObject
         process.launch()
     }
     
-    func checkServerPortIsAvailable(completion:@escaping (_ completion: ServerPortIsAvailableResult) -> Void)
+    func checkServerPortIsAvailable(completion:@escaping (_ completion: ServerCheckResult) -> Void)
     {
         guard let path = Bundle.main.path(forResource: "CheckRedisServerPortScript", ofType: "sh")
             else
         {
             print("Unable to check the Redis server port. Could not find the script.")
-            completion(.available(nil))
+            completion(.failure("Unable to check the Redis server port. Could not find the script."))
             return
         }
         
@@ -196,7 +227,7 @@ class RedisServerController: NSObject
             if output == ""
             {
                 print("\nOur port is empty")
-                completion(.available(nil))
+                completion(.okay(nil))
             }
             else
             {
@@ -205,7 +236,7 @@ class RedisServerController: NSObject
                 else
                 {
                     print("\nlsof response could not be interpreted as a string.")
-                    completion(.available(nil))
+                    completion(.failure("lsof response could not be interpreted as a string."))
                     return
                 }
                 
@@ -213,7 +244,7 @@ class RedisServerController: NSObject
                 guard responseArray.count > 1
                 else
                 {
-                    completion(.available(nil))
+                    completion(.failure(nil))
                     return
                 }
                 
@@ -222,11 +253,11 @@ class RedisServerController: NSObject
                 
                 if processName == "redis-ser"
                 {
-                    completion(.redisRunning(pid: pid))
+                    completion(.corruptRedisOnPort(pid: pid))
                 }
                 else
                 {
-                    completion(.otherProcessRunning(name: processName))
+                    completion(.otherProcessOnPort(name: processName))
                 }
             }
         }
@@ -281,7 +312,7 @@ class RedisServerController: NSObject
             {
                 (success) in
                 
-                completion(success)
+                completion(true)
             }
         }
         catch let copyError
@@ -292,7 +323,7 @@ class RedisServerController: NSObject
             {
                 (success) in
                 
-                completion(success)
+                completion(true)
             }
             
             // Reset dbfilename to the default as we failed to copy the new file over

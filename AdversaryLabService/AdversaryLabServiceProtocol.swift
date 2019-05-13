@@ -11,7 +11,7 @@ import Foundation
 @objc (AdversaryLabServiceProtocol)
 public protocol AdversaryLabServiceProtocol
 {
-    func startAdversaryLabClient(allowBlock: String, port: String, configFileName: String)
+    func startAdversaryLabClient(allowBlock: String, port: String, pathToClient: String)
     func stopAdversaryLabClient()
 }
 

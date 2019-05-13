@@ -56,16 +56,16 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
         return true
     }
     
-    func startAdversaryLabClient(allowBlock: String, port: String, configFileName: String)
+    func startAdversaryLabClient(allowBlock: String, port: String, pathToClient: String)
     {
-        writeToLog(logDirectory: appDirectory, content: "\n******* START Adversary Lab Client *******")
-        
+        writeToLog(logDirectory: appDirectory, content: "\n******* START Adversary Lab Client Called *******")
+       
         //Arguments
         let mode = "capture"
         let dataset = "testing"
         let adversaryLabeClientArgs: [String] = [mode, dataset, allowBlock, port]
         
-        _ = runAdversaryLabClientScript(arguments: adversaryLabeClientArgs)
+        _ = runAdversaryLabClientScript(arguments: adversaryLabeClientArgs, pathToExecutable: pathToClient)
         
         writeToLog(logDirectory: appDirectory, content: "START Adversary Lab Client END OF FUNCTION")
     }
@@ -82,21 +82,14 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
         //killAll(processToKill: "")
     }
     
-    private func runAdversaryLabClientScript(arguments: [String]) -> Bool
+    private func runAdversaryLabClientScript(arguments: [String], pathToExecutable: String) -> Bool
     {
         writeToLog(logDirectory: appDirectory, content: "Helper func: runAdversaryLabClientScript")
-        
-        guard let adversaryLabClientPath = Bundle.main.path(forResource: "AdversaryLabClient", ofType: nil)
-        else
-        {
-            print("\nCould not find AdversaryLabClient executable. This should be in the app bundle.")
-            return false
-        }
 
         //Creates a new Process and assigns it to the connectTask property.
         AdversaryLabService.connectTask = Process()
         //The launchPath is the path to the executable to run.
-        AdversaryLabService.connectTask.launchPath = adversaryLabClientPath
+        AdversaryLabService.connectTask.launchPath = pathToExecutable
         //Arguments will pass the arguments to the executable, as though typed directly into terminal.
         AdversaryLabService.connectTask.arguments = arguments
         
@@ -111,7 +104,7 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
     {
         let timeStamp = Date()
         let contentString = "\n\(timeStamp):\n\(content)\n"
-        let logFilePath = logDirectory + "moonbounceLog.txt"
+        let logFilePath = logDirectory + "AdversaryLabLog.txt"
         
         if let fileHandle = FileHandle(forWritingAtPath: logFilePath)
         {

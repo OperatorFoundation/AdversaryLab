@@ -4,5 +4,10 @@
 <dict>
 	<key>Label</key>
 	<string>org.operatorFoundation.AdversaryLabService</string>
+	<key>MachServices</key>
+	<dict>
+		<key>org.operatorFoundation.AdversaryLabService</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

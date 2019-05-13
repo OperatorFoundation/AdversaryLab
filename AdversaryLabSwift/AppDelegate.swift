@@ -25,6 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate
         else
         {
             helperClient = HelperAppController.connectToXPCService()
+            
         }
     }
     

@@ -10,6 +10,7 @@ import Cocoa
 import Auburn
 import RedShot
 import Datable
+import CoreML
 
 class ViewController: NSViewController
 {
@@ -109,15 +110,26 @@ class ViewController: NSViewController
         // Launch Redis Server
         RedisServerController.sharedInstance.launchRedisServer
         {
-            (success) in
+            (result) in
             
-            // Update Labels and Progress Indicator
-            self.loadLabelData()
-            self.updateProgressIndicator()
+            switch result
+            {
+            case .okay(_):
+                // Update Labels and Progress Indicator
+                self.loadLabelData()
+                self.updateProgressIndicator()
+            case .otherProcessOnPort(let processName):
+                self.showOtherProcessAlert(processName: processName)
+            case .corruptRedisOnPort(let pidString):
+                self.showCorruptRedisAlert(processPID: pidString)
+            case .failure(let failureString):
+                print("\nReceived failure on launch server: \(failureString ?? "")")
+                self.quitAdversaryLab()
+            }
         }
         
         // Subscribe to pubsub to know when to inspect a new connection
-        //subscribeToNewConnectionsChannel()
+        subscribeToNewConnectionsChannel()
 
         // Also update labels and progress indicator when new data is available
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
@@ -144,9 +156,18 @@ class ViewController: NSViewController
         
         if sender.state == .on
         {
-            print("Time to analyze some things.")
-            self.connectionInspector.analyzeConnections(configModel: configModel)
-            updateProgressIndicator()
+            
+            if let name = showNameModelAlert()
+            {
+                print("Time to analyze some things.")
+                configModel.modelName = name
+                connectionInspector.analyzeConnections(configModel: configModel)
+                updateProgressIndicator()
+            }
+            else
+            {
+                sender.state = .off
+            }
         }
         else
         {
@@ -155,6 +176,30 @@ class ViewController: NSViewController
         }
         
         self.loadLabelData()
+    }
+    
+    @IBAction func testModeClicked(_ sender: NSButton)
+    {
+        // Segue with Identifier: "TestModeSegue"
+        
+        guard let window = view.window
+            else { return }
+        
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        
+        panel.beginSheetModal(for: window)
+        {
+            (result) in
+            
+            guard result == NSApplication.ModalResponse.OK
+                else { return }
+            
+            let selectedDirURL = panel.urls[0]
+
+            self.performSegue(withIdentifier: "TestModeSegue", sender: selectedDirURL)
+        }
     }
     
     @IBAction func liveCaptureClick(_ sender: NSButton)
@@ -169,6 +214,10 @@ class ViewController: NSViewController
         else
         {
             print("🛑  Stop recording!! 🛑")
+            guard let helper = helperClient
+                else { return }
+            
+            helper.stopAdversaryLabClient()
         }
     }
     
@@ -230,17 +279,113 @@ class ViewController: NSViewController
         }
     }
     
+    func showOtherProcessAlert(processName: String)
+    {
+        let alert = NSAlert()
+        alert.messageText = "Server port is busy"
+        alert.informativeText = "\(processName) is using the Redis server port. Adversary Lab will quit"
+        alert.beginSheetModal(for: self.view.window!)
+        {
+            (response) in
+            
+            self.quitAdversaryLab()
+        }
+    }
+    
+    func showCorruptRedisAlert(processPID: String)
+    {
+        let alert = NSAlert()
+        alert.messageText = "A redis server is already running"
+        alert.informativeText = "This server will need to be shut down in order to proceed. Manually shut down this server?"
+        
+        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "Quit")
+        
+        alert.beginSheetModal(for: self.view.window!)
+        {
+            (response) in
+            
+            switch response
+            {
+            case .alertFirstButtonReturn:
+                print("\nUser chose to quit Adversary Lab rather than kill server.")
+                self.quitAdversaryLab()
+            case .alertSecondButtonReturn:
+                // TODO: Kill Redis Server
+                print("\nUser chose to manually kill Redis server with PID: \(processPID)")
+                RedisServerController.sharedInstance.killProcess(pid: processPID, completion:
+                {
+                    (_) in
+                    
+                    // Launch Redis Server
+                    RedisServerController.sharedInstance.launchRedisServer
+                    {
+                        (result) in
+                        
+                        switch result
+                        {
+                        case .okay(_):
+                            // Update Labels and Progress Indicator
+                            self.loadLabelData()
+                            self.updateProgressIndicator()
+                        case .otherProcessOnPort(let processName):
+                            self.showOtherProcessAlert(processName: processName)
+                        case .corruptRedisOnPort(let pidString):
+                            self.showCorruptRedisAlert(processPID: pidString)
+                        case .failure(let failureString):
+                            print("\nReceived failure on launch server: \(failureString ?? "")")
+                            self.quitAdversaryLab()
+                        }
+                    }
+                })
+            default:
+                print("\nUnknown error user chose unknown option for redis server alert.")
+            }
+        }
+    }
+    
     // TODO: Call this when there is no appropriate data to be processed in the rdb file
     func showNoDataAlert()
     {
         let alert = NSAlert()
-        alert.messageText = "No Packets to Process"
+        alert.messageText = "No packets to process"
         alert.informativeText = "There is no valid data in the selected database file to process."
         alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
     }
     
+    func showNameModelAlert() -> String?
+    {
+        let alert = NSAlert()
+        alert.messageText = "Please name the folder where we will save the model group."
+        
+        let textfield = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 21))
+        textfield.placeholderString = "Model Name"
+        alert.accessoryView = textfield
+        
+        let _ = alert.runModal()
+        
+        guard textfield.stringValue != ""
+            else { return nil }
+        
+        return textfield.stringValue
+    }
+    
     func showCaptureAlert()
     {
+        guard let helper = helperClient
+            else
+        {
+            print("\nUnable to start live capture, the helper app is not initialized.")
+            return
+        }
+        
+        guard let adversaryLabClientPath = Bundle.main.path(forResource: "AdversaryLabClient", ofType: nil)
+            else
+        {
+            print("Could not find AdversaryLabClient executable. This should be in the app bundle.")
+            return
+        }
+        
         let alert = NSAlert()
         alert.messageText = "Please enter your capture options"
         alert.informativeText = "Enter the desired port to listen on and choose whether this is an allowed or a blocked connection."
@@ -265,10 +410,12 @@ class ViewController: NSViewController
         case .alertFirstButtonReturn:
             // Allowed Traffic
             print("\nCapture requested for allowed connection on port:\(textfield.stringValue)")
+            helper.startAdversaryLabClient(allowBlock: "allow", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
 
         case .alertSecondButtonReturn:
             // Blocked traffic
             print("\nCapture requested for blocked connection on port:\(textfield.stringValue)")
+            helper.startAdversaryLabClient(allowBlock: "block", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
 
         default:
             // Cancel Button
@@ -606,9 +753,11 @@ class ViewController: NSViewController
         
         do
         {
+            print("\nSubscribing to redis channel.")
             try redis.subscribe(channel:newConnectionsChannel)
             { (maybeRedisType, maybeError) in
-                
+               
+                print("\nReceived redis subscribe callback.")
                 guard let redisList = maybeRedisType as? [Datable]
                     else
                 {
@@ -630,13 +779,34 @@ class ViewController: NSViewController
                     }
 
                     self.connectionInspector.analyzeConnections(configModel: self.configModel)
+                    
                 }
+                self.loadLabelData()
             }
         }
         catch
         {
             print(error)
         }        
+    }
+    
+    func quitAdversaryLab()
+    {
+        // TODO: Quit
+        RedisServerController.sharedInstance.shutdownRedisServer()
+        NSApplication.shared.terminate(self)
+    }
+
+    override func prepare(for segue: NSStoryboardSegue, sender: Any?)
+    {
+        guard let testModeViewController = segue.destinationController as? TestModeViewController
+            else { return }
+        
+        //TODO: Pass Model
+        if let modelDirURL = sender as? URL
+        {
+            testModeViewController.modelDirectoryURL = modelDirURL
+        }
     }
 
 }

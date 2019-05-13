@@ -51,7 +51,7 @@ class TLS12CoreML
         return true
     }
     
-    func processTls12(_ connection: ObservedConnection)
+    func processTls12(_ connection: ObservedConnection) -> String?
     {
         let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
         let tlsCommonNameSet: RSortedSet<String> = RSortedSet(key: connection.outgoingTlsCommonNameKey)
@@ -61,20 +61,20 @@ class TLS12CoreML
             else
         {
             NSLog("No TLS outgoing packet found")
-            return
+            return nil
         }
         
         let maybeBegin = findCommonNameStart(outPacket)
         guard let begin = maybeBegin else {
             NSLog("No common name beginning found")
             NSLog("\(connection.outgoingKey) \(connection.connectionID) \(outPacket.count)")
-            return
+            return nil
         }
         
         let maybeEnd = findCommonNameEnd(outPacket, begin+commonNameStart.count)
         guard let end = maybeEnd else {
             NSLog("No common name beginning end")
-            return
+            return nil
         }
         
         let commonData = extract(outPacket, begin+commonNameStart.count, end-1)
@@ -82,9 +82,10 @@ class TLS12CoreML
         NSLog("Found TLS 1.2 common name: \(commonName) \(commonName.count) \(begin) \(end)")
         
         let _ = tlsCommonNameSet.incrementScore(ofField: commonName, byIncrement: 1)
+        return commonName
     }
     
-    func scoreTls12()
+    func scoreTls12(modelName: String)
     {
         var allTLSNames = [String]()
         var classificationLabels = [String]()
@@ -229,7 +230,7 @@ class TLS12CoreML
                         tlsResults[forbiddenTLSKey] = predictedBlockedTLSName
                         
                         // Save the model
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: tlsClassifierMetadata, regressor: regressor, regressorMetadata: tlsRegressorMetadata, name: ColumnLabel.tlsNames.rawValue)
+                        MLModelController().saveModel(classifier: classifier, classifierMetadata: tlsClassifierMetadata, regressor: regressor, regressorMetadata: tlsRegressorMetadata, fileName: ColumnLabel.tlsNames.rawValue, groupName: modelName)
                     }
                     catch let blockedTLSColumnError
                     {

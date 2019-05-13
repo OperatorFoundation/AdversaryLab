@@ -63,22 +63,22 @@ class PacketLengthsCoreML
         return(true, nil)
     }
     
-    func scoreAllPacketLengths()
+    /**
+     Train a model for packet lengths
+     
+     - Parameter modelName: A String that will be used to save the resulting mlm file.
+     */
+    func scoreAllPacketLengths(modelName: String)
     {
         // Outgoing Lengths Scoring
-        scorePacketLengths(connectionDirection: .outgoing)
+        scorePacketLengths(connectionDirection: .outgoing, modelName: modelName)
         
         //Incoming Lengths Scoring
-        scorePacketLengths(connectionDirection: .incoming)
+        scorePacketLengths(connectionDirection: .incoming, modelName: modelName)
     }
     
-    func scorePacketLengths(connectionDirection: ConnectionDirection)
+    func scorePacketLengths(connectionDirection: ConnectionDirection, modelName: String)
     {
-        var lengths = [Int]()
-        var classificationLabel = [String]()
-        
-        let allowedLengthsKey: String
-        let blockedLengthsKey: String
         let requiredLengthKey: String
         let forbiddenLengthKey: String
         let lengthsTAccKey: String
@@ -88,16 +88,12 @@ class PacketLengthsCoreML
         switch connectionDirection
         {
         case .incoming:
-            allowedLengthsKey = allowedIncomingLengthsKey
-            blockedLengthsKey = blockedIncomingLengthsKey
             requiredLengthKey = incomingRequiredLengthKey
             forbiddenLengthKey = incomingForbiddenLengthKey
             lengthsTAccKey = incomingLengthsTAccKey
             lengthsVAccKey = incomingLengthsVAccKey
             lengthsEAccKey = incomingLengthsEAccKey
         case .outgoing:
-            allowedLengthsKey = allowedOutgoingLengthsKey
-            blockedLengthsKey = blockedOutgoingLengthsKey
             requiredLengthKey = outgoingRequiredLengthKey
             forbiddenLengthKey = outgoingForbiddenLengthKey
             lengthsTAccKey = outgoingLengthsTAccKey
@@ -105,51 +101,12 @@ class PacketLengthsCoreML
             lengthsEAccKey = outgoingLengthsEAccKey
         }
 
-        /// A is the sorted set of lengths for the Allowed traffic
-        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
-        /// B is the sorted set of lengths for the Blocked traffic
-        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let blockedLengthsArray = newIntArray(from: [blockedLengthsRSet])
-        
-        for length in allowedLengthsArray
-        {
-            guard let score: Float = allowedLengthsRSet[length]
-                else
-            {
-                continue
-            }
-            
-            let count = Int(score)
-            
-            for _ in 0 ..< count
-            {
-                lengths.append(length)
-                classificationLabel.append(ClassificationLabel.allowed.rawValue)
-            }
-        }
-        
-        for length in blockedLengthsArray
-        {
-            guard let score: Float = blockedLengthsRSet[length]
-                else
-            {
-                continue
-            }
-            
-            let count = Int(score)
-            
-            for _ in 0 ..< count
-            {
-                lengths.append(length)
-                classificationLabel.append(ClassificationLabel.blocked.rawValue)
-            }
-        }
+        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
         
         // Create the Lengths Table
         var lengthsTable = MLDataTable()
         let lengthsColumn = MLDataColumn(lengths)
-        let classyLabelColumn = MLDataColumn(classificationLabel)
+        let classyLabelColumn = MLDataColumn(classificationLabels)
         lengthsTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
         lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
         
@@ -241,7 +198,7 @@ class PacketLengthsCoreML
                                 lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
                                 
                                 // Save the models to a file
-                                MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, regressor: regressor, regressorMetadata: lengthsRegressorMetadata, name: ColumnLabel.length.rawValue)
+                                MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, regressor: regressor, regressorMetadata: lengthsRegressorMetadata, fileName: ColumnLabel.length.rawValue, groupName: modelName)
                             }
                             catch let blockedPredictionError
                             {
@@ -272,6 +229,68 @@ class PacketLengthsCoreML
         {
             print("\nError creating the classifier for lengths:\(error)")
         }
+    }
+    
+    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], classifications: [String])
+    {
+        var lengths = [Int]()
+        var classificationLabels = [String]()
+        let allowedLengthsKey: String
+        let blockedLengthsKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            allowedLengthsKey = allowedIncomingLengthsKey
+            blockedLengthsKey = blockedIncomingLengthsKey
+        case .outgoing:
+            allowedLengthsKey = allowedOutgoingLengthsKey
+            blockedLengthsKey = blockedOutgoingLengthsKey
+        }
+        
+        /// A is the sorted set of lengths for the Allowed traffic
+        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
+        let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
+        
+        /// B is the sorted set of lengths for the Blocked traffic
+        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
+        let blockedLengthsArray = newIntArray(from: [blockedLengthsRSet])
+        
+        for length in allowedLengthsArray
+        {
+            guard let score: Float = allowedLengthsRSet[length]
+                else
+            {
+                continue
+            }
+            
+            let count = Int(score)
+            
+            for _ in 0 ..< count
+            {
+                lengths.append(length)
+                classificationLabels.append(ClassificationLabel.allowed.rawValue)
+            }
+        }
+        
+        for length in blockedLengthsArray
+        {
+            guard let score: Float = blockedLengthsRSet[length]
+                else
+            {
+                continue
+            }
+            
+            let count = Int(score)
+            
+            for _ in 0 ..< count
+            {
+                lengths.append(length)
+                classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            }
+        }
+        
+        return(lengths, classificationLabels)
     }
     
     func newIntSet(from redisSets:[RSortedSet<Int>]) -> Set<Int>

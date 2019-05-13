@@ -12,7 +12,6 @@ import Auburn
 class ConnectionInspector
 {
     var pauseBuddy = PauseBot()
-    
 
     func analyzeConnections(configModel: ProcessingConfigurationModel)
     {
@@ -130,7 +129,8 @@ class ConnectionInspector
                             let allowedConnection = ObservedConnection(connectionType: .allowed, connectionID: allowedConnectionID)
                             self.analyze(connection: allowedConnection, configModel: configModel)
                             
-                            DispatchQueue.main.async {
+                            DispatchQueue.main.async
+                            {
                                 NotificationCenter.default.post(name: .updateStats, object: nil)
                                 self.pauseBuddy.currentIndex = index + 1
                             }
@@ -208,11 +208,13 @@ class ConnectionInspector
     func scoreConnections(configModel: ProcessingConfigurationModel)
     {
         sleep(1)
-        PacketLengthsCoreML().scoreAllPacketLengths()
+        PacketLengthsCoreML().scoreAllPacketLengths(modelName: configModel.modelName)
         sleep(1)
-        EntropyCoreML().scoreAllEntropyInDatabase()
+        EntropyCoreML().scoreAllEntropyInDatabase(modelName: configModel.modelName)
         sleep(1)
-        TimingCoreML().scoreTiming()
+        TimingCoreML().scoreTiming(modelName: configModel.modelName)
+        sleep(1)
+        AllFeatures.sharedInstance.scoreAllFeatures(modelName: configModel.modelName)
         sleep(1)
         
         if configModel.enableSequenceAnalysis
@@ -224,9 +226,12 @@ class ConnectionInspector
         
         if configModel.enableTLSAnalysis
         {
-            TLS12CoreML().scoreTls12()
+            TLS12CoreML().scoreTls12(modelName: configModel.modelName)
             sleep(1)
         }
+        
+        // ZIP All Saved Models
+        MLModelController().bundle(modelGroup: configModel.modelName)
         
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
@@ -263,10 +268,18 @@ class ConnectionInspector
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (entropyProcessed, _) = EntropyCoreML().processEntropy(forConnection: connection)
+        let (entropyProcessed,_, _, _) = EntropyCoreML().processEntropy(forConnection: connection)
+        
+        
+        // TODO: Process All Features
+        DispatchQueue.main.async
+        {
+            ProgressBot.sharedInstance.progressMessage = "Analyzing All Features for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
+        }
+        let allFeaturesProcessed = AllFeatures.sharedInstance.processData(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
-        if packetLengthProcessed, timingProcessed, subsequenceNoErrors, entropyProcessed
+        if packetLengthProcessed, timingProcessed, subsequenceNoErrors, entropyProcessed, allFeaturesProcessed
         {
             let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
             let _ = packetsAnalyzedDictionary.increment(field: connection.packetsAnalyzedKey)
@@ -289,16 +302,19 @@ class ConnectionInspector
             }
         }
         
-        if configModel.enableTLSAnalysis {
-            DispatchQueue.main.async{
+        if configModel.enableTLSAnalysis
+        {
+            DispatchQueue.main.async
+            {
                 ProgressBot.sharedInstance.progressMessage = "Analyzing TLS Names for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
             }
-            if let knownProtocol = detectKnownProtocol(connection: connection) {
+            
+            if let knownProtocol = detectKnownProtocol(connection: connection)
+            {
                 NSLog("It's TLS!")
                 processKnownProtocol(knownProtocol, connection)
-            } else {
-                NSLog("Not TLS.")
             }
+            else { NSLog("Not TLS.") }
         }
     }
     
@@ -320,6 +336,16 @@ class ConnectionInspector
         blockedOutLengthsSet.delete()
         let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthsKey)
         blockedInLengthsSet.delete()
+        let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesAccuracyKey)
+        allFeaturesDictionary.delete()
+        let timingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeResultsKey)
+        timingDictionary.delete()
+        let entropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyResultsKey)
+        entropyDictionary.delete()
+        let lengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthResultsKey)
+        lengthDictionary.delete()
+        let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSResultsKey)
+        tlsDictionary.delete()
         
         let inRequiredFloats: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
         inRequiredFloats.delete()

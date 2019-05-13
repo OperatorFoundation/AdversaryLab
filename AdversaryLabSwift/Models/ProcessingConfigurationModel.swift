@@ -14,4 +14,5 @@ class ProcessingConfigurationModel: NSObject
     var enableTLSAnalysis = false
     var removePackets = false
     var processingEnabled = false
+    var modelName = "UnnamedModel.mlm"
 }

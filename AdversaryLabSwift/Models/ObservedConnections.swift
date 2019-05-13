@@ -27,13 +27,13 @@ struct ObservedConnection
     let incomingEntropyKey: String
     let outgoingEntropyKey: String
     let outgoingTlsCommonNameKey: String
-    
+    let connectionType: ClassificationLabel
     let connectionID: String
     
-    init(connectionType: ConnectionType, connectionID: String)
+    init(connectionType: ClassificationLabel, connectionID: String)
     {
         self.connectionID = connectionID
-        
+        self.connectionType = connectionType
         switch connectionType
         {
             case .allowed:
@@ -76,11 +76,11 @@ struct ObservedConnection
     }
 }
 
-enum ConnectionType
-{
-    case allowed
-    case blocked
-}
+//enum ConnectionType: String
+//{
+//    case allowed = ClassificationLabel.allowed.rawValue
+//    case blocked
+//}
 
 enum ConnectionDirection
 {

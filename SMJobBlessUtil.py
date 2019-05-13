@@ -57,6 +57,7 @@ import getopt
 import subprocess
 import plistlib
 import operator
+import traceback
 
 class UsageException (Exception):
     """
@@ -161,8 +162,10 @@ def readPlistFromToolSection(toolPath, segmentName, sectionName):
             assert len(columns) == 2
             for hexStr in columns[1].split():
                 bytes.append(int(hexStr, 16))
+        print(bytearray(bytes))
         plist = plistlib.readPlistFromString(bytearray(bytes))
     except:
+        traceback.print_exc()
         raise CheckException("tool %s / %s section dump malformed (2)" % (segmentName, sectionName), toolPath)
 
     # Check the root of the property list.

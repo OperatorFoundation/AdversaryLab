@@ -31,7 +31,68 @@
 	<key>SMPrivilegedExecutables</key>
 	<dict>
 		<key>org.operatorFoundation.AdversaryLabService</key>
-		<string>identifier "org.operatorFoundation.AdversaryLabService" and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Adelita Schule (MZ3MR7KVAN)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+		<string>identifier &quot;org.operatorFoundation.AdversaryLabService&quot; and anchor apple generic and certificate leaf[subject.CN] = &quot;Mac Developer: Adelita Schule (MZ3MR7KVAN)&quot; and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
 	</dict>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.pkware.zip-archive</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>org.operatorFoundation.AdversaryLabSwift</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>adversary</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.pkware.zip-archive</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>org.operatorFoundation.AdversaryLabSwift</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>adversary</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>LSTypeIsPackage</key>
+			<true/>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.operatorFoundation.AdversaryLabSwift</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>adversary</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+		</dict>
+	</array>
 </dict>
 </plist>

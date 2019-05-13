@@ -135,6 +135,17 @@ let tlsEAccKey = "TLSEvaluationAccuracy"
 //let allowedTlsScoreKey = "Allowed:Outgoing:TLS:Score"
 //let blockedTlsScoreKey = "Blocked:Outgoing:TLS:Score"
 
+
+// All Features
+let allFeaturesAccuracyKey = "AllFeatures:Accuracy"
+let allFeaturesTAccKey = "AllFeatures:TrainingAccuracy"
+let allFeaturesVAccKey = "AllFeatures:ValidationAccuracy"
+let allFeaturesEAccKey = "AllFeatures:EvaluationAccuracy"
+let allFeaturesTimeResultsKey = "AllFeatures:TimeDifference:Results"
+let allFeaturesEntropyResultsKey = "AllFeatures:Entropy:Results"
+let allFeaturesLengthResultsKey = "AllFeatures:PacketLengths:Results"
+let allFeaturesTLSResultsKey = "AllFeatures:TLS:Results"
+
 ///
 let newConnectionMessage = "NewConnectionAdded"
 
@@ -152,14 +163,20 @@ let scoringFloatSequencesString = "Scoring float sequences"
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
 let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
-let entropyRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
-let entropyClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
-let timingRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
-let timingClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
-let lengthsRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden Entropy for a Connection", version: "1.0")
-let lengthsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
-let tlsRegressorMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts Required/Forbidden tls name for a Connection", version: "1.0")
-let tlsClassifierMetadata = MLModelMetadata(author: "Canary", shortDescription: "Predicts whether a tls name is from an allowed or blocked connection.", version: "1.0")
+let entropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts Required/Forbidden entropy for a connection", version: "1.0")
+let entropyClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
+let timingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection", version: "1.0")
+let timingClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
+let lengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden length for a connection", version: "1.0")
+let lengthsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
+let tlsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
+let tlsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a TLS name is from an allowed or blocked connection.", version: "1.0")
+
+let allFeaturesClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given set of features is from an allowed or blocked connection.", version: "1.0")
+let allFeaturesEntropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts Required/Forbidden entropy for a connection given all features", version: "1.0")
+let allFeaturesTimingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection given all features", version: "1.0")
+let allFeaturesLengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden lengths for a connection given all features", version: "1.0")
+let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 
 let helperToolName = "org.operatorFoundation.AdversaryLabService"
 
@@ -197,16 +214,21 @@ enum ClassificationLabel: String
 enum ColumnLabel: String
 {
     case length = "length"
+    case outLength = "outgoingLength"
+    case inLength = "incomingLength"
     case entropy = "entropy"
+    case outEntropy = "outgoingEntropy"
+    case inEntropy = "incomingEntropy"
     case timeDifference = "timeDifference"
     case tlsNames = "tlsNames"
     case classification = "classification"
     case direction = "direction"
 }
 
-enum ServerPortIsAvailableResult
+enum ServerCheckResult
 {
-    case available(String?)
-    case redisRunning(pid: String)
-    case otherProcessRunning(name: String)
+    case okay(String?)
+    case corruptRedisOnPort(pid: String)
+    case otherProcessOnPort(name: String)
+    case failure(String?)
 }
