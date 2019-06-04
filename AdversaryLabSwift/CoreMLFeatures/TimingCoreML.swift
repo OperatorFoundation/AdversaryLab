@@ -9,6 +9,7 @@
 import Foundation
 import Auburn
 import CreateML
+import CoreML
 
 class TimingCoreML
 {
@@ -44,41 +45,78 @@ class TimingCoreML
 //        scoreTiming(allowedTimeDifferenceKey: allowedConnectionsTimeDiffKey, blockedTimeDifferenceKey: blockedConnectionsTimeDiffKey, requiredTimeDifferenceKey: requiredTimeDiffKey, requiredTimeDifferenceAccKey: requiredTimeDiffAccKey, forbiddenTimeDifferenceKey: forbiddenTimeDiffKey, forbiddenTimeDifferenceAccKey: forbiddenTimeDiffAccKey)
 //    }
     
-    
-    func scoreTiming(modelName: String)
+    func scoreTiming(configModel: ProcessingConfigurationModel)
     {
-        var timeDifferenceList = [Double]()
-        var classificationLabels = [String]()
-        
-        /// TimeDifferences for the Allowed traffic
-        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
-        
-        for timeDifferenceIndex in 0 ..< allowedTimeDifferenceList.count
+        if configModel.trainingMode
         {
-            guard let aTimeDifference = allowedTimeDifferenceList[timeDifferenceIndex]
-                else
+            trainModels(configModel: configModel)
+        }
+        else
+        {
+            testModels(configModel: configModel)
+        }
+    }
+    
+    func testModels(configModel: ProcessingConfigurationModel)
+    {
+        var blockedTimeDifferenceList = [Double]()
+        let bTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
+        if bTimeDifferenceList.count > 0
+        {
+            for timeDifference in blockedTimeDifferenceList
             {
-                continue
+                timeDifferenceList.append(timeDifference)
             }
-            
-            timeDifferenceList.append(aTimeDifference)
-            classificationLabels.append(ClassificationLabel.allowed.rawValue)
         }
         
-        /// TimeDifferences for the Blocked traffic
-        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
-        
-        for timeDifferenceIndex in 0 ..< blockedTimeDifferenceList.count
+        var allowedTimeDifferenceList = [Double]()
+        let aTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
+        for timeDifference in aTimeDifferenceList
         {
-            guard let bTimeDifference = blockedTimeDifferenceList[timeDifferenceIndex]
+            allowedTimeDifferenceList.append(timeDifference)
+        }
+
+        
+        do
+        {
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferenceList])
+            
+            guard let appDirectory = getAdversarySupportDirectory()
                 else
             {
-                continue
+                print("\nFailed to test models. Unable to locate application document directory.")
+                return
             }
             
-            timeDifferenceList.append(bTimeDifference)
-            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                else
+                {
+                    print("\nFailed to make a timing prediction.")
+                    return
+                }
+                
+                // TODO: Save the classifier prediction accuracy
+                let firstFeature = classifierPrediction.features(at: 0)
+                let probability = firstFeature.featureValue(for: "classificationProbability").debugDescription
+                let timingClassification = firstFeature.featureValue(for: "classification").debugDescription
+                print("\n🔮  Created a timing prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)\nClassification:\n\(timingClassification)")
+            }
         }
+        catch
+        {
+            print("Unable to test timing model. Error creating the feature provider: \(error)")
+        }
+    }
+    
+    func trainModels(configModel: ProcessingConfigurationModel)
+    {
+        let (timeDifferenceList, classificationLabels) = getTimeDifferenceAndClassificationArrays()
         
         // Create the time difference table
         var timeDifferenceTable = MLDataTable()
@@ -133,78 +171,72 @@ class TimingCoreML
                 print("Worst Validation Error: \(worstValidationError)")
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
+                guard let (allowedTimingTable, blockedTimingTable) = MLModelController().createAllowedBlockedTables(fromTable: timeDifferenceTable)
+                else
+                {
+                    print("\nUnable to create allowed and blocked tables from time difference table.")
+                    return
+                }
+                
                 // This is the dictionary where we will save our results
-                let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceResultsKey)
+                let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceTrainingResultsKey)
                 
                 // Allowed Connection Time Differences
                 do
                 {
-                    let allowedTimeTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.allowed.rawValue, ColumnLabel.timeDifference.rawValue: 0])
+                    let allowedTimeColumn = try regressor.predictions(from: allowedTimingTable)
                     
-                    do
+                    guard let allowedTimeDifferences = allowedTimeColumn.doubles
+                    else
                     {
-                        let allowedTimeColumn = try regressor.predictions(from: allowedTimeTable)
-                        
-                        guard let allowedTimeDifferences = allowedTimeColumn.doubles
-                        else
-                        {
-                            print("\nFailed to identify allowed time differences.")
-                            return
-                        }
-                        
-                        let predictedAllowedTimeDifference = allowedTimeDifferences[0]
-                        print("\n Predicted allowed time difference = \(predictedAllowedTimeDifference)")
-                        
-                        // Save scores
-                        timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
-                        timingDictionary[timeDiffEAccKey] = evaluationAccuracy
-                        timingDictionary[timeDiffTAccKey] = trainingAccuracy
-                        timingDictionary[timeDiffVAccKey] = validationAccuracy
+                        print("\nFailed to identify allowed time differences.")
+                        return
                     }
-                    catch let allowedColumnError
-                    {
-                        print("\nError creating allowed time difference column: \(allowedColumnError)")
-                    }
+                    
+                    let predictedAllowedTimeDifference = allowedTimeDifferences[0]
+                    print("\n Predicted allowed time difference = \(predictedAllowedTimeDifference)")
+                    
+                    // Save scores
+                    timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
+                    timingDictionary[timeDiffEAccKey] = evaluationAccuracy
+                    timingDictionary[timeDiffTAccKey] = trainingAccuracy
+                    timingDictionary[timeDiffVAccKey] = validationAccuracy
                 }
-                catch let allowedTimeTableError
+                catch let allowedColumnError
                 {
-                    print("\nError creating allowed time difference table: \(allowedTimeTableError)")
+                    print("\nError creating allowed time difference column: \(allowedColumnError)")
                 }
                 
                 // Blocked Connection Time Differences
                 do
                 {
-                    let blockedTimeTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.blocked.rawValue, ColumnLabel.timeDifference.rawValue: 0])
+                    let blockedColumn = try regressor.predictions(from: blockedTimingTable)
+                    guard let blockedTimeDifferences = blockedColumn.doubles
+                    else
+                    {
+                        print("\nFailed to identify blocked time differences.")
+                        return
+                    }
                     
-                    do
-                    {
-                        let blockedColumn = try regressor.predictions(from: blockedTimeTable)
-                        guard let blockedTimeDifferences = blockedColumn.doubles
-                        else
-                        {
-                            print("\nFailed to identify blocked time differences.")
-                            return
-                        }
-                        
-                        let predictedBlockedTimeDifference = blockedTimeDifferences[0]
-                        print("\nPredicted blocked time difference = \(predictedBlockedTimeDifference)")
-                        
-                        /// Save Predicted Time Difference
-                        timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
-                        
-                        // Save the models
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: timingClassifierMetadata, regressor: regressor, regressorMetadata: timingRegressorMetadata, fileName: ColumnLabel.timeDifference.rawValue, groupName: modelName)
-                    }
-                    catch let blockedColumnError
-                    {
-                        print("\nError creating blocked time difference column: \(blockedColumnError)")
-                    }
+                    let predictedBlockedTimeDifference = blockedTimeDifferences[0]
+                    print("\nPredicted blocked time difference = \(predictedBlockedTimeDifference)")
+                    
+                    /// Save Predicted Time Difference
+                    timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
+                    
+                    // Save the models
+                    MLModelController().saveModel(classifier: classifier,
+                                                  classifierMetadata: timingClassifierMetadata,
+                                                  classifierFileName: timingClassifierName,
+                                                  regressor: regressor,
+                                                  regressorMetadata: timingRegressorMetadata,
+                                                  regressorFileName: timingRegressorName,
+                                                  groupName: configModel.modelName)
                 }
-                catch let blockedTimeTableError
+                catch let blockedColumnError
                 {
-                    print("\nError creating blocked time difference table: \(blockedTimeTableError)")
+                    print("\nError creating blocked time difference column: \(blockedColumnError)")
                 }
-
             }
             catch let regressorError
             {
@@ -215,6 +247,45 @@ class TimingCoreML
         {
             print("\n Error creating the time difference classifier: \(classiferError)")
         }
+    }
+    
+    
+    func getTimeDifferenceAndClassificationArrays() -> (timeDifferenceList: [Double], classificationLabels: [String])
+    {
+        var timeDifferenceList = [Double]()
+        var classificationLabels = [String]()
+        
+        /// TimeDifferences for the Allowed traffic
+        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
+        
+        for timeDifferenceIndex in 0 ..< allowedTimeDifferenceList.count
+        {
+            guard let aTimeDifference = allowedTimeDifferenceList[timeDifferenceIndex]
+                else
+            {
+                continue
+            }
+            
+            timeDifferenceList.append(aTimeDifference)
+            classificationLabels.append(ClassificationLabel.allowed.rawValue)
+        }
+        
+        /// TimeDifferences for the Blocked traffic
+        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
+        
+        for timeDifferenceIndex in 0 ..< blockedTimeDifferenceList.count
+        {
+            guard let bTimeDifference = blockedTimeDifferenceList[timeDifferenceIndex]
+                else
+            {
+                continue
+            }
+            
+            timeDifferenceList.append(bTimeDifference)
+            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+        }
+        
+        return (timeDifferenceList, classificationLabels)
     }
 
 }

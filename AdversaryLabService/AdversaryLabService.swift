@@ -13,7 +13,7 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
     static var connectTask:Process!
     var verbosity = 3
     
-    let logPath = NSHomeDirectory()+"/Documents/debug.log"
+    let logPath: String
     //let fixInternetPath = "Helpers/fixInternet.sh"
     
     fileprivate var listener:NSXPCListener
@@ -23,6 +23,16 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
     {
         // Set up our XPC listener to handle requests on our Mach service.
         self.listener = NSXPCListener(machServiceName:kHelperToolMachServiceName)
+        
+        if let appDirectory = getAdversarySupportDirectory()
+        {
+            logPath = appDirectory.appendingPathComponent("Documents/debug.log").path
+        }
+        else
+        {
+            logPath = NSHomeDirectory()+"/Documents/debug.log"
+        }
+        
         super.init()
         self.listener.delegate = self
     }

@@ -208,31 +208,38 @@ class ConnectionInspector
     func scoreConnections(configModel: ProcessingConfigurationModel)
     {
         sleep(1)
-        PacketLengthsCoreML().scoreAllPacketLengths(modelName: configModel.modelName)
+        PacketLengthsCoreML().scoreAllPacketLengths(configModel: configModel)
         sleep(1)
-        EntropyCoreML().scoreAllEntropyInDatabase(modelName: configModel.modelName)
+        EntropyCoreML().scoreAllEntropyInDatabase(configModel: configModel)
         sleep(1)
-        TimingCoreML().scoreTiming(modelName: configModel.modelName)
+        TimingCoreML().scoreTiming(configModel: configModel)
         sleep(1)
-        AllFeatures.sharedInstance.scoreAllFeatures(modelName: configModel.modelName)
+        AllFeatures.sharedInstance.scoreAllFeatures(configModel: configModel)
         sleep(1)
-        
-        if configModel.enableSequenceAnalysis
-        {
-            scoreAllFloatSequences()
-            scoreAllOffsetSequenes()
-            sleep(1)
-        }
         
         if configModel.enableTLSAnalysis
         {
-            TLS12CoreML().scoreTls12(modelName: configModel.modelName)
+            TLS12CoreML().scoreTLS12(configModel: configModel)
             sleep(1)
         }
         
-        // ZIP All Saved Models
-        MLModelController().bundle(modelGroup: configModel.modelName)
-        
+        if configModel.trainingMode
+        {
+            if configModel.enableSequenceAnalysis
+            {
+                scoreAllFloatSequences()
+                scoreAllOffsetSequenes()
+                sleep(1)
+            }
+            
+            // ZIP All Saved Models
+            MLModelController().bundle(modelGroup: configModel.modelName)
+        }
+        else
+        {
+            //
+        }
+
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
     
@@ -271,7 +278,7 @@ class ConnectionInspector
         let (entropyProcessed,_, _, _) = EntropyCoreML().processEntropy(forConnection: connection)
         
         
-        // TODO: Process All Features
+        // Process All Features
         DispatchQueue.main.async
         {
             ProgressBot.sharedInstance.progressMessage = "Analyzing All Features for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
@@ -311,10 +318,10 @@ class ConnectionInspector
             
             if let knownProtocol = detectKnownProtocol(connection: connection)
             {
-                NSLog("It's TLS!")
+                //NSLog("It's TLS!")
                 processKnownProtocol(knownProtocol, connection)
             }
-            else { NSLog("Not TLS.") }
+            //else { NSLog("Not TLS.") }
         }
     }
     
@@ -326,26 +333,45 @@ class ConnectionInspector
         packetsAnalyzedDictionary[blockedPacketsAnalyzedKey] = 0
         
         // Delete all current scores
-        let packetLengthsResults: RMap<String, Double> = RMap(key: packetLengthsResultsKey)
-        packetLengthsResults.delete()
+        let packetLengthsTrainingResults: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
+        packetLengthsTrainingResults.delete()
+//        let packetLengthsTestResults: RMap<String, Double> = RMap(key: packetLengthsTestResultsKey)
+//        packetLengthsTestResults.delete()
+        
         let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthsKey)
         allowedOutLengthsSet.delete()
         let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthsKey)
         allowedInLengthsSet.delete()
+        
         let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthsKey)
         blockedOutLengthsSet.delete()
         let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthsKey)
         blockedInLengthsSet.delete()
-        let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesAccuracyKey)
-        allFeaturesDictionary.delete()
-        let timingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeResultsKey)
-        timingDictionary.delete()
-        let entropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyResultsKey)
-        entropyDictionary.delete()
-        let lengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthResultsKey)
-        lengthDictionary.delete()
-        let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSResultsKey)
-        tlsDictionary.delete()
+        
+        let allFeaturesTrainingDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
+        allFeaturesTrainingDictionary.delete()
+        let allFeaturesTestDictionary: RMap<String, Double> = RMap(key: allFeaturesTestAccuracyKey)
+        allFeaturesTestDictionary.delete()
+        
+        let timingTrainingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTrainingResultsKey)
+        timingTrainingDictionary.delete()
+        let timingTestDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTestResultsKey)
+        timingTestDictionary.delete()
+        
+        let entropyTrainingDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTrainingResultsKey)
+        entropyTrainingDictionary.delete()
+        let entropyTestDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTestResultsKey)
+        entropyTestDictionary.delete()
+        
+        let lengthTrainingDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
+        lengthTrainingDictionary.delete()
+        let lengthTestDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTestResultsKey)
+        lengthTestDictionary.delete()
+        
+        let tlsTrainingDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
+        tlsTrainingDictionary.delete()
+        let tlsTestDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTestResultsKey)
+        tlsTestDictionary.delete()
         
         let inRequiredFloats: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
         inRequiredFloats.delete()
@@ -391,17 +417,24 @@ class ConnectionInspector
         let blockedOutEntropyList: RList<Double> = RList(key: blockedOutgoingEntropyKey)
         blockedOutEntropyList.delete()
         
-        let timeDifferenceResults: RMap<String, Double> = RMap(key: timeDifferenceResultsKey)
-        timeDifferenceResults.delete()
+        let timeDifferenceTrainingResults: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
+        timeDifferenceTrainingResults.delete()
+        let timeDifferenceTestResults: RMap<String, Double> = RMap(key: timeDifferenceTestResultsKey)
+        timeDifferenceTestResults.delete()
+        
         let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
         allowedTimeDifferenceList.delete()
         let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
         blockedTimeDifferenceList.delete()
         
-        let tlsResults: RMap <String, String> = RMap(key: tlsResultsKey)
-        tlsResults.delete()
-        let tlsAccuracy: RMap <String, Double> = RMap(key: tlsAccuracyKey)
-        tlsAccuracy.delete()
+        let tlsTrainingResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
+        tlsTrainingResults.delete()
+        let tlsTestResults: RMap <String, String> = RMap(key: tlsTestResultsKey)
+        tlsTestResults.delete()
+        let tlsTrainingAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
+        tlsTrainingAccuracy.delete()
+        let tlsTestAccuracy: RMap <String, Double> = RMap(key: tlsTestAccuracyKey)
+        tlsTestAccuracy.delete()
         
         let allowedTlsCommonNames: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
         allowedTlsCommonNames.delete()

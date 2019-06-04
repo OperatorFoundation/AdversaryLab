@@ -12,7 +12,7 @@ import RedShot
 import Datable
 import CoreML
 
-class ViewController: NSViewController
+class ViewController: NSViewController, NSTabViewDelegate
 {
     @objc dynamic var allowedPacketsSeen = "Loading..."
     @objc dynamic var allowedPacketsAnalyzed = "Loading..."
@@ -88,18 +88,37 @@ class ViewController: NSViewController
     
     @objc dynamic var processingMessage = ""
     
+    @IBOutlet weak var tabView: NSTabView!
     @IBOutlet weak var databaseNameLabel: NSTextField!
     @IBOutlet weak var removePacketsCheck: NSButton!
     @IBOutlet weak var enableSequencesCheck: NSButton!
     @IBOutlet weak var enableTLSCheck: NSButton!
     @IBOutlet weak var processPacketsButton: NSButton!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
-    @IBOutlet weak var LoadDataButton: NSButtonCell!
+    @IBOutlet weak var loadDataButton: NSButtonCell!
     
     let connectionInspector = ConnectionInspector()
     
     var streaming: Bool = false
     var configModel = ProcessingConfigurationModel()
+    
+    // MARK: - Test Mode
+    @objc dynamic var modelName = ""
+    @objc dynamic var timingAccuracy = ""
+    @objc dynamic var tlsAccuracy = ""
+    @objc dynamic var inLengthAccuracy = ""
+    @objc dynamic var outLengthAccuracy = ""
+    @objc dynamic var inEntropyAccuracy = ""
+    @objc dynamic var outEntropyAccuracy = ""
+    
+    @objc dynamic var inLengthProbability = ""
+    @objc dynamic var outLengthProbability = ""
+    @objc dynamic var inLengthClassification = ""
+    @objc dynamic var outLengthClassification = ""
+    
+    
+    var modelDirectoryURL: URL?
+    
     
     override func viewDidLoad()
     {
@@ -119,12 +138,12 @@ class ViewController: NSViewController
                 self.loadLabelData()
                 self.updateProgressIndicator()
             case .otherProcessOnPort(let processName):
-                self.showOtherProcessAlert(processName: processName)
+                showOtherProcessAlert(processName: processName)
             case .corruptRedisOnPort(let pidString):
                 self.showCorruptRedisAlert(processPID: pidString)
             case .failure(let failureString):
                 print("\nReceived failure on launch server: \(failureString ?? "")")
-                self.quitAdversaryLab()
+                quitAdversaryLab()
             }
         }
         
@@ -149,6 +168,7 @@ class ViewController: NSViewController
         self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
     }
     
+    // MARK: - IBActions
     @IBAction func runClick(_ sender: NSButton)
     {
         print("\nYou clicked the process packets button 👻")
@@ -156,17 +176,29 @@ class ViewController: NSViewController
         
         if sender.state == .on
         {
+            // Identify which tab we need to update
+            guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
+                let currentTab = TabIds(rawValue: identifier)
+                else { return }
             
-            if let name = showNameModelAlert()
+            switch currentTab
             {
-                print("Time to analyze some things.")
-                configModel.modelName = name
+            case .TestMode:
+                configModel.modelName = modelName
                 connectionInspector.analyzeConnections(configModel: configModel)
                 updateProgressIndicator()
-            }
-            else
-            {
-                sender.state = .off
+            case .TrainingMode: // In Training mode we need a name so we can save the model files
+                if let name = showNameModelAlert()
+                {
+                    print("Time to analyze some things.")
+                    configModel.modelName = name
+                    connectionInspector.analyzeConnections(configModel: configModel)
+                    updateProgressIndicator()
+                }
+                else
+                {
+                    sender.state = .off
+                }
             }
         }
         else
@@ -180,14 +212,13 @@ class ViewController: NSViewController
     
     @IBAction func testModeClicked(_ sender: NSButton)
     {
-        // Segue with Identifier: "TestModeSegue"
-        
         guard let window = view.window
             else { return }
         
         let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ["adversary"]
         
         panel.beginSheetModal(for: window)
         {
@@ -279,19 +310,60 @@ class ViewController: NSViewController
         }
     }
     
-    func showOtherProcessAlert(processName: String)
+    // MARK: - TabView Delegate
+    
+    func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?)
     {
-        let alert = NSAlert()
-        alert.messageText = "Server port is busy"
-        alert.informativeText = "\(processName) is using the Redis server port. Adversary Lab will quit"
-        alert.beginSheetModal(for: self.view.window!)
+        // Identify which tab was selected
+        guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
+            let currentTab = TabIds(rawValue: identifier)
+            else { return }
+        
+        switch currentTab
         {
-            (response) in
-            
-            self.quitAdversaryLab()
+        case .TrainingMode:
+            configModel.trainingMode = true
+        case .TestMode:
+            configModel.trainingMode = false
+            testModeSelected()
         }
+        
+        loadLabelData()
     }
     
+    // MARK: - Test Mode
+    
+    func testModeSelected()
+    {
+        // Make sure that we have gotten an Adversary file and unpacked it to a temporary directory
+        // TODO: Delete this directory on program exit
+        guard modelDirectoryURL != nil
+            else
+        {
+            // Get the user to select the correct .adversary file
+            if let selectedURL = showSelectAdversaryFileAlert()
+            {
+                // Model Group Name should be the same as the directory
+                modelName = selectedURL.deletingPathExtension().lastPathComponent
+                
+                // Unpack to a temporary directory
+                modelDirectoryURL = MLModelController().unpack(adversaryURL: selectedURL)
+            }
+            else
+            {
+                // User likely selected  cancel in the choose file alert
+                // Return to the training tab
+                let trainingTab = NSTabViewItem(identifier: TabIds.TrainingMode)
+                tabView.selectTabViewItem(trainingTab)
+            }
+            
+            return
+        }
+        
+        loadLabelData()
+    }
+
+    // MARK: - Alerts
     func showCorruptRedisAlert(processPID: String)
     {
         let alert = NSAlert()
@@ -309,7 +381,7 @@ class ViewController: NSViewController
             {
             case .alertFirstButtonReturn:
                 print("\nUser chose to quit Adversary Lab rather than kill server.")
-                self.quitAdversaryLab()
+                quitAdversaryLab()
             case .alertSecondButtonReturn:
                 // TODO: Kill Redis Server
                 print("\nUser chose to manually kill Redis server with PID: \(processPID)")
@@ -329,97 +401,18 @@ class ViewController: NSViewController
                             self.loadLabelData()
                             self.updateProgressIndicator()
                         case .otherProcessOnPort(let processName):
-                            self.showOtherProcessAlert(processName: processName)
+                            showOtherProcessAlert(processName: processName)
                         case .corruptRedisOnPort(let pidString):
                             self.showCorruptRedisAlert(processPID: pidString)
                         case .failure(let failureString):
                             print("\nReceived failure on launch server: \(failureString ?? "")")
-                            self.quitAdversaryLab()
+                            quitAdversaryLab()
                         }
                     }
                 })
             default:
                 print("\nUnknown error user chose unknown option for redis server alert.")
             }
-        }
-    }
-    
-    // TODO: Call this when there is no appropriate data to be processed in the rdb file
-    func showNoDataAlert()
-    {
-        let alert = NSAlert()
-        alert.messageText = "No packets to process"
-        alert.informativeText = "There is no valid data in the selected database file to process."
-        alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
-    }
-    
-    func showNameModelAlert() -> String?
-    {
-        let alert = NSAlert()
-        alert.messageText = "Please name the folder where we will save the model group."
-        
-        let textfield = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 21))
-        textfield.placeholderString = "Model Name"
-        alert.accessoryView = textfield
-        
-        let _ = alert.runModal()
-        
-        guard textfield.stringValue != ""
-            else { return nil }
-        
-        return textfield.stringValue
-    }
-    
-    func showCaptureAlert()
-    {
-        guard let helper = helperClient
-            else
-        {
-            print("\nUnable to start live capture, the helper app is not initialized.")
-            return
-        }
-        
-        guard let adversaryLabClientPath = Bundle.main.path(forResource: "AdversaryLabClient", ofType: nil)
-            else
-        {
-            print("Could not find AdversaryLabClient executable. This should be in the app bundle.")
-            return
-        }
-        
-        let alert = NSAlert()
-        alert.messageText = "Please enter your capture options"
-        alert.informativeText = "Enter the desired port to listen on and choose whether this is an allowed or a blocked connection."
-        
-        let textfield = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 21))
-        textfield.placeholderString = "Port Number"
-        alert.accessoryView = textfield
-        alert.addButton(withTitle: "Capture Allowed Traffic")
-        alert.addButton(withTitle: "Capture Blocked Traffic")
-        alert.addButton(withTitle: "Cancel")
-        
-        let response = alert.runModal()
-        
-        guard textfield.stringValue != ""
-        else
-        {
-            return
-        }
-        
-        switch response
-        {
-        case .alertFirstButtonReturn:
-            // Allowed Traffic
-            print("\nCapture requested for allowed connection on port:\(textfield.stringValue)")
-            helper.startAdversaryLabClient(allowBlock: "allow", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
-
-        case .alertSecondButtonReturn:
-            // Blocked traffic
-            print("\nCapture requested for blocked connection on port:\(textfield.stringValue)")
-            helper.startAdversaryLabClient(allowBlock: "block", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
-
-        default:
-            // Cancel Button
-            return
         }
     }
     
@@ -430,6 +423,19 @@ class ViewController: NSViewController
         configModel.enableTLSAnalysis = self.enableTLSCheck.state == .on
         configModel.removePackets = self.removePacketsCheck.state == .on
         configModel.processingEnabled = self.processPacketsButton.state == .on
+        
+        guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
+            let currentTab = TabIds(rawValue: identifier)
+            else { return }
+        
+        switch currentTab
+        {
+        case .TrainingMode:
+            configModel.trainingMode = true
+        case .TestMode:
+            configModel.trainingMode = false
+            testModeSelected()
+        }
     }
     
     @objc func updateProgressIndicator()
@@ -465,8 +471,9 @@ class ViewController: NSViewController
     
     @objc func loadLabelData()
     {
-        // Get redis data in the utility clue and update the labels with the data in the main queue
+        // Updates Labels that are in the main window (always visible)
         
+        // Get redis data in the utility queue and update the labels with the data in the main queue
         DispatchQueue.global(qos: .utility).async
         {
             let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
@@ -475,6 +482,77 @@ class ViewController: NSViewController
             let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
             let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
             
+            DispatchQueue.main.async
+            {
+                self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
+                self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
+                self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
+                self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
+                
+                guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
+                    let currentTab = TabIds(rawValue: identifier)
+                    else { return }
+                
+                switch currentTab
+                {
+                case .TrainingMode:
+                    self.loadTrainingLabelData()
+                case .TestMode:
+                    self.loadTestLabelData()
+                }
+            }
+        }
+        
+        // Identify which tab we need to update
+    }
+    
+    func loadTestLabelData()
+    {
+        // Get redis data in the utility queue and update the labels with the data in the main queue
+        DispatchQueue.global(qos: .utility).async
+        {
+            // Timing (milliseconds)
+            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTestResultsKey)
+            
+            // TLS Common Names
+            let tlsResults: RMap <String, String> = RMap(key: tlsTestResultsKey)
+            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTestResultsKey)
+            
+            // Lengths
+            let outLengthClassificationDictionary: RMap<String, String> = RMap(key: outgoingLengthClassificationKey)
+            let outLengthClassification = outLengthClassificationDictionary[ColumnLabel.classification.rawValue]
+            let outLengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: outgoingLengthClassificationProbKey)
+            let outLengthClassificationProbability =  outLengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue]
+            
+            let inLengthClassificationDictionary: RMap<String, String> = RMap(key: incomingLengthClassificationKey)
+            let inLengthClassification = inLengthClassificationDictionary[ColumnLabel.classification.rawValue]
+            let inLengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: incomingLengthClassificationProbKey)
+            let inLengthClassificationProbability = inLengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue]
+            
+            // TODO: Entropy
+            
+            DispatchQueue.main.async
+            {
+                if let testTimeEAcc = timingDictionary[timeDiffEAccKey]
+                {
+                    self.timingAccuracy = String(format: "%.2f", testTimeEAcc)
+                }
+                else
+                {
+                    self.timingAccuracy = "--"
+                }
+               
+                self.loadDataButton.title = "Load Model File"
+            }
+        }
+    }
+    
+    func loadTrainingLabelData()
+    {
+        // Get redis data in the utility queue and update the labels with the data in the main queue
+        
+        DispatchQueue.global(qos: .utility).async
+        {
             /// Scores
             
             // Offset Subsequences
@@ -503,17 +581,17 @@ class ViewController: NSViewController
             let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
             // Timing (milliseconds)
-            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceResultsKey)
+            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
             
             // TLS Common Names
-            let tlsResults: RMap <String, String> = RMap(key: tlsResultsKey)
-            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsAccuracyKey)
+            let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
+            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
 
             // Lengths
-            let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsResultsKey)
+            let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsTrainingResultsKey)
             
             // Entropy
-            let entropyResults: RMap <String, Double> = RMap(key: entropyResultsKey)
+            let entropyResults: RMap <String, Double> = RMap(key: entropyTrainingResultsKey)
             
             //Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
@@ -529,215 +607,212 @@ class ViewController: NSViewController
             let forbiddenInFloatSequenceTuple: (Data, Float)? = forbiddenInFloatSequenceSet.last
             
             DispatchQueue.main.async
+            {
+                self.loadDataButton.title = "Load DB File"
+                
+                // Offset Subsequences
+                self.requiredOutOffset = requiredOutOffsetString
+                self.requiredOutOffsetCount = requiredOutOffsetCountString
+                self.requiredOutOffsetIndex = requiredOutOffsetIndexString
+                self.requiredOutOffsetAcc = requiredOutOffsetAccString
+                
+                self.forbiddenOutOffset = forbiddenOutOffsetString
+                self.forbiddenOutOffsetCount = forbiddenOutOffsetCountString
+                self.forbiddenOutOffsetIndex = forbiddenOutOffsetIndexString
+                self.forbiddenOutOffsetAcc = forbiddenOutOffsetAccString
+                
+                self.requiredInOffset = requiredInOffsetString
+                self.requiredInOffsetCount = requiredInOffsetCountString
+                self.requiredInOffsetIndex = requiredInOffsetIndexString
+                self.requiredInOffsetAcc = requiredInOffsetAccString
+                
+                self.forbiddenInOffset = forbiddenInOffsetString
+                self.forbiddenInOffsetCount = forbiddenInOffsetCountString
+                self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
+                self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
+                
+                // Timing (milliseconds)
+                if let rTiming = timingDictionary[requiredTimeDiffKey],
+                    let fTiming = timingDictionary[forbiddenTimeDiffKey],
+                    let timeDiffTAcc = timingDictionary[timeDiffTAccKey],
+                    let timeDiffVAcc = timingDictionary[timeDiffVAccKey],
+                    let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
                 {
-                    self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
-                    self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
-                    self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
-                    self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
-                    
-                    // Offset Subsequences
-                    self.requiredOutOffset = requiredOutOffsetString
-                    self.requiredOutOffsetCount = requiredOutOffsetCountString
-                    self.requiredOutOffsetIndex = requiredOutOffsetIndexString
-                    self.requiredOutOffsetAcc = requiredOutOffsetAccString
-                    
-                    self.forbiddenOutOffset = forbiddenOutOffsetString
-                    self.forbiddenOutOffsetCount = forbiddenOutOffsetCountString
-                    self.forbiddenOutOffsetIndex = forbiddenOutOffsetIndexString
-                    self.forbiddenOutOffsetAcc = forbiddenOutOffsetAccString
-                    
-                    self.requiredInOffset = requiredInOffsetString
-                    self.requiredInOffsetCount = requiredInOffsetCountString
-                    self.requiredInOffsetIndex = requiredInOffsetIndexString
-                    self.requiredInOffsetAcc = requiredInOffsetAccString
-                    
-                    self.forbiddenInOffset = forbiddenInOffsetString
-                    self.forbiddenInOffsetCount = forbiddenInOffsetCountString
-                    self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
-                    self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
-                    
-                    // Timing (milliseconds)
-                    if let rTiming = timingDictionary[requiredTimeDiffKey],
-                        let fTiming = timingDictionary[forbiddenTimeDiffKey],
-                        let timeDiffTAcc = timingDictionary[timeDiffTAccKey],
-                        let timeDiffVAcc = timingDictionary[timeDiffVAccKey],
-                        let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
-                    {
-                        self.requiredTiming = String(format: "%.2f", rTiming) + "ms"
-                        self.forbiddenTiming = String(format: "%.2f", fTiming) + "ms"
-                        self.timeTAcc = String(format: "%.2f", timeDiffTAcc)
-                        self.timeVAcc = String(format: "%.2f", timeDiffVAcc)
-                        self.timeEAcc = String(format: "%.2f", timeDiffEAcc)
-                    }
-                    else
-                    {
-                        self.requiredTiming = "--"
-                        self.forbiddenTiming = "--"
-                        self.timeTAcc = "--"
-                        self.timeVAcc = "--"
-                        self.timeEAcc = "--"
-                    }
-                    
-                    // TLS Common Names
-                    if let rTLS = tlsResults[requiredTLSKey],
-                        let fTLS = tlsResults[forbiddenTLSKey],
-                        let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey],
-                        let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey],
-                        let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
-                    {
-                        self.requiredTLSName = rTLS
-                        self.forbiddenTLSName = fTLS
-                        self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy)
-                        self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy)
-                        self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy)
-                    }
-                    else
-                    {
-                        self.requiredTLSName = "--"
-                        self.forbiddenTLSName = "--"
-                        self.tlsTAcc = "--"
-                        self.tlsVAcc = "--"
-                        self.tlsEAcc = "--"
-                    }
-                    
-                    // Lengths
-                    if let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey],
-                        let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey],
-                        let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey],
-                        let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey],
-                        let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
-                    {
-                        self.requiredOutLength = String(format: "%.2f", outRequiredLength)
-                        self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength)
-                        self.outLengthTAcc = String(format: "%.2f", outTrainingAcc)
-                        self.outLengthVAcc = String(format: "%.2f", outValidationAcc)
-                        self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc)
-                    }
-                    else
-                    {
-                        self.requiredOutLength = "--"
-                        self.forbiddenOutLength = "--"
-                        self.outLengthTAcc = "--"
-                        self.outLengthVAcc = "--"
-                        self.outLengthEAcc = "--"
-                    }
-                    
-                    if let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey],
-                        let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey],
-                        let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey],
-                        let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey],
-                        let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
-                    {
-                        self.requiredInLength = String(format: "%.2f", inRequiredLength)
-                        self.forbiddenInLength = String(format: "%.2f", inForbiddenLength)
-                        self.inLengthTAcc = String(format: "%.2f", inTrainingAcc)
-                        self.inLengthVAcc = String(format: "%.2f", inValidationAcc)
-                        self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc)
-                    }
-                    else
-                    {
-                        self.requiredInLength = "--"
-                        self.forbiddenInLength = "--"
-                        self.inLengthTAcc = "--"
-                        self.inLengthVAcc = "--"
-                        self.inLengthEAcc = "--"
-                    }
-                    
-                    // Entropy
-                    if let rOutEntropy = entropyResults[outgoingRequiredEntropyKey],
-                        let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey],
-                        let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey],
-                        let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey],
-                        let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
-                    {
-                        self.requiredOutEntropy = String(format: "%.2f", rOutEntropy)
-                        self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy)
-                        self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy)
-                        self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy)
-                        self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy)
-                    }
-                    else
-                    {
-                        self.requiredOutEntropy = "--"
-                        self.forbiddenOutEntropy = "--"
-                        self.outEntropyTAcc = "--"
-                        self.outEntropyVAcc = "--"
-                        self.outEntropyEAcc = "--"
-                    }
-                    
-                    if let rInEntropy = entropyResults[incomingRequiredEntropyKey],
-                        let fInEntropy = entropyResults[incomingForbiddenEntropyKey],
-                        let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey],
-                        let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey],
-                        let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
-                    {
-                        self.requiredInEntropy = String(format: "%.2f", rInEntropy)
-                        self.forbiddenInEntropy = String(format: "%.2f", fInEntropy)
-                        self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy)
-                        self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy)
-                        self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy)
-                    }
-                    else
-                    {
-                        self.requiredInEntropy = "--"
-                        self.forbiddenInEntropy = "--"
-                        self.inEntropyTAcc = "--"
-                        self.inEntropyVAcc = "--"
-                        self.inEntropyEAcc = "--"
-                    }
-                    
-                    //Float Subsequences
-                    if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
-                    {
-                        self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
-                        self.requiredOutSequenceCount = "\(roFloatSeqMember)"
-                        self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
-                    }
-                    else
-                    {
-                        self.requiredOutSequence = "--"
-                        self.requiredOutSequenceCount = "--"
-                        self.requiredOutSequenceAcc = "--"
-                    }
-                    
-                    if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
-                    {
-                        self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
-                        self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
-                        self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
-                    }
-                    else
-                    {
-                        self.forbiddenOutSequence = "--"
-                        self.forbiddenOutSequenceCount = "--"
-                        self.forbiddenOutSequenceAcc = "--"
-                    }
-                    
-                    if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
-                    {
-                        self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
-                        self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
-                        self.requiredInSequenceAcc = "\(riFloatSeqScore)"
-                    }
-                    else
-                    {
-                        self.requiredInSequence = "--"
-                        self.requiredInSequenceCount = "--"
-                        self.requiredInSequenceAcc = "--"
-                    }
-                    
-                    if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
-                    {
-                        self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
-                        self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
-                        self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
-                    }
-                    else
-                    {
-                        self.forbiddenInSequence = "--"
-                        self.forbiddenInSequenceCount = "--"
-                        self.forbiddenInSequenceAcc = "--"
-                    }
+                    self.requiredTiming = String(format: "%.2f", rTiming) + "ms"
+                    self.forbiddenTiming = String(format: "%.2f", fTiming) + "ms"
+                    self.timeTAcc = String(format: "%.2f", timeDiffTAcc)
+                    self.timeVAcc = String(format: "%.2f", timeDiffVAcc)
+                    self.timeEAcc = String(format: "%.2f", timeDiffEAcc)
+                }
+                else
+                {
+                    self.requiredTiming = "--"
+                    self.forbiddenTiming = "--"
+                    self.timeTAcc = "--"
+                    self.timeVAcc = "--"
+                    self.timeEAcc = "--"
+                }
+                
+                // TLS Common Names
+                if let rTLS = tlsResults[requiredTLSKey],
+                    let fTLS = tlsResults[forbiddenTLSKey],
+                    let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey],
+                    let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey],
+                    let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
+                {
+                    self.requiredTLSName = rTLS
+                    self.forbiddenTLSName = fTLS
+                    self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy)
+                    self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy)
+                    self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy)
+                }
+                else
+                {
+                    self.requiredTLSName = "--"
+                    self.forbiddenTLSName = "--"
+                    self.tlsTAcc = "--"
+                    self.tlsVAcc = "--"
+                    self.tlsEAcc = "--"
+                }
+                
+                // Lengths
+                if let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey],
+                    let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey],
+                    let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey],
+                    let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey],
+                    let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
+                {
+                    self.requiredOutLength = String(format: "%.2f", outRequiredLength)
+                    self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength)
+                    self.outLengthTAcc = String(format: "%.2f", outTrainingAcc)
+                    self.outLengthVAcc = String(format: "%.2f", outValidationAcc)
+                    self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc)
+                }
+                else
+                {
+                    self.requiredOutLength = "--"
+                    self.forbiddenOutLength = "--"
+                    self.outLengthTAcc = "--"
+                    self.outLengthVAcc = "--"
+                    self.outLengthEAcc = "--"
+                }
+                
+                if let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey],
+                    let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey],
+                    let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey],
+                    let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey],
+                    let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
+                {
+                    self.requiredInLength = String(format: "%.2f", inRequiredLength)
+                    self.forbiddenInLength = String(format: "%.2f", inForbiddenLength)
+                    self.inLengthTAcc = String(format: "%.2f", inTrainingAcc)
+                    self.inLengthVAcc = String(format: "%.2f", inValidationAcc)
+                    self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc)
+                }
+                else
+                {
+                    self.requiredInLength = "--"
+                    self.forbiddenInLength = "--"
+                    self.inLengthTAcc = "--"
+                    self.inLengthVAcc = "--"
+                    self.inLengthEAcc = "--"
+                }
+                
+                // Entropy
+                if let rOutEntropy = entropyResults[outgoingRequiredEntropyKey],
+                    let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey],
+                    let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey],
+                    let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey],
+                    let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
+                {
+                    self.requiredOutEntropy = String(format: "%.2f", rOutEntropy)
+                    self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy)
+                    self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy)
+                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy)
+                    self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy)
+                }
+                else
+                {
+                    self.requiredOutEntropy = "--"
+                    self.forbiddenOutEntropy = "--"
+                    self.outEntropyTAcc = "--"
+                    self.outEntropyVAcc = "--"
+                    self.outEntropyEAcc = "--"
+                }
+                
+                if let rInEntropy = entropyResults[incomingRequiredEntropyKey],
+                    let fInEntropy = entropyResults[incomingForbiddenEntropyKey],
+                    let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey],
+                    let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey],
+                    let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
+                {
+                    self.requiredInEntropy = String(format: "%.2f", rInEntropy)
+                    self.forbiddenInEntropy = String(format: "%.2f", fInEntropy)
+                    self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy)
+                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy)
+                    self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy)
+                }
+                else
+                {
+                    self.requiredInEntropy = "--"
+                    self.forbiddenInEntropy = "--"
+                    self.inEntropyTAcc = "--"
+                    self.inEntropyVAcc = "--"
+                    self.inEntropyEAcc = "--"
+                }
+                
+                //Float Subsequences
+                if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
+                {
+                    self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
+                    self.requiredOutSequenceCount = "\(roFloatSeqMember)"
+                    self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
+                }
+                else
+                {
+                    self.requiredOutSequence = "--"
+                    self.requiredOutSequenceCount = "--"
+                    self.requiredOutSequenceAcc = "--"
+                }
+                
+                if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
+                {
+                    self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
+                    self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
+                    self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
+                }
+                else
+                {
+                    self.forbiddenOutSequence = "--"
+                    self.forbiddenOutSequenceCount = "--"
+                    self.forbiddenOutSequenceAcc = "--"
+                }
+                
+                if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
+                {
+                    self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
+                    self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
+                    self.requiredInSequenceAcc = "\(riFloatSeqScore)"
+                }
+                else
+                {
+                    self.requiredInSequence = "--"
+                    self.requiredInSequenceCount = "--"
+                    self.requiredInSequenceAcc = "--"
+                }
+                
+                if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
+                {
+                    self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
+                    self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
+                    self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
+                }
+                else
+                {
+                    self.forbiddenInSequence = "--"
+                    self.forbiddenInSequenceCount = "--"
+                    self.forbiddenInSequenceAcc = "--"
+                }
             }
         }
     }
@@ -775,6 +850,7 @@ class ViewController: NSViewController
                     guard thisElement.string == newConnectionMessage
                         else
                     {
+                        print("\nReceived a message: \(thisElement.string)")
                         continue
                     }
 
@@ -789,25 +865,14 @@ class ViewController: NSViewController
             print(error)
         }        
     }
-    
-    func quitAdversaryLab()
-    {
-        // TODO: Quit
-        RedisServerController.sharedInstance.shutdownRedisServer()
-        NSApplication.shared.terminate(self)
-    }
 
-    override func prepare(for segue: NSStoryboardSegue, sender: Any?)
-    {
-        guard let testModeViewController = segue.destinationController as? TestModeViewController
-            else { return }
-        
-        //TODO: Pass Model
-        if let modelDirURL = sender as? URL
-        {
-            testModeViewController.modelDirectoryURL = modelDirURL
-        }
-    }
+}
 
+// MARK: - TabView Identifiers
+
+enum TabIds: String
+{
+    case TrainingMode
+    case TestMode
 }
 

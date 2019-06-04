@@ -10,6 +10,7 @@ import Foundation
 import Auburn
 import Datable
 import CreateML
+import CoreML
 
 let tlsRequestStart=Data(bytes: [0x16, 0x03])
 let tlsResponseStart=Data(bytes: [0x16, 0x03])
@@ -60,32 +61,32 @@ class TLS12CoreML
         guard let outPacket: Data = outPacketHash[connection.connectionID]
             else
         {
-            NSLog("No TLS outgoing packet found")
+            //NSLog("No TLS outgoing packet found")
             return nil
         }
         
         let maybeBegin = findCommonNameStart(outPacket)
         guard let begin = maybeBegin else {
-            NSLog("No common name beginning found")
-            NSLog("\(connection.outgoingKey) \(connection.connectionID) \(outPacket.count)")
+            //NSLog("No common name beginning found")
+            //NSLog("\(connection.outgoingKey) \(connection.connectionID) \(outPacket.count)")
             return nil
         }
         
         let maybeEnd = findCommonNameEnd(outPacket, begin+commonNameStart.count)
         guard let end = maybeEnd else {
-            NSLog("No common name beginning end")
+            //NSLog("No common name beginning end")
             return nil
         }
         
         let commonData = extract(outPacket, begin+commonNameStart.count, end-1)
         let commonName = commonData.string
-        NSLog("Found TLS 1.2 common name: \(commonName) \(commonName.count) \(begin) \(end)")
+        //NSLog("Found TLS 1.2 common name: \(commonName) \(commonName.count) \(begin) \(end)")
         
         let _ = tlsCommonNameSet.incrementScore(ofField: commonName, byIncrement: 1)
         return commonName
     }
     
-    func scoreTls12(modelName: String)
+    func getTLSAndClassificationLists() -> (allTLSNames: [String], classificationLabels: [String])
     {
         var allTLSNames = [String]()
         var classificationLabels = [String]()
@@ -112,6 +113,49 @@ class TLS12CoreML
             classificationLabels.append(ClassificationLabel.blocked.rawValue)
         }
         
+        return (allTLSNames, classificationLabels)
+    }
+    
+    func testTLS12Model(modelName: String)
+    {
+        let (allTLSNames, classificationLabels) = getTLSAndClassificationLists()
+        
+        guard allTLSNames.count == classificationLabels.count
+            else { return }
+        
+        do
+        {
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: allTLSNames, ColumnLabel.classification.rawValue: classificationLabels])
+            
+            guard let appDirectory = getAdversarySupportDirectory()
+                else
+            {
+                print("\nFailed to test TLS model. Unable to locate application document directory.")
+                return
+            }
+            
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
+            
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                
+                // TODO: Save the classifier prediction accuracy
+                print("\n🔮  Created a TLS12 prediction from a model file. Feature at index 0:\n\(classifierPrediction?.features(at: 0))")
+            }
+        }
+        catch
+        {
+            print("\nError testing TLS12 Model: \(error)")
+        }
+    }
+    
+    func trainTLS12Model(modelName: String)
+    {
+        let (allTLSNames, classificationLabels) = getTLSAndClassificationLists()
+        
         var tlsTable = MLDataTable()
         let tlsColumn = MLDataColumn(allTLSNames)
         let classyColumn = MLDataColumn(classificationLabels)
@@ -120,7 +164,6 @@ class TLS12CoreML
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (tlsEvaluationTable, tlsTrainingTable) = tlsTable.randomSplit(by: 0.20)
-        
         
         // Train the classifier
         do
@@ -166,80 +209,75 @@ class TLS12CoreML
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
                 // Save our results accuracy
-                let tlsAccuracy: RMap <String, Double> = RMap(key: tlsAccuracyKey)
+                let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
                 tlsAccuracy[tlsTAccKey] = trainingAccuracy
                 tlsAccuracy[tlsVAccKey] = validationAccuracy
                 tlsAccuracy[tlsEAccKey] = evaluationAccuracy
                 
+                guard let (allowedTLSTable, blockedTLSTable) = MLModelController().createAllowedBlockedTables(fromTable: tlsTable)
+                else
+                {
+                    print("\nUnable to create allowed and blocked tables from tls table.")
+                    return
+                }
+                
                 // This is the dictionary where we will save our predictions
-                let tlsResults: RMap <String, String> = RMap(key: tlsResultsKey)
+                let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
                 
                 // Allowed TLS Names
                 do
                 {
-                    let allowedTLSTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.allowed.rawValue, ColumnLabel.tlsNames.rawValue: ""])
+                    let allowedTLSColumn = try regressor.predictions(from: allowedTLSTable)
                     
-                    do
-                    {
-                        let allowedTLSColumn = try regressor.predictions(from: allowedTLSTable)
-                        
-                        guard let allowedTLSNames = allowedTLSColumn.strings
+                    guard let allowedTLSNames = allowedTLSColumn.strings
                         else
-                        {
-                            print("\nFailed to predict allowed TLS name.")
-                            return
-                        }
-                        
-                        let predictedAllowedTLSName = allowedTLSNames[0]
-                        print("\nPredicted allowed TLS Name = \(predictedAllowedTLSName)")
-                        
-                        // TODO: This is only one result
-                        /// Save Prediction
-                       tlsResults[requiredTLSKey] = predictedAllowedTLSName
-                    }
-                    catch let allowedTLSColumnError
                     {
-                        print("\nError creating allowed TLS column: \(allowedTLSColumnError)")
+                        print("\nFailed to predict allowed TLS name.")
+                        return
                     }
+                    
+                    let predictedAllowedTLSName = allowedTLSNames[0]
+                    print("\nPredicted allowed TLS Name = \(predictedAllowedTLSName)")
+                    
+                    // TODO: This is only one result
+                    /// Save Prediction
+                    tlsResults[requiredTLSKey] = predictedAllowedTLSName
                 }
-                catch let allowedTLSTableError
+                catch let allowedTLSColumnError
                 {
-                    print("\nError creating allowed tls table: \(allowedTLSTableError)")
+                    print("\nError creating allowed TLS column: \(allowedTLSColumnError)")
                 }
                 
                 // Blocked TLS Named
                 do
                 {
-                    let blockedTLSTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.blocked.rawValue, ColumnLabel.tlsNames.rawValue: ""])
+                    let blockedTLSColumn = try regressor.predictions(from: blockedTLSTable)
                     
-                    do
-                    {
-                        let blockedTLSColumn = try regressor.predictions(from: blockedTLSTable)
-                        
-                        guard let blockedTLSNames = blockedTLSColumn.strings
+                    guard let blockedTLSNames = blockedTLSColumn.strings
                         else
-                        {
-                            print("\nFailed to predict blocked tls name.")
-                            return
-                        }
-                        
-                        let predictedBlockedTLSName = blockedTLSNames[0]
-                        print("\nPredicted blocked tls name = \(predictedBlockedTLSName)")
-                        
-                        /// Save Scores
-                        tlsResults[forbiddenTLSKey] = predictedBlockedTLSName
-                        
-                        // Save the model
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: tlsClassifierMetadata, regressor: regressor, regressorMetadata: tlsRegressorMetadata, fileName: ColumnLabel.tlsNames.rawValue, groupName: modelName)
-                    }
-                    catch let blockedTLSColumnError
                     {
-                        print("\nError creating blocked TLS column: \(blockedTLSColumnError)")
+                        print("\nFailed to predict blocked tls name.")
+                        return
                     }
+                    
+                    let predictedBlockedTLSName = blockedTLSNames[0]
+                    print("\nPredicted blocked tls name = \(predictedBlockedTLSName)")
+                    
+                    /// Save Scores
+                    tlsResults[forbiddenTLSKey] = predictedBlockedTLSName
+                    
+                    // Save the model
+                    MLModelController().saveModel(classifier: classifier,
+                                                  classifierMetadata: tlsClassifierMetadata,
+                                                  classifierFileName: tlsClassifierName,
+                                                  regressor: regressor,
+                                                  regressorMetadata: tlsRegressorMetadata,
+                                                  regressorFileName: tlsRegressorName,
+                                                  groupName: modelName)
                 }
-                catch let blockedTLSTableError
+                catch let blockedTLSColumnError
                 {
-                    print("\nError creating blocked tls table: \(blockedTLSTableError)")
+                    print("\nError creating blocked TLS column: \(blockedTLSColumnError)")
                 }
             }
             catch let regressorError
@@ -254,7 +292,20 @@ class TLS12CoreML
         }
     }
     
-    private func findCommonNameStart(_ outPacket: Data) -> Int? {
+    func scoreTLS12(configModel: ProcessingConfigurationModel)
+    {
+        if configModel.trainingMode
+        {
+            trainTLS12Model(modelName: configModel.modelName)
+        }
+        else
+        {
+            testTLS12Model(modelName: configModel.modelName)
+        }
+    }
+    
+    private func findCommonNameStart(_ outPacket: Data) -> Int?
+    {
         let maybeRange = outPacket.range(of: commonNameStart)
         guard let range = maybeRange else {
             return nil

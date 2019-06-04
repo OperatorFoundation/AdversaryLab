@@ -10,9 +10,8 @@ import Foundation
 import CreateML
 
 let packetStatsKey = "Packet:Stats"
-let newConnectionsChannel = "New:Connections:Channel"
 
-/// Allowed Connections
+// MARK: Allowed Connections
 let allowedConnectionsKey = "Allowed:Connections"
 let allowedIncomingKey = "Allowed:Incoming:Packets"
 let allowedOutgoingKey = "Allowed:Outgoing:Packets"
@@ -35,7 +34,7 @@ let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
 let allowedPacketsSeenKey = "Allowed:Connections:Seen"
 let allowedPacketsAnalyzedKey = "Allowed:Connections:Analyzed"
 
-/// Blocked Connections
+// MARK: Blocked Connections
 let blockedConnectionsKey = "Blocked:Connections"
 let blockedIncomingKey = "Blocked:Incoming:Packets"
 let blockedOutgoingKey = "Blocked:Outgoing:Packets"
@@ -58,23 +57,35 @@ let blockedOutgoingEntropyKey = "Blocked:Outgoing:Entropy"
 let blockedPacketsSeenKey = "Blocked:Connections:Seen"
 let blockedPacketsAnalyzedKey = "Blocked:Connections:Analyzed"
 
-/// Scores
+// MARK: - Scores
 
-// Lengths
-let packetLengthsResultsKey = "PacketLengths:Results"
-let incomingRequiredLengthKey = "IncomingRequiredLength"
-let incomingForbiddenLengthKey = "IncomingForbiddenLength"
-let incomingLengthsTAccKey = "IncomingLengthsTrainingAccuracy"
-let incomingLengthsVAccKey = "IncomingValidationAccuracy"
-let incomingLengthsEAccKey = "IncomingEvaluationAccuracy"
+/**
+Dictionary :
+{allowed = "0.2708641312836384";
+blocked = "0.7291358687163616";}
+ */
 
-let outgoingRequiredLengthKey = "OutgoingRequiredLength"
-let outgoingForbiddenLengthKey = "OutgoingForbiddenLength"
-let outgoingLengthsTAccKey = "OutgoingLengthsTrainingAccuracy"
-let outgoingLengthsVAccKey = "OutgoingLengthsValidationAccuracy"
-let outgoingLengthsEAccKey = "OutgoingLengthsEvaluationAccuracy"
+// MARK: Lengths
+let packetLengthsTrainingResultsKey = "PacketLengths:Training:Results"
+let incomingRequiredLengthKey = "Incoming:Required:Length"
+let incomingForbiddenLengthKey = "Incoming:Forbidden:Length"
+let incomingLengthsTAccKey = "Incoming:Lengths:TrainingAccuracy"
+let incomingLengthsVAccKey = "Incoming:Validation:Accuracy"
+let incomingLengthsEAccKey = "Incoming:Evaluation:Accuracy"
 
-// Float Sequences
+//let packetLengthsTestResultsKey = "PacketLengths:Test:Results"
+let incomingLengthClassificationProbKey = "Incoming:Length:ClassificationProbability"
+let incomingLengthClassificationKey = "Incoming:Length:Classification"
+let outgoingLengthClassificationProbKey = "Outgoing:Length:ClassificationProbability"
+let outgoingLengthClassificationKey = "Outgoing:Length:Classification"
+
+let outgoingRequiredLengthKey = "Outgoing:Required:Length"
+let outgoingForbiddenLengthKey = "Outgoing:Forbidden:Length"
+let outgoingLengthsTAccKey = "Outgoing:Lengths:TrainingAccuracy"
+let outgoingLengthsVAccKey = "Outgoing:Lengths:ValidationAccuracy"
+let outgoingLengthsEAccKey = "Outgoing:Lengths:EvaluationAccuracy"
+
+// MARK: Float Sequences
 let incomingRequiredFloatSequencesKey = "Incoming:Required:FloatSequence"
 let incomingForbiddenFloatSequencesKey = "Incoming:Forbidden:FloatSequence"
 let incomingFloatSequenceScoresKey = "Incoming:FloatSequence:Scores"
@@ -82,7 +93,7 @@ let outgoingRequiredFloatSequencesKey = "Outgoing:Required:FloatSequence"
 let outgoingForbiddenFloatSequencesKey = "Outgoing:Forbidden:FloatSequence"
 let outgoingFloatSequenceScoresKey = "Outgoing:FloatSequence:Scores"
 
-// Offset Sequences
+// MARK: Offset Sequences
 let requiredOffsetSequenceKey = "Incoming:Required:OffsetSequence"
 let requiredOffsetByteCountKey = "Incoming:Required:OffsetByteCount"
 let requiredOffsetIndexKey = "Incoming:Required:OffsetIndex"
@@ -98,8 +109,13 @@ let incomingRequiredOffsetKey = "Incoming:Required:Offset"
 let outgoingRequiredOffsetKey = "Outgoing:Required:Offset"
 let outgoingForbiddenOffsetKey = "Outgoing:Forbidden:Offset"
 
-// Entropy
-let entropyResultsKey = "Entropy:Results"
+// MARK: Entropy
+let entropyTrainingResultsKey = "Entropy:Training:Results"
+//let entropyTestResultsKey = "Entropy:Test:Results"
+let incomingEntropyClassificationProbKey = "Incoming:Entropy:ClassificationProbability"
+let incomingEntropyClassificationKey = "Incoming:Entropy:Classification"
+let outgoingEntropyClassificationProbKey = "Outgoing:Entropy:ClassificationProbability"
+let outgoingEntropyClassificationKey = "Outgoing:Entropy:Classification"
 
 let incomingRequiredEntropyKey = "IncomingRequiredEntropy"
 let incomingForbiddenEntropyKey = "IncomingForbiddenEntropy"
@@ -113,43 +129,49 @@ let outgoingEntropyTAccKey = "OutgoingEntropyTrainingAccuracy"
 let outgoingEntropyVAccKey = "OutgoingEntropyValidationAccuracy"
 let outgoingEntropyEAccKey = "OutgoingEntropyEvaluationAccuracy"
 
-// Timing
-let timeDifferenceResultsKey = "TimeDifference:Results"
+// MARK: Timing
+let timeDifferenceTrainingResultsKey = "TimeDifference:Training:Results"
+let timeDifferenceTestResultsKey = "TimeDifference:Test:Results"
 let requiredTimeDiffKey = "RequiredTimeDifference"
 let forbiddenTimeDiffKey = "ForbiddenTimeDifference"
 let timeDiffTAccKey = "TimeDifferenceTAccuracy"
 let timeDiffVAccKey = "TimeDifferenceVAccuracy"
 let timeDiffEAccKey = "TimeDifferenceEAccuracy"
 
-// TLS
+// MARK: TLS
 let allowedTlsCommonNameKey = "Allowed:Outgoing:TLS:CommonName"
 let blockedTlsCommonNameKey = "Blocked:Outgoing:TLS:CommonName"
 
-let tlsResultsKey = "TLS:Results"
+let tlsTrainingResultsKey = "TLS:Training:Results"
+let tlsTestResultsKey = "TLS:Test:Results"
 let requiredTLSKey = "RequiredTLS"
 let forbiddenTLSKey = "ForbiddenTLS"
-let tlsAccuracyKey = "TLS:Accuracy"
+let tlsTrainingAccuracyKey = "TLS:Training:Accuracy"
+let tlsTestAccuracyKey = "TLS:Test:Accuracy"
 let tlsTAccKey = "TLSTrainingAccuracy"
 let tlsVAccKey = "TLSValidationAccuracy"
 let tlsEAccKey = "TLSEvaluationAccuracy"
-//let allowedTlsScoreKey = "Allowed:Outgoing:TLS:Score"
-//let blockedTlsScoreKey = "Blocked:Outgoing:TLS:Score"
 
-
-// All Features
-let allFeaturesAccuracyKey = "AllFeatures:Accuracy"
+// MARK: All Features
+let allFeaturesTrainingAccuracyKey = "AllFeatures:Training:Accuracy"
+let allFeaturesTestAccuracyKey = "AllFeatures:Test:Accuracy"
 let allFeaturesTAccKey = "AllFeatures:TrainingAccuracy"
 let allFeaturesVAccKey = "AllFeatures:ValidationAccuracy"
 let allFeaturesEAccKey = "AllFeatures:EvaluationAccuracy"
-let allFeaturesTimeResultsKey = "AllFeatures:TimeDifference:Results"
-let allFeaturesEntropyResultsKey = "AllFeatures:Entropy:Results"
-let allFeaturesLengthResultsKey = "AllFeatures:PacketLengths:Results"
-let allFeaturesTLSResultsKey = "AllFeatures:TLS:Results"
+let allFeaturesTimeTrainingResultsKey = "AllFeatures:TimeDifference:Training:Results"
+let allFeaturesTimeTestResultsKey = "AllFeatures:TimeDifference:Test:Results"
+let allFeaturesEntropyTrainingResultsKey = "AllFeatures:Entropy:Training:Results"
+let allFeaturesEntropyTestResultsKey = "AllFeatures:Entropy:Test:Results"
+let allFeaturesLengthTrainingResultsKey = "AllFeatures:PacketLengths:Training:Results"
+let allFeaturesLengthTestResultsKey = "AllFeatures:PacketLengths:Test:Results"
+let allFeaturesTLSTraininResultsKey = "AllFeatures:TLS:Training:Results"
+let allFeaturesTLSTestResultsKey = "AllFeatures:TLS:Test:Results"
 
-///
+// MARK: - PubSub
 let newConnectionMessage = "NewConnectionAdded"
+let newConnectionsChannel = "New:Connections:Channel"
 
-// Human Reaable Strings
+// MARK: -  Human Readable Strings
 let analyzingAllowedConnectionsString = "Analyzing allowed connection"
 let analyzingBlockedConnectionString = "Analyzing blocked connection"
 let scoringPacketLengthsString = "Scoring packet lengths"
@@ -159,10 +181,37 @@ let scoringTLSNamesString = "Scoring TLS names"
 let scoringOffsetsString = "Scoring offset sequences"
 let scoringFloatSequencesString = "Scoring float sequences"
 
-//
+// MARK: - Queues
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
 let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
+// MARK: - Models
+// MARK: Model Filenames
+let allClassifierName = "AllFeatures_Classifier"
+let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
+let allInEntropyRegressorName = "AllFeatures_Entropy_In_Regressor"
+let allOutEntropyRegressorName = "AllFeatures_Entropy_Out_Regressor"
+let allInPacketLengthRegressorName = "AllFeatures_PacketLength_In_Regressor"
+let allOutPacketLengthRegressorName = "AllFeatures_PacketLength_Out_Regressor"
+let allTLSRegressorName = "AllFeatures_TLS_Regressor"
+
+let timingRegressorName = "TimeDifference_Regressor"
+let timingClassifierName = "TimeDifference_Classifier"
+
+let inEntropyRegressorName = "Entropy_In_Regressor"
+let outEntropyRegressorName = "Entropy_Out_Regressor"
+let inEntropyClassifierName = "Entropy_In_Classifier"
+let outEntropyClassifierName = "Entropy_Out_Classifier"
+
+let inLengthRegressorName = "Length_In_Regressor"
+let outLengthRegressorName = "Length_Out_Regressor"
+let inLengthClassifierName = "Length_In_Classifier"
+let outLengthClassifierName = "Length_Out_Classifier"
+
+let tlsRegressorName = "TLS_Regressor"
+let tlsClassifierName = "TLS_Classifier"
+
+// MARK: Model Metadata
 let entropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts Required/Forbidden entropy for a connection", version: "1.0")
 let entropyClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
 let timingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection", version: "1.0")
@@ -178,8 +227,10 @@ let allFeaturesTimingRegressorMetadata = MLModelMetadata(author: "Operator Found
 let allFeaturesLengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden lengths for a connection given all features", version: "1.0")
 let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 
+// MARK: - Helper Tool
 let helperToolName = "org.operatorFoundation.AdversaryLabService"
 
+// MARK: - Notifications
 extension Notification.Name
 {
     static let updateDBFilename = Notification.Name("UpdateDatabaseFilename")
@@ -187,6 +238,7 @@ extension Notification.Name
     static let updateProgressIndicator = Notification.Name("UpdatedProgress")
 }
 
+// MARK: - Enums
 enum KnownProtocolType {
     case TLS12 // TLS 1.2
 }
@@ -223,6 +275,12 @@ enum ColumnLabel: String
     case tlsNames = "tlsNames"
     case classification = "classification"
     case direction = "direction"
+}
+
+enum PredictionKey: String
+{
+    case classificationProbability
+    case classification
 }
 
 enum ServerCheckResult

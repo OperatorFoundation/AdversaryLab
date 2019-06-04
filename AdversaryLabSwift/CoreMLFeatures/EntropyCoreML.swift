@@ -9,6 +9,7 @@
 import Foundation
 import Auburn
 import CreateML
+import CoreML
 
 class EntropyCoreML
 {
@@ -81,19 +82,44 @@ class EntropyCoreML
         return countArray
     }
     
-    func scoreAllEntropyInDatabase(modelName: String)
+    func scoreAllEntropyInDatabase(configModel: ProcessingConfigurationModel)
     {
-        // Outgoing
-        let outEntropyTable = createEntropyTable(connectionDirection: .outgoing)
-        scoreEntropy(table: outEntropyTable, connectionDirection: .outgoing, modelName: modelName)
+        if configModel.trainingMode
+        {
+            // Outgoing
+            let outEntropyTable = createEntropyTable(connectionDirection: .outgoing)
+            trainEntropy(table: outEntropyTable, connectionDirection: .outgoing, modelName: configModel.modelName)
+            
+            // Incoming
+            let inEntropyTable = createEntropyTable(connectionDirection: .incoming)
+            trainEntropy(table: inEntropyTable, connectionDirection: .incoming, modelName: configModel.modelName)
+        }
+        else
+        {
+            testEntropy(connectionDirection: .outgoing, configModel: configModel)
+            testEntropy(connectionDirection: .incoming, configModel: configModel)
+        }
         
-        // Incoming
-        let inEntropyTable = createEntropyTable(connectionDirection: .incoming)
-        scoreEntropy(table: inEntropyTable, connectionDirection: .incoming, modelName: modelName)
     }
     
     func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
+        let (entropyList, classificationLabels) = getEntropyAndClassificationLists(connectionDirection: connectionDirection)
+        var entropyTable = MLDataTable()
+        let entropyColumn = MLDataColumn(entropyList)
+        let classificationColumn = MLDataColumn(classificationLabels)
+        
+        entropyTable.addColumn(entropyColumn, named: ColumnLabel.entropy.rawValue)
+        entropyTable.addColumn(classificationColumn, named: ColumnLabel.classification.rawValue)
+        
+        return entropyTable
+    }
+    
+    func getEntropyAndClassificationLists(connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
+    {
+        var entropyList = [Double]()
+        var classificationLabels = [String]()
+        
         let allowedEntropyKey: String
         let blockedEntropyKey: String
         
@@ -106,9 +132,6 @@ class EntropyCoreML
             allowedEntropyKey = allowedIncomingEntropyKey
             blockedEntropyKey = blockedIncomingEntropyKey
         }
-        
-        var entropyList = [Double]()
-        var classificationLabels = [String]()
         
         // Allowed Traffic
         let allowedEntropyList: RList<Double> = RList(key: allowedEntropyKey)
@@ -140,22 +163,74 @@ class EntropyCoreML
             classificationLabels.append(ClassificationLabel.blocked.rawValue)
         }
         
-        var entropyTable = MLDataTable()
-        let entropyColumn = MLDataColumn(entropyList)
-        let classificationColumn = MLDataColumn(classificationLabels)
-        entropyTable.addColumn(entropyColumn, named: ColumnLabel.entropy.rawValue)
-        entropyTable.addColumn(classificationColumn, named: ColumnLabel.classification.rawValue)
-        
-        return entropyTable
+        return (entropyList, classificationLabels)
     }
     
-    func scoreEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
+    func testEntropy(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    {
+        let (entropyList, classificationLabels) = getEntropyAndClassificationLists(connectionDirection: connectionDirection)
+        
+        let entropyColumnLabel: String
+        let entropyClassifierName: String
+        
+        switch connectionDirection
+        {
+        case .outgoing:
+            entropyColumnLabel = ColumnLabel.outEntropy.rawValue
+            entropyClassifierName = outEntropyClassifierName
+        case .incoming:
+            entropyColumnLabel = ColumnLabel.inEntropy.rawValue
+            entropyClassifierName = inEntropyClassifierName
+        }
+        
+        guard entropyList.count == classificationLabels.count
+            else { return }
+        
+        do
+        {
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [entropyColumnLabel: entropyList, ColumnLabel.classification.rawValue: classificationLabels])
+            
+            guard let appDirectory = getAdversarySupportDirectory()
+                else
+            {
+                print("\nFailed to test entropy model. Unable to locate application document directory.")
+                return
+            }
+            
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(entropyClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                    else
+                {
+                    print("\nFailed to make an entropy prediction.")
+                    return
+                }
+                
+                // TODO: Save the classifier prediction accuracy
+                let firstFeature = classifierPrediction.features(at: 0)
+                let probability = firstFeature.featureValue(for: "classificationProbability").debugDescription
+                print("\n🔮  Created an entropy prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)")
+            }
+        }
+        catch
+        {
+            print("Unable to test \(connectionDirection) entropy. Error creating batch feature provider: \(error)")
+        }
+    }
+    
+    func trainEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
     {
         let requiredEntropyKey: String
         let forbiddenEntropyKey: String
         let entropyTAccKey: String
         let entropyVAccKey: String
         let entropyEAccKey: String
+        let entropyClassifierName: String
+        let entropyRegressorName: String
         
         switch connectionDirection
         {
@@ -165,12 +240,16 @@ class EntropyCoreML
             entropyTAccKey = outgoingEntropyTAccKey
             entropyVAccKey = outgoingEntropyVAccKey
             entropyEAccKey = outgoingEntropyEAccKey
+            entropyClassifierName = outEntropyClassifierName
+            entropyRegressorName = outEntropyRegressorName
         case .incoming:
             requiredEntropyKey = incomingRequiredEntropyKey
             forbiddenEntropyKey = incomingForbiddenEntropyKey
             entropyTAccKey = incomingEntropyTAccKey
             entropyVAccKey = incomingEntropyVAccKey
             entropyEAccKey = incomingEntropyEAccKey
+            entropyClassifierName = inEntropyClassifierName
+            entropyRegressorName = inEntropyRegressorName
         }
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
@@ -219,76 +298,72 @@ class EntropyCoreML
                 print("Worst Validation Error: \(worstValidationError)")
                 print("Worst Evaluation Error: \(worstEvaluationError)")
                 
+                guard let (allowedEntropyTable, blockedEntropyTable) = MLModelController().createAllowedBlockedTables(fromTable: entropyTable)
+                else
+                {
+                    print("\nUnable to create allowed and blocked tables from entropy table.")
+                    return
+                }
+                
                 // This is the dictionary we will save our results to
-                let entropyResults: RMap<String,Double> = RMap(key: entropyResultsKey)
+                let entropyResults: RMap<String,Double> = RMap(key: entropyTrainingResultsKey)
                 
                 // Allowed Entropy
                 do
                 {
-                    let allowedEntropyTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.allowed.rawValue, ColumnLabel.entropy.rawValue: 0])
+                    let allowedEntropyColumn = try regressor.predictions(from: allowedEntropyTable)
                     
-                    do
+                    guard let allowedEntropies = allowedEntropyColumn.doubles
+                        else
                     {
-                        let allowedEntropyColumn = try regressor.predictions(from: allowedEntropyTable)
-                        
-                        guard let allowedEntropies = allowedEntropyColumn.doubles
-                            else
-                        {
-                            print("Failed to identify allowed entropy.")
-                            return
-                        }
-                        
-                        let predictedAllowedEntropy = allowedEntropies[0]
-                        print("\nPredicted allowed entropy = \(predictedAllowedEntropy)")
-                        
-                        /// Save Results
-                        entropyResults[requiredEntropyKey] = predictedAllowedEntropy
-                        entropyResults[entropyTAccKey] = trainingAccuracy
-                        entropyResults[entropyVAccKey] = validationAccuracy
-                        entropyResults[entropyEAccKey] = evaluationAccuracy
+                        print("Failed to identify allowed entropy.")
+                        return
                     }
-                    catch let allowedColumnError
-                    {
-                        print("\nError creating allowed entropy column:\(allowedColumnError)")
-                    }
+                    
+                    let predictedAllowedEntropy = allowedEntropies[0]
+                    print("\nPredicted allowed entropy = \(predictedAllowedEntropy)")
+                    
+                    /// Save Results
+                    entropyResults[requiredEntropyKey] = predictedAllowedEntropy
+                    entropyResults[entropyTAccKey] = trainingAccuracy
+                    entropyResults[entropyVAccKey] = validationAccuracy
+                    entropyResults[entropyEAccKey] = evaluationAccuracy
                 }
-                catch let allowedTableError
+                catch let allowedColumnError
                 {
-                    print("Error creating allowed entropy table: \(allowedTableError)")
+                    print("\nError creating allowed entropy column:\(allowedColumnError)")
                 }
+
                 
                 // Blocked Entropy
                 do
                 {
-                    let blockedEntropyTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.blocked.rawValue, ColumnLabel.entropy.rawValue: 0])
+                    let blockedEntropyColumn = try regressor.predictions(from: blockedEntropyTable)
+                    guard let blockedEntropies = blockedEntropyColumn.doubles
+                        else
+                    {
+                        print("\nFailed to identify blocked entropy.")
+                        return
+                    }
                     
-                    do
-                    {
-                        let blockedEntropyColumn = try regressor.predictions(from: blockedEntropyTable)
-                        guard let blockedEntropies = blockedEntropyColumn.doubles
-                            else
-                        {
-                            print("\nFailed to identify blocked entropy.")
-                            return
-                        }
-                        
-                        let predictedBlockedEntropy = blockedEntropies[0]
-                        print("\nPredicted blocked entropy = \(predictedBlockedEntropy)")
-                        
-                        // Save Scores
-                        entropyResults[forbiddenEntropyKey] = predictedBlockedEntropy
-                        
-                        // Save the models
-                        MLModelController().saveModel(classifier: classifier, classifierMetadata: entropyClassifierMetadata, regressor: regressor, regressorMetadata: entropyRegressorMetadata, fileName: ColumnLabel.entropy.rawValue, groupName: modelName)
-                    }
-                    catch let blockedColumnError
-                    {
-                        print("Error creating blocked entropy column: \(blockedColumnError)")
-                    }
+                    let predictedBlockedEntropy = blockedEntropies[0]
+                    print("\nPredicted blocked entropy = \(predictedBlockedEntropy)")
+                    
+                    // Save Scores
+                    entropyResults[forbiddenEntropyKey] = predictedBlockedEntropy
+                    
+                    // Save the models
+                    MLModelController().saveModel(classifier: classifier,
+                                                  classifierMetadata: entropyClassifierMetadata,
+                                                  classifierFileName: entropyClassifierName,
+                                                  regressor: regressor,
+                                                  regressorMetadata: entropyRegressorMetadata,
+                                                  regressorFileName: entropyRegressorName,
+                                                  groupName: modelName)
                 }
-                catch let blockedTableError
+                catch let blockedColumnError
                 {
-                    print("Error creating blocked table for entropy: \(blockedTableError)")
+                    print("Error creating blocked entropy column: \(blockedColumnError)")
                 }
             }
             catch let regressorError

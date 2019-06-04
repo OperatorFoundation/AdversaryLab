@@ -46,7 +46,6 @@
 		AE0BC8C4226F96A000AD89E7 /* AdversaryLabService-Launchd.plist in Sources */ = {isa = PBXBuildFile; fileRef = AECB0C85226F7FE900567BEA /* AdversaryLabService-Launchd.plist */; };
 		AE0BC8D5226FAC6500AD89E7 /* CheckRedisServerPortScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */; };
 		AE0BC8D72273831500AD89E7 /* KillRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8D62273831500AD89E7 /* KillRedisServerScript.sh */; };
-		AE0BC8DB22739BFB00AD89E7 /* TestModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0BC8DA22739BFB00AD89E7 /* TestModeViewController.swift */; };
 		AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
 		AE0BC8E02280940D00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
 		AE0BC8E22280941900AD89E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8E12280941900AD89E7 /* Foundation.framework */; };
@@ -65,6 +64,7 @@
 		AEDE2BE3226A9DCA00A6219A /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
 		AEE50A9F228238DE009698CC /* ZIPFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AEE50A9E228238DE009698CC /* ZIPFoundation.framework */; };
 		AEE50AA222875905009698CC /* AdversaryFeaturesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AA122875905009698CC /* AdversaryFeaturesModel.swift */; };
+		AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AFE228FBE8C009698CC /* Alerts.swift */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
 		CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */; };
@@ -231,7 +231,6 @@
 		AE0BC8AD226F87A400AD89E7 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerPortScript.sh; sourceTree = "<group>"; };
 		AE0BC8D62273831500AD89E7 /* KillRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = KillRedisServerScript.sh; sourceTree = "<group>"; };
-		AE0BC8DA22739BFB00AD89E7 /* TestModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModeViewController.swift; sourceTree = "<group>"; };
 		AE0BC8DE2280923E00AD89E7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AE0BC8E12280941900AD89E7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AE1AC6F92258020500555456 /* MLModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLModelController.swift; sourceTree = "<group>"; };
@@ -249,6 +248,7 @@
 		AEC9D56222651901008F32F2 /* AdversaryLabService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdversaryLabService.swift; sourceTree = "<group>"; };
 		AECB0C85226F7FE900567BEA /* AdversaryLabService-Launchd.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AdversaryLabService-Launchd.plist"; sourceTree = "<group>"; };
 		AEE50AA122875905009698CC /* AdversaryFeaturesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdversaryFeaturesModel.swift; sourceTree = "<group>"; };
+		AEE50AFE228FBE8C009698CC /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		CA727CD32050A3580051A01B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KnownProtocols.swift; sourceTree = "<group>"; };
 		CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLS12.swift; sourceTree = "<group>"; };
@@ -321,6 +321,7 @@
 				467E49392017F166008B19E3 /* Constants.swift */,
 				462271F62049021A00F21D08 /* DataHelper.swift */,
 				AE929724226521F6005C1FBB /* Globals.swift */,
+				AEE50AFE228FBE8C009698CC /* Alerts.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -363,7 +364,6 @@
 				468B26502023CFF8000A2B5D /* Models */,
 				46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */,
 				4651A15020083BF700037D31 /* AppDelegate.swift */,
-				AE0BC8DA22739BFB00AD89E7 /* TestModeViewController.swift */,
 				4651A15220083BF700037D31 /* ViewController.swift */,
 				4651A15420083BF700037D31 /* Assets.xcassets */,
 				4651A15620083BF700037D31 /* Main.storyboard */,
@@ -726,7 +726,6 @@
 				AEE50AA222875905009698CC /* AdversaryFeaturesModel.swift in Sources */,
 				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,
 				462E73A72091421400C59B80 /* ProgressBot.swift in Sources */,
-				AE0BC8DB22739BFB00AD89E7 /* TestModeViewController.swift in Sources */,
 				AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */,
 				AE08E0CC226A6D3B00D94E45 /* AdversaryLabServiceProtocol.swift in Sources */,
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
@@ -737,6 +736,7 @@
 				AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */,
 				CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */,
 				46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */,
+				AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */,
 				468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */,
 				5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */,
 				AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */,

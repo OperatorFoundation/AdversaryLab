@@ -68,22 +68,120 @@ class PacketLengthsCoreML
      
      - Parameter modelName: A String that will be used to save the resulting mlm file.
      */
-    func scoreAllPacketLengths(modelName: String)
+    func scoreAllPacketLengths(configModel: ProcessingConfigurationModel)
+        //(modelName: String, trainingMode: Bool)
     {
         // Outgoing Lengths Scoring
-        scorePacketLengths(connectionDirection: .outgoing, modelName: modelName)
+        scorePacketLengths(connectionDirection: .outgoing, modelName: configModel.modelName, trainingMode: configModel.trainingMode)
         
         //Incoming Lengths Scoring
-        scorePacketLengths(connectionDirection: .incoming, modelName: modelName)
+        scorePacketLengths(connectionDirection: .incoming, modelName: configModel.modelName, trainingMode: configModel.trainingMode)
     }
     
-    func scorePacketLengths(connectionDirection: ConnectionDirection, modelName: String)
+    func scorePacketLengths(connectionDirection: ConnectionDirection, modelName: String, trainingMode: Bool)
+    {
+        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
+        
+        if trainingMode
+        {
+            let lengthsTable = createLengthTable(classificationLabels: classificationLabels, lengths: lengths)
+            trainModels(lengthsTable: lengthsTable, connectionDirection: connectionDirection, modelName: modelName)
+        }
+        else
+        {
+            testModels(classificationLabels: classificationLabels, lengths: lengths, connectionDirection: connectionDirection, modelName: modelName)
+        }
+    }
+    
+    func testModels(classificationLabels: [String], lengths: [Int], connectionDirection: ConnectionDirection, modelName: String)
+    {
+        let classifierName: String
+        let lengthClassificationKey: String
+        let lengthClassificationProbabiltyKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            classifierName = inLengthClassifierName
+            lengthClassificationKey = incomingLengthClassificationKey
+            lengthClassificationProbabiltyKey = incomingLengthClassificationProbKey
+        case .outgoing:
+            classifierName = outLengthClassifierName
+            lengthClassificationKey = outgoingLengthClassificationKey
+            lengthClassificationProbabiltyKey = outgoingLengthClassificationProbKey
+        }
+        do
+        {
+            guard classificationLabels.count == lengths.count
+            else
+            {
+                print("Cannot test the lengths model, lengths (\(lengths.count)), and classifications (\(classificationLabels.count)) do not have the same number of values.")
+                return
+            }
+
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths, ColumnLabel.classification.rawValue: classificationLabels])
+            
+            guard let appDirectory = getAdversarySupportDirectory()
+            else
+            {
+                print("\nFailed to test models. Unable to locate application document directory.")
+                return
+            }
+            
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                if let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                {
+                    let firstFeature = classifierPrediction.features(at: 0)
+                    let probability = firstFeature.featureValue(for: PredictionKey.classificationProbability.rawValue).debugDescription
+
+                    guard let lengthClassification = firstFeature.featureValue(for: PredictionKey.classification.rawValue)
+                    else
+                    {
+                        print("\nLength classification result was nil.")
+                        return
+                    }
+                    
+                    print("\n🔮  Created a length prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)\nClassification:\n\(lengthClassification)")
+                    
+                    let lengthClassificationDictionary: RMap<String, String> = RMap(key: lengthClassificationKey)
+                    lengthClassificationDictionary[ColumnLabel.classification.rawValue] = lengthClassification.stringValue
+                    
+                    let lengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: lengthClassificationKey)
+                    lengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue] = probability
+                }
+            }
+        }
+        catch let featureProviderError
+        {
+            print("\nError creating lengths feature provider: \(featureProviderError)")
+        }
+    }
+    
+    func createLengthTable(classificationLabels: [String], lengths: [Int]) -> MLDataTable
+    {
+        // Create the Lengths Table
+        var lengthsTable = MLDataTable()
+        let lengthsColumn = MLDataColumn(lengths)
+        let classyLabelColumn = MLDataColumn(classificationLabels)
+        lengthsTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
+        lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
+        
+        return lengthsTable
+    }
+    
+    func trainModels(lengthsTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
     {
         let requiredLengthKey: String
         let forbiddenLengthKey: String
         let lengthsTAccKey: String
         let lengthsVAccKey: String
         let lengthsEAccKey: String
+        let regressorName: String
+        let classifierName: String
         
         switch connectionDirection
         {
@@ -93,22 +191,17 @@ class PacketLengthsCoreML
             lengthsTAccKey = incomingLengthsTAccKey
             lengthsVAccKey = incomingLengthsVAccKey
             lengthsEAccKey = incomingLengthsEAccKey
+            regressorName = inLengthRegressorName
+            classifierName = inLengthClassifierName
         case .outgoing:
             requiredLengthKey = outgoingRequiredLengthKey
             forbiddenLengthKey = outgoingForbiddenLengthKey
             lengthsTAccKey = outgoingLengthsTAccKey
             lengthsVAccKey = outgoingLengthsVAccKey
             lengthsEAccKey = outgoingLengthsEAccKey
+            regressorName = outLengthRegressorName
+            classifierName = outLengthClassifierName
         }
-
-        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
-        
-        // Create the Lengths Table
-        var lengthsTable = MLDataTable()
-        let lengthsColumn = MLDataColumn(lengths)
-        let classyLabelColumn = MLDataColumn(classificationLabels)
-        lengthsTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
-        lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (lengthsEvaluationTable, lengthsTrainingTable) = lengthsTable.randomSplit(by: 0.20)
@@ -117,108 +210,58 @@ class PacketLengthsCoreML
         do
         {
             let classifier = try MLClassifier(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
-            
-            // Classifier training accuracy as a percentage
-            let trainingError = classifier.trainingMetrics.classificationError
-            let trainingAccuracy = (1.0 - trainingError) * 100
-            print("Length Classifier Training Accuracy = \(trainingAccuracy)")
-            
-            // Classifier validation accuracy as a percentage
-            let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy = (1.0 - validationError) * 100
-            print("Length Classifier Validation Accuracy = \(validationAccuracy)")
-            
-            // Evaluate the classifier
+            let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
+            let validationAccuracy = (1.0 - classifier.validationMetrics.classificationError) * 100
             let classifierEvaluation = classifier.evaluation(on: lengthsEvaluationTable)
-            
-            // Classifier evaluation accuracy as a percentage
-            let evaluationError = classifierEvaluation.classificationError
-            let evaluationAccuracy = (1.0 - evaluationError) * 100
-            print("Length Classifier Evaluation Accuracy \(evaluationAccuracy)")
+            let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
             
             do
             {
                 let regressor = try MLRegressor(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.length.rawValue)
                 
-                // The largest distance between predictions and expected values
-                let worstTrainingError = regressor.trainingMetrics.maximumError
-                let worstValidationError = regressor.validationMetrics.maximumError
-                
-                // Evaluate the regressor
-                let regressorEvaluation = regressor.evaluation(on: lengthsEvaluationTable)
-                
-                // The largerat distance between predictions and the expected values
-                let worstEvaluationError = regressorEvaluation.maximumError
-                
-                print("Length Regressor:")
-                print("Worst Training Error = \(worstTrainingError)")
-                print("Worst Validation Error = \(worstValidationError)")
-                print("Worst Evaluation Error = \(worstEvaluationError)")
-                
-                do
+                guard let (allowedTable, blockedTable) = MLModelController().createAllowedBlockedTables(fromTable: lengthsTable)
+                    else
                 {
-                    let allowedTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.allowed.rawValue, ColumnLabel.length.rawValue: 0])
-                    
-                    do
-                    {
-                        let blockedTable = try MLDataTable(dictionary: [ColumnLabel.classification.rawValue: ClassificationLabel.blocked.rawValue, ColumnLabel.length.rawValue: 0])
-                        do
-                        {
-                            let allowedColumn = try regressor.predictions(from: allowedTable)
-                            
-                            do
-                            {
-                                let blockedColumn = try regressor.predictions(from: blockedTable)
-                                
-                                guard let allowedLengths = allowedColumn.doubles
-                                else
-                                {
-                                    print("Failed to get allowed lengths from allowed column.")
-                                    return
-                                }
-                                
-                                guard let blockedLengths = blockedColumn.doubles
-                                else
-                                {
-                                    print("Failed to get blocked lengths from blocked column.")
-                                    return
-                                }
-                                
-                                let predictedAllowedLength = allowedLengths[0]
-                                let predictedBlockedLength = blockedLengths[0]
-                                print("\nPredicted Allowed Length = \(predictedAllowedLength)")
-                                print("Predicted Blocked Length = \(predictedBlockedLength)")
-                                
-                                /// Save Scores
-                                let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsResultsKey)
-                                lengthsDictionary[requiredLengthKey] = predictedAllowedLength
-                                lengthsDictionary[forbiddenLengthKey] = predictedBlockedLength
-                                lengthsDictionary[lengthsTAccKey] = trainingAccuracy
-                                lengthsDictionary[lengthsVAccKey] = validationAccuracy
-                                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
-                                
-                                // Save the models to a file
-                                MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, regressor: regressor, regressorMetadata: lengthsRegressorMetadata, fileName: ColumnLabel.length.rawValue, groupName: modelName)
-                            }
-                            catch let blockedPredictionError
-                            {
-                                print("\nError making blocked lengths prediction = \(blockedPredictionError)")
-                            }
-                        }
-                        catch let allowedPredictionError
-                        {
-                            print("\nError making allowed lengths prediction = \(allowedPredictionError)")
-                        }
-                    }
-                    catch let blockedTableError
-                    {
-                        print("\nError creating blocked lengths table: \(blockedTableError)")
-                    }
+                    print("\nUnable to get allowed/blocked tables from lengths data table.")
+                    return
                 }
-                catch let allowedTableError
+                
+                let allowedPredictionColumn = try regressor.predictions(from: allowedTable)
+                let blockedPredictionColumn = try regressor.predictions(from: blockedTable)
+                
+                guard let allowedLengths = allowedPredictionColumn.doubles
+                    else
                 {
-                    print("\nError creating allowed lengths table: \(allowedTableError)")
+                    print("Failed to get allowed lengths from allowed column.")
+                    return
                 }
+                
+                guard let blockedLengths = blockedPredictionColumn.doubles
+                    else
+                {
+                    print("Failed to get blocked lengths from blocked column.")
+                    return
+                }
+
+                let predictedAllowedLength = allowedLengths[0]
+                let predictedBlockedLength = blockedLengths[0]
+                
+                // Save Scores
+                let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
+                lengthsDictionary[requiredLengthKey] = predictedAllowedLength
+                lengthsDictionary[forbiddenLengthKey] = predictedBlockedLength
+                lengthsDictionary[lengthsTAccKey] = trainingAccuracy
+                lengthsDictionary[lengthsVAccKey] = validationAccuracy
+                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
+                
+                // Save the models to a file
+                MLModelController().saveModel(classifier: classifier,
+                                              classifierMetadata: lengthsClassifierMetadata,
+                                              classifierFileName: classifierName,
+                                              regressor: regressor,
+                                              regressorMetadata: lengthsRegressorMetadata,
+                                              regressorFileName: regressorName,
+                                              groupName: modelName)
             }
             catch let regressorError
             {
@@ -276,10 +319,7 @@ class PacketLengthsCoreML
         for length in blockedLengthsArray
         {
             guard let score: Float = blockedLengthsRSet[length]
-                else
-            {
-                continue
-            }
+                else { continue }
             
             let count = Int(score)
             

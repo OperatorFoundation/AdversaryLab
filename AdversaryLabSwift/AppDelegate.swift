@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import ZIPFoundation
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate
@@ -29,18 +30,55 @@ class AppDelegate: NSObject, NSApplicationDelegate
         }
     }
     
+    func application(_ application: NSApplication, open urls: [URL])
+    {
+        print("\nAdversary file opened. File URL(s): \(urls)")
+        
+        guard let fileURL = urls.first
+            else { return }
+        
+        guard let adversaryDirectory = getAdversarySupportDirectory()
+            else { return }
+        
+        let temporaryDirectory = adversaryDirectory.appendingPathComponent("Temporary", isDirectory: true)
+        
+        do
+        {
+            try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true, attributes: nil)
+        }
+        catch
+        {
+            print("\nError creating temporary directory: \(error)")
+        }
+
+        do
+        {
+            try FileManager.default.unzipItem(at: fileURL, to: temporaryDirectory)
+            
+            
+        }
+        catch
+        {
+            print("\nError unzipping adversary file: \(error)")
+        }
+    }
+    
     func createAppSupportDirectory()
     {
-        let appSupportDirectory = fileManager.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask)
-        if appSupportDirectory.count > 0
+        if let adversaryDirectoryURL = getAdversarySupportDirectory()
         {
-            if let bundleID: String = Bundle.main.bundleIdentifier
+            do
             {
-                // Append the bundle ID to the URL for the
-                // Application Support directory
-                let directoryPath = appSupportDirectory[0].appendingPathComponent(bundleID)
-                appDirectory = directoryPath.path
+                try FileManager.default.createDirectory(at: adversaryDirectoryURL, withIntermediateDirectories: true, attributes: nil)
             }
+            catch
+            {
+                print("\nError creating adversary support directory: \(error)")
+            }
+        }
+        else
+        {
+            print("\nUnable to find the application support directory. This is needed in order to save and unpack model files.")
         }
     }
 

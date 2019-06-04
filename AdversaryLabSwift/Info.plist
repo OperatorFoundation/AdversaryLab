@@ -4,6 +4,31 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>adversary</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>FileIcon</string>
+			<key>CFBundleTypeName</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.operatorFoundation.AdversaryLabSwift</string>
+			</array>
+			<key>LSTypeIsPackage</key>
+			<true/>
+			<key>NSDocumentClass</key>
+			<string></string>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
@@ -31,17 +56,19 @@
 	<key>SMPrivilegedExecutables</key>
 	<dict>
 		<key>org.operatorFoundation.AdversaryLabService</key>
-		<string>identifier &quot;org.operatorFoundation.AdversaryLabService&quot; and anchor apple generic and certificate leaf[subject.CN] = &quot;Mac Developer: Adelita Schule (MZ3MR7KVAN)&quot; and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+		<string>identifier "org.operatorFoundation.AdversaryLabService" and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Adelita Schule (MZ3MR7KVAN)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
 	</dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
-			<key>UTTypeDescription</key>
-			<string>Adversary Lab Machine Learning Models</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>com.pkware.zip-archive</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>UTTypeIconFile</key>
+			<string>FileIcon</string>
 			<key>UTTypeIdentifier</key>
 			<string>org.operatorFoundation.AdversaryLabSwift</string>
 			<key>UTTypeTagSpecification</key>
@@ -56,12 +83,14 @@
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
-			<key>UTTypeDescription</key>
-			<string>Adversary Lab Machine Learning Models</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>com.pkware.zip-archive</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>Adversary Lab Machine Learning Models</string>
+			<key>UTTypeIconFile</key>
+			<string>FileIcon</string>
 			<key>UTTypeIdentifier</key>
 			<string>org.operatorFoundation.AdversaryLabSwift</string>
 			<key>UTTypeTagSpecification</key>
@@ -71,27 +100,6 @@
 					<string>adversary</string>
 				</array>
 			</dict>
-		</dict>
-	</array>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>LSTypeIsPackage</key>
-			<true/>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>org.operatorFoundation.AdversaryLabSwift</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>adversary</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Adversary Lab Machine Learning Models</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
 		</dict>
 	</array>
 </dict>
