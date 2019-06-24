@@ -20,7 +20,7 @@ func detectKnownProtocol(connection: ObservedConnection) -> KnownProtocolType? {
 func processKnownProtocol(_ prot: KnownProtocolType, _ connection: ObservedConnection) {
     switch prot {
         case .TLS12:
-            TLS12CoreML().processTls12(connection)
+            let _ = TLS12CoreML().processTls12(connection)
     }
 }
 

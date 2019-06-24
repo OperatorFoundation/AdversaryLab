@@ -35,24 +35,7 @@ class AdversaryLabSwiftTests: XCTestCase
         goTo(urlPath: "https://store.dftba.com")
         goTo(urlPath: "https://www.livescience.com/countdowns")
     }
-    
-    func testCreateEntropyTable()
-    {
-        let entropyML = EntropyCoreML()
-        let filePath = "/Users/mafalda/Documents/Operator/AdversaryLab/AdversaryLabSwift/exampleData.csv"
-        let fileURL = URL(fileURLWithPath: filePath)
-        
-        guard let (inEntropyTable, outEntropyTable) = entropyML.createEntropyTable(fromFile: fileURL)
-            else
-        {
-                XCTFail()
-                return
-        }
-        
-        print("\nIncoming Entropy Table: \(inEntropyTable)")
-        print("\nOutgoing Entropy Table: \(outEntropyTable)")
-    }
-    
+  
     func goTo(urlPath: String)
     {
         print("\nRequesting \(urlPath)")

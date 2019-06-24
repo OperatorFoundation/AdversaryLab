@@ -34,7 +34,7 @@ class RedisServerController: NSObject
                     
                     switch result
                     {
-                    case .okay(let _):
+                    case .okay( _):
                         print("\nServer port is available")
                         
                         let bundle = Bundle.main

@@ -17,6 +17,14 @@ func showNoDataAlert()
     alert.runModal()
 }
 
+func showNoBlockedConnectionsAlert()
+{
+    let alert = NSAlert()
+    alert.messageText = "No blocked connections to test"
+    alert.informativeText = "There are no observed blocked connections in the current database. Please run live capture for blocked connections before trying to test the data."
+    alert.runModal()
+}
+
 func showOtherProcessAlert(processName: String)
 {
     let alert = NSAlert()

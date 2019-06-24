@@ -12,10 +12,10 @@ import Datable
 import CreateML
 import CoreML
 
-let tlsRequestStart=Data(bytes: [0x16, 0x03])
-let tlsResponseStart=Data(bytes: [0x16, 0x03])
-let commonNameStart=Data(bytes: [0x55, 0x04, 0x03])
-let commonNameEnd=Data(bytes: [0x30])
+let tlsRequestStart=Data([0x16, 0x03])
+let tlsResponseStart=Data([0x16, 0x03])
+let commonNameStart=Data([0x55, 0x04, 0x03])
+let commonNameEnd=Data([0x30])
 
 class TLS12CoreML
 {
@@ -116,16 +116,40 @@ class TLS12CoreML
         return (allTLSNames, classificationLabels)
     }
     
-    func testTLS12Model(modelName: String)
+    func testModel(name: String)
     {
-        let (allTLSNames, classificationLabels) = getTLSAndClassificationLists()
+        // Blocked
+        let blockedTLSNamesSet: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
+        let blockedTLSNames = newStringArray(from: [blockedTLSNamesSet])
         
-        guard allTLSNames.count == classificationLabels.count
-            else { return }
+        guard blockedTLSNames.count > 0
+        else
+        {
+            print("\nUnable to test TLS names. Blocked names list is empty.")
+            return
+        }
+        testModel(connectionType: .blocked, tlsNames: blockedTLSNames, modelName: name)
         
+        // Allowed
+        let allowedTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
+        let allowedTLSNames = newStringArray(from: [allowedTLSNamesSet])
+        testModel(connectionType: .allowed, tlsNames: allowedTLSNames, modelName: name)
+    }
+    
+    func testModel(connectionType: ClassificationLabel, tlsNames: [String], modelName: String)
+    {
+        let accuracyKey: String
+        
+        switch connectionType
+        {
+        case .allowed:
+            accuracyKey = tlsAllowAccuracyKey
+        case .blocked:
+            accuracyKey = tlsBlockAccuracyKey
+        }
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: allTLSNames, ColumnLabel.classification.rawValue: classificationLabels])
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: tlsNames])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -140,10 +164,38 @@ class TLS12CoreML
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
-                let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                else
+                {
+                    print("\n🛑  Failed to make a TLS prediction.")
+                    return
+                }
                 
-                // TODO: Save the classifier prediction accuracy
-                print("\n🔮  Created a TLS12 prediction from a model file. Feature at index 0:\n\(classifierPrediction?.features(at: 0))")
+                let featureCount = classifierPrediction.count
+                
+                guard featureCount > 0
+                else
+                {
+                    print("\nTLS12 prediction had no values.")
+                    return
+                }
+                var allowedBlockedCount: Double = 0.0
+                for index in 0 ..< featureCount
+                {
+                    let thisFeature = classifierPrediction.features(at: index)
+                    guard let tlsClassification = thisFeature.featureValue(for: "classification")
+                        else { continue }
+                    if tlsClassification.stringValue == connectionType.rawValue
+                    {
+                        allowedBlockedCount += 1
+                    }
+                }
+                
+                let accuracy = allowedBlockedCount/Double(featureCount)
+                print("\n🔮 TLS12 prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                // This is the dictionary where we will save our results
+                let tlsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                tlsDictionary[accuracyKey] = accuracy
             }
         }
         catch
@@ -156,6 +208,9 @@ class TLS12CoreML
     {
         let (allTLSNames, classificationLabels) = getTLSAndClassificationLists()
         
+        guard allTLSNames.count > 2
+            else { return }
+        
         var tlsTable = MLDataTable()
         let tlsColumn = MLDataColumn(allTLSNames)
         let classyColumn = MLDataColumn(classificationLabels)
@@ -164,6 +219,12 @@ class TLS12CoreML
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (tlsEvaluationTable, tlsTrainingTable) = tlsTable.randomSplit(by: 0.20)
+        guard tlsTrainingTable.rows.count > 2, tlsEvaluationTable.rows.count > 2
+        else
+        {
+            print("\nUnable to train for TLS, there is not enough data.")
+            return
+        }
         
         // Train the classifier
         do
@@ -300,7 +361,7 @@ class TLS12CoreML
         }
         else
         {
-            testTLS12Model(modelName: configModel.modelName)
+            testModel(name: configModel.modelName)
         }
     }
     

@@ -96,8 +96,8 @@ class EntropyCoreML
         }
         else
         {
-            testEntropy(connectionDirection: .outgoing, configModel: configModel)
-            testEntropy(connectionDirection: .incoming, configModel: configModel)
+            testModel(connectionDirection: .incoming, configModel: configModel)
+            testModel(connectionDirection: .outgoing, configModel: configModel)
         }
         
     }
@@ -105,20 +105,20 @@ class EntropyCoreML
     func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
         let (entropyList, classificationLabels) = getEntropyAndClassificationLists(connectionDirection: connectionDirection)
+        
         var entropyTable = MLDataTable()
         let entropyColumn = MLDataColumn(entropyList)
         let classificationColumn = MLDataColumn(classificationLabels)
-        
         entropyTable.addColumn(entropyColumn, named: ColumnLabel.entropy.rawValue)
         entropyTable.addColumn(classificationColumn, named: ColumnLabel.classification.rawValue)
         
         return entropyTable
     }
     
-    func getEntropyAndClassificationLists(connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
+    func getAllowedBlockedEntropyLists(connectionDirection: ConnectionDirection) -> (allowedEntropy:[Double], blockedEntropy: [Double])
     {
-        var entropyList = [Double]()
-        var classificationLabels = [String]()
+        var allowedEntropyList = [Double]()
+        var blockedEntropyList = [Double]()
         
         let allowedEntropyKey: String
         let blockedEntropyKey: String
@@ -134,31 +134,32 @@ class EntropyCoreML
         }
         
         // Allowed Traffic
-        let allowedEntropyList: RList<Double> = RList(key: allowedEntropyKey)
+        allowedEntropyList = RList(key: allowedEntropyKey).list
+        blockedEntropyList = RList(key: blockedEntropyKey).list
+        
+        return (allowedEntropyList, blockedEntropyList)
+    }
+    
+    func getEntropyAndClassificationLists(connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
+    {
+        var entropyList = [Double]()
+        var classificationLabels = [String]()
+        let (allowedEntropyList, blockedEntropyList) = getAllowedBlockedEntropyLists(connectionDirection: connectionDirection)
+        
+        // Allowed Traffic
         
         for entropyIndex in 0 ..< allowedEntropyList.count
         {
-            guard let aEntropy = allowedEntropyList[entropyIndex]
-                else
-            {
-                continue
-            }
-            
+            let aEntropy = allowedEntropyList[entropyIndex]
             entropyList.append(aEntropy)
             classificationLabels.append(ClassificationLabel.allowed.rawValue)
         }
         
         /// Blocked traffic
-        let blockedEntropyList: RList<Double> = RList(key: blockedEntropyKey)
         
         for entropyIndex in 0 ..< blockedEntropyList.count
         {
-            guard let bEntropy = blockedEntropyList[entropyIndex]
-                else
-            {
-                continue
-            }
-            
+            let bEntropy = blockedEntropyList[entropyIndex]
             entropyList.append(bEntropy)
             classificationLabels.append(ClassificationLabel.blocked.rawValue)
         }
@@ -166,29 +167,54 @@ class EntropyCoreML
         return (entropyList, classificationLabels)
     }
     
-    func testEntropy(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
-        let (entropyList, classificationLabels) = getEntropyAndClassificationLists(connectionDirection: connectionDirection)
+        let (allowedEntropyList, blockedEntropyList) = getAllowedBlockedEntropyLists(connectionDirection: connectionDirection)
         
-        let entropyColumnLabel: String
+        guard blockedEntropyList.count > 0
+        else
+        {
+            print("\nUnable to test entropy. The blocked entropy list is empty.")
+            return
+        }
+        
+        // Allowed
+        testModel(entropyList: allowedEntropyList, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+        
+        // Blocked
+        testModel(entropyList: blockedEntropyList, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+    }
+    
+    func testModel(entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    {
         let entropyClassifierName: String
+        let accuracyKey: String
         
         switch connectionDirection
         {
         case .outgoing:
-            entropyColumnLabel = ColumnLabel.outEntropy.rawValue
             entropyClassifierName = outEntropyClassifierName
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = outgoingEntropyAllowAccuracyKey
+            case .blocked:
+                accuracyKey = outgoingEntropyBlockAccuracyKey
+            }
         case .incoming:
-            entropyColumnLabel = ColumnLabel.inEntropy.rawValue
             entropyClassifierName = inEntropyClassifierName
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = incomingEntropyAllowAccuracyKey
+            case .blocked:
+                accuracyKey = incomingEntropyBlockAccuracyKey
+            }
         }
-        
-        guard entropyList.count == classificationLabels.count
-            else { return }
-        
+
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [entropyColumnLabel: entropyList, ColumnLabel.classification.rawValue: classificationLabels])
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.entropy.rawValue: entropyList])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -206,14 +232,28 @@ class EntropyCoreML
                 guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
                     else
                 {
-                    print("\nFailed to make an entropy prediction.")
+                    print("\n🛑  Failed to make an entropy prediction.")
                     return
                 }
                 
-                // TODO: Save the classifier prediction accuracy
-                let firstFeature = classifierPrediction.features(at: 0)
-                let probability = firstFeature.featureValue(for: "classificationProbability").debugDescription
-                print("\n🔮  Created an entropy prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)")
+                let featureCount = classifierPrediction.count
+                var allowedBlockedCount: Double = 0.0
+                for index in 0 ..< featureCount
+                {
+                    let thisFeature = classifierPrediction.features(at: index)
+                    guard let entropyClassification = thisFeature.featureValue(for: "classification")
+                        else { continue }
+                    if entropyClassification.stringValue == connectionType.rawValue
+                    {
+                        allowedBlockedCount += 1
+                    }
+                }
+                
+                let accuracy = allowedBlockedCount/Double(featureCount)
+                print("\n🔮 Entropy prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                // This is the dictionary where we will save our results
+                let entropyDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                entropyDictionary[accuracyKey] = accuracy
             }
         }
         catch
@@ -263,12 +303,10 @@ class EntropyCoreML
             // Classifier Training Accuracy as a Percentage
             let trainingError = classifier.trainingMetrics.classificationError
             let trainingAccuracy = (1.0 - trainingError) * 100
-            print("\nEntropy training accuracy = \(trainingAccuracy)")
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
             let validationAccuracy = (1.0 - validationError) * 100
-            print("\nEntropy validation accuracy = \(validationAccuracy)")
             
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: entropyEvaluationTable)
@@ -276,7 +314,6 @@ class EntropyCoreML
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
             let evaluationAccuracy = (1.0 - evaluationError) * 100
-            print("\nEntropy Evaluation Accuracy = \(evaluationAccuracy)")
             
             // Regressor
             do

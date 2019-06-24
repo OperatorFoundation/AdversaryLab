@@ -64,7 +64,26 @@ Dictionary :
 {allowed = "0.2708641312836384";
 blocked = "0.7291358687163616";}
  */
+// MARK: - Tests
 
+let testResultsKey = "TestResults"
+let incomingEntropyBlockAccuracyKey = "Incoming:Entropy:BlockAccuracy"
+let incomingEntropyAllowAccuracyKey = "Incoming:Entropy:AllowAccuracy"
+let outgoingEntropyBlockAccuracyKey = "Outgoing:Entropy:BlockAccuracy"
+let outgoingEntropyAllowAccuracyKey = "Outgoing:Entropy:AllowAccuracy"
+let incomingLengthBlockAccuracyKey = "Incoming:Length:BlockAccuracy"
+let incomingLengthAllowAccuracyKey = "Incoming:Length:AllowAccuracy"
+let outgoingLengthBlockAccuracyKey = "Outgoing:Length:BlockAccuracy"
+let outgoingLengthAllowAccuracyKey = "Outgoing:Length:AllowAccuracy"
+let allFeaturesBlockAccuracyKey = "AllFeatures:BlockAccuracy"
+let allFeaturesAllowAccuracyKey = "AllFeatures:AllowAccuracy"
+let timingBlockAccuracyKey = "Timing:BlockAccuracy"
+let timingAllowAccuracyKey = "Timing:AllowAccuracy"
+let tlsBlockAccuracyKey = "TLS12:BlockAccuracy"
+let tlsAllowAccuracyKey = "TLS12:AllowAccuracy"
+
+
+// MARK: - Training
 // MARK: Lengths
 let packetLengthsTrainingResultsKey = "PacketLengths:Training:Results"
 let incomingRequiredLengthKey = "Incoming:Required:Length"
@@ -72,12 +91,6 @@ let incomingForbiddenLengthKey = "Incoming:Forbidden:Length"
 let incomingLengthsTAccKey = "Incoming:Lengths:TrainingAccuracy"
 let incomingLengthsVAccKey = "Incoming:Validation:Accuracy"
 let incomingLengthsEAccKey = "Incoming:Evaluation:Accuracy"
-
-//let packetLengthsTestResultsKey = "PacketLengths:Test:Results"
-let incomingLengthClassificationProbKey = "Incoming:Length:ClassificationProbability"
-let incomingLengthClassificationKey = "Incoming:Length:Classification"
-let outgoingLengthClassificationProbKey = "Outgoing:Length:ClassificationProbability"
-let outgoingLengthClassificationKey = "Outgoing:Length:Classification"
 
 let outgoingRequiredLengthKey = "Outgoing:Required:Length"
 let outgoingForbiddenLengthKey = "Outgoing:Forbidden:Length"
@@ -111,12 +124,6 @@ let outgoingForbiddenOffsetKey = "Outgoing:Forbidden:Offset"
 
 // MARK: Entropy
 let entropyTrainingResultsKey = "Entropy:Training:Results"
-//let entropyTestResultsKey = "Entropy:Test:Results"
-let incomingEntropyClassificationProbKey = "Incoming:Entropy:ClassificationProbability"
-let incomingEntropyClassificationKey = "Incoming:Entropy:Classification"
-let outgoingEntropyClassificationProbKey = "Outgoing:Entropy:ClassificationProbability"
-let outgoingEntropyClassificationKey = "Outgoing:Entropy:Classification"
-
 let incomingRequiredEntropyKey = "IncomingRequiredEntropy"
 let incomingForbiddenEntropyKey = "IncomingForbiddenEntropy"
 let incomingEntropyTAccKey = "IncomingEntropyTrainingAccuracy"
@@ -154,18 +161,13 @@ let tlsEAccKey = "TLSEvaluationAccuracy"
 
 // MARK: All Features
 let allFeaturesTrainingAccuracyKey = "AllFeatures:Training:Accuracy"
-let allFeaturesTestAccuracyKey = "AllFeatures:Test:Accuracy"
 let allFeaturesTAccKey = "AllFeatures:TrainingAccuracy"
 let allFeaturesVAccKey = "AllFeatures:ValidationAccuracy"
 let allFeaturesEAccKey = "AllFeatures:EvaluationAccuracy"
 let allFeaturesTimeTrainingResultsKey = "AllFeatures:TimeDifference:Training:Results"
-let allFeaturesTimeTestResultsKey = "AllFeatures:TimeDifference:Test:Results"
 let allFeaturesEntropyTrainingResultsKey = "AllFeatures:Entropy:Training:Results"
-let allFeaturesEntropyTestResultsKey = "AllFeatures:Entropy:Test:Results"
 let allFeaturesLengthTrainingResultsKey = "AllFeatures:PacketLengths:Training:Results"
-let allFeaturesLengthTestResultsKey = "AllFeatures:PacketLengths:Test:Results"
 let allFeaturesTLSTraininResultsKey = "AllFeatures:TLS:Training:Results"
-let allFeaturesTLSTestResultsKey = "AllFeatures:TLS:Test:Results"
 
 // MARK: - PubSub
 let newConnectionMessage = "NewConnectionAdded"

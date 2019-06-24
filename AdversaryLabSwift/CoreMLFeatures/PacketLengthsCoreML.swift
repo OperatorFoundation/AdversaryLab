@@ -72,54 +72,69 @@ class PacketLengthsCoreML
         //(modelName: String, trainingMode: Bool)
     {
         // Outgoing Lengths Scoring
-        scorePacketLengths(connectionDirection: .outgoing, modelName: configModel.modelName, trainingMode: configModel.trainingMode)
+        scorePacketLengths(connectionDirection: .outgoing, configModel: configModel)
         
         //Incoming Lengths Scoring
-        scorePacketLengths(connectionDirection: .incoming, modelName: configModel.modelName, trainingMode: configModel.trainingMode)
+        scorePacketLengths(connectionDirection: .incoming, configModel: configModel)
     }
     
-    func scorePacketLengths(connectionDirection: ConnectionDirection, modelName: String, trainingMode: Bool)
+    func scorePacketLengths(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
         
-        if trainingMode
+        if configModel.trainingMode
         {
             let lengthsTable = createLengthTable(classificationLabels: classificationLabels, lengths: lengths)
-            trainModels(lengthsTable: lengthsTable, connectionDirection: connectionDirection, modelName: modelName)
+            trainModels(lengthsTable: lengthsTable, connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
-            testModels(classificationLabels: classificationLabels, lengths: lengths, connectionDirection: connectionDirection, modelName: modelName)
+            let (allowedLengths, blockedLengths) = getLengths(forConnectionDirection: connectionDirection)
+            
+            guard blockedLengths.count > 0
+            else
+            {
+                print("\nUnable to test lengths. The blocked lengths list is empty.")
+                return
+            }
+            
+            // Allowed
+            testModel(lengths: allowedLengths, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+            
+            // Blocked
+            testModel(lengths: blockedLengths, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
     
-    func testModels(classificationLabels: [String], lengths: [Int], connectionDirection: ConnectionDirection, modelName: String)
+    func testModel(lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let classifierName: String
-        let lengthClassificationKey: String
-        let lengthClassificationProbabiltyKey: String
+        let accuracyKey: String
         
         switch connectionDirection
         {
         case .incoming:
             classifierName = inLengthClassifierName
-            lengthClassificationKey = incomingLengthClassificationKey
-            lengthClassificationProbabiltyKey = incomingLengthClassificationProbKey
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = incomingLengthAllowAccuracyKey
+            case .blocked:
+                accuracyKey = incomingLengthBlockAccuracyKey
+            }
         case .outgoing:
             classifierName = outLengthClassifierName
-            lengthClassificationKey = outgoingLengthClassificationKey
-            lengthClassificationProbabiltyKey = outgoingLengthClassificationProbKey
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = outgoingLengthAllowAccuracyKey
+            case .blocked:
+                accuracyKey = outgoingLengthBlockAccuracyKey
+            }
         }
         do
         {
-            guard classificationLabels.count == lengths.count
-            else
-            {
-                print("Cannot test the lengths model, lengths (\(lengths.count)), and classifications (\(classificationLabels.count)) do not have the same number of values.")
-                return
-            }
-
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths, ColumnLabel.classification.rawValue: classificationLabels])
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths])
             
             guard let appDirectory = getAdversarySupportDirectory()
             else
@@ -128,30 +143,46 @@ class PacketLengthsCoreML
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension("mlmodel")
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
                 if let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
                 {
-                    let firstFeature = classifierPrediction.features(at: 0)
-                    let probability = firstFeature.featureValue(for: PredictionKey.classificationProbability.rawValue).debugDescription
-
-                    guard let lengthClassification = firstFeature.featureValue(for: PredictionKey.classification.rawValue)
+                    guard classifierPrediction.count > 0
                     else
                     {
-                        print("\nLength classification result was nil.")
+                        print("\nLength classifier prediction has no values.")
                         return
                     }
                     
-                    print("\n🔮  Created a length prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)\nClassification:\n\(lengthClassification)")
+                    let featureCount = classifierPrediction.count
                     
-                    let lengthClassificationDictionary: RMap<String, String> = RMap(key: lengthClassificationKey)
-                    lengthClassificationDictionary[ColumnLabel.classification.rawValue] = lengthClassification.stringValue
+                    guard featureCount > 0
+                    else
+                    {
+                        print("/nLength prediction had no values.")
+                        return
+                    }
                     
-                    let lengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: lengthClassificationKey)
-                    lengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue] = probability
+                    var allowedBlockedCount: Double = 0.0
+                    for index in 0 ..< featureCount
+                    {
+                        let thisFeature = classifierPrediction.features(at: index)
+                        guard let lengthClassification = thisFeature.featureValue(for: "classification")
+                            else { continue }
+                        if lengthClassification.stringValue == connectionType.rawValue
+                        {
+                            allowedBlockedCount += 1
+                        }
+                    }
+                    
+                    let accuracy = allowedBlockedCount/Double(featureCount)
+                    print("\n🔮 Length prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                    // This is the dictionary where we will save our results
+                    let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                    timingDictionary[accuracyKey] = accuracy
                 }
             }
         }
@@ -274,10 +305,37 @@ class PacketLengthsCoreML
         }
     }
     
+    func getLengths(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths:[Int], blockedLengths: [Int])
+    {
+        let allowedLengthsKey: String
+        let blockedLengthsKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            allowedLengthsKey = allowedIncomingLengthsKey
+            blockedLengthsKey = blockedIncomingLengthsKey
+        case .outgoing:
+            allowedLengthsKey = allowedOutgoingLengthsKey
+            blockedLengthsKey = blockedOutgoingLengthsKey
+        }
+        
+        /// A is the sorted set of lengths for the Allowed traffic
+        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
+        let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
+        
+        /// B is the sorted set of lengths for the Blocked traffic
+        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
+        let blockedLengthsArray = newIntArray(from: [blockedLengthsRSet])
+        
+        return (allowedLengthsArray, blockedLengthsArray)
+    }
+    
     func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], classifications: [String])
     {
         var lengths = [Int]()
         var classificationLabels = [String]()
+        
         let allowedLengthsKey: String
         let blockedLengthsKey: String
         

@@ -86,6 +86,21 @@ class ViewController: NSViewController, NSTabViewDelegate
     @objc dynamic var forbiddenInOffsetIndex = "--"
     @objc dynamic var forbiddenInOffsetAcc = "--"
     
+    // MARK: All Features Training Labels
+    @objc dynamic var allAllowedOutLength = "--"
+    @objc dynamic var allBlockedOutLength = "--"
+    @objc dynamic var allAllowedOutEntropy = "--"
+    @objc dynamic var allBlockedOutEntropy = "--"
+    @objc dynamic var allAllowedInLength = "--"
+    @objc dynamic var allBlockedInLength = "--"
+    @objc dynamic var allAllowedInEntropy = "--"
+    @objc dynamic var allBlockedInEntropy = "--"
+    @objc dynamic var allAllowedTiming = "--"
+    @objc dynamic var allBlockedTiming = "--"
+    @objc dynamic var allAllowedTLS = "--"
+    @objc dynamic var allBlockedTLS = "--"
+    @objc dynamic var allEvaluationAccuracy = "--"
+    
     @objc dynamic var processingMessage = ""
     
     @IBOutlet weak var tabView: NSTabView!
@@ -102,23 +117,24 @@ class ViewController: NSViewController, NSTabViewDelegate
     var streaming: Bool = false
     var configModel = ProcessingConfigurationModel()
     
-    // MARK: - Test Mode
-    @objc dynamic var modelName = ""
-    @objc dynamic var timingAccuracy = ""
-    @objc dynamic var tlsAccuracy = ""
-    @objc dynamic var inLengthAccuracy = ""
-    @objc dynamic var outLengthAccuracy = ""
-    @objc dynamic var inEntropyAccuracy = ""
-    @objc dynamic var outEntropyAccuracy = ""
-    
-    @objc dynamic var inLengthProbability = ""
-    @objc dynamic var outLengthProbability = ""
-    @objc dynamic var inLengthClassification = ""
-    @objc dynamic var outLengthClassification = ""
-    
+    // MARK: - Test Mode Labels
+    @objc dynamic var modelName = "--"
+    @objc dynamic var allFeaturesAllowAccuracy = "--"
+    @objc dynamic var allFeaturesBlockAccuracy = "--"
+    @objc dynamic var timingBlockAccuracy = "--"
+    @objc dynamic var timingAllowAccuracy = "--"
+    @objc dynamic var tls12AllowAccuracy = "--"
+    @objc dynamic var tls12BlockAccuracy = "--"
+    @objc dynamic var inLengthAllowAccuracy = "--"
+    @objc dynamic var inLengthBlockAccuracy = "--"
+    @objc dynamic var outLengthAllowAccuracy = "--"
+    @objc dynamic var outLengthBlockAccuracy = "--"
+    @objc dynamic var inEntropyAllowAccuracy = "--"
+    @objc dynamic var outEntropyAllowAccuracy = "--"
+    @objc dynamic var inEntropyBlockAccuracy = "--"
+    @objc dynamic var outEntropyBlockAccuracy = "--"
     
     var modelDirectoryURL: URL?
-    
     
     override func viewDidLoad()
     {
@@ -154,7 +170,6 @@ class ViewController: NSViewController, NSTabViewDelegate
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateProgressIndicator), name: .updateProgressIndicator, object: nil)
         
-        // FIXME: getting the filename after switching files jams us up
         NotificationCenter.default.addObserver(forName: .updateDBFilename, object: nil, queue: .main)
         { (notification) in
             self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "unknown"
@@ -184,9 +199,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             switch currentTab
             {
             case .TestMode:
-                configModel.modelName = modelName
-                connectionInspector.analyzeConnections(configModel: configModel)
-                updateProgressIndicator()
+                runTest()
             case .TrainingMode: // In Training mode we need a name so we can save the model files
                 if let name = showNameModelAlert()
                 {
@@ -208,29 +221,6 @@ class ViewController: NSViewController, NSTabViewDelegate
         }
         
         self.loadLabelData()
-    }
-    
-    @IBAction func testModeClicked(_ sender: NSButton)
-    {
-        guard let window = view.window
-            else { return }
-        
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = false
-        panel.allowedFileTypes = ["adversary"]
-        
-        panel.beginSheetModal(for: window)
-        {
-            (result) in
-            
-            guard result == NSApplication.ModalResponse.OK
-                else { return }
-            
-            let selectedDirURL = panel.urls[0]
-
-            self.performSegue(withIdentifier: "TestModeSegue", sender: selectedDirURL)
-        }
     }
     
     @IBAction func liveCaptureClick(_ sender: NSButton)
@@ -282,31 +272,51 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     @IBAction func loadDataClicked(_ sender: NSButton)
     {
+        
         guard let window = view.window
             else { return }
+        guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
+            let currentTab = TabIds(rawValue: identifier)
+            else { return }
         
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = false
-        panel.allowedFileTypes = ["rdb"]
-        
-        panel.beginSheetModal(for: window)
+        switch currentTab
         {
-            (result) in
-            
-            guard result == NSApplication.ModalResponse.OK
-                else { return }
-            
-            let selectedFileURL = panel.urls[0]
-            
-            RedisServerController.sharedInstance.switchDatabaseFile(withFile: selectedFileURL, completion:
+        case .TestMode:
+            if modelDirectoryURL == nil
             {
-                (success) in
+                // Get the user to select the correct .adversary file
+                if let selectedURL = showSelectAdversaryFileAlert()
+                {
+                    // Model Group Name should be the same as the directory
+                    modelName = selectedURL.deletingPathExtension().lastPathComponent
+                    configModel.modelName = modelName
+                }
+            }
+  
+        case .TrainingMode:
+            let panel = NSOpenPanel()
+            panel.canChooseFiles = true
+            panel.canChooseDirectories = false
+            panel.allowsMultipleSelection = false
+            panel.allowedFileTypes = ["rdb"]
+            
+            panel.beginSheetModal(for: window)
+            {
+                (result) in
                 
-                self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
-                self.loadLabelData()
-            })
+                guard result == NSApplication.ModalResponse.OK
+                    else { return }
+                
+                let selectedFileURL = panel.urls[0]
+                
+                RedisServerController.sharedInstance.switchDatabaseFile(withFile: selectedFileURL, completion:
+                    {
+                        (success) in
+                        
+                        self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
+                        self.loadLabelData()
+                })
+            }
         }
     }
     
@@ -323,22 +333,31 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
         case .TrainingMode:
             configModel.trainingMode = true
+            self.loadDataButton.title = "Load DB File"
+            self.processPacketsButton.title = "Train With Data"
         case .TestMode:
             configModel.trainingMode = false
-            testModeSelected()
+            self.loadDataButton.title = "Load Model File"
+            self.processPacketsButton.title = "Test Data"
         }
-        
-        loadLabelData()
     }
+    
     
     // MARK: - Test Mode
     
-    func testModeSelected()
+    func runTest()
     {
+        let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
+        guard blockedConnectionList.count > 1
+            else
+        {
+            showNoBlockedConnectionsAlert()
+            return
+        }
+        
         // Make sure that we have gotten an Adversary file and unpacked it to a temporary directory
         // TODO: Delete this directory on program exit
-        guard modelDirectoryURL != nil
-            else
+        if modelDirectoryURL == nil
         {
             // Get the user to select the correct .adversary file
             if let selectedURL = showSelectAdversaryFileAlert()
@@ -348,19 +367,19 @@ class ViewController: NSViewController, NSTabViewDelegate
                 
                 // Unpack to a temporary directory
                 modelDirectoryURL = MLModelController().unpack(adversaryURL: selectedURL)
+                runTest()
             }
             else
             {
-                // User likely selected  cancel in the choose file alert
-                // Return to the training tab
-                let trainingTab = NSTabViewItem(identifier: TabIds.TrainingMode)
-                tabView.selectTabViewItem(trainingTab)
+                processPacketsButton.state = .off
             }
             
             return
         }
         
-        loadLabelData()
+        configModel.modelName = modelName
+        connectionInspector.analyzeConnections(configModel: configModel)
+        updateProgressIndicator()
     }
 
     // MARK: - Alerts
@@ -434,7 +453,6 @@ class ViewController: NSViewController, NSTabViewDelegate
             configModel.trainingMode = true
         case .TestMode:
             configModel.trainingMode = false
-            testModeSelected()
         }
     }
     
@@ -450,7 +468,12 @@ class ViewController: NSViewController, NSTabViewDelegate
             {
                 self.processingMessage = ""
                 self.progressIndicator.stopAnimation(self)
+                self.progressIndicator.isHidden = true
                 self.processPacketsButton.state = .off
+            }
+            else
+            {
+                self.progressIndicator.isHidden = false
             }
         }
     }
@@ -511,38 +534,159 @@ class ViewController: NSViewController, NSTabViewDelegate
         // Get redis data in the utility queue and update the labels with the data in the main queue
         DispatchQueue.global(qos: .utility).async
         {
+            let testResults: RMap<String,Double> = RMap(key: testResultsKey)
+            
             // Timing (milliseconds)
-            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTestResultsKey)
+            let timeBlockAccuracy = testResults[timingBlockAccuracyKey]
+            let timeAllowAccuracy = testResults[timingAllowAccuracyKey]
             
             // TLS Common Names
-            let tlsResults: RMap <String, String> = RMap(key: tlsTestResultsKey)
-            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTestResultsKey)
+            let tlsBlockAccuracy = testResults[tlsBlockAccuracyKey]
+            let tlsAllowAccuracy = testResults[tlsAllowAccuracyKey]
             
             // Lengths
-            let outLengthClassificationDictionary: RMap<String, String> = RMap(key: outgoingLengthClassificationKey)
-            let outLengthClassification = outLengthClassificationDictionary[ColumnLabel.classification.rawValue]
-            let outLengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: outgoingLengthClassificationProbKey)
-            let outLengthClassificationProbability =  outLengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue]
+            let lengthInAllowAccuracy = testResults[incomingLengthAllowAccuracyKey]
+            let lengthInBlockAccuracy = testResults[incomingLengthBlockAccuracyKey]
+            let lengthOutAllowAccuracy = testResults[outgoingLengthAllowAccuracyKey]
+            let lengthOutBlockAccuracy = testResults[outgoingLengthBlockAccuracyKey]
             
-            let inLengthClassificationDictionary: RMap<String, String> = RMap(key: incomingLengthClassificationKey)
-            let inLengthClassification = inLengthClassificationDictionary[ColumnLabel.classification.rawValue]
-            let inLengthClassificationProbabilityDictionary: RMap<String, String> = RMap(key: incomingLengthClassificationProbKey)
-            let inLengthClassificationProbability = inLengthClassificationProbabilityDictionary[PredictionKey.classificationProbability.rawValue]
+            // Entropy
+            let entInAllowAccuracy = testResults[incomingEntropyAllowAccuracyKey]
+            let entoutAllowAccuracy = testResults[outgoingEntropyAllowAccuracyKey]
+            let entInBlockAccuracy = testResults[incomingEntropyBlockAccuracyKey]
+            let entOutBlockAccuracy = testResults[outgoingEntropyBlockAccuracyKey]
             
-            // TODO: Entropy
+            // All Features
+            let allAllowAccuracy = testResults[allFeaturesAllowAccuracyKey]
+            let allBlockAccuracy = testResults[allFeaturesBlockAccuracyKey]
             
             DispatchQueue.main.async
             {
-                if let testTimeEAcc = timingDictionary[timeDiffEAccKey]
+                if timeAllowAccuracy != nil
                 {
-                    self.timingAccuracy = String(format: "%.2f", testTimeEAcc)
+                    self.timingAllowAccuracy = String(format: "%.2f", timeAllowAccuracy!)
                 }
                 else
                 {
-                    self.timingAccuracy = "--"
+                    self.timingAllowAccuracy = "--"
                 }
-               
-                self.loadDataButton.title = "Load Model File"
+                
+                if timeBlockAccuracy != nil
+                {
+                    self.timingBlockAccuracy = String(format: "%.2f", timeBlockAccuracy!)
+                }
+                else
+                {
+                    self.timingBlockAccuracy = "--"
+                }
+                
+                if tlsAllowAccuracy != nil
+                {
+                    self.tls12AllowAccuracy = String(format: "%.2f", tlsAllowAccuracy!)
+                }
+                else
+                {
+                    self.tls12AllowAccuracy = "--"
+                }
+                
+                if tlsBlockAccuracy != nil
+                {
+                    self.tls12BlockAccuracy = String(format: "%.2f", tlsBlockAccuracy ?? "--")
+                }
+                else
+                {
+                    self.tls12BlockAccuracy = "--"
+                }
+                
+                if entInAllowAccuracy != nil
+                {
+                    self.inEntropyAllowAccuracy = String(format: "%.2f", entInAllowAccuracy!)
+                }
+                else
+                {
+                    self.inEntropyAllowAccuracy = "--"
+                }
+                
+                if entInBlockAccuracy != nil
+                {
+                    self.inEntropyBlockAccuracy = String(format: "%.2f", entInBlockAccuracy!)
+                }
+                else
+                {
+                    self.inEntropyBlockAccuracy = "--"
+                }
+                
+                if entoutAllowAccuracy != nil
+                {
+                    self.outEntropyAllowAccuracy = String(format: "%.2f", entoutAllowAccuracy ?? "--")
+                }
+                else
+                {
+                    self.outEntropyAllowAccuracy = "--"
+                }
+                
+                if entOutBlockAccuracy != nil
+                {
+                    self.outEntropyBlockAccuracy = String(format: "%.2f", entOutBlockAccuracy!)
+                }
+                else
+                {
+                    self.outEntropyBlockAccuracy = "--"
+                }
+                
+                if lengthInAllowAccuracy != nil
+                {
+                    self.inLengthAllowAccuracy = String(format: "%.2f", lengthInAllowAccuracy!)
+                }
+                else
+                {
+                    self.inLengthAllowAccuracy = "--"
+                }
+                
+                if lengthInBlockAccuracy != nil
+                {
+                    self.inLengthBlockAccuracy = String(format: "%.2f", lengthInBlockAccuracy!)
+                }
+                else
+                {
+                    self.inLengthBlockAccuracy = "--"
+                }
+                
+                if lengthOutAllowAccuracy != nil
+                {
+                    self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)
+                }
+                else
+                {
+                    self.outLengthAllowAccuracy = "--"
+                }
+                
+                if lengthOutBlockAccuracy != nil
+                {
+                    self.outLengthBlockAccuracy = String(format: "%.2f", lengthOutBlockAccuracy!)
+                }
+                else
+                {
+                    self.outLengthBlockAccuracy = "--"
+                }
+                
+                if allAllowAccuracy != nil
+                {
+                    self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!)
+                }
+                else
+                {
+                    self.allFeaturesAllowAccuracy = "--"
+                }
+                
+                if allBlockAccuracy != nil
+                {
+                    self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!)
+                }
+                else
+                {
+                    self.allFeaturesBlockAccuracy = "--"
+                }
             }
         }
     }
@@ -593,7 +737,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             // Entropy
             let entropyResults: RMap <String, Double> = RMap(key: entropyTrainingResultsKey)
             
-            //Float Subsequences
+            // Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
             let requiredOutFloatSequenceTuple: (Data, Float)? = requiredOutFloatSequenceSet.last
             
@@ -606,10 +750,64 @@ class ViewController: NSViewController, NSTabViewDelegate
             let forbiddenInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
             let forbiddenInFloatSequenceTuple: (Data, Float)? = forbiddenInFloatSequenceSet.last
             
+            // All Features
+            let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
+            let allTimingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTrainingResultsKey)
+            let allEntropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTrainingResultsKey)
+            let allLengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
+            let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
+            
+            let allFeaturesEvaluationAccuracy = allFeaturesDictionary[allFeaturesEAccKey]
+            
+            let allFeaturesAllowedOutLength = allLengthDictionary[outgoingRequiredLengthKey]
+            let allFeaturesBlockedOutLength = allLengthDictionary[outgoingForbiddenLengthKey]
+            let allFeaturesAllowedOutEntropy = allEntropyDictionary[outgoingRequiredEntropyKey]
+            let allFeaturesBlockedOutEntropy = allEntropyDictionary[outgoingForbiddenEntropyKey]
+            let allFeaturesAllowedInLength = allLengthDictionary[incomingRequiredLengthKey]
+            let allFeaturesBlockedInLength = allLengthDictionary[incomingForbiddenLengthKey]
+            let allFeaturesAllowedInEntropy = allEntropyDictionary[incomingRequiredEntropyKey]
+            let allFeaturesBlockedInEntropy = allEntropyDictionary[incomingForbiddenEntropyKey]
+            let allFeaturesAllowedTiming = allTimingDictionary[requiredTimeDiffKey]
+            let allFeaturesBlockedTiming = allTimingDictionary[forbiddenTimeDiffKey]
+            let allFeaturesAllowedTLS = tlsDictionary[requiredTLSKey]
+            let allFeaturesBlockedTLS = tlsDictionary[forbiddenTLSKey]
+            
             DispatchQueue.main.async
             {
-                self.loadDataButton.title = "Load DB File"
                 
+                // All Features
+                if allFeaturesEvaluationAccuracy != nil, allFeaturesAllowedOutLength != nil, allFeaturesBlockedOutLength != nil, allFeaturesAllowedOutEntropy != nil, allFeaturesBlockedOutEntropy != nil, allFeaturesAllowedInLength != nil, allFeaturesBlockedInLength != nil, allFeaturesAllowedInEntropy != nil, allFeaturesBlockedInEntropy != nil, allFeaturesAllowedTiming != nil, allFeaturesBlockedTiming != nil
+                {
+                    self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvaluationAccuracy!)
+                    self.allAllowedOutLength = String(format: "%.2f", allFeaturesAllowedOutLength!)
+                    self.allBlockedOutLength = String(format: "%.2f", allFeaturesBlockedOutLength!)
+                    self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesAllowedOutEntropy!)
+                    self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesBlockedOutEntropy!)
+                    self.allAllowedInLength = String(format: "%.2f", allFeaturesAllowedInLength!)
+                    self.allBlockedInLength = String(format: "%.2f", allFeaturesBlockedInLength!)
+                    self.allAllowedInEntropy = String(format: "%.2f", allFeaturesAllowedInEntropy!)
+                    self.allBlockedInEntropy = String(format: "%.2f", allFeaturesBlockedInEntropy!)
+                    self.allAllowedTiming = String(format: "%.2f", allFeaturesAllowedTiming!)
+                    self.allBlockedTiming = String(format: "%.2f", allFeaturesBlockedTiming!)
+                }
+                else
+                {
+                    self.allEvaluationAccuracy = "--"
+                    self.allAllowedOutLength = "--"
+                    self.allBlockedOutLength = "--"
+                    self.allAllowedOutEntropy = "--"
+                    self.allBlockedOutEntropy = "--"
+                    self.allAllowedInLength = "--"
+                    self.allBlockedInLength = "--"
+                    self.allAllowedInEntropy = "--"
+                    self.allBlockedInEntropy = "--"
+                    self.allAllowedTiming = "--"
+                    self.allBlockedTiming = "--"
+                }
+
+                self.allAllowedTLS = allFeaturesAllowedTLS ?? "--"
+                self.allBlockedTLS = allFeaturesBlockedTLS ?? "--"
+
                 // Offset Subsequences
                 self.requiredOutOffset = requiredOutOffsetString
                 self.requiredOutOffsetCount = requiredOutOffsetCountString
@@ -819,51 +1017,57 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     func subscribeToNewConnectionsChannel()
     {
-        guard let redis = try? Redis(hostname: "localhost", port: 6379)
-            else
+        DispatchQueue.global(qos: .utility).async
         {
-            print("Unable to connect to Redis")
-            return
-        }
-        
-        do
-        {
-            print("\nSubscribing to redis channel.")
-            try redis.subscribe(channel:newConnectionsChannel)
-            { (maybeRedisType, maybeError) in
-               
-                print("\nReceived redis subscribe callback.")
-                guard let redisList = maybeRedisType as? [Datable]
-                    else
-                {
-                    return
-                }
+            guard let redis = try? Redis(hostname: "localhost", port: 6379)
+                else
+            {
+                print("Unable to connect to Redis")
+                return
+            }
+            
+            do
+            {
+                print("\nSubscribing to redis channel.")
                 
-                for each in redisList
+                try redis.subscribe(channel:newConnectionsChannel)
                 {
-                    guard let thisElement = each as? Data
+                    (maybeRedisType, maybeError) in
+                    
+                    print("\nReceived redis subscribe callback.")
+                    guard let redisList = maybeRedisType as? [Datable]
                         else
                     {
-                        continue
+                        return
                     }
                     
-                    guard thisElement.string == newConnectionMessage
-                        else
+                    for each in redisList
                     {
-                        print("\nReceived a message: \(thisElement.string)")
-                        continue
+                        guard let thisElement = each as? Data
+                            else
+                        {
+                            continue
+                        }
+                        
+                        guard thisElement.string == newConnectionMessage
+                            else
+                        {
+                            print("\nReceived a message: \(thisElement.string)")
+                            continue
+                        }
+                        
+                        DispatchQueue.main.async
+                        {
+                            self.loadLabelData()
+                        }
                     }
-
-                    self.connectionInspector.analyzeConnections(configModel: self.configModel)
-                    
                 }
-                self.loadLabelData()
+            }
+            catch
+            {
+                print(error)
             }
         }
-        catch
-        {
-            print(error)
-        }        
     }
 
 }

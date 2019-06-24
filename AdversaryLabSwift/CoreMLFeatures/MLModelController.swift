@@ -144,7 +144,7 @@ class MLModelController
         }
         catch let saveClassyError
         {
-            print("Error saving Classification model: \(saveClassyError)")
+            print("\nError saving Classification model: \(saveClassyError)")
         }
     }
     
@@ -250,6 +250,11 @@ class MLModelController
         
         do
         {
+            if fileManager.fileExists(atPath: temporaryDirURL.path)
+            {
+                try fileManager.removeItem(at: temporaryDirURL)
+            }
+            
             try fileManager.unzipItem(at: adversaryURL, to: temporaryDirURL, progress: nil, preferredEncoding: nil)
             
             let fileURLS = try fileManager.contentsOfDirectory(at: temporaryDirURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
@@ -305,6 +310,8 @@ class MLModelController
         return (aTable, bTable)
     }
     
+
+    
     func prediction(fileURL: URL, batchFeatureProvider: MLBatchProvider) -> MLBatchProvider?
     {
         do
@@ -315,6 +322,13 @@ class MLModelController
             
             do
             {
+                print("\nAttempting to make a prediction with \(model) using \(batchFeatureProvider.count) features")
+                for index in 0 ..< batchFeatureProvider.count
+                {
+                    batchFeatureProvider.features(at: index).featureNames
+                    print("Feature \(batchFeatureProvider.features(at: index).featureNames) = \(batchFeatureProvider.features(at: index).featureValue(for: batchFeatureProvider.features(at: index).featureNames.first!))")
+                }
+                
                 let prediction = try model.predictions(from: batchFeatureProvider, options: MLPredictionOptions())
                 print("\n🔮  Made a prediction: \(prediction)  🔮")
                 return prediction

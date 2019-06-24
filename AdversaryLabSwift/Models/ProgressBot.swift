@@ -43,4 +43,23 @@ class ProgressBot: NSObject
             NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
+    
+    func update(progressMessage: String, totalToAnalyze: Int, currentProgress: Int)
+    {
+        if Thread.isMainThread
+        {
+            self.progressMessage = progressMessage
+            self.totalToAnalyze = totalToAnalyze
+            self.currentProgress = currentProgress
+        }
+        else
+        {
+            DispatchQueue.main.async
+            {
+                self.progressMessage = progressMessage
+                self.totalToAnalyze = totalToAnalyze
+                self.currentProgress = currentProgress
+            }
+        }
+    }
 }

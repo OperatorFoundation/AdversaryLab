@@ -53,33 +53,47 @@ class TimingCoreML
         }
         else
         {
-            testModels(configModel: configModel)
+            testModel(configModel: configModel)
         }
     }
     
-    func testModels(configModel: ProcessingConfigurationModel)
+    func testModel(configModel: ProcessingConfigurationModel)
     {
-        var blockedTimeDifferenceList = [Double]()
         let bTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
-        if bTimeDifferenceList.count > 0
+        let blockedTimeDifferences = bTimeDifferenceList.list
+        let aTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
+        let allowedTimeDifferences = aTimeDifferenceList.list
+
+        guard blockedTimeDifferences.count > 0
+            else
         {
-            for timeDifference in blockedTimeDifferenceList
-            {
-                timeDifferenceList.append(timeDifference)
-            }
+            print("\nError: No blocked time differences found in the database. Tests cannot be run without blocked connection data.")
+            return
         }
         
-        var allowedTimeDifferenceList = [Double]()
-        let aTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
-        for timeDifference in aTimeDifferenceList
+        testModel(connectionType: .blocked, timeDifferences: blockedTimeDifferences, configModel: configModel)
+        
+        if allowedTimeDifferences.count > 0
         {
-            allowedTimeDifferenceList.append(timeDifference)
+            testModel(connectionType: .allowed, timeDifferences: allowedTimeDifferences, configModel: configModel)
         }
-
+    }
+    
+    func testModel(connectionType: ClassificationLabel, timeDifferences: [Double], configModel: ProcessingConfigurationModel)
+    {
+        let accuracyKey: String
+        
+        switch connectionType
+        {
+        case .allowed:
+            accuracyKey = timingAllowAccuracyKey
+        case .blocked:
+            accuracyKey = timingBlockAccuracyKey
+        }
         
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferenceList])
+            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferences])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -95,17 +109,30 @@ class TimingCoreML
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
                 guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
-                else
+                    else
                 {
-                    print("\nFailed to make a timing prediction.")
+                    print("\n🛑  Failed to make a timing prediction.")
                     return
                 }
                 
-                // TODO: Save the classifier prediction accuracy
-                let firstFeature = classifierPrediction.features(at: 0)
-                let probability = firstFeature.featureValue(for: "classificationProbability").debugDescription
-                let timingClassification = firstFeature.featureValue(for: "classification").debugDescription
-                print("\n🔮  Created a timing prediction from a model file. Feature at index 0 \(firstFeature)\nFeature Names:\n\(firstFeature.featureNames)\nClassification Probability:\n\(probability)\nClassification:\n\(timingClassification)")
+                let featureCount = classifierPrediction.count
+                var allowedBlockedCount: Double = 0.0
+                for index in 0 ..< featureCount
+                {
+                    let thisFeature = classifierPrediction.features(at: index)
+                    guard let timingClassification = thisFeature.featureValue(for: "classification")
+                        else { continue }
+                    if timingClassification.stringValue == connectionType.rawValue
+                    {
+                        allowedBlockedCount += 1
+                    }
+                }
+                
+                let accuracy = allowedBlockedCount/Double(featureCount)
+                print("\n🔮 Timing prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                // This is the dictionary where we will save our results
+                let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                timingDictionary[accuracyKey] = accuracy
             }
         }
         catch
@@ -155,21 +182,6 @@ class TimingCoreML
             do
             {
                 let regressor = try MLRegressor(trainingData: timeTrainingTable, targetColumn: ColumnLabel.timeDifference.rawValue)
-                
-                // The largest distance between predictions and expected values
-                let worstTrainingError = regressor.trainingMetrics.maximumError
-                let worstValidationError = regressor.validationMetrics.maximumError
-                
-                // Evaluate the regressor
-                let regressorEvaluation = regressor.evaluation(on: timeEvaluationTable)
-                
-                // The largest distance between predictions and expected values
-                let worstEvaluationError = regressorEvaluation.maximumError
-                
-                print("\nTime Difference regressor:")
-                print("Worst Training Error: \(worstTrainingError)")
-                print("Worst Validation Error: \(worstValidationError)")
-                print("Worst Evaluation Error: \(worstEvaluationError)")
                 
                 guard let (allowedTimingTable, blockedTimingTable) = MLModelController().createAllowedBlockedTables(fromTable: timeDifferenceTable)
                 else
