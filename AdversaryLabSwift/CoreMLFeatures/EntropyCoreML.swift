@@ -188,33 +188,42 @@ class EntropyCoreML
     func testModel(entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let entropyClassifierName: String
+        let entropyRegressorName: String
         let accuracyKey: String
+        let entropyKey: String
         
         switch connectionDirection
         {
         case .outgoing:
             entropyClassifierName = outEntropyClassifierName
+            entropyRegressorName = outEntropyRegressorName
             switch connectionType
             {
             case .allowed:
-                accuracyKey = outgoingEntropyAllowAccuracyKey
+                accuracyKey = allowedOutgoingEntropyAccuracyKey
+                entropyKey = allowedOutgoingEntropyKey
             case .blocked:
-                accuracyKey = outgoingEntropyBlockAccuracyKey
+                accuracyKey = blockedOutgoingEntropyAccuracyKey
+                entropyKey = blockedOutgoingEntropyKey
             }
         case .incoming:
             entropyClassifierName = inEntropyClassifierName
+            entropyRegressorName = inEntropyRegressorName
             switch connectionType
             {
             case .allowed:
-                accuracyKey = incomingEntropyAllowAccuracyKey
+                accuracyKey = allowedIncomingEntropyAccuracyKey
+                entropyKey = allowedIncomingEntropyKey
             case .blocked:
-                accuracyKey = incomingEntropyBlockAccuracyKey
+                accuracyKey = blockedIncomingEntropyAccuracyKey
+                entropyKey = blockedIncomingEntropyKey
             }
         }
 
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.entropy.rawValue: entropyList])
+            let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.entropy.rawValue: entropyList])
+            let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -224,21 +233,53 @@ class EntropyCoreML
             }
             
             let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(entropyClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            let regressorFileURL = temporaryDirURL.appendingPathComponent(entropyRegressorName).appendingPathExtension(modelFileExtension)
             
-            let classifierFileURL = temporaryDirURL.appendingPathComponent(entropyClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            // This is the dictionary where we will save our results (saves to Redis db)
+            let entropyDictionary: RMap<String,Double> = RMap(key: testResultsKey)
             
-            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            // Regressor
+            if FileManager.default.fileExists(atPath: regressorFileURL.path)
             {
-                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
                     else
                 {
-                    print("\n🛑  Failed to make an entropy prediction.")
+                    print("\n🛑  Failed to make an entropy regressor prediction.")
                     return
                 }
                 
-                let featureCount = classifierPrediction.count
+                guard regressorPrediction.count > 0
+                    else { return }
+                
+                // We are only expecting one result
+                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+                
+                // Check that we received a result with a feature named 'entropy' and that it has a value.
+                guard let firstFeatureName = thisFeatureNames.first
+                    else { return }
+                guard firstFeatureName == ColumnLabel.entropy.rawValue
+                    else { return }
+                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                    else { return }
+                
+                print("🔮 Entropy prediction for \(entropyKey): \(thisFeatureValue).")
+                entropyDictionary[entropyKey] = thisFeatureValue.doubleValue
+            }
+            
+            // Classifier
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: classifierFeatureProvider)
+                    else
+                {
+                    print("\n🛑  Failed to make an entropy classifier prediction.")
+                    return
+                }
+                
+                let classifierFeatureCount = classifierPrediction.count
                 var allowedBlockedCount: Double = 0.0
-                for index in 0 ..< featureCount
+                for index in 0 ..< classifierFeatureCount
                 {
                     let thisFeature = classifierPrediction.features(at: index)
                     guard let entropyClassification = thisFeature.featureValue(for: "classification")
@@ -249,10 +290,9 @@ class EntropyCoreML
                     }
                 }
                 
-                let accuracy = allowedBlockedCount/Double(featureCount)
-                print("\n🔮 Entropy prediction: \(accuracy * 100) \(connectionType.rawValue).")
-                // This is the dictionary where we will save our results
-                let entropyDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                let accuracy = allowedBlockedCount/Double(classifierFeatureCount)
+                print("🔮 Entropy classification prediction accuracy: \(accuracy * 100) \(connectionType.rawValue).")
+                
                 entropyDictionary[accuracyKey] = accuracy
             }
         }
@@ -306,7 +346,17 @@ class EntropyCoreML
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy = (1.0 - validationError) * 100
+            let validationAccuracy: Double?
+            
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError < 0
+            {
+                validationAccuracy = nil
+            }
+            else
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
             
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: entropyEvaluationTable)
@@ -319,21 +369,6 @@ class EntropyCoreML
             do
             {
                 let regressor = try MLRegressor(trainingData: entropyTrainingTable, targetColumn: ColumnLabel.entropy.rawValue)
-                
-                // The largest distance between predictions and expected values
-                let worstTrainingError = regressor.trainingMetrics.maximumError
-                let worstValidationError = regressor.validationMetrics.maximumError
-                
-                // Evaluate the regressor
-                let regressorEvaluation = regressor.evaluation(on: entropyEvaluationTable)
-                
-                // The largest distance between predictions and expected values
-                let worstEvaluationError = regressorEvaluation.maximumError
-                
-                print("\nEntropy regressor:")
-                print("Worst Training Error: \(worstTrainingError)")
-                print("Worst Validation Error: \(worstValidationError)")
-                print("Worst Evaluation Error: \(worstEvaluationError)")
                 
                 guard let (allowedEntropyTable, blockedEntropyTable) = MLModelController().createAllowedBlockedTables(fromTable: entropyTable)
                 else
@@ -363,8 +398,12 @@ class EntropyCoreML
                     /// Save Results
                     entropyResults[requiredEntropyKey] = predictedAllowedEntropy
                     entropyResults[entropyTAccKey] = trainingAccuracy
-                    entropyResults[entropyVAccKey] = validationAccuracy
                     entropyResults[entropyEAccKey] = evaluationAccuracy
+                    
+                    if validationAccuracy != nil
+                    {
+                        entropyResults[entropyVAccKey] = validationAccuracy!
+                    }
                 }
                 catch let allowedColumnError
                 {

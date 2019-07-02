@@ -116,28 +116,28 @@ class OperatorReportController
             let testResults: RMap<String,Double> = RMap(key: testResultsKey)
             
             // Timing (milliseconds)
-            let timeBlockAccuracy = String(format: "%.2f", testResults[timingBlockAccuracyKey] ?? "--")
-            let timeAllowAccuracy = String(format: "%.2f", testResults[timingAllowAccuracyKey] ?? "--")
+            let timeBlockAccuracy = String(format: "%.2f", testResults[blockedTimingAccuracyKey] ?? "--")
+            let timeAllowAccuracy = String(format: "%.2f", testResults[allowedTimingAccuracyKey] ?? "--")
             
             // TLS Common Names
-            let tlsBlockAccuracy = String(format: "%.2f", testResults[tlsBlockAccuracyKey] ?? "--")
-            let tlsAllowAccuracy = String(format: "%.2f", testResults[tlsAllowAccuracyKey] ?? "--")
+            let tlsBlockAccuracy = String(format: "%.2f", testResults[blockedTLSAccuracyKey] ?? "--")
+            let tlsAllowAccuracy = String(format: "%.2f", testResults[allowedTLSAccuracyKey] ?? "--")
             
             // Lengths
-            let lengthInAllowAccuracy = String(format: "%.2f", testResults[incomingLengthAllowAccuracyKey] ?? "--")
-            let lengthInBlockAccuracy = String(format: "%.2f", testResults[incomingLengthBlockAccuracyKey] ?? "--")
-            let lengthOutAllowAccuracy = String(format: "%.2f", testResults[outgoingLengthAllowAccuracyKey] ?? "--")
-            let lengthOutBlockAccuracy = String(format: "%.2f", testResults[outgoingLengthBlockAccuracyKey] ?? "--")
+            let lengthInAllowAccuracy = String(format: "%.2f", testResults[allowedIncomingLengthAccuracyKey] ?? "--")
+            let lengthInBlockAccuracy = String(format: "%.2f", testResults[blockedIncomingLengthAccuracyKey] ?? "--")
+            let lengthOutAllowAccuracy = String(format: "%.2f", testResults[allowedOutgoingLengthAccuracyKey] ?? "--")
+            let lengthOutBlockAccuracy = String(format: "%.2f", testResults[blockedOutgoingLengthAccuracyKey] ?? "--")
             
             // Entropy
-            let entInAllowAccuracy = String(format: "%.2f", testResults[incomingEntropyAllowAccuracyKey] ?? "--")
-            let entoutAllowAccuracy = String(format: "%.2f", testResults[outgoingEntropyAllowAccuracyKey] ?? "--")
-            let entInBlockAccuracy = String(format: "%.2f", testResults[incomingEntropyBlockAccuracyKey] ?? "--")
-            let entOutBlockAccuracy = String(format: "%.2f", testResults[outgoingEntropyBlockAccuracyKey] ?? "--")
+            let entInAllowAccuracy = String(format: "%.2f", testResults[allowedIncomingEntropyAccuracyKey] ?? "--")
+            let entoutAllowAccuracy = String(format: "%.2f", testResults[allowedOutgoingEntropyAccuracyKey] ?? "--")
+            let entInBlockAccuracy = String(format: "%.2f", testResults[blockedIncomingEntropyAccuracyKey] ?? "--")
+            let entOutBlockAccuracy = String(format: "%.2f", testResults[blockedOutgoingEntropyAccuracyKey] ?? "--")
             
             // All Features
-            let allAllowAccuracy = String(format: "%.2f", testResults[allFeaturesAllowAccuracyKey] ?? "--")
-            let allBlockAccuracy = String(format: "%.2f", testResults[allFeaturesBlockAccuracyKey] ?? "--")
+            let allAllowAccuracy = String(format: "%.2f", testResults[allowedAllFeaturesAccuracyKey] ?? "--")
+            let allBlockAccuracy = String(format: "%.2f", testResults[blockedAllFeaturesAccuracyKey] ?? "--")
             let row1 = "| Allowed| \(timeAllowAccuracy) | \(tlsAllowAccuracy) | \(lengthInAllowAccuracy) | \(lengthOutAllowAccuracy) | \(entInAllowAccuracy) | \(entoutAllowAccuracy) | \(allAllowAccuracy) |\n"
             let row2 = "| Blocked| \(timeBlockAccuracy) | \(tlsBlockAccuracy) | \(lengthInBlockAccuracy) | \(lengthOutBlockAccuracy) | \(entInBlockAccuracy) | \(entOutBlockAccuracy) | \(allBlockAccuracy) |\n"
             DispatchQueue.main.async

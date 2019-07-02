@@ -127,9 +127,8 @@ class AllFeatures
             }
             
             let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
-            
-            let classifierFileURL = temporaryDirURL.appendingPathComponent(allClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
-            
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(allClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
                 let batchFeatureProvider: MLArrayBatchProvider
@@ -138,16 +137,41 @@ class AllFeatures
                 let inputs = model.modelDescription.inputDescriptionsByName
 
                 let accuracyKey: String
+                let inLengthKey: String
+                let outLengthKey:String
+                let inEntropyKey: String
+                let outEntropyKey: String
+                let timingKey: String
+                let tlsKey: String
                 
                 switch connectionType
                 {
                 case .allowed:
-                    accuracyKey = allFeaturesAllowAccuracyKey
+                    accuracyKey = allowedAllFeaturesAccuracyKey
+                    inLengthKey = allowedAllFeaturesIncomingLengthKey
+                    outLengthKey = allowedAllFeaturesOutgoingLengthKey
+                    inEntropyKey = allowedAllFeaturesIncomingEntropyKey
+                    outEntropyKey = allowedAllFeaturesOutgoingEntropyKey
+                    timingKey = allowedAllFeaturesTimingKey
+                    tlsKey = allowedAllFeaturesTLSKey
 
                 case .blocked:
-                    accuracyKey = allFeaturesBlockAccuracyKey
-
+                    accuracyKey = blockedAllFeaturesAccuracyKey
+                    inLengthKey = blockedAllFeaturesIncomingLengthKey
+                    outLengthKey = blockedAllFeaturesOutgoingLengthKey
+                    inEntropyKey = blockedAllFeaturesIncomingEntropyKey
+                    outEntropyKey = blockedAllFeaturesOutgoingEntropyKey
+                    timingKey = blockedAllFeaturesTimingKey
+                    tlsKey = blockedAllFeaturesTLSKey
                 }
+                
+                test(feature: inLengthKey, regressorName: allInPacketLengthRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.inLength.rawValue, featureValueType: .double)
+                test(feature: outLengthKey, regressorName: allOutPacketLengthRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.outLength.rawValue, featureValueType: .double)
+                test(feature: inEntropyKey, regressorName: allInEntropyRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.inEntropy.rawValue, featureValueType: .double)
+                test(feature: outEntropyKey, regressorName: allOutEntropyRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.outEntropy.rawValue, featureValueType: .double)
+                test(feature: tlsKey, regressorName: allTLSRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.tlsNames.rawValue, featureValueType: .string)
+                test(feature: timingKey, regressorName: allTimingRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.timeDifference.rawValue, featureValueType: .double)
+                
                 if inputs.keys.contains(ColumnLabel.tlsNames.rawValue)
                 {
                     guard let (incomingLengths, outgoingLengths, incomingEntropy, outgoingEntropy, timeDifferences, tls) = createTestingArrays(connectionType: connectionType, includeTLS: true)
@@ -164,7 +188,7 @@ class AllFeatures
                 }
                 else
                 {
-                    guard let (incomingLengths, outgoingLengths, incomingEntropy, outgoingEntropy, timeDifferences, tls) = createTestingArrays(connectionType: connectionType, includeTLS: false)
+                    guard let (incomingLengths, outgoingLengths, incomingEntropy, outgoingEntropy, timeDifferences, _) = createTestingArrays(connectionType: connectionType, includeTLS: false)
                         else
                     { return }
                     
@@ -209,6 +233,55 @@ class AllFeatures
         catch
         {
             print("\nError testing all features model: \(error)")
+        }
+    }
+    
+    func test(feature resultsKey: String, regressorName: String, temporaryDirURL: URL, connectionType: ClassificationLabel, expectedFeatureName: String, featureValueType: MLFeatureType)
+    {
+        let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
+        
+        if FileManager.default.fileExists(atPath: regressorFileURL.path)
+        {
+            do
+            {
+                let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
+                
+                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+                    else { return }
+                
+                guard regressorPrediction.count > 0
+                    else { return }
+                
+                // We are only expecting one result
+                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+                
+                guard let firstFeatureName = thisFeatureNames.first
+                    else { return }
+                guard firstFeatureName == expectedFeatureName
+                    else { return }
+                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                    else { return }
+                
+                print("🔮 AllFeatures prediction for \(expectedFeatureName): \(thisFeatureValue).")
+                switch featureValueType
+                {
+                case .string:
+                    // This is the dictionary where we will save our results
+                    // TLS Values are the only non Double results currently
+                    let resultsDictionary: RMap<String,Double> = RMap(key: tlsTestResultsKey)
+                    resultsDictionary[resultsKey] = thisFeatureValue.doubleValue
+                case .double:
+                    // This is the dictionary where we will save our results
+                    let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                    resultsDictionary[resultsKey] = thisFeatureValue.doubleValue
+                default:
+                    print("Received an unexpected value type from a regressor prediction: \(featureValueType)")
+                }
+            }
+            catch
+            {
+                print("\nError testing all features model \(resultsKey): \(error)")
+            }
         }
     }
     
@@ -260,9 +333,21 @@ class AllFeatures
         {
             let classifier = try MLClassifier(trainingData: trainingTable, targetColumn: ColumnLabel.classification.rawValue)
             let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
-            let validationAccuracy = (1.0 - classifier.validationMetrics.classificationError) * 100
             let classifierEvaluation = classifier.evaluation(on: evaluationTable)
             let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
+            
+            let validationError = classifier.validationMetrics.classificationError
+            let validationAccuracy: Double?
+            
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError < 0
+            {
+                validationAccuracy = nil
+            }
+            else
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
 
             // Regressors
             do
@@ -280,7 +365,11 @@ class AllFeatures
                 
                 allFeaturesDictionary[allFeaturesEAccKey] = evaluationAccuracy
                 allFeaturesDictionary[allFeaturesTAccKey] = trainingAccuracy
-                allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy
+                
+                if validationAccuracy != nil
+                {
+                    allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy!
+                }
                 
                 let modelController = MLModelController()
                 guard let (allowedTable, blockedTable) = modelController.createAllowedBlockedTables(fromTable: allFeaturesTable)

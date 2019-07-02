@@ -119,20 +119,49 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     // MARK: - Test Mode Labels
     @objc dynamic var modelName = "--"
+    
+    @objc dynamic var allFeaturesAllowedInLength = "--"
+    @objc dynamic var allFeaturesAllowedOutLength = "--"
+    @objc dynamic var allFeaturesAllowedInEntropy = "--"
+    @objc dynamic var allFeaturesAllowedOutEntropy = "--"
+    @objc dynamic var allFeaturesAllowedTiming = "--"
+    @objc dynamic var allFeaturesAllowedTLS = "--"
     @objc dynamic var allFeaturesAllowAccuracy = "--"
+    @objc dynamic var allFeaturesBlockedInLength = "--"
+    @objc dynamic var allFeaturesBlockedOutLength = "--"
+    @objc dynamic var allFeaturesBlockedInEntropy = "--"
+    @objc dynamic var allFeaturesBlockedOutEntropy = "--"
+    @objc dynamic var allFeaturesBlockedTiming = "--"
+    @objc dynamic var allFeaturesBlockedTLS = "--"
     @objc dynamic var allFeaturesBlockAccuracy = "--"
+    
+    @objc dynamic var timingBlocked = "--"
     @objc dynamic var timingBlockAccuracy = "--"
+    @objc dynamic var timingAllowed = "--"
     @objc dynamic var timingAllowAccuracy = "--"
+    
+    @objc dynamic var tls12Allowed = "--"
     @objc dynamic var tls12AllowAccuracy = "--"
+    @objc dynamic var tls12Blocked = "--"
     @objc dynamic var tls12BlockAccuracy = "--"
+    
     @objc dynamic var inLengthAllowAccuracy = "--"
     @objc dynamic var inLengthBlockAccuracy = "--"
+    @objc dynamic var inLengthAllowed = "--"
+    @objc dynamic var inLengthBlocked = "--"
     @objc dynamic var outLengthAllowAccuracy = "--"
     @objc dynamic var outLengthBlockAccuracy = "--"
+    @objc dynamic var outLengthAllowed = "--"
+    @objc dynamic var outLengthBlocked = "--"
+    
     @objc dynamic var inEntropyAllowAccuracy = "--"
-    @objc dynamic var outEntropyAllowAccuracy = "--"
     @objc dynamic var inEntropyBlockAccuracy = "--"
+    @objc dynamic var inBlockedEntropy = "--"
+    @objc dynamic var inAllowedEntropy = "--"
+    @objc dynamic var outEntropyAllowAccuracy = "--"
     @objc dynamic var outEntropyBlockAccuracy = "--"
+    @objc dynamic var outAllowedEntropy = "--"
+    @objc dynamic var outBlockedEntropy = "--"
     
     var modelDirectoryURL: URL?
     
@@ -537,154 +566,212 @@ class ViewController: NSViewController, NSTabViewDelegate
             let testResults: RMap<String,Double> = RMap(key: testResultsKey)
             
             // Timing (milliseconds)
-            let timeBlockAccuracy = testResults[timingBlockAccuracyKey]
-            let timeAllowAccuracy = testResults[timingAllowAccuracyKey]
+            let timeBlocked = testResults[blockedTimingKey]
+            let timeBlockAccuracy = testResults[blockedTimingAccuracyKey]
+            let timeAllowed = testResults[allowedTimingKey]
+            let timeAllowAccuracy = testResults[allowedTimingAccuracyKey]
             
             // TLS Common Names
-            let tlsBlockAccuracy = testResults[tlsBlockAccuracyKey]
-            let tlsAllowAccuracy = testResults[tlsAllowAccuracyKey]
+            let tlsBlockAccuracy = testResults[blockedTLSAccuracyKey]
+            let tlsAllowAccuracy = testResults[allowedTLSAccuracyKey]
+            let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+            let tlsAllowed = tlsResultsDictionary[allowedTLSKey]
+            let tlsBlocked = tlsResultsDictionary[blockedTLSKey]
             
             // Lengths
-            let lengthInAllowAccuracy = testResults[incomingLengthAllowAccuracyKey]
-            let lengthInBlockAccuracy = testResults[incomingLengthBlockAccuracyKey]
-            let lengthOutAllowAccuracy = testResults[outgoingLengthAllowAccuracyKey]
-            let lengthOutBlockAccuracy = testResults[outgoingLengthBlockAccuracyKey]
+            let lengthInAllowed = testResults[allowedIncomingLengthKey]
+            let lengthInAllowAccuracy = testResults[allowedIncomingLengthAccuracyKey]
+            let lengthInBlocked = testResults[blockedIncomingLengthKey]
+            let lengthInBlockAccuracy = testResults[blockedIncomingLengthAccuracyKey]
+            let lengthOutAllowed = testResults[allowedOutgoingLengthKey]
+            let lengthOutAllowAccuracy = testResults[allowedOutgoingLengthAccuracyKey]
+            let lengthOutBlocked = testResults[blockedOutgoingLengthKey]
+            let lengthOutBlockAccuracy = testResults[blockedOutgoingLengthAccuracyKey]
             
             // Entropy
-            let entInAllowAccuracy = testResults[incomingEntropyAllowAccuracyKey]
-            let entoutAllowAccuracy = testResults[outgoingEntropyAllowAccuracyKey]
-            let entInBlockAccuracy = testResults[incomingEntropyBlockAccuracyKey]
-            let entOutBlockAccuracy = testResults[outgoingEntropyBlockAccuracyKey]
+            let entInAllowAccuracy = testResults[allowedIncomingEntropyAccuracyKey]
+            let entInBlockAccuracy = testResults[blockedIncomingEntropyAccuracyKey]
+            let entInAllowed = testResults[allowedIncomingEntropyKey]
+            let entInBlocked = testResults[blockedIncomingEntropyKey]
+            
+            let entoutAllowAccuracy = testResults[allowedOutgoingEntropyAccuracyKey]
+            let entOutBlockAccuracy = testResults[blockedOutgoingEntropyAccuracyKey]
+            let entOutAllowed = testResults[allowedOutgoingEntropyKey]
+            let entOutBlocked = testResults[blockedOutgoingEntropyKey]
             
             // All Features
-            let allAllowAccuracy = testResults[allFeaturesAllowAccuracyKey]
-            let allBlockAccuracy = testResults[allFeaturesBlockAccuracyKey]
+            let allTLSTestResults:RMap<String,Double> = RMap(key: tlsTestResultsKey)
+            
+            let allAllowInLength = testResults[allowedAllFeaturesIncomingLengthKey]
+            let allAllowOutLength = testResults[allowedAllFeaturesOutgoingLengthKey]
+            let allAllowInEntropy = testResults[allowedAllFeaturesIncomingEntropyKey]
+            let allAllowOutEntropy = testResults[allowedAllFeaturesOutgoingEntropyKey]
+            let allAllowTiming = testResults[allowedAllFeaturesTimingKey]
+            let allAllowTLS = allTLSTestResults[allowedAllFeaturesTLSKey]
+            let allAllowAccuracy = testResults[allowedAllFeaturesAccuracyKey]
+            
+            let allBlockInLength = testResults[blockedAllFeaturesIncomingLengthKey]
+            let allBlockOutLength = testResults[blockedAllFeaturesOutgoingLengthKey]
+            let allBlockInEntropy = testResults[blockedAllFeaturesIncomingEntropyKey]
+            let allBlockOutEntropy = testResults[blockedAllFeaturesOutgoingEntropyKey]
+            let allBlockTiming = testResults[blockedAllFeaturesTimingKey]
+            let allBlockTLS = allTLSTestResults[blockedAllFeaturesTLSKey]
+            let allBlockAccuracy = testResults[blockedAllFeaturesAccuracyKey]
             
             DispatchQueue.main.async
             {
-                if timeAllowAccuracy != nil
+                if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
                 {
+                    self.timingAllowed = String(format: "%.2f", timeAllowed!)
                     self.timingAllowAccuracy = String(format: "%.2f", timeAllowAccuracy!)
-                }
-                else
-                {
-                    self.timingAllowAccuracy = "--"
-                }
-                
-                if timeBlockAccuracy != nil
-                {
+                    self.timingBlocked = String(format: "%.2f", timeBlocked!)
                     self.timingBlockAccuracy = String(format: "%.2f", timeBlockAccuracy!)
                 }
                 else
                 {
+                    self.timingAllowed = "--"
+                    self.timingAllowAccuracy = "--"
+                    self.timingBlocked = "--"
                     self.timingBlockAccuracy = "--"
                 }
                 
-                if tlsAllowAccuracy != nil
+                if tlsAllowAccuracy != nil, tlsBlockAccuracy != nil, tlsAllowed != nil, tlsBlocked != nil
                 {
+                    self.tls12Allowed = String(format: "%.2f", tlsAllowed!)
                     self.tls12AllowAccuracy = String(format: "%.2f", tlsAllowAccuracy!)
+                    self.tls12Blocked = String(format: "%.2f", tlsBlocked!)
+                    self.tls12BlockAccuracy = String(format: "%.2f", tlsBlockAccuracy!)
                 }
                 else
                 {
+                    self.tls12Allowed = "--"
                     self.tls12AllowAccuracy = "--"
-                }
-                
-                if tlsBlockAccuracy != nil
-                {
-                    self.tls12BlockAccuracy = String(format: "%.2f", tlsBlockAccuracy ?? "--")
-                }
-                else
-                {
+                    self.tls12Blocked = "--"
                     self.tls12BlockAccuracy = "--"
                 }
                 
-                if entInAllowAccuracy != nil
+                if
+                    entInAllowed != nil,
+                    entInBlocked != nil,
+                    entInAllowAccuracy != nil,
+                    entInBlockAccuracy != nil
                 {
+                    self.inAllowedEntropy = String(format: "%.2f", entInAllowed!)
                     self.inEntropyAllowAccuracy = String(format: "%.2f", entInAllowAccuracy!)
-                }
-                else
-                {
-                    self.inEntropyAllowAccuracy = "--"
-                }
-                
-                if entInBlockAccuracy != nil
-                {
+                    self.inBlockedEntropy = String(format: "%.2f", entInBlocked!)
                     self.inEntropyBlockAccuracy = String(format: "%.2f", entInBlockAccuracy!)
                 }
                 else
                 {
+                    self.inAllowedEntropy = "--"
+                    self.inEntropyAllowAccuracy = "--"
+                    self.inBlockedEntropy = "--"
                     self.inEntropyBlockAccuracy = "--"
                 }
                 
-                if entoutAllowAccuracy != nil
+                if
+                    entOutAllowed != nil,
+                    entOutBlocked != nil,
+                    entoutAllowAccuracy != nil,
+                    entOutBlockAccuracy != nil
                 {
-                    self.outEntropyAllowAccuracy = String(format: "%.2f", entoutAllowAccuracy ?? "--")
-                }
-                else
-                {
-                    self.outEntropyAllowAccuracy = "--"
-                }
-                
-                if entOutBlockAccuracy != nil
-                {
+                    self.outAllowedEntropy = String(format: "%.2f", entOutAllowed!)
+                    self.outBlockedEntropy = String(format: "%.2f", entOutBlocked!)
+                    self.outEntropyAllowAccuracy = String(format: "%.2f", entoutAllowAccuracy!)
                     self.outEntropyBlockAccuracy = String(format: "%.2f", entOutBlockAccuracy!)
                 }
                 else
                 {
+                    self.outAllowedEntropy = "--"
+                    self.outBlockedEntropy = "--"
+                    self.outEntropyAllowAccuracy = "--"
                     self.outEntropyBlockAccuracy = "--"
                 }
                 
-                if lengthInAllowAccuracy != nil
+                if
+                    lengthInAllowAccuracy != nil,
+                    lengthInBlockAccuracy != nil,
+                    lengthInAllowed != nil,
+                    lengthInBlocked != nil
                 {
+                    self.inLengthAllowed = String(format: "%.2f", lengthInAllowed!)
                     self.inLengthAllowAccuracy = String(format: "%.2f", lengthInAllowAccuracy!)
-                }
-                else
-                {
-                    self.inLengthAllowAccuracy = "--"
-                }
-                
-                if lengthInBlockAccuracy != nil
-                {
+                    self.inLengthBlocked = String(format: "%.2f", lengthInBlocked!)
                     self.inLengthBlockAccuracy = String(format: "%.2f", lengthInBlockAccuracy!)
                 }
                 else
                 {
+                    self.inLengthAllowed = "--"
+                    self.inLengthAllowAccuracy = "--"
+                    self.inLengthBlocked = "--"
                     self.inLengthBlockAccuracy = "--"
                 }
                 
-                if lengthOutAllowAccuracy != nil
+                if lengthOutAllowAccuracy != nil, lengthOutBlockAccuracy != nil, lengthOutAllowed != nil, lengthOutBlocked != nil
                 {
+                    self.outLengthAllowed = String(format: "%.2f", lengthOutAllowed!)
                     self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)
-                }
-                else
-                {
-                    self.outLengthAllowAccuracy = "--"
-                }
-                
-                if lengthOutBlockAccuracy != nil
-                {
+                    self.outLengthBlocked = String(format: "%.2f", lengthOutBlocked!)
                     self.outLengthBlockAccuracy = String(format: "%.2f", lengthOutBlockAccuracy!)
                 }
                 else
                 {
+                    self.outLengthAllowed = "--"
+                    self.outLengthAllowAccuracy = "--"
+                    self.outLengthBlocked = "--"
                     self.outLengthBlockAccuracy = "--"
                 }
-                
-                if allAllowAccuracy != nil
+                if allAllowInLength != nil,
+                    allAllowOutLength != nil,
+                    allAllowInEntropy != nil,
+                    allAllowOutEntropy != nil,
+                    allAllowTiming != nil,
+                    allAllowTLS != nil,
+                    allAllowAccuracy != nil
                 {
+                    self.allFeaturesAllowedInLength = String(format: "%.2f", allAllowInLength!)
+                    self.allFeaturesAllowedOutLength = String(format: "%.2f", allAllowOutLength!)
+                    self.allFeaturesAllowedInEntropy = String(format: "%.2f", allAllowInEntropy!)
+                    self.allFeaturesAllowedOutEntropy = String(format: "%.2f", allAllowOutEntropy!)
+                    self.allFeaturesAllowedTiming = String(format: "%.2f", allAllowTiming!)
+                    self.allFeaturesAllowedTLS = String(format: "%.2f", allAllowTLS!)
                     self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!)
                 }
                 else
                 {
+                    self.allFeaturesAllowedInLength = "--"
+                    self.allFeaturesAllowedOutLength = "--"
+                    self.allFeaturesAllowedInEntropy = "--"
+                    self.allFeaturesAllowedOutEntropy = "--"
+                    self.allFeaturesAllowedTiming = "--"
+                    self.allFeaturesAllowedTLS = "--"
                     self.allFeaturesAllowAccuracy = "--"
                 }
                 
-                if allBlockAccuracy != nil
+                if allBlockInLength != nil,
+                    allBlockOutLength != nil,
+                    allBlockInEntropy != nil,
+                    allBlockOutEntropy != nil,
+                    allBlockTiming != nil,
+                    allBlockTLS != nil,
+                    allBlockAccuracy != nil
                 {
+                    self.allFeaturesBlockedInLength = String(format: "%.2f", allBlockInLength!)
+                    self.allFeaturesBlockedOutLength = String(format: "%.2f", allBlockOutLength!)
+                    self.allFeaturesBlockedInEntropy = String(format: "%.2f", allBlockInEntropy!)
+                    self.allFeaturesBlockedOutEntropy = String(format: "%.2f", allBlockOutEntropy!)
+                    self.allFeaturesBlockedTiming = String(format: "%.2f", allBlockTiming!)
+                    self.allFeaturesBlockedTLS = String(format: "%.2f", allBlockTLS!)
                     self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!)
                 }
                 else
                 {
+                    self.allFeaturesBlockedInLength = "--"
+                    self.allFeaturesBlockedOutLength = "--"
+                    self.allFeaturesBlockedInEntropy = "--"
+                    self.allFeaturesBlockedOutEntropy = "--"
+                    self.allFeaturesBlockedTiming = "--"
+                    self.allFeaturesBlockedTLS = "--"
                     self.allFeaturesBlockAccuracy = "--"
                 }
             }
@@ -726,16 +813,46 @@ class ViewController: NSViewController, NSTabViewDelegate
             
             // Timing (milliseconds)
             let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
+            let rTiming = timingDictionary[requiredTimeDiffKey]
+            let fTiming = timingDictionary[forbiddenTimeDiffKey]
+            let timeDiffTAcc = timingDictionary[timeDiffTAccKey]
+            let timeDiffVAcc = timingDictionary[timeDiffVAccKey]
+            let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
             
             // TLS Common Names
             let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
             let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
+            let rTLS = tlsResults[requiredTLSKey]
+            let fTLS = tlsResults[forbiddenTLSKey]
+            let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey]
+            let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey]
+            let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
 
             // Lengths
             let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsTrainingResultsKey)
+            let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey]
+            let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey]
+            let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey]
+            let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey]
+            let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
+            let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey]
+            let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey]
+            let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey]
+            let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey]
+            let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
             
             // Entropy
             let entropyResults: RMap <String, Double> = RMap(key: entropyTrainingResultsKey)
+            let rOutEntropy = entropyResults[outgoingRequiredEntropyKey]
+            let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey]
+            let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey]
+            let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey]
+            let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
+            let rInEntropy = entropyResults[incomingRequiredEntropyKey]
+            let fInEntropy = entropyResults[incomingForbiddenEntropyKey]
+            let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey]
+            let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey]
+            let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
             
             // Float Subsequences
             let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
@@ -757,38 +874,38 @@ class ViewController: NSViewController, NSTabViewDelegate
             let allLengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
             let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
             
-            let allFeaturesEvaluationAccuracy = allFeaturesDictionary[allFeaturesEAccKey]
+            let allFeaturesEvalAccuracy = allFeaturesDictionary[allFeaturesEAccKey]
             
-            let allFeaturesAllowedOutLength = allLengthDictionary[outgoingRequiredLengthKey]
-            let allFeaturesBlockedOutLength = allLengthDictionary[outgoingForbiddenLengthKey]
-            let allFeaturesAllowedOutEntropy = allEntropyDictionary[outgoingRequiredEntropyKey]
-            let allFeaturesBlockedOutEntropy = allEntropyDictionary[outgoingForbiddenEntropyKey]
-            let allFeaturesAllowedInLength = allLengthDictionary[incomingRequiredLengthKey]
-            let allFeaturesBlockedInLength = allLengthDictionary[incomingForbiddenLengthKey]
-            let allFeaturesAllowedInEntropy = allEntropyDictionary[incomingRequiredEntropyKey]
-            let allFeaturesBlockedInEntropy = allEntropyDictionary[incomingForbiddenEntropyKey]
-            let allFeaturesAllowedTiming = allTimingDictionary[requiredTimeDiffKey]
-            let allFeaturesBlockedTiming = allTimingDictionary[forbiddenTimeDiffKey]
-            let allFeaturesAllowedTLS = tlsDictionary[requiredTLSKey]
-            let allFeaturesBlockedTLS = tlsDictionary[forbiddenTLSKey]
+            let allFeaturesTrainAllowedOutLength = allLengthDictionary[outgoingRequiredLengthKey]
+            let allFeaturesTrainBlockedOutLength = allLengthDictionary[outgoingForbiddenLengthKey]
+            let allFeaturesTrainAllowedOutEntropy = allEntropyDictionary[outgoingRequiredEntropyKey]
+            let allFeaturesTrainBlockedOutEntropy = allEntropyDictionary[outgoingForbiddenEntropyKey]
+            let allFeaturesTrainAllowedInLength = allLengthDictionary[incomingRequiredLengthKey]
+            let allFeaturesTrainBlockedInLength = allLengthDictionary[incomingForbiddenLengthKey]
+            let allFeaturesTrainAllowedInEntropy = allEntropyDictionary[incomingRequiredEntropyKey]
+            let allFeaturesTrainBlockedInEntropy = allEntropyDictionary[incomingForbiddenEntropyKey]
+            let allFeaturesTrainAllowedTiming = allTimingDictionary[requiredTimeDiffKey]
+            let allFeaturesTrainBlockedTiming = allTimingDictionary[forbiddenTimeDiffKey]
+            let allFeaturesTrainAllowedTLS = tlsDictionary[requiredTLSKey]
+            let allFeaturesTrainBlockedTLS = tlsDictionary[forbiddenTLSKey]
             
             DispatchQueue.main.async
             {
                 
                 // All Features
-                if allFeaturesEvaluationAccuracy != nil, allFeaturesAllowedOutLength != nil, allFeaturesBlockedOutLength != nil, allFeaturesAllowedOutEntropy != nil, allFeaturesBlockedOutEntropy != nil, allFeaturesAllowedInLength != nil, allFeaturesBlockedInLength != nil, allFeaturesAllowedInEntropy != nil, allFeaturesBlockedInEntropy != nil, allFeaturesAllowedTiming != nil, allFeaturesBlockedTiming != nil
+                if allFeaturesEvalAccuracy != nil, allFeaturesTrainAllowedOutLength != nil, allFeaturesTrainBlockedOutLength != nil, allFeaturesTrainAllowedOutEntropy != nil, allFeaturesTrainBlockedOutEntropy != nil, allFeaturesTrainAllowedInLength != nil, allFeaturesTrainBlockedInLength != nil, allFeaturesTrainAllowedInEntropy != nil, allFeaturesTrainBlockedInEntropy != nil, allFeaturesTrainAllowedTiming != nil, allFeaturesTrainBlockedTiming != nil
                 {
-                    self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvaluationAccuracy!)
-                    self.allAllowedOutLength = String(format: "%.2f", allFeaturesAllowedOutLength!)
-                    self.allBlockedOutLength = String(format: "%.2f", allFeaturesBlockedOutLength!)
-                    self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesAllowedOutEntropy!)
-                    self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesBlockedOutEntropy!)
-                    self.allAllowedInLength = String(format: "%.2f", allFeaturesAllowedInLength!)
-                    self.allBlockedInLength = String(format: "%.2f", allFeaturesBlockedInLength!)
-                    self.allAllowedInEntropy = String(format: "%.2f", allFeaturesAllowedInEntropy!)
-                    self.allBlockedInEntropy = String(format: "%.2f", allFeaturesBlockedInEntropy!)
-                    self.allAllowedTiming = String(format: "%.2f", allFeaturesAllowedTiming!)
-                    self.allBlockedTiming = String(format: "%.2f", allFeaturesBlockedTiming!)
+                    self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvalAccuracy!)
+                    self.allAllowedOutLength = String(format: "%.2f", allFeaturesTrainAllowedOutLength!)
+                    self.allBlockedOutLength = String(format: "%.2f", allFeaturesTrainBlockedOutLength!)
+                    self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesTrainAllowedOutEntropy!)
+                    self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesTrainBlockedOutEntropy!)
+                    self.allAllowedInLength = String(format: "%.2f", allFeaturesTrainAllowedInLength!)
+                    self.allBlockedInLength = String(format: "%.2f", allFeaturesTrainBlockedInLength!)
+                    self.allAllowedInEntropy = String(format: "%.2f", allFeaturesTrainAllowedInEntropy!)
+                    self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!)
+                    self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!)
+                    self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!)
                 }
                 else
                 {
@@ -805,8 +922,8 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.allBlockedTiming = "--"
                 }
 
-                self.allAllowedTLS = allFeaturesAllowedTLS ?? "--"
-                self.allBlockedTLS = allFeaturesBlockedTLS ?? "--"
+                self.allAllowedTLS = allFeaturesTrainAllowedTLS ?? "--"
+                self.allBlockedTLS = allFeaturesTrainBlockedTLS ?? "--"
 
                 // Offset Subsequences
                 self.requiredOutOffset = requiredOutOffsetString
@@ -830,17 +947,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
                 
                 // Timing (milliseconds)
-                if let rTiming = timingDictionary[requiredTimeDiffKey],
-                    let fTiming = timingDictionary[forbiddenTimeDiffKey],
-                    let timeDiffTAcc = timingDictionary[timeDiffTAccKey],
-                    let timeDiffVAcc = timingDictionary[timeDiffVAccKey],
-                    let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
+                if rTiming != nil,
+                fTiming != nil,
+                timeDiffTAcc != nil,
+                timeDiffVAcc != nil,
+                timeDiffEAcc != nil
                 {
-                    self.requiredTiming = String(format: "%.2f", rTiming) + "ms"
-                    self.forbiddenTiming = String(format: "%.2f", fTiming) + "ms"
-                    self.timeTAcc = String(format: "%.2f", timeDiffTAcc)
-                    self.timeVAcc = String(format: "%.2f", timeDiffVAcc)
-                    self.timeEAcc = String(format: "%.2f", timeDiffEAcc)
+                    self.requiredTiming = String(format: "%.2f", rTiming!) + "ms"
+                    self.forbiddenTiming = String(format: "%.2f", fTiming!) + "ms"
+                    self.timeTAcc = String(format: "%.2f", timeDiffTAcc!)
+                    self.timeVAcc = String(format: "%.2f", timeDiffVAcc!)
+                    self.timeEAcc = String(format: "%.2f", timeDiffEAcc!)
                 }
                 else
                 {
@@ -852,17 +969,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
                 
                 // TLS Common Names
-                if let rTLS = tlsResults[requiredTLSKey],
-                    let fTLS = tlsResults[forbiddenTLSKey],
-                    let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey],
-                    let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey],
-                    let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
+                if rTLS != nil,
+                    fTLS != nil,
+                    tlsTrainingAccuracy != nil,
+                    tlsValidationAccuracy != nil,
+                    tlsEvaluationAccuracy != nil
                 {
-                    self.requiredTLSName = rTLS
-                    self.forbiddenTLSName = fTLS
-                    self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy)
-                    self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy)
-                    self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy)
+                    self.requiredTLSName = rTLS!
+                    self.forbiddenTLSName = fTLS!
+                    self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy!)
+                    self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy!)
+                    self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!)
                 }
                 else
                 {
@@ -874,17 +991,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
                 
                 // Lengths
-                if let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey],
-                    let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey],
-                    let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey],
-                    let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey],
-                    let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
+                if outRequiredLength != nil,
+                    outForbiddenLength != nil,
+                    outTrainingAcc != nil,
+                    outValidationAcc != nil,
+                    outEvaluationAcc != nil
                 {
-                    self.requiredOutLength = String(format: "%.2f", outRequiredLength)
-                    self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength)
-                    self.outLengthTAcc = String(format: "%.2f", outTrainingAcc)
-                    self.outLengthVAcc = String(format: "%.2f", outValidationAcc)
-                    self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc)
+                    self.requiredOutLength = String(format: "%.2f", outRequiredLength!)
+                    self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!)
+                    self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!)
+                    self.outLengthVAcc = String(format: "%.2f", outValidationAcc!)
+                    self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!)
                 }
                 else
                 {
@@ -895,17 +1012,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.outLengthEAcc = "--"
                 }
                 
-                if let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey],
-                    let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey],
-                    let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey],
-                    let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey],
-                    let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
+                if inRequiredLength != nil,
+                    inForbiddenLength != nil,
+                    inTrainingAcc != nil,
+                    inValidationAcc != nil,
+                    inEvaluationAcc != nil
                 {
-                    self.requiredInLength = String(format: "%.2f", inRequiredLength)
-                    self.forbiddenInLength = String(format: "%.2f", inForbiddenLength)
-                    self.inLengthTAcc = String(format: "%.2f", inTrainingAcc)
-                    self.inLengthVAcc = String(format: "%.2f", inValidationAcc)
-                    self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc)
+                    self.requiredInLength = String(format: "%.2f", inRequiredLength!)
+                    self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!)
+                    self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!)
+                    self.inLengthVAcc = String(format: "%.2f", inValidationAcc!)
+                    self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!)
                 }
                 else
                 {
@@ -917,17 +1034,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
                 
                 // Entropy
-                if let rOutEntropy = entropyResults[outgoingRequiredEntropyKey],
-                    let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey],
-                    let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey],
-                    let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey],
-                    let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
+                if rOutEntropy != nil,
+                    fOutEntropy != nil,
+                    outEntropyTrainingAccuracy != nil,
+                    outEntropyValidationAccuracy != nil,
+                    outEntropyEvaluationAccuracy != nil
                 {
-                    self.requiredOutEntropy = String(format: "%.2f", rOutEntropy)
-                    self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy)
-                    self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy)
-                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy)
-                    self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy)
+                    self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!)
+                    self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!)
+                    self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!)
+                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
+                    self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!)
                 }
                 else
                 {
@@ -938,17 +1055,17 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.outEntropyEAcc = "--"
                 }
                 
-                if let rInEntropy = entropyResults[incomingRequiredEntropyKey],
-                    let fInEntropy = entropyResults[incomingForbiddenEntropyKey],
-                    let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey],
-                    let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey],
-                    let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
+                if rInEntropy != nil,
+                    fInEntropy != nil,
+                    inEntropyTrainingAccuracy != nil,
+                    inEntropyValidationAccuracy != nil,
+                    inEntropyEvaluationAccuracy != nil
                 {
-                    self.requiredInEntropy = String(format: "%.2f", rInEntropy)
-                    self.forbiddenInEntropy = String(format: "%.2f", fInEntropy)
-                    self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy)
-                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy)
-                    self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy)
+                    self.requiredInEntropy = String(format: "%.2f", rInEntropy!)
+                    self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!)
+                    self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!)
+                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
+                    self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!)
                 }
                 else
                 {
@@ -1045,9 +1162,7 @@ class ViewController: NSViewController, NSTabViewDelegate
                     {
                         guard let thisElement = each as? Data
                             else
-                        {
-                            continue
-                        }
+                        { continue }
                         
                         guard thisElement.string == newConnectionMessage
                             else
@@ -1064,9 +1179,7 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
             }
             catch
-            {
-                print(error)
-            }
+            { print(error) }
         }
     }
 

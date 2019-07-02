@@ -323,10 +323,13 @@ class MLModelController
             do
             {
                 print("\nAttempting to make a prediction with \(model) using \(batchFeatureProvider.count) features")
+                
                 for index in 0 ..< batchFeatureProvider.count
                 {
-                    batchFeatureProvider.features(at: index).featureNames
-                    print("Feature \(batchFeatureProvider.features(at: index).featureNames) = \(batchFeatureProvider.features(at: index).featureValue(for: batchFeatureProvider.features(at: index).featureNames.first!))")
+                    let features = batchFeatureProvider.features(at: index)
+                    let featureNames = features.featureNames
+                    let featureValue = features.featureValue(for: featureNames.first!)
+                    print("\nFeature \(featureNames) = \(featureValue!)")
                 }
                 
                 let prediction = try model.predictions(from: batchFeatureProvider, options: MLPredictionOptions())

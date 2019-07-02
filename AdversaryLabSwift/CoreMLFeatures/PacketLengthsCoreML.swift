@@ -109,32 +109,41 @@ class PacketLengthsCoreML
     func testModel(lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let classifierName: String
+        let regressorName: String
         let accuracyKey: String
+        let lengthKey: String
         
         switch connectionDirection
         {
         case .incoming:
             classifierName = inLengthClassifierName
+            regressorName = inLengthRegressorName
             switch connectionType
             {
             case .allowed:
-                accuracyKey = incomingLengthAllowAccuracyKey
+                accuracyKey = allowedIncomingLengthAccuracyKey
+                lengthKey = allowedIncomingLengthKey
             case .blocked:
-                accuracyKey = incomingLengthBlockAccuracyKey
+                accuracyKey = blockedIncomingLengthAccuracyKey
+                lengthKey = blockedIncomingLengthKey
             }
         case .outgoing:
             classifierName = outLengthClassifierName
+            regressorName = outLengthRegressorName
             switch connectionType
             {
             case .allowed:
-                accuracyKey = outgoingLengthAllowAccuracyKey
+                accuracyKey = allowedOutgoingLengthAccuracyKey
+                lengthKey = allowedOutgoingLengthKey
             case .blocked:
-                accuracyKey = outgoingLengthBlockAccuracyKey
+                accuracyKey = blockedOutgoingLengthAccuracyKey
+                lengthKey = blockedOutgoingLengthKey
             }
         }
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths])
+            let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths])
+            let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
             guard let appDirectory = getAdversarySupportDirectory()
             else
@@ -144,11 +153,40 @@ class PacketLengthsCoreML
             }
             
             let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
-            let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
+            // This is the dictionary where we will save our results
+            let lengthDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+            
+            // Regressor
+            if FileManager.default.fileExists(atPath: regressorFileURL.path)
+            {
+                if let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+                {
+                    guard regressorPrediction.count > 0
+                        else { return }
+                    
+                    // We are only expecting one result
+                    let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+                    
+                    // Check that we received a result with a feature named 'entropy' and that it has a value.
+                    guard let firstFeatureName = thisFeatureNames.first
+                        else { return }
+                    guard firstFeatureName == ColumnLabel.length.rawValue
+                        else { return }
+                    guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                        else { return }
+                    
+                    print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue).")
+                    lengthDictionary[lengthKey] = thisFeatureValue.doubleValue
+                }
+            }
+            
+            // Classifier
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
-                if let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                if let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: classifierFeatureProvider)
                 {
                     guard classifierPrediction.count > 0
                     else
@@ -180,9 +218,8 @@ class PacketLengthsCoreML
                     
                     let accuracy = allowedBlockedCount/Double(featureCount)
                     print("\n🔮 Length prediction: \(accuracy * 100) \(connectionType.rawValue).")
-                    // This is the dictionary where we will save our results
-                    let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
-                    timingDictionary[accuracyKey] = accuracy
+                    
+                    lengthDictionary[accuracyKey] = accuracy
                 }
             }
         }
@@ -242,9 +279,21 @@ class PacketLengthsCoreML
         {
             let classifier = try MLClassifier(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
             let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
-            let validationAccuracy = (1.0 - classifier.validationMetrics.classificationError) * 100
             let classifierEvaluation = classifier.evaluation(on: lengthsEvaluationTable)
             let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
+            
+            let validationError = classifier.validationMetrics.classificationError
+            let validationAccuracy: Double?
+            
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError < 0
+            {
+                validationAccuracy = nil
+            }
+            else
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
             
             do
             {
@@ -282,8 +331,12 @@ class PacketLengthsCoreML
                 lengthsDictionary[requiredLengthKey] = predictedAllowedLength
                 lengthsDictionary[forbiddenLengthKey] = predictedBlockedLength
                 lengthsDictionary[lengthsTAccKey] = trainingAccuracy
-                lengthsDictionary[lengthsVAccKey] = validationAccuracy
                 lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
+                
+                if validationAccuracy != nil
+                {
+                    lengthsDictionary[lengthsVAccKey] = validationAccuracy!
+                }
                 
                 // Save the models to a file
                 MLModelController().saveModel(classifier: classifier,
@@ -313,11 +366,11 @@ class PacketLengthsCoreML
         switch connectionDirection
         {
         case .incoming:
-            allowedLengthsKey = allowedIncomingLengthsKey
-            blockedLengthsKey = blockedIncomingLengthsKey
+            allowedLengthsKey = allowedIncomingLengthKey
+            blockedLengthsKey = blockedIncomingLengthKey
         case .outgoing:
-            allowedLengthsKey = allowedOutgoingLengthsKey
-            blockedLengthsKey = blockedOutgoingLengthsKey
+            allowedLengthsKey = allowedOutgoingLengthKey
+            blockedLengthsKey = blockedOutgoingLengthKey
         }
         
         /// A is the sorted set of lengths for the Allowed traffic
@@ -342,11 +395,11 @@ class PacketLengthsCoreML
         switch connectionDirection
         {
         case .incoming:
-            allowedLengthsKey = allowedIncomingLengthsKey
-            blockedLengthsKey = blockedIncomingLengthsKey
+            allowedLengthsKey = allowedIncomingLengthKey
+            blockedLengthsKey = blockedIncomingLengthKey
         case .outgoing:
-            allowedLengthsKey = allowedOutgoingLengthsKey
-            blockedLengthsKey = blockedOutgoingLengthsKey
+            allowedLengthsKey = allowedOutgoingLengthKey
+            blockedLengthsKey = blockedOutgoingLengthKey
         }
         
         /// A is the sorted set of lengths for the Allowed traffic

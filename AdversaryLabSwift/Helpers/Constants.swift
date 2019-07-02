@@ -20,16 +20,10 @@ let allowedIncomingDatesKey = "Allowed:Incoming:Dates"
 let allowedOutgoingDatesKey = "Allowed:Outgoing:Dates"
 let allowedConnectionsTimeDiffKey = "Allowed:Connections:TimeDifference"
 
-let allowedIncomingLengthsKey = "Allowed:Incoming:Lengths"
-let allowedOutgoingLengthsKey = "Allowed:Outgoing:Lengths"
-
 let allowedIncomingOffsetSequencesKey = "Allowed:Incoming:OffsetSequence"
 let allowedOutgoingOffsetSequencesKey = "Allowed:Outgoing:OffsetSequence"
 let allowedIncomingFloatingSequencesKey = "Allowed:Incoming:FloatingSequence"
 let allowedOutgoingFloatingSequencesKey = "Allowed:Outgoing:FloatingSequence"
-
-let allowedIncomingEntropyKey = "Allowed:Incoming:Entropy"
-let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
 
 let allowedPacketsSeenKey = "Allowed:Connections:Seen"
 let allowedPacketsAnalyzedKey = "Allowed:Connections:Analyzed"
@@ -43,47 +37,72 @@ let blockedIncomingDatesKey = "Blocked:Incoming:Dates"
 let blockedOutgoingDatesKey = "Blocked:Outgoing:Dates"
 let blockedConnectionsTimeDiffKey = "Blocked:Connections:TimeDifference"
 
-let blockedIncomingLengthsKey = "Blocked:Incoming:Lengths"
-let blockedOutgoingLengthsKey = "Blocked:Outgoing:Lengths"
-
 let blockedIncomingOffsetSequencesKey = "Blocked:Incoming:OffsetSequence"
 let blockedOutgoingOffsetSequencesKey = "Blocked:Outgoing:OffsetSequence"
 let blockedIncomingFloatingSequencesKey = "Blocked:Incoming:FloatingSequence"
 let blockedOutgoingFloatingSequencesKey = "Blocked:Outgoing:FloatingSequence"
-
-let blockedIncomingEntropyKey = "Blocked:Incoming:Entropy"
-let blockedOutgoingEntropyKey = "Blocked:Outgoing:Entropy"
 
 let blockedPacketsSeenKey = "Blocked:Connections:Seen"
 let blockedPacketsAnalyzedKey = "Blocked:Connections:Analyzed"
 
 // MARK: - Scores
 
-/**
-Dictionary :
-{allowed = "0.2708641312836384";
-blocked = "0.7291358687163616";}
- */
-// MARK: - Tests
-
+// MARK: Tests
 let testResultsKey = "TestResults"
-let incomingEntropyBlockAccuracyKey = "Incoming:Entropy:BlockAccuracy"
-let incomingEntropyAllowAccuracyKey = "Incoming:Entropy:AllowAccuracy"
-let outgoingEntropyBlockAccuracyKey = "Outgoing:Entropy:BlockAccuracy"
-let outgoingEntropyAllowAccuracyKey = "Outgoing:Entropy:AllowAccuracy"
-let incomingLengthBlockAccuracyKey = "Incoming:Length:BlockAccuracy"
-let incomingLengthAllowAccuracyKey = "Incoming:Length:AllowAccuracy"
-let outgoingLengthBlockAccuracyKey = "Outgoing:Length:BlockAccuracy"
-let outgoingLengthAllowAccuracyKey = "Outgoing:Length:AllowAccuracy"
-let allFeaturesBlockAccuracyKey = "AllFeatures:BlockAccuracy"
-let allFeaturesAllowAccuracyKey = "AllFeatures:AllowAccuracy"
-let timingBlockAccuracyKey = "Timing:BlockAccuracy"
-let timingAllowAccuracyKey = "Timing:AllowAccuracy"
-let tlsBlockAccuracyKey = "TLS12:BlockAccuracy"
-let tlsAllowAccuracyKey = "TLS12:AllowAccuracy"
 
+// Entropy
+let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
+let allowedIncomingEntropyKey = "Allow:Incoming:Entropy"
+let allowedOutgoingEntropyAccuracyKey = "Allowed:Outgoing:Entropy:Accuracy"
+let allowedIncomingEntropyAccuracyKey = "Allow:Incoming:Entropy:Accuracy"
 
-// MARK: - Training
+let blockedIncomingEntropyKey = "Blocked:Incoming:Entropy"
+let blockedOutgoingEntropyKey = "Blocked:Outgoing:Entropy"
+let blockedOutgoingEntropyAccuracyKey = "Blocked:Outgoing:Entropy:Accuracy"
+let blockedIncomingEntropyAccuracyKey = "Blocked:Incoming:Entropy:Accuracy"
+
+// Length
+let allowedIncomingLengthKey = "Allowed:Incoming:Length"
+let allowedIncomingLengthAccuracyKey = "Allowed:Incoming:Length:Accuracy"
+let allowedOutgoingLengthKey = "Allowed:Outgoing:Length"
+let allowedOutgoingLengthAccuracyKey = "Allowed:Outgoing:Length:Accuracy"
+
+let blockedIncomingLengthKey = "Blocked:Incoming:Length"
+let blockedIncomingLengthAccuracyKey = "Blocked:Incoming:Length:Accuracy"
+let blockedOutgoingLengthKey = "Blocked:Outgoing:Length"
+let blockedOutgoingLengthAccuracyKey = "Blocked:Outgoing:Length:Accuracy"
+
+// All Features
+let allowedAllFeaturesAccuracyKey = "Allowed:AllFeatures:Accuracy"
+let allowedAllFeaturesIncomingLengthKey = "Allowed:AllFeatures:Incoming:Length"
+let allowedAllFeaturesOutgoingLengthKey = " Allowed:AllFeatures:Outgoing:Length"
+let allowedAllFeaturesIncomingEntropyKey = "Allowed:AllFeatures:Incoming:Entropy"
+let allowedAllFeaturesOutgoingEntropyKey = "Allowed:AllFeatures:Outgoing:Entropy"
+let allowedAllFeaturesTimingKey = "Allowed:AllFeatures:Timing"
+let allowedAllFeaturesTLSKey = "Allowed:AllFeatures:TLS"
+let blockedAllFeaturesAccuracyKey = "Blocked:AllFeatures:Accuracy"
+let blockedAllFeaturesIncomingLengthKey = "Blocked:AllFeatures:Incoming:Length"
+let blockedAllFeaturesOutgoingLengthKey = "Blocked:AllFeatures:Outgoing:Length"
+let blockedAllFeaturesIncomingEntropyKey = "Blocked:AllFeatures:Incoming:Entropy"
+let blockedAllFeaturesOutgoingEntropyKey = "Blocked:AllFeatures:Outgoing:Entropy"
+let blockedAllFeaturesTimingKey = "Blocked:AllFeatures:Timing"
+let blockedAllFeaturesTLSKey = "Blocked:AllFeatures:TLS"
+
+// Timing
+let allowedTimingKey = "Allowed:Timing"
+let allowedTimingAccuracyKey = "Allowed:Timing:Accuracy"
+let blockedTimingKey = "Blocked:Timing"
+let blockedTimingAccuracyKey = "Blocked:Timing:Accuracy"
+
+// TLS A seperate results dictionary is needed for the valuse but no the accuracies because values are Strings not Doubles
+let tlsTestResults = "TestResults:TLS:Values"
+let allowedTLSKey = "Allowed:TLS12"
+let blockedTLSKey = "Blocked:TLS12"
+
+let allowedTLSAccuracyKey = "Allowed:TLS12:Accuracy"
+let blockedTLSAccuracyKey = "Blocked:TLS12:Accuracy"
+
+// MARK: Training
 // MARK: Lengths
 let packetLengthsTrainingResultsKey = "PacketLengths:Training:Results"
 let incomingRequiredLengthKey = "Incoming:Required:Length"
@@ -124,8 +143,8 @@ let outgoingForbiddenOffsetKey = "Outgoing:Forbidden:Offset"
 
 // MARK: Entropy
 let entropyTrainingResultsKey = "Entropy:Training:Results"
-let incomingRequiredEntropyKey = "IncomingRequiredEntropy"
-let incomingForbiddenEntropyKey = "IncomingForbiddenEntropy"
+let incomingRequiredEntropyKey = "Incoming:Allowed:Entropy"
+let incomingForbiddenEntropyKey = "Incoming:Blocked:Entropy"
 let incomingEntropyTAccKey = "IncomingEntropyTrainingAccuracy"
 let incomingEntropyVAccKey = "IncomingEntropyValidationAccuracy"
 let incomingEntropyEAccKey = "IncomingEntropyEvaluationAccuracy"
@@ -189,6 +208,8 @@ let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
 // MARK: - Models
 // MARK: Model Filenames
+let modelFileExtension = "mlmodel"
+
 let allClassifierName = "AllFeatures_Classifier"
 let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
 let allInEntropyRegressorName = "AllFeatures_Entropy_In_Regressor"

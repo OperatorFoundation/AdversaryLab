@@ -42,8 +42,8 @@ struct ObservedConnection
                 outgoingKey = allowedOutgoingKey
                 incomingDateKey = allowedIncomingDatesKey
                 outgoingDateKey = allowedOutgoingDatesKey
-                incomingLengthsKey = allowedIncomingLengthsKey
-                outgoingLengthsKey = allowedOutgoingLengthsKey
+                incomingLengthsKey = allowedIncomingLengthKey
+                outgoingLengthsKey = allowedOutgoingLengthKey
                 packetsSeenKey = allowedPacketsSeenKey
                 packetsAnalyzedKey = allowedPacketsAnalyzedKey
                 timeDifferenceKey = allowedConnectionsTimeDiffKey
@@ -60,8 +60,8 @@ struct ObservedConnection
                 outgoingKey = blockedOutgoingKey
                 incomingDateKey = blockedIncomingDatesKey
                 outgoingDateKey = blockedOutgoingDatesKey
-                incomingLengthsKey = blockedIncomingLengthsKey
-                outgoingLengthsKey = blockedOutgoingLengthsKey
+                incomingLengthsKey = blockedIncomingLengthKey
+                outgoingLengthsKey = blockedOutgoingLengthKey
                 packetsSeenKey = blockedPacketsSeenKey
                 packetsAnalyzedKey = blockedPacketsAnalyzedKey
                 timeDifferenceKey = blockedConnectionsTimeDiffKey

@@ -12,7 +12,7 @@ import Auburn
 class ConnectionInspector
 {
     var pauseBuddy = PauseBot()
-
+    
     func analyzeConnections(configModel: ProcessingConfigurationModel)
     {
         ProgressBot.sharedInstance.analysisComplete = false
@@ -197,6 +197,8 @@ class ConnectionInspector
             ProgressBot.sharedInstance.analysisComplete = true
             NotificationCenter.default.post(name: .updateStats, object: nil)
         }
+        
+        deleteTemporaryModelDirectory(named: configModel.modelName)
     }
     
     // TODO: Decide when we should use this
@@ -313,14 +315,17 @@ class ConnectionInspector
         let testResults: RMap<String,Double> = RMap(key: testResultsKey)
         testResults.delete()
         
-        let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthsKey)
+        let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+        tlsResultsDictionary.delete()
+        
+        let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
         allowedOutLengthsSet.delete()
-        let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthsKey)
+        let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthKey)
         allowedInLengthsSet.delete()
         
-        let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthsKey)
+        let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
         blockedOutLengthsSet.delete()
-        let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthsKey)
+        let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
         blockedInLengthsSet.delete()
         
         let allFeaturesTrainingDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)

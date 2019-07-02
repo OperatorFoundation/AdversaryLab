@@ -139,17 +139,21 @@ class TLS12CoreML
     func testModel(connectionType: ClassificationLabel, tlsNames: [String], modelName: String)
     {
         let accuracyKey: String
+        let tlsKey: String
         
         switch connectionType
         {
         case .allowed:
-            accuracyKey = tlsAllowAccuracyKey
+            accuracyKey = allowedTLSAccuracyKey
+            tlsKey = allowedTLSKey
         case .blocked:
-            accuracyKey = tlsBlockAccuracyKey
+            accuracyKey = blockedTLSAccuracyKey
+            tlsKey =  blockedTLSKey
         }
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: tlsNames])
+            let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: tlsNames])
+            let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -159,12 +163,37 @@ class TLS12CoreML
             }
             
             let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
-            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            
+            
+            if FileManager.default.fileExists(atPath: regressorFileURL.path)
+            {
+                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+                    else { return }
+                
+                // We are only expecting one result
+                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+                
+                // Check that we received a result with a feature named 'tlsNames' and that it has a value.
+                guard let firstFeatureName = thisFeatureNames.first
+                    else { return }
+                guard firstFeatureName == ColumnLabel.tlsNames.rawValue
+                    else { return }
+                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                    else { return }
+                
+                print("🔮 TLS prediction for \(tlsKey): \(thisFeatureValue).")
+                
+                // This is the dictionary where we will save our results
+                let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+                tlsResultsDictionary[tlsKey] = thisFeatureValue.stringValue
+            }
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
-                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: classifierFeatureProvider)
                 else
                 {
                     print("\n🛑  Failed to make a TLS prediction.")
@@ -193,9 +222,10 @@ class TLS12CoreML
                 
                 let accuracy = allowedBlockedCount/Double(featureCount)
                 print("\n🔮 TLS12 prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                
                 // This is the dictionary where we will save our results
-                let tlsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
-                tlsDictionary[accuracyKey] = accuracy
+                let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                resultsDictionary[accuracyKey] = accuracy
             }
         }
         catch
@@ -234,12 +264,20 @@ class TLS12CoreML
             // Classifier training accuracy as a percentage
             let trainingError = classifier.trainingMetrics.classificationError
             let trainingAccuracy = (1.0 - trainingError) * 100
-            print("\nTLS training accuracy = \(trainingAccuracy)")
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy = (1.0 - validationError) * 100
-            print("\nTLS validation accuracy = \(validationAccuracy)")
+            let validationAccuracy: Double?
+            
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError < 0
+            {
+                validationAccuracy = nil
+            }
+            else
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
             
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: tlsEvaluationTable)
@@ -247,33 +285,21 @@ class TLS12CoreML
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
             let evaluationAccuracy = (1.0 - evaluationError) * 100
-            print("\nTLS evaluation accuracy = \(evaluationAccuracy)")
             
             // Regressor
             do
             {
                 let regressor = try MLRegressor(trainingData: tlsTrainingTable, targetColumn: ColumnLabel.tlsNames.rawValue)
                 
-                // The largest distance between predictions and expected values
-                let worstTrainingError = regressor.trainingMetrics.maximumError
-                let worstValidationError = regressor.validationMetrics.maximumError
-                
-                // Evaluate the regressor
-                let regressorEvaluation = regressor.evaluation(on: tlsEvaluationTable)
-                
-                // The largest distance between predictions and expected values
-                let worstEvaluationError = regressorEvaluation.maximumError
-                
-                print("\nTLS names regressor:")
-                print("Worst Training Error: \(worstTrainingError)")
-                print("Worst Validation Error: \(worstValidationError)")
-                print("Worst Evaluation Error: \(worstEvaluationError)")
-                
                 // Save our results accuracy
                 let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
                 tlsAccuracy[tlsTAccKey] = trainingAccuracy
-                tlsAccuracy[tlsVAccKey] = validationAccuracy
                 tlsAccuracy[tlsEAccKey] = evaluationAccuracy
+                
+                if validationAccuracy != nil
+                {
+                    tlsAccuracy[tlsVAccKey] = validationAccuracy!
+                }
                 
                 guard let (allowedTLSTable, blockedTLSTable) = MLModelController().createAllowedBlockedTables(fromTable: tlsTable)
                 else

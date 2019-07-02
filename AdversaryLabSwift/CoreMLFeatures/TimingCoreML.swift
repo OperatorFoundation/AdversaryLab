@@ -82,18 +82,22 @@ class TimingCoreML
     func testModel(connectionType: ClassificationLabel, timeDifferences: [Double], configModel: ProcessingConfigurationModel)
     {
         let accuracyKey: String
+        let timingKey: String
         
         switch connectionType
         {
         case .allowed:
-            accuracyKey = timingAllowAccuracyKey
+            accuracyKey = allowedTimingAccuracyKey
+            timingKey = allowedTimingKey
         case .blocked:
-            accuracyKey = timingBlockAccuracyKey
+            accuracyKey = blockedTimingAccuracyKey
+            timingKey = blockedTimingKey
         }
         
         do
         {
-            let batchFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferences])
+            let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferences])
+            let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
             guard let appDirectory = getAdversarySupportDirectory()
                 else
@@ -103,12 +107,35 @@ class TimingCoreML
             }
             
             let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
-            let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension("mlmodel")
+            // This is the dictionary where we will save our results
+            let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+            
+            if FileManager.default.fileExists(atPath: regressorFileURL.path)
+            {
+                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+                    else { return }
+                
+                // We are only expecting one result
+                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+                
+                // Check that we received a result with a feature named 'timeDifference' and that it has a value.
+                guard let firstFeatureName = thisFeatureNames.first
+                    else { return }
+                guard firstFeatureName == ColumnLabel.timeDifference.rawValue
+                    else { return }
+                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                    else { return }
+                
+                print("🔮 Timing prediction for \(timingKey): \(thisFeatureValue).")
+                timingDictionary[timingKey] = thisFeatureValue.doubleValue
+            }
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
             {
-                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: batchFeatureProvider)
+                guard let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: classifierFeatureProvider)
                     else
                 {
                     print("\n🛑  Failed to make a timing prediction.")
@@ -130,8 +157,7 @@ class TimingCoreML
                 
                 let accuracy = allowedBlockedCount/Double(featureCount)
                 print("\n🔮 Timing prediction: \(accuracy * 100) \(connectionType.rawValue).")
-                // This is the dictionary where we will save our results
-                let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+                
                 timingDictionary[accuracyKey] = accuracy
             }
         }
@@ -163,12 +189,20 @@ class TimingCoreML
             // Classifier training accuracy as a percentage
             let trainingError = classifier.trainingMetrics.classificationError
             let trainingAccuracy = (1.0 - trainingError) * 100
-            print("\nTime difference traning accuracy = \(trainingAccuracy)")
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy = (1.0 - validationError ) * 100
-            print("\nTime difference validation accuracy = \(validationAccuracy)")
+            let validationAccuracy: Double?
+
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError < 0
+            {
+                validationAccuracy = nil
+            }
+            else
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
             
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: timeEvaluationTable)
@@ -176,7 +210,6 @@ class TimingCoreML
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
             let evaluationAccuracy = (1.0 - evaluationError) * 100
-            print("\nTime difference evaluation accuracy = \(evaluationAccuracy)")
             
             // Regressor
             do
@@ -212,7 +245,11 @@ class TimingCoreML
                     timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
                     timingDictionary[timeDiffEAccKey] = evaluationAccuracy
                     timingDictionary[timeDiffTAccKey] = trainingAccuracy
-                    timingDictionary[timeDiffVAccKey] = validationAccuracy
+                    
+                    if validationAccuracy != nil
+                    {
+                        timingDictionary[timeDiffVAccKey] = validationAccuracy!
+                    }
                 }
                 catch let allowedColumnError
                 {
