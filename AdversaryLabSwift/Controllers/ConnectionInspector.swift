@@ -180,7 +180,7 @@ class ConnectionInspector
                 currentProgress += 1
                 ProgressBot.sharedInstance.update(progressMessage: "\(actionString) sequences.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
                 scoreAllFloatSequences()
-                scoreAllOffsetSequenes()
+                scoreAllOffsetSequences()
                 sleep(1)
             }
             
@@ -315,8 +315,17 @@ class ConnectionInspector
         let testResults: RMap<String,Double> = RMap(key: testResultsKey)
         testResults.delete()
         
-        let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+        let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
         tlsResultsDictionary.delete()
+        
+        let allFeaturesTLSTestResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
+        allFeaturesTLSTestResultsDictionary.delete()
+        
+        let incomingOffsetTrainingSequences: RList<Data> = RList(key: incomingOffsetTrainingSequencesKey)
+        incomingOffsetTrainingSequences.delete()
+        
+        let outgoingOffsetTrainingSequences: RList<Data> = RList(key: outgoingOffsetTrainingSequenceKey)
+        outgoingOffsetTrainingSequences.delete()
         
         let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
         allowedOutLengthsSet.delete()
@@ -325,6 +334,7 @@ class ConnectionInspector
         
         let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
         blockedOutLengthsSet.delete()
+        
         let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
         blockedInLengthsSet.delete()
         

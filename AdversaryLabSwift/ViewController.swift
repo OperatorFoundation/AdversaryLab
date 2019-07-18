@@ -574,7 +574,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             // TLS Common Names
             let tlsBlockAccuracy = testResults[blockedTLSAccuracyKey]
             let tlsAllowAccuracy = testResults[allowedTLSAccuracyKey]
-            let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+            let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
             let tlsAllowed = tlsResultsDictionary[allowedTLSKey]
             let tlsBlocked = tlsResultsDictionary[blockedTLSKey]
             
@@ -721,59 +721,65 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.outLengthBlocked = "--"
                     self.outLengthBlockAccuracy = "--"
                 }
-                if allAllowInLength != nil,
-                    allAllowOutLength != nil,
-                    allAllowInEntropy != nil,
-                    allAllowOutEntropy != nil,
-                    allAllowTiming != nil,
-                    allAllowTLS != nil,
-                    allAllowAccuracy != nil
-                {
-                    self.allFeaturesAllowedInLength = String(format: "%.2f", allAllowInLength!)
-                    self.allFeaturesAllowedOutLength = String(format: "%.2f", allAllowOutLength!)
-                    self.allFeaturesAllowedInEntropy = String(format: "%.2f", allAllowInEntropy!)
-                    self.allFeaturesAllowedOutEntropy = String(format: "%.2f", allAllowOutEntropy!)
-                    self.allFeaturesAllowedTiming = String(format: "%.2f", allAllowTiming!)
-                    self.allFeaturesAllowedTLS = String(format: "%.2f", allAllowTLS!)
-                    self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!)
-                }
-                else
-                {
-                    self.allFeaturesAllowedInLength = "--"
-                    self.allFeaturesAllowedOutLength = "--"
-                    self.allFeaturesAllowedInEntropy = "--"
-                    self.allFeaturesAllowedOutEntropy = "--"
-                    self.allFeaturesAllowedTiming = "--"
-                    self.allFeaturesAllowedTLS = "--"
-                    self.allFeaturesAllowAccuracy = "--"
-                }
                 
-                if allBlockInLength != nil,
-                    allBlockOutLength != nil,
-                    allBlockInEntropy != nil,
-                    allBlockOutEntropy != nil,
-                    allBlockTiming != nil,
-                    allBlockTLS != nil,
-                    allBlockAccuracy != nil
-                {
-                    self.allFeaturesBlockedInLength = String(format: "%.2f", allBlockInLength!)
-                    self.allFeaturesBlockedOutLength = String(format: "%.2f", allBlockOutLength!)
-                    self.allFeaturesBlockedInEntropy = String(format: "%.2f", allBlockInEntropy!)
-                    self.allFeaturesBlockedOutEntropy = String(format: "%.2f", allBlockOutEntropy!)
-                    self.allFeaturesBlockedTiming = String(format: "%.2f", allBlockTiming!)
-                    self.allFeaturesBlockedTLS = String(format: "%.2f", allBlockTLS!)
-                    self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!)
-                }
-                else
-                {
-                    self.allFeaturesBlockedInLength = "--"
-                    self.allFeaturesBlockedOutLength = "--"
-                    self.allFeaturesBlockedInEntropy = "--"
-                    self.allFeaturesBlockedOutEntropy = "--"
-                    self.allFeaturesBlockedTiming = "--"
-                    self.allFeaturesBlockedTLS = "--"
-                    self.allFeaturesBlockAccuracy = "--"
-                }
+                // All Features
+                self.allFeaturesAllowedInLength = "--"
+                self.allFeaturesAllowedOutLength = "--"
+                self.allFeaturesAllowedInEntropy = "--"
+                self.allFeaturesAllowedOutEntropy = "--"
+                self.allFeaturesAllowedTiming = "--"
+                self.allFeaturesAllowedTLS = "--"
+                self.allFeaturesAllowAccuracy = "--"
+                
+                self.allFeaturesBlockedInLength = "--"
+                self.allFeaturesBlockedOutLength = "--"
+                self.allFeaturesBlockedInEntropy = "--"
+                self.allFeaturesBlockedOutEntropy = "--"
+                self.allFeaturesBlockedTiming = "--"
+                self.allFeaturesBlockedTLS = "--"
+                self.allFeaturesBlockAccuracy = "--"
+                
+                if allAllowInLength != nil
+                {self.allFeaturesAllowedInLength = String(format: "%.2f", allAllowInLength!)}
+                
+                if allAllowOutLength != nil
+                {self.allFeaturesAllowedOutLength = String(format: "%.2f", allAllowOutLength!)}
+                
+                if allAllowInEntropy != nil
+                {self.allFeaturesAllowedInEntropy = String(format: "%.2f", allAllowInEntropy!)}
+                
+                if allAllowOutEntropy != nil
+                {self.allFeaturesAllowedOutEntropy = String(format: "%.2f", allAllowOutEntropy!)}
+                
+                if allAllowTiming != nil
+                {self.allFeaturesAllowedTiming = String(format: "%.2f", allAllowTiming!)}
+                
+                if allAllowTLS != nil
+                {self.allFeaturesAllowedTLS = String(format: "%.2f", allAllowTLS!)}
+                
+                if allAllowAccuracy != nil
+                { self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!) }
+                
+                if allBlockInLength != nil
+                { self.allFeaturesBlockedInLength = String(format: "%.2f", allBlockInLength!) }
+                
+                if allBlockOutLength != nil
+                { self.allFeaturesBlockedOutLength = String(format: "%.2f", allBlockOutLength!) }
+                
+                if allBlockInEntropy != nil
+                { self.allFeaturesBlockedInEntropy = String(format: "%.2f", allBlockInEntropy!) }
+                
+                if allBlockOutEntropy != nil
+                { self.allFeaturesBlockedOutEntropy = String(format: "%.2f", allBlockOutEntropy!) }
+                
+                if allBlockTiming != nil
+                { self.allFeaturesBlockedTiming = String(format: "%.2f", allBlockTiming!) }
+                
+                if allBlockTLS != nil
+                { self.allFeaturesBlockedTLS = String(format: "%.2f", allBlockTLS!) }
+                
+                if allBlockAccuracy != nil
+                { self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!) }
             }
         }
     }
@@ -891,36 +897,51 @@ class ViewController: NSViewController, NSTabViewDelegate
             
             DispatchQueue.main.async
             {
+                self.allEvaluationAccuracy = "--"
+                self.allAllowedOutLength = "--"
+                self.allBlockedOutLength = "--"
+                self.allAllowedOutEntropy = "--"
+                self.allBlockedOutEntropy = "--"
+                self.allAllowedInLength = "--"
+                self.allBlockedInLength = "--"
+                self.allAllowedInEntropy = "--"
+                self.allBlockedInEntropy = "--"
+                self.allAllowedTiming = "--"
+                self.allBlockedTiming = "--"
                 
                 // All Features
-                if allFeaturesEvalAccuracy != nil, allFeaturesTrainAllowedOutLength != nil, allFeaturesTrainBlockedOutLength != nil, allFeaturesTrainAllowedOutEntropy != nil, allFeaturesTrainBlockedOutEntropy != nil, allFeaturesTrainAllowedInLength != nil, allFeaturesTrainBlockedInLength != nil, allFeaturesTrainAllowedInEntropy != nil, allFeaturesTrainBlockedInEntropy != nil, allFeaturesTrainAllowedTiming != nil, allFeaturesTrainBlockedTiming != nil
-                {
-                    self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvalAccuracy!)
-                    self.allAllowedOutLength = String(format: "%.2f", allFeaturesTrainAllowedOutLength!)
-                    self.allBlockedOutLength = String(format: "%.2f", allFeaturesTrainBlockedOutLength!)
-                    self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesTrainAllowedOutEntropy!)
-                    self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesTrainBlockedOutEntropy!)
-                    self.allAllowedInLength = String(format: "%.2f", allFeaturesTrainAllowedInLength!)
-                    self.allBlockedInLength = String(format: "%.2f", allFeaturesTrainBlockedInLength!)
-                    self.allAllowedInEntropy = String(format: "%.2f", allFeaturesTrainAllowedInEntropy!)
-                    self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!)
-                    self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!)
-                    self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!)
-                }
-                else
-                {
-                    self.allEvaluationAccuracy = "--"
-                    self.allAllowedOutLength = "--"
-                    self.allBlockedOutLength = "--"
-                    self.allAllowedOutEntropy = "--"
-                    self.allBlockedOutEntropy = "--"
-                    self.allAllowedInLength = "--"
-                    self.allBlockedInLength = "--"
-                    self.allAllowedInEntropy = "--"
-                    self.allBlockedInEntropy = "--"
-                    self.allAllowedTiming = "--"
-                    self.allBlockedTiming = "--"
-                }
+                if allFeaturesEvalAccuracy != nil
+                { self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvalAccuracy!) }
+                
+                if allFeaturesTrainAllowedOutLength != nil
+                { self.allAllowedOutLength = String(format: "%.2f", allFeaturesTrainAllowedOutLength!) }
+                
+                if allFeaturesTrainBlockedOutLength != nil
+                { self.allBlockedOutLength = String(format: "%.2f", allFeaturesTrainBlockedOutLength!) }
+                
+                if allFeaturesTrainAllowedOutEntropy != nil
+                { self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesTrainAllowedOutEntropy!) }
+                
+                if allFeaturesTrainBlockedOutEntropy != nil
+                { self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesTrainBlockedOutEntropy!) }
+                
+                if allFeaturesTrainAllowedInLength != nil
+                { self.allAllowedInLength = String(format: "%.2f", allFeaturesTrainAllowedInLength!) }
+                
+                if allFeaturesTrainBlockedInLength != nil
+                { self.allBlockedInLength = String(format: "%.2f", allFeaturesTrainBlockedInLength!) }
+                
+                if allFeaturesTrainAllowedInEntropy != nil
+                { self.allAllowedInEntropy = String(format: "%.2f", allFeaturesTrainAllowedInEntropy!) }
+                
+                if allFeaturesTrainBlockedInEntropy != nil
+                { self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!) }
+                
+                if allFeaturesTrainAllowedTiming != nil
+                { self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!) }
+                
+                if allFeaturesTrainBlockedTiming != nil
+                { self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!) }
 
                 self.allAllowedTLS = allFeaturesTrainAllowedTLS ?? "--"
                 self.allBlockedTLS = allFeaturesTrainBlockedTLS ?? "--"
@@ -947,26 +968,27 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
                 
                 // Timing (milliseconds)
-                if rTiming != nil,
-                fTiming != nil,
-                timeDiffTAcc != nil,
-                timeDiffVAcc != nil,
-                timeDiffEAcc != nil
-                {
-                    self.requiredTiming = String(format: "%.2f", rTiming!) + "ms"
-                    self.forbiddenTiming = String(format: "%.2f", fTiming!) + "ms"
-                    self.timeTAcc = String(format: "%.2f", timeDiffTAcc!)
-                    self.timeVAcc = String(format: "%.2f", timeDiffVAcc!)
-                    self.timeEAcc = String(format: "%.2f", timeDiffEAcc!)
-                }
-                else
-                {
-                    self.requiredTiming = "--"
-                    self.forbiddenTiming = "--"
-                    self.timeTAcc = "--"
-                    self.timeVAcc = "--"
-                    self.timeEAcc = "--"
-                }
+                self.requiredTiming = "--"
+                self.forbiddenTiming = "--"
+                self.timeTAcc = "--"
+                self.timeVAcc = "--"
+                self.timeEAcc = "--"
+                
+                if rTiming != nil
+                { self.requiredTiming = String(format: "%.2f", rTiming!) + "ms" }
+                
+                if fTiming != nil
+                { self.forbiddenTiming = String(format: "%.2f", fTiming!) + "ms" }
+                
+                if timeDiffTAcc != nil
+                { self.timeTAcc = String(format: "%.2f", timeDiffTAcc!) }
+                
+                if timeDiffVAcc != nil
+                { self.timeVAcc = String(format: "%.2f", timeDiffVAcc!) }
+                
+                if timeDiffEAcc != nil
+                { self.timeEAcc = String(format: "%.2f", timeDiffEAcc!) }
+
                 
                 // TLS Common Names
                 if rTLS != nil,
@@ -991,47 +1013,47 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
                 
                 // Lengths
-                if outRequiredLength != nil,
-                    outForbiddenLength != nil,
-                    outTrainingAcc != nil,
-                    outValidationAcc != nil,
-                    outEvaluationAcc != nil
-                {
-                    self.requiredOutLength = String(format: "%.2f", outRequiredLength!)
-                    self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!)
-                    self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!)
-                    self.outLengthVAcc = String(format: "%.2f", outValidationAcc!)
-                    self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!)
-                }
-                else
-                {
-                    self.requiredOutLength = "--"
-                    self.forbiddenOutLength = "--"
-                    self.outLengthTAcc = "--"
-                    self.outLengthVAcc = "--"
-                    self.outLengthEAcc = "--"
-                }
+                self.requiredOutLength = "--"
+                self.forbiddenOutLength = "--"
+                self.outLengthTAcc = "--"
+                self.outLengthVAcc = "--"
+                self.outLengthEAcc = "--"
                 
-                if inRequiredLength != nil,
-                    inForbiddenLength != nil,
-                    inTrainingAcc != nil,
-                    inValidationAcc != nil,
-                    inEvaluationAcc != nil
-                {
-                    self.requiredInLength = String(format: "%.2f", inRequiredLength!)
-                    self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!)
-                    self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!)
-                    self.inLengthVAcc = String(format: "%.2f", inValidationAcc!)
-                    self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!)
-                }
-                else
-                {
-                    self.requiredInLength = "--"
-                    self.forbiddenInLength = "--"
-                    self.inLengthTAcc = "--"
-                    self.inLengthVAcc = "--"
-                    self.inLengthEAcc = "--"
-                }
+                self.requiredInLength = "--"
+                self.forbiddenInLength = "--"
+                self.inLengthTAcc = "--"
+                self.inLengthVAcc = "--"
+                self.inLengthEAcc = "--"
+                
+                if outRequiredLength != nil
+                { self.requiredOutLength = String(format: "%.2f", outRequiredLength!) }
+                
+                if outForbiddenLength != nil
+                { self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!) }
+                
+                if outTrainingAcc != nil
+                { self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!) }
+
+                if outValidationAcc != nil
+                { self.outLengthVAcc = String(format: "%.2f", outValidationAcc!) }
+                
+                if outEvaluationAcc != nil
+                { self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!) }
+                
+                if inRequiredLength != nil
+                { self.requiredInLength = String(format: "%.2f", inRequiredLength!) }
+                
+                if inForbiddenLength != nil
+                { self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!) }
+                
+                if inTrainingAcc != nil
+                { self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!) }
+                
+                if inValidationAcc != nil
+                { self.inLengthVAcc = String(format: "%.2f", inValidationAcc!) }
+                
+                if inEvaluationAcc != nil
+                { self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!) }
                 
                 // Entropy
                 if rOutEntropy != nil,

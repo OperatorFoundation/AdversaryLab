@@ -49,6 +49,8 @@ let blockedPacketsAnalyzedKey = "Blocked:Connections:Analyzed"
 
 // MARK: Tests
 let testResultsKey = "TestResults"
+let tlsTestResultsKey = "TestResults:TLS"
+let allFeaturesTLSTestResultsKey = "TestResults:AllFeatures:TLS"
 
 // Entropy
 let allowedOutgoingEntropyKey = "Allowed:Outgoing:Entropy"
@@ -94,8 +96,8 @@ let allowedTimingAccuracyKey = "Allowed:Timing:Accuracy"
 let blockedTimingKey = "Blocked:Timing"
 let blockedTimingAccuracyKey = "Blocked:Timing:Accuracy"
 
-// TLS A seperate results dictionary is needed for the valuse but no the accuracies because values are Strings not Doubles
-let tlsTestResults = "TestResults:TLS:Values"
+// TLS A seperate results dictionary is needed for the values but not the accuracies because values are Strings not Doubles
+//let tlsTestResultValuesKey = "TestResults:TLS:Values"
 let allowedTLSKey = "Allowed:TLS12"
 let blockedTLSKey = "Blocked:TLS12"
 
@@ -118,6 +120,9 @@ let outgoingLengthsVAccKey = "Outgoing:Lengths:ValidationAccuracy"
 let outgoingLengthsEAccKey = "Outgoing:Lengths:EvaluationAccuracy"
 
 // MARK: Float Sequences
+let incomingFloatTrainingSequencesKey = "Incoming:FloatSequence:TrainingSequences"
+let outgoingFloatTrainingSequencesKey = "Outgoing:FloatSequence:TrainingSequences"
+
 let incomingRequiredFloatSequencesKey = "Incoming:Required:FloatSequence"
 let incomingForbiddenFloatSequencesKey = "Incoming:Forbidden:FloatSequence"
 let incomingFloatSequenceScoresKey = "Incoming:FloatSequence:Scores"
@@ -126,6 +131,10 @@ let outgoingForbiddenFloatSequencesKey = "Outgoing:Forbidden:FloatSequence"
 let outgoingFloatSequenceScoresKey = "Outgoing:FloatSequence:Scores"
 
 // MARK: Offset Sequences
+
+let incomingOffsetTrainingSequencesKey = "Incoming:OffsetSequence:TrainingSequences"
+let outgoingOffsetTrainingSequenceKey = "Outgoing:OffsetSequence:TrainingSequences"
+
 let requiredOffsetSequenceKey = "Incoming:Required:OffsetSequence"
 let requiredOffsetByteCountKey = "Incoming:Required:OffsetByteCount"
 let requiredOffsetIndexKey = "Incoming:Required:OffsetIndex"
@@ -169,7 +178,6 @@ let allowedTlsCommonNameKey = "Allowed:Outgoing:TLS:CommonName"
 let blockedTlsCommonNameKey = "Blocked:Outgoing:TLS:CommonName"
 
 let tlsTrainingResultsKey = "TLS:Training:Results"
-let tlsTestResultsKey = "TLS:Test:Results"
 let requiredTLSKey = "RequiredTLS"
 let forbiddenTLSKey = "ForbiddenTLS"
 let tlsTrainingAccuracyKey = "TLS:Training:Accuracy"

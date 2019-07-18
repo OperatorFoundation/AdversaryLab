@@ -165,12 +165,42 @@ class AllFeatures
                     tlsKey = blockedAllFeaturesTLSKey
                 }
                 
-                test(feature: inLengthKey, regressorName: allInPacketLengthRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.inLength.rawValue, featureValueType: .double)
-                test(feature: outLengthKey, regressorName: allOutPacketLengthRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.outLength.rawValue, featureValueType: .double)
-                test(feature: inEntropyKey, regressorName: allInEntropyRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.inEntropy.rawValue, featureValueType: .double)
-                test(feature: outEntropyKey, regressorName: allOutEntropyRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.outEntropy.rawValue, featureValueType: .double)
-                test(feature: tlsKey, regressorName: allTLSRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.tlsNames.rawValue, featureValueType: .string)
-                test(feature: timingKey, regressorName: allTimingRegressorName, temporaryDirURL: temporaryDirURL, connectionType: connectionType, expectedFeatureName: ColumnLabel.timeDifference.rawValue, featureValueType: .double)
+                test(feature: inLengthKey,
+                     regressorName: allInPacketLengthRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.inLength.rawValue,
+                     featureValueType: .double)
+                test(feature: outLengthKey,
+                     regressorName: allOutPacketLengthRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.outLength.rawValue,
+                     featureValueType: .double)
+                test(feature: inEntropyKey,
+                     regressorName: allInEntropyRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.inEntropy.rawValue,
+                     featureValueType: .double)
+                test(feature: outEntropyKey,
+                     regressorName: allOutEntropyRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.outEntropy.rawValue,
+                     featureValueType: .double)
+                test(feature: tlsKey,
+                     regressorName: allTLSRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.tlsNames.rawValue,
+                     featureValueType: .string)
+                test(feature: timingKey,
+                     regressorName: allTimingRegressorName,
+                     temporaryDirURL: temporaryDirURL,
+                     connectionType: connectionType,
+                     expectedFeatureName: ColumnLabel.timeDifference.rawValue,
+                     featureValueType: .double)
                 
                 if inputs.keys.contains(ColumnLabel.tlsNames.rawValue)
                 {
@@ -268,8 +298,8 @@ class AllFeatures
                 case .string:
                     // This is the dictionary where we will save our results
                     // TLS Values are the only non Double results currently
-                    let resultsDictionary: RMap<String,Double> = RMap(key: tlsTestResultsKey)
-                    resultsDictionary[resultsKey] = thisFeatureValue.doubleValue
+                    let resultsDictionary: RMap<String,String> = RMap(key: allFeaturesTLSTestResultsKey)
+                    resultsDictionary[resultsKey] = thisFeatureValue.stringValue
                 case .double:
                     // This is the dictionary where we will save our results
                     let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
@@ -331,6 +361,9 @@ class AllFeatures
         // Train the classifier
         do
         {
+            print("\nAttempting to create classifier with training table.")
+            print(trainingTable.columnTypes)
+            print("Target Column = \(ColumnLabel.classification.rawValue)")
             let classifier = try MLClassifier(trainingData: trainingTable, targetColumn: ColumnLabel.classification.rawValue)
             let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
             let classifierEvaluation = classifier.evaluation(on: evaluationTable)
@@ -504,7 +537,6 @@ class AllFeatures
                 {
                     print("\nError creating all features blocked column: \(blockedColumnsError)")
                 }
-
             }
             catch let allFeaturesRegressorError
             {

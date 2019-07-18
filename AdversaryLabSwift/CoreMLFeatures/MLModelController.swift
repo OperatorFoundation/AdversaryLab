@@ -309,9 +309,7 @@ class MLModelController
         
         return (aTable, bTable)
     }
-    
 
-    
     func prediction(fileURL: URL, batchFeatureProvider: MLBatchProvider) -> MLBatchProvider?
     {
         do

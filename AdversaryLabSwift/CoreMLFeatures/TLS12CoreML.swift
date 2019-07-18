@@ -165,9 +165,7 @@ class TLS12CoreML
             let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
-            
-            
-            
+
             if FileManager.default.fileExists(atPath: regressorFileURL.path)
             {
                 guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
@@ -187,7 +185,7 @@ class TLS12CoreML
                 print("🔮 TLS prediction for \(tlsKey): \(thisFeatureValue).")
                 
                 // This is the dictionary where we will save our results
-                let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResults)
+                let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
                 tlsResultsDictionary[tlsKey] = thisFeatureValue.stringValue
             }
             

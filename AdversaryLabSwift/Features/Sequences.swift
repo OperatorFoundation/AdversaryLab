@@ -41,31 +41,49 @@ func processSequences(forConnection connection: ObservedConnection) -> (processe
 func scoreAllFloatSequences()
 {
     // Outgoing
-    scoreFloatSequences(allowedFloatKey: allowedOutgoingFloatingSequencesKey,
-                        blockedFloatKey: blockedOutgoingFloatingSequencesKey,
-                        requiredFloatKey: outgoingRequiredFloatSequencesKey,
-                        forbiddenFloatKey: outgoingForbiddenFloatSequencesKey,
-                        floatScoresKey: outgoingFloatSequenceScoresKey)
+    scoreFloatSequences(connectionDirection: .outgoing)
     
     // Incoming
-    scoreFloatSequences(allowedFloatKey: allowedIncomingFloatingSequencesKey,
-                        blockedFloatKey: blockedIncomingFloatingSequencesKey,
-                        requiredFloatKey: incomingRequiredFloatSequencesKey,
-                        forbiddenFloatKey: incomingForbiddenFloatSequencesKey,
-                        floatScoresKey: incomingFloatSequenceScoresKey)
+    scoreFloatSequences(connectionDirection: .incoming)
 }
 
-func scoreAllOffsetSequenes()
+func scoreAllOffsetSequences()
 {
     // Outgoing
-    scoreOffsetSequences(allowedOffsetKey: allowedOutgoingOffsetSequencesKey, blockedOffsetKey: blockedOutgoingOffsetSequencesKey, requiredOffsetKey: outgoingRequiredOffsetKey, forbiddenOffsetKey: outgoingForbiddenOffsetKey)
+    scoreOffsetSequences(connectionDirection: .outgoing)
     
     // Incoming
-    scoreOffsetSequences(allowedOffsetKey: allowedIncomingOffsetSequencesKey, blockedOffsetKey: blockedIncomingOffsetSequencesKey, requiredOffsetKey: incomingRequiredOffsetKey, forbiddenOffsetKey: incomingForbiddenOffsetKey)
+    scoreOffsetSequences(connectionDirection: .incoming)
 }
 
-func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, requiredOffsetKey: String, forbiddenOffsetKey: String)
+func scoreOffsetSequences(connectionDirection: ConnectionDirection)
 {
+    let allowedOffsetKey: String
+    let blockedOffsetKey: String
+    let requiredOffsetKey: String
+    let forbiddenOffsetKey: String
+    let trainingSequencesKey: String
+    
+    // These arrays will be saved to the DB after the loop to be used for training a model
+    var topSequences = [OffsetSequenceRecord]()
+    var bottomSequences = [OffsetSequenceRecord]()
+    
+    switch connectionDirection
+    {
+    case .incoming:
+        allowedOffsetKey = allowedIncomingOffsetSequencesKey
+        blockedOffsetKey = blockedIncomingOffsetSequencesKey
+        requiredOffsetKey = incomingRequiredOffsetKey
+        forbiddenOffsetKey = incomingForbiddenOffsetKey
+        trainingSequencesKey = incomingOffsetTrainingSequencesKey
+    case .outgoing:
+        allowedOffsetKey = allowedOutgoingOffsetSequencesKey
+        blockedOffsetKey = blockedOutgoingOffsetSequencesKey
+        requiredOffsetKey = outgoingRequiredOffsetKey
+        forbiddenOffsetKey = outgoingForbiddenOffsetKey
+        trainingSequencesKey = outgoingOffsetTrainingSequenceKey
+    }
+    
     let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
     
     /// Ta is the number of Allowed connections analyzed (Allowed:Connections:Analyzed)
@@ -98,6 +116,7 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
     while true
     {
         let tempOffsetScoresKey = "tempOffsetScores"
+        
         /// Returns a new sorted set with the correct scoring
         let tempOffsetScores: RSortedSet<Data> = RSortedSet(
             unionOf: allowedOffsetKey + ":\(offsetIndex)",
@@ -178,12 +197,19 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
         offsetIndex += 1
         
         // Progress Indicator Info
-        DispatchQueue.main.async {
+        DispatchQueue.main.async
+        {
             ProgressBot.sharedInstance.currentProgress = offsetIndex
             ProgressBot.sharedInstance.totalToAnalyze = tempOffsetScores.count
             ProgressBot.sharedInstance.progressMessage = "\(scoringOffsetsString) \(offsetIndex)"
         }
-        //
+        
+        // Let's gather some training data
+        let topOffset = OffsetSequenceRecord(offset: offsetIndex, sequence: longestTopSequence, score: thisTopOffsetScore)
+        topSequences.append(topOffset)
+        let bottomOffset = OffsetSequenceRecord(offset: offsetIndex, sequence: longestBottomSequence, score: thisBottomOffsetScore)
+        bottomSequences.append(bottomOffset)
+        
         tempOffsetScores.delete()
     }
 
@@ -200,11 +226,104 @@ func scoreOffsetSequences(allowedOffsetKey: String, blockedOffsetKey: String, re
     let forbiddenOffsetRuleAccuracy = abs(bottomOffsetScore!)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenOffsetHash: RMap = [forbiddenOffsetSequenceKey: bottomOffsetSequence!.hexEncodedString(), forbiddenOffsetAccuracyKey: "\(forbiddenOffsetRuleAccuracy)", forbiddenOffsetIndexKey: bottomOffsetIndex!.string, forbiddenOffsetByteCountKey: String(describing: bottomOffsetSequence!)]
     forbiddenOffsetHash.key = forbiddenOffsetKey
+    
+    // Sort top sequences high to low
+    topSequences.sort
+    {
+        (firstRecord, secondRecord) -> Bool in
+        
+        if firstRecord.score > secondRecord.score
+        {
+            return true
+        }
+        else if firstRecord.score == secondRecord.score
+        {
+            if firstRecord.sequence.count >= secondRecord.sequence.count
+            {
+                return true
+            }
+            else
+            {
+                return false
+            }
+        }
+        else
+        {
+            return false
+        }
+    }
+
+    // Sort bottom sequences lowe to high
+    bottomSequences.sort
+    {
+        (firstRecord, secondRecord) -> Bool in
+        
+        if firstRecord.score < secondRecord.score
+        {
+            return true
+        }
+        else if firstRecord.score == secondRecord.score
+        {
+            if firstRecord.sequence.count <= secondRecord.sequence.count
+            {
+                return true
+            }
+            else
+            {
+                return false
+            }
+        }
+        else
+        {
+            return false
+        }
+    }
+    
+    // Narrow training data to top and bottom ten
+    let topTenSequences = [OffsetSequenceRecord](topSequences[0..<10])
+    let bottomTenSequences = [OffsetSequenceRecord](bottomSequences[0..<10])
+    
+    // Save them to Redis in one list of 20
+    let trainingSequences: RList<Data> = RList(key: trainingSequencesKey)
+    
+    for topRecord in topTenSequences
+    {
+        trainingSequences.append(topRecord.sequence)
+    }
+    
+    for bottomRecord in bottomTenSequences
+    {
+        trainingSequences.append(bottomRecord.sequence)
+    }
 }
 
 
-func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requiredFloatKey: String, forbiddenFloatKey: String, floatScoresKey: String)
+func scoreFloatSequences(connectionDirection: ConnectionDirection)
 {
+    let allowedFloatKey: String
+    let blockedFloatKey: String
+    let requiredFloatKey: String
+    let forbiddenFloatKey: String
+    let floatScoresKey: String
+    let trainingSequencesKey: String
+    
+    switch connectionDirection
+    {
+    case .outgoing:
+        allowedFloatKey = allowedOutgoingFloatingSequencesKey
+        blockedFloatKey = blockedOutgoingFloatingSequencesKey
+        requiredFloatKey = outgoingRequiredFloatSequencesKey
+        forbiddenFloatKey = outgoingForbiddenFloatSequencesKey
+        floatScoresKey = outgoingFloatSequenceScoresKey
+        trainingSequencesKey = outgoingFloatTrainingSequencesKey
+    case .incoming:
+        allowedFloatKey = allowedIncomingFloatingSequencesKey
+        blockedFloatKey = blockedIncomingFloatingSequencesKey
+        requiredFloatKey = incomingRequiredFloatSequencesKey
+        forbiddenFloatKey = incomingForbiddenFloatSequencesKey
+        floatScoresKey = incomingFloatSequenceScoresKey
+        trainingSequencesKey = incomingFloatTrainingSequencesKey
+    }
     ProgressBot.sharedInstance.currentProgress = 0
     ProgressBot.sharedInstance.totalToAnalyze = 3
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(0) of \(3)"
@@ -231,6 +350,7 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     /// Returns a new sorted set with the correct scoring (key: sequenceScoresKey)
     let oldSequenceScoresSet: RSortedSet<Data> = RSortedSet(key: floatScoresKey)
     oldSequenceScoresSet.delete()
+    
     let sequenceScoresSet: RSortedSet<Data> = RSortedSet(unionOf: allowedFloatKey, scoresMultipliedBy: blockedConnectionsAnalyzed, secondSetKey: blockedFloatKey, scoresMultipliedBy: -allowedConnectionsAnalyzed, newSetKey: floatScoresKey)
     
     /// Top score is the required rule
@@ -252,7 +372,6 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     ProgressBot.sharedInstance.currentProgress = 1
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(1) of \(3)"
     
-    //TODO: There's some hopping around between float and double that could be cleaned up
     /// Divide the score by Ta * Tb to get the accuracy
     let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let requiredSequenceSet: RSortedSet<Data> = RSortedSet(key: requiredFloatKey)
@@ -277,7 +396,6 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     ProgressBot.sharedInstance.currentProgress = 2
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(2) of \(3)"
     
-    //TODO: There's some hopping around between float and double that could be cleaned up
     /// Divide the score by Ta * Tb to get the accuracy
     let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
@@ -286,5 +404,55 @@ func scoreFloatSequences(allowedFloatKey: String, blockedFloatKey: String, requi
     
     ProgressBot.sharedInstance.currentProgress = 3
     ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(3) of \(3)"
+    
+    // Save top 10 and bottom 10 to the DB to use later for model training
+    let trainingSequences: RList<Data> = RList(key: trainingSequencesKey)
+    if sequenceScoresSet.count == 20
+    {
+        for index in 0 ..< sequenceScoresSet.count
+        {
+            if let sequence = sequenceScoresSet[index]
+            {
+                trainingSequences.append(sequence)
+            }
+        }
+    }
+    else if sequenceScoresSet.count > 20
+    {
+        //ZPOPMAX
+        guard let highestResults = sequenceScoresSet.removeHighest(numberToRemove: 10)
+        else
+        {
+            sequenceScoresSet.delete()
+            return
+        }
+        
+        for highResult in highestResults
+        {
+            trainingSequences.append(highResult.value)
+        }
+        
+        //ZPOPMIN
+        guard let lowestResults = sequenceScoresSet.removeLowest(numberToRemove: 10)
+        else
+        {
+            sequenceScoresSet.delete()
+            return
+        }
+        
+        for lowResult in lowestResults
+        {
+            trainingSequences.append(lowResult.value)
+        }
+    }
+    
+    sequenceScoresSet.delete()
 }
 
+
+struct OffsetSequenceRecord
+{
+    var offset: Int
+    var sequence: Data
+    var score: Float
+}

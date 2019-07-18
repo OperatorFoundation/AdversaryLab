@@ -50,6 +50,7 @@
 		AE0BC8E02280940D00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
 		AE0BC8E22280941900AD89E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8E12280941900AD89E7 /* Foundation.framework */; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
+		AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */; };
 		AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
@@ -235,6 +236,7 @@
 		AE0BC8DE2280923E00AD89E7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AE0BC8E12280941900AD89E7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AE1AC6F92258020500555456 /* MLModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLModelController.swift; sourceTree = "<group>"; };
+		AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequencesCoreML.swift; sourceTree = "<group>"; };
 		AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = exampleData.csv; sourceTree = "<group>"; };
 		AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllFeatures.swift; sourceTree = "<group>"; };
 		AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketLengthsCoreML.swift; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 				AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */,
 				AE1AC6F92258020500555456 /* MLModelController.swift */,
 				AEE50AA122875905009698CC /* AdversaryFeaturesModel.swift */,
+				AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */,
 			);
 			path = CoreMLFeatures;
 			sourceTree = "<group>";
@@ -726,6 +729,7 @@
 			files = (
 				AE08E0C2226A6ABF00D94E45 /* HelperAppInstaller.swift in Sources */,
 				AE08E0CB226A6ACC00D94E45 /* HelperAppController.swift in Sources */,
+				AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */,
 				AEE50AA222875905009698CC /* AdversaryFeaturesModel.swift in Sources */,
 				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,
 				462E73A72091421400C59B80 /* ProgressBot.swift in Sources */,
