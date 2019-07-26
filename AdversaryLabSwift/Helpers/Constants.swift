@@ -110,8 +110,8 @@ let packetLengthsTrainingResultsKey = "PacketLengths:Training:Results"
 let incomingRequiredLengthKey = "Incoming:Required:Length"
 let incomingForbiddenLengthKey = "Incoming:Forbidden:Length"
 let incomingLengthsTAccKey = "Incoming:Lengths:TrainingAccuracy"
-let incomingLengthsVAccKey = "Incoming:Validation:Accuracy"
-let incomingLengthsEAccKey = "Incoming:Evaluation:Accuracy"
+let incomingLengthsVAccKey = "Incoming:Lengths:Validation:Accuracy"
+let incomingLengthsEAccKey = "Incoming:Lengths:Evaluation:Accuracy"
 
 let outgoingRequiredLengthKey = "Outgoing:Required:Length"
 let outgoingForbiddenLengthKey = "Outgoing:Forbidden:Length"
@@ -131,9 +131,20 @@ let outgoingForbiddenFloatSequencesKey = "Outgoing:Forbidden:FloatSequence"
 let outgoingFloatSequenceScoresKey = "Outgoing:FloatSequence:Scores"
 
 // MARK: Offset Sequences
+let offsetSequencesTrainingResultsKey = "OffsetSequences:Training:Results"
 
-let incomingOffsetTrainingSequencesKey = "Incoming:OffsetSequence:TrainingSequences"
-let outgoingOffsetTrainingSequenceKey = "Outgoing:OffsetSequence:TrainingSequences"
+let incomingOffsetTrainingSequencesKey = "Incoming:Offset:TrainingSequences"
+let incomingOffsetTrainingSequenceOffsetsKey = "Incoming:Offset:TrainingSequenceOffsets"
+let outgoingOffsetTrainingSequencesKey = "Outgoing:Offset:TrainingSequences"
+let outgoingOffsetTrainingSequenceOffsetsKey = "Outgoing:Offset:TrainingSequenceOffsets"
+
+let incomingOffsetSequencesTAccKey = "Incoming:OffsetSequences:TrainingAccuracy"
+let incomingOffsetSequencesVAccKey = "Incoming:OffsetSequences:ValidationAccuracy"
+let incomingOffsetSequencesEAccKey = "Incoming:OffsetSequences:EvaluationAccuracy"
+
+let outgoingOffsetSequencesTAccKey = "Outgoing:OffsetSequences:TrainingAccuracy"
+let outgoingOffsetSequencesVAccKey = "Outgoing:OffsetSequences:ValidationAccuracy"
+let outgoingOffsetSequencesEAccKey = "Outgoing:OffsetSequences:EvaluationAccuracy"
 
 let requiredOffsetSequenceKey = "Incoming:Required:OffsetSequence"
 let requiredOffsetByteCountKey = "Incoming:Required:OffsetByteCount"
@@ -219,12 +230,12 @@ let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 let modelFileExtension = "mlmodel"
 
 let allClassifierName = "AllFeatures_Classifier"
-let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
-let allInEntropyRegressorName = "AllFeatures_Entropy_In_Regressor"
-let allOutEntropyRegressorName = "AllFeatures_Entropy_Out_Regressor"
-let allInPacketLengthRegressorName = "AllFeatures_PacketLength_In_Regressor"
-let allOutPacketLengthRegressorName = "AllFeatures_PacketLength_Out_Regressor"
-let allTLSRegressorName = "AllFeatures_TLS_Regressor"
+//let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
+//let allInEntropyRegressorName = "AllFeatures_Entropy_In_Regressor"
+//let allOutEntropyRegressorName = "AllFeatures_Entropy_Out_Regressor"
+//let allInPacketLengthRegressorName = "AllFeatures_PacketLength_In_Regressor"
+//let allOutPacketLengthRegressorName = "AllFeatures_PacketLength_Out_Regressor"
+//let allTLSRegressorName = "AllFeatures_TLS_Regressor"
 
 let timingRegressorName = "TimeDifference_Regressor"
 let timingClassifierName = "TimeDifference_Classifier"
@@ -238,6 +249,11 @@ let inLengthRegressorName = "Length_In_Regressor"
 let outLengthRegressorName = "Length_Out_Regressor"
 let inLengthClassifierName = "Length_In_Classifier"
 let outLengthClassifierName = "Length_Out_Classifier"
+
+let inOffsetRegressorName = "Offset_In_Regressor"
+let outOffsetRegressorName = "Offset_Out_Regressor"
+let inOffsetClassifierName = "Offset_In_Classifier"
+let outOffsetClassifierName = "Offset_Out_Classifier"
 
 let tlsRegressorName = "TLS_Regressor"
 let tlsClassifierName = "TLS_Classifier"
@@ -257,6 +273,9 @@ let allFeaturesEntropyRegressorMetadata = MLModelMetadata(author: "Operator Foun
 let allFeaturesTimingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection given all features", version: "1.0")
 let allFeaturesLengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden lengths for a connection given all features", version: "1.0")
 let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
+
+let offsetClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given offset sequence is from an allowed or blocked connection.", version: "1.0")
+
 
 // MARK: - Helper Tool
 let helperToolName = "org.operatorFoundation.AdversaryLabService"

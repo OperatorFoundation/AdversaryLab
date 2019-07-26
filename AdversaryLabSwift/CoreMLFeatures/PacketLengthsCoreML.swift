@@ -80,11 +80,9 @@ class PacketLengthsCoreML
     
     func scorePacketLengths(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
-        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
-        
         if configModel.trainingMode
         {
-            let lengthsTable = createLengthTable(classificationLabels: classificationLabels, lengths: lengths)
+            let lengthsTable = createLengthTable(connectionDirection: connectionDirection)
             trainModels(lengthsTable: lengthsTable, connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
@@ -229,8 +227,10 @@ class PacketLengthsCoreML
         }
     }
     
-    func createLengthTable(classificationLabels: [String], lengths: [Int]) -> MLDataTable
+    func createLengthTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
+        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
+        
         // Create the Lengths Table
         var lengthsTable = MLDataTable()
         let lengthsColumn = MLDataColumn(lengths)

@@ -119,20 +119,8 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     // MARK: - Test Mode Labels
     @objc dynamic var modelName = "--"
-    
-    @objc dynamic var allFeaturesAllowedInLength = "--"
-    @objc dynamic var allFeaturesAllowedOutLength = "--"
-    @objc dynamic var allFeaturesAllowedInEntropy = "--"
-    @objc dynamic var allFeaturesAllowedOutEntropy = "--"
-    @objc dynamic var allFeaturesAllowedTiming = "--"
-    @objc dynamic var allFeaturesAllowedTLS = "--"
+
     @objc dynamic var allFeaturesAllowAccuracy = "--"
-    @objc dynamic var allFeaturesBlockedInLength = "--"
-    @objc dynamic var allFeaturesBlockedOutLength = "--"
-    @objc dynamic var allFeaturesBlockedInEntropy = "--"
-    @objc dynamic var allFeaturesBlockedOutEntropy = "--"
-    @objc dynamic var allFeaturesBlockedTiming = "--"
-    @objc dynamic var allFeaturesBlockedTLS = "--"
     @objc dynamic var allFeaturesBlockAccuracy = "--"
     
     @objc dynamic var timingBlocked = "--"
@@ -723,60 +711,11 @@ class ViewController: NSViewController, NSTabViewDelegate
                 }
                 
                 // All Features
-                self.allFeaturesAllowedInLength = "--"
-                self.allFeaturesAllowedOutLength = "--"
-                self.allFeaturesAllowedInEntropy = "--"
-                self.allFeaturesAllowedOutEntropy = "--"
-                self.allFeaturesAllowedTiming = "--"
-                self.allFeaturesAllowedTLS = "--"
                 self.allFeaturesAllowAccuracy = "--"
-                
-                self.allFeaturesBlockedInLength = "--"
-                self.allFeaturesBlockedOutLength = "--"
-                self.allFeaturesBlockedInEntropy = "--"
-                self.allFeaturesBlockedOutEntropy = "--"
-                self.allFeaturesBlockedTiming = "--"
-                self.allFeaturesBlockedTLS = "--"
                 self.allFeaturesBlockAccuracy = "--"
-                
-                if allAllowInLength != nil
-                {self.allFeaturesAllowedInLength = String(format: "%.2f", allAllowInLength!)}
-                
-                if allAllowOutLength != nil
-                {self.allFeaturesAllowedOutLength = String(format: "%.2f", allAllowOutLength!)}
-                
-                if allAllowInEntropy != nil
-                {self.allFeaturesAllowedInEntropy = String(format: "%.2f", allAllowInEntropy!)}
-                
-                if allAllowOutEntropy != nil
-                {self.allFeaturesAllowedOutEntropy = String(format: "%.2f", allAllowOutEntropy!)}
-                
-                if allAllowTiming != nil
-                {self.allFeaturesAllowedTiming = String(format: "%.2f", allAllowTiming!)}
-                
-                if allAllowTLS != nil
-                {self.allFeaturesAllowedTLS = String(format: "%.2f", allAllowTLS!)}
-                
+
                 if allAllowAccuracy != nil
                 { self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!) }
-                
-                if allBlockInLength != nil
-                { self.allFeaturesBlockedInLength = String(format: "%.2f", allBlockInLength!) }
-                
-                if allBlockOutLength != nil
-                { self.allFeaturesBlockedOutLength = String(format: "%.2f", allBlockOutLength!) }
-                
-                if allBlockInEntropy != nil
-                { self.allFeaturesBlockedInEntropy = String(format: "%.2f", allBlockInEntropy!) }
-                
-                if allBlockOutEntropy != nil
-                { self.allFeaturesBlockedOutEntropy = String(format: "%.2f", allBlockOutEntropy!) }
-                
-                if allBlockTiming != nil
-                { self.allFeaturesBlockedTiming = String(format: "%.2f", allBlockTiming!) }
-                
-                if allBlockTLS != nil
-                { self.allFeaturesBlockedTLS = String(format: "%.2f", allBlockTLS!) }
                 
                 if allBlockAccuracy != nil
                 { self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!) }

@@ -135,72 +135,16 @@ class AllFeatures
                 let compiledModelURL = try MLModel.compileModel(at: classifierFileURL)
                 let model = try MLModel(contentsOf: compiledModelURL)
                 let inputs = model.modelDescription.inputDescriptionsByName
-
                 let accuracyKey: String
-                let inLengthKey: String
-                let outLengthKey:String
-                let inEntropyKey: String
-                let outEntropyKey: String
-                let timingKey: String
-                let tlsKey: String
                 
                 switch connectionType
                 {
                 case .allowed:
                     accuracyKey = allowedAllFeaturesAccuracyKey
-                    inLengthKey = allowedAllFeaturesIncomingLengthKey
-                    outLengthKey = allowedAllFeaturesOutgoingLengthKey
-                    inEntropyKey = allowedAllFeaturesIncomingEntropyKey
-                    outEntropyKey = allowedAllFeaturesOutgoingEntropyKey
-                    timingKey = allowedAllFeaturesTimingKey
-                    tlsKey = allowedAllFeaturesTLSKey
 
                 case .blocked:
                     accuracyKey = blockedAllFeaturesAccuracyKey
-                    inLengthKey = blockedAllFeaturesIncomingLengthKey
-                    outLengthKey = blockedAllFeaturesOutgoingLengthKey
-                    inEntropyKey = blockedAllFeaturesIncomingEntropyKey
-                    outEntropyKey = blockedAllFeaturesOutgoingEntropyKey
-                    timingKey = blockedAllFeaturesTimingKey
-                    tlsKey = blockedAllFeaturesTLSKey
                 }
-                
-                test(feature: inLengthKey,
-                     regressorName: allInPacketLengthRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.inLength.rawValue,
-                     featureValueType: .double)
-                test(feature: outLengthKey,
-                     regressorName: allOutPacketLengthRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.outLength.rawValue,
-                     featureValueType: .double)
-                test(feature: inEntropyKey,
-                     regressorName: allInEntropyRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.inEntropy.rawValue,
-                     featureValueType: .double)
-                test(feature: outEntropyKey,
-                     regressorName: allOutEntropyRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.outEntropy.rawValue,
-                     featureValueType: .double)
-                test(feature: tlsKey,
-                     regressorName: allTLSRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.tlsNames.rawValue,
-                     featureValueType: .string)
-                test(feature: timingKey,
-                     regressorName: allTimingRegressorName,
-                     temporaryDirURL: temporaryDirURL,
-                     connectionType: connectionType,
-                     expectedFeatureName: ColumnLabel.timeDifference.rawValue,
-                     featureValueType: .double)
                 
                 if inputs.keys.contains(ColumnLabel.tlsNames.rawValue)
                 {
@@ -361,14 +305,10 @@ class AllFeatures
         // Train the classifier
         do
         {
-            print("\nAttempting to create classifier with training table.")
-            print(trainingTable.columnTypes)
-            print("Target Column = \(ColumnLabel.classification.rawValue)")
             let classifier = try MLClassifier(trainingData: trainingTable, targetColumn: ColumnLabel.classification.rawValue)
             let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
             let classifierEvaluation = classifier.evaluation(on: evaluationTable)
             let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
-            
             let validationError = classifier.validationMetrics.classificationError
             let validationAccuracy: Double?
             
@@ -382,166 +322,18 @@ class AllFeatures
                 validationAccuracy = (1.0 - validationError) * 100
             }
 
-            // Regressors
-            do
+            let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
+            allFeaturesDictionary[allFeaturesEAccKey] = evaluationAccuracy
+            allFeaturesDictionary[allFeaturesTAccKey] = trainingAccuracy
+            
+            if validationAccuracy != nil
             {
-                let timeRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.timeDifference.rawValue)
-                let inEntropyRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.inEntropy.rawValue)
-                let outEntropyRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.outEntropy.rawValue)
-                let inLengthRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.inLength.rawValue)
-                let outLengthRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.outLength.rawValue)
-
-                let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
-                let timingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTrainingResultsKey)
-                let entropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTrainingResultsKey)
-                let lengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
-                
-                allFeaturesDictionary[allFeaturesEAccKey] = evaluationAccuracy
-                allFeaturesDictionary[allFeaturesTAccKey] = trainingAccuracy
-                
-                if validationAccuracy != nil
-                {
-                    allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy!
-                }
-                
-                let modelController = MLModelController()
-                guard let (allowedTable, blockedTable) = modelController.createAllowedBlockedTables(fromTable: allFeaturesTable)
-                    else
-                {
-                    print("\nUnable to create allowed and blocked tables from all features table.")
-                    return
-                }
-                // Allowed
-                do
-                {
-                    let allowedTimeColumn = try timeRegressor.predictions(from: allowedTable)
-                    let allowedInEntropyColumn = try inEntropyRegressor.predictions(from: allowedTable)
-                    let allowedOutEntropyColumn = try outEntropyRegressor.predictions(from: allowedTable)
-                    let allowedInLengthColumn = try inLengthRegressor.predictions(from: allowedTable)
-                    let allowedOutLengthColumn = try outLengthRegressor.predictions(from: allowedTable)
-
-                    guard let allowedTimeDifferences = allowedTimeColumn.doubles,
-                        let allowedInEntropy = allowedInEntropyColumn.doubles,
-                        let allowedOutEntropy = allowedOutEntropyColumn.doubles,
-                        let allowedInLength = allowedInLengthColumn.doubles,
-                        let allowedOutLength = allowedOutLengthColumn.doubles
-                        else
-                    {
-                        print("\nFailed to identify predictions from all features regressor.")
-                        return
-                    }
-
-                    let predictedAllowedTimeDifference = allowedTimeDifferences[0]
-                    let predictedAllowedInEntropy = allowedInEntropy[0]
-                    let predictedAllowedOutEntropy = allowedOutEntropy[0]
-                    let predictedAllowedInLength = allowedInLength[0]
-                    let predictedAllowedOutLength = allowedOutLength[0]
-                    
-                    if configModel.enableTLSAnalysis
-                    {
-                        do
-                        {
-                            let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
-                            let tlsRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.tlsNames.rawValue)
-                            let allowedTLSColumn = try tlsRegressor.predictions(from: allowedTable)
-                            
-                            if let allowedTLS = allowedTLSColumn.strings
-                            {
-                                let predictedAllowedTLS = allowedTLS[0]
-                                tlsDictionary[requiredTLSKey] = predictedAllowedTLS
-                            }
-                        }
-                        catch let tlsTrainingError
-                        {
-                            print("\nReceived a tls training error when training for all features: \(tlsTrainingError)")
-                        }
-                    }
-                    
-                    // Save scores
-                    timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
-                    entropyDictionary[outgoingRequiredEntropyKey] = predictedAllowedOutEntropy
-                    entropyDictionary[incomingRequiredEntropyKey] = predictedAllowedInEntropy
-                    lengthDictionary[outgoingRequiredLengthKey] = predictedAllowedOutLength
-                    lengthDictionary[incomingRequiredLengthKey] = predictedAllowedInLength
-                }
-                catch let allowedColumnError
-                {
-                    print("\nError creating allowed column for all features training: \(allowedColumnError)")
-                }
-
-                // Blocked
-                do
-                {
-                    let blockedTimeColumn = try timeRegressor.predictions(from: blockedTable)
-                    let blockedInEntropyColumn = try inEntropyRegressor.predictions(from: blockedTable)
-                    let blockedOutEntropyColumn = try outEntropyRegressor.predictions(from: blockedTable)
-                    let blockedInLengthColumn = try inLengthRegressor.predictions(from: blockedTable)
-                    let blockedOutLengthColumn = try outLengthRegressor.predictions(from: blockedTable)
-                    
-                    guard let blockedTimeDifferences = blockedTimeColumn.doubles,
-                        let blockedInEntropy = blockedInEntropyColumn.doubles,
-                        let blockedOutEntropy = blockedOutEntropyColumn.doubles,
-                        let blockedInLengths = blockedInLengthColumn.doubles,
-                        let blockedOutLengths = blockedOutLengthColumn.doubles
-                    else
-                    {
-                        print("\nUnable to get blocked predictions from all features")
-                        return
-                    }
-                    
-                    let predictedBlockedTimeDifference = blockedTimeDifferences[0]
-                    let predictedBlockedInEntropy = blockedInEntropy[0]
-                    let predictedBlockedOutEntropy = blockedOutEntropy[0]
-                    let predictedBlockedInLength = blockedInLengths[0]
-                    let predictedBlockedOutLength = blockedOutLengths[0]
-                    
-                    if configModel.enableTLSAnalysis
-                    {
-                        do
-                        {
-                            let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
-                            let tlsRegressor = try MLRegressor(trainingData: trainingTable, targetColumn: ColumnLabel.tlsNames.rawValue)
-                            let blockedTLSColumn = try tlsRegressor.predictions(from: blockedTable)
-                            
-                            // TLS is Optional
-                            if let blockedTLS = blockedTLSColumn.strings
-                            {
-                                let predictedBlockedTLS = blockedTLS[0]
-                                tlsDictionary[forbiddenTLSKey] = predictedBlockedTLS
-                                MLModelController().save(regressor: tlsRegressor, regressorMetadata: allFeaturesTLSRegressorMetadata, fileName: allTLSRegressorName, groupName: configModel.modelName)
-                            }
-                        }
-                        catch let tlsTrainingError
-                        {
-                            print("\nReceived a tls training error when training for all features: \(tlsTrainingError)")
-                        }
-                    }
-                    
-                    // Save the results
-                    timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
-                    entropyDictionary[incomingForbiddenEntropyKey] = predictedBlockedInEntropy
-                    entropyDictionary[outgoingForbiddenEntropyKey] = predictedBlockedOutEntropy
-                    lengthDictionary[incomingForbiddenLengthKey] = predictedBlockedInLength
-                    lengthDictionary[outgoingForbiddenLengthKey] = predictedBlockedOutLength
-                    
-                    // Save the models
-                    let modelController = MLModelController()
-                    modelController.save(classifier: classifier, classifierMetadata: allFeaturesClassifierMetadata, fileName: allClassifierName, groupName: configModel.modelName)
-                    modelController.save(regressor: timeRegressor, regressorMetadata: allFeaturesTimingRegressorMetadata, fileName: allTimingRegressorName, groupName: configModel.modelName)
-                    modelController.save(regressor: inEntropyRegressor, regressorMetadata: allFeaturesEntropyRegressorMetadata, fileName: allInEntropyRegressorName, groupName: configModel.modelName)
-                    modelController.save(regressor: outEntropyRegressor, regressorMetadata: allFeaturesEntropyRegressorMetadata, fileName: allOutEntropyRegressorName, groupName: configModel.modelName)
-                    modelController.save(regressor: inLengthRegressor, regressorMetadata: allFeaturesLengthsRegressorMetadata, fileName: allInPacketLengthRegressorName, groupName: configModel.modelName)
-                    modelController.save(regressor: outLengthRegressor, regressorMetadata: allFeaturesLengthsRegressorMetadata, fileName: allOutPacketLengthRegressorName, groupName: configModel.modelName)
-                }
-                catch let blockedColumnsError
-                {
-                    print("\nError creating all features blocked column: \(blockedColumnsError)")
-                }
+                allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy!
             }
-            catch let allFeaturesRegressorError
-            {
-                print("\nAll features regressor error: \(allFeaturesRegressorError)")
-            }
+            
+            let modelController = MLModelController()
+
+            modelController.save(classifier: classifier, classifierMetadata: allFeaturesClassifierMetadata, fileName: allClassifierName, groupName: configModel.modelName)
         }
         catch let classifierTrainingError
         {

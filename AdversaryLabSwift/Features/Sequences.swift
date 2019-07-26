@@ -63,7 +63,8 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
     let requiredOffsetKey: String
     let forbiddenOffsetKey: String
     let trainingSequencesKey: String
-    
+    let trainingSequenceOffsetsKey: String
+
     // These arrays will be saved to the DB after the loop to be used for training a model
     var topSequences = [OffsetSequenceRecord]()
     var bottomSequences = [OffsetSequenceRecord]()
@@ -76,12 +77,14 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
         requiredOffsetKey = incomingRequiredOffsetKey
         forbiddenOffsetKey = incomingForbiddenOffsetKey
         trainingSequencesKey = incomingOffsetTrainingSequencesKey
+        trainingSequenceOffsetsKey = incomingOffsetTrainingSequenceOffsetsKey
     case .outgoing:
         allowedOffsetKey = allowedOutgoingOffsetSequencesKey
         blockedOffsetKey = blockedOutgoingOffsetSequencesKey
         requiredOffsetKey = outgoingRequiredOffsetKey
         forbiddenOffsetKey = outgoingForbiddenOffsetKey
-        trainingSequencesKey = outgoingOffsetTrainingSequenceKey
+        trainingSequencesKey = outgoingOffsetTrainingSequencesKey
+        trainingSequenceOffsetsKey = outgoingOffsetTrainingSequenceOffsetsKey
     }
     
     let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
@@ -143,7 +146,6 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
             print("\nFailed to find the longest top offset sequence.")
             break
         }
-        
         
         // Save the top scoring, longest offset
         if topOffsetScore != nil
@@ -253,7 +255,7 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
         }
     }
 
-    // Sort bottom sequences lowe to high
+    // Sort bottom sequences low to high
     bottomSequences.sort
     {
         (firstRecord, secondRecord) -> Bool in
@@ -284,17 +286,22 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
     let bottomTenSequences = [OffsetSequenceRecord](bottomSequences[0..<10])
     
     // Save them to Redis in one list of 20
+    // Also save their offsets in parallel
     let trainingSequences: RList<Data> = RList(key: trainingSequencesKey)
-    
+    let trainingSequenceOffsets: RList<Int> = RList(key: trainingSequenceOffsetsKey)
     for topRecord in topTenSequences
     {
         trainingSequences.append(topRecord.sequence)
+        trainingSequenceOffsets.append(topRecord.offset)
     }
     
     for bottomRecord in bottomTenSequences
     {
         trainingSequences.append(bottomRecord.sequence)
+        trainingSequenceOffsets.append(bottomRecord.offset)
     }
+    
+    SequencesCoreML().trainOffsetModels(connectionDirection: connectionDirection, modelName: model)
 }
 
 

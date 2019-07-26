@@ -634,7 +634,7 @@
 /* Begin PBXReferenceProxy section */
 		46D85127201FE4B50052DF49 /* AdversaryLabSwiftPackageTests.xctest */ = {
 			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
+			fileType = file;
 			path = AdversaryLabSwiftPackageTests.xctest;
 			remoteRef = 46D85126201FE4B50052DF49 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;

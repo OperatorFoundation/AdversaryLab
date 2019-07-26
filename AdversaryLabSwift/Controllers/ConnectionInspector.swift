@@ -309,6 +309,16 @@ class ConnectionInspector
         packetsAnalyzedDictionary[blockedPacketsAnalyzedKey] = 0
         
         // Delete all current scores
+        let outTrainingSequences: RList<Data> = RList(key: outgoingOffsetTrainingSequencesKey)
+        outTrainingSequences.delete()
+        let outTrainingSequenceOffsets: RList<Int> = RList(key: outgoingOffsetTrainingSequenceOffsetsKey)
+        outTrainingSequenceOffsets.delete()
+        
+        let inTrainingSequences: RList<Data> = RList(key: incomingOffsetTrainingSequencesKey)
+        inTrainingSequences.delete()
+        let inTrainingSequenceOffsets: RList<Int> = RList(key: incomingOffsetTrainingSequenceOffsetsKey)
+        inTrainingSequenceOffsets.delete()
+        
         let packetLengthsTrainingResults: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
         packetLengthsTrainingResults.delete()
         
@@ -320,12 +330,6 @@ class ConnectionInspector
         
         let allFeaturesTLSTestResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
         allFeaturesTLSTestResultsDictionary.delete()
-        
-        let incomingOffsetTrainingSequences: RList<Data> = RList(key: incomingOffsetTrainingSequencesKey)
-        incomingOffsetTrainingSequences.delete()
-        
-        let outgoingOffsetTrainingSequences: RList<Data> = RList(key: outgoingOffsetTrainingSequenceKey)
-        outgoingOffsetTrainingSequences.delete()
         
         let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
         allowedOutLengthsSet.delete()
