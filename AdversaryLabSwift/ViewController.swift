@@ -588,22 +588,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             let entOutBlocked = testResults[blockedOutgoingEntropyKey]
             
             // All Features
-            let allTLSTestResults:RMap<String,Double> = RMap(key: tlsTestResultsKey)
-            
-            let allAllowInLength = testResults[allowedAllFeaturesIncomingLengthKey]
-            let allAllowOutLength = testResults[allowedAllFeaturesOutgoingLengthKey]
-            let allAllowInEntropy = testResults[allowedAllFeaturesIncomingEntropyKey]
-            let allAllowOutEntropy = testResults[allowedAllFeaturesOutgoingEntropyKey]
-            let allAllowTiming = testResults[allowedAllFeaturesTimingKey]
-            let allAllowTLS = allTLSTestResults[allowedAllFeaturesTLSKey]
             let allAllowAccuracy = testResults[allowedAllFeaturesAccuracyKey]
-            
-            let allBlockInLength = testResults[blockedAllFeaturesIncomingLengthKey]
-            let allBlockOutLength = testResults[blockedAllFeaturesOutgoingLengthKey]
-            let allBlockInEntropy = testResults[blockedAllFeaturesIncomingEntropyKey]
-            let allBlockOutEntropy = testResults[blockedAllFeaturesOutgoingEntropyKey]
-            let allBlockTiming = testResults[blockedAllFeaturesTimingKey]
-            let allBlockTLS = allTLSTestResults[blockedAllFeaturesTLSKey]
             let allBlockAccuracy = testResults[blockedAllFeaturesAccuracyKey]
             
             DispatchQueue.main.async

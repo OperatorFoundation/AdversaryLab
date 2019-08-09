@@ -74,6 +74,17 @@ let blockedIncomingLengthAccuracyKey = "Blocked:Incoming:Length:Accuracy"
 let blockedOutgoingLengthKey = "Blocked:Outgoing:Length"
 let blockedOutgoingLengthAccuracyKey = "Blocked:Outgoing:Length:Accuracy"
 
+// Sequences
+let allowedIncomingFloatAccuracyKey = "Allowed:Incoming:FloatSequence:Accuracy"
+let allowedOutgoingFloatAccuracyKey = "Allowed:Outgoing:FloatSequence:Accuracy"
+let blockedIncomingFloatAccuracyKey = "Blocked:Incoming:FloatSequence:Accuracy"
+let blockedOutgoingFloatAccuracyKey = "Blocked:Outgoing:FloatSequence:Accuracy"
+
+let allowedIncomingOffsetAccuracyKey = "Allowed:Incoming:OffsetSequence:Accuracy"
+let allowedOutgoingOffsetAccuracyKey = "Allowed:Outgoing:OffsetSequence:Accuracy"
+let blockedIncomingOffsetAccuracyKey = "Blocked:Incoming:OffsetSequence:Accuracy"
+let blockedOutgoingOffsetAccuracyKey = "Blocked:Outgoing:OffsetSequence:Accuracy"
+
 // All Features
 let allowedAllFeaturesAccuracyKey = "Allowed:AllFeatures:Accuracy"
 let allowedAllFeaturesIncomingLengthKey = "Allowed:AllFeatures:Incoming:Length"
@@ -120,8 +131,18 @@ let outgoingLengthsVAccKey = "Outgoing:Lengths:ValidationAccuracy"
 let outgoingLengthsEAccKey = "Outgoing:Lengths:EvaluationAccuracy"
 
 // MARK: Float Sequences
+let floatSequencesTrainingResultsKey = "FloatSequences:Training:Results"
+
 let incomingFloatTrainingSequencesKey = "Incoming:FloatSequence:TrainingSequences"
 let outgoingFloatTrainingSequencesKey = "Outgoing:FloatSequence:TrainingSequences"
+
+let incomingFloatSequencesTAccKey = "Incoming:FloatSequences:TrainingAccuracy"
+let incomingFloatSequencesVAccKey = "Incoming:FloatSequences:ValidationAccuracy"
+let incomingFloatSequencesEAccKey = "Incoming:FloatSequences:EvaluationAccuracy"
+
+let outgoingFloatSequencesTAccKey = "Outgoing:FloatSequences:TrainingAccuracy"
+let outgoingFloatSequencesVAccKey = "Outgoing:FloatSequences:ValidationAccuracy"
+let outgoingFloatSequencesEAccKey = "Outgoing:FloatSequences:EvaluationAccuracy"
 
 let incomingRequiredFloatSequencesKey = "Incoming:Required:FloatSequence"
 let incomingForbiddenFloatSequencesKey = "Incoming:Forbidden:FloatSequence"
@@ -250,8 +271,8 @@ let outLengthRegressorName = "Length_Out_Regressor"
 let inLengthClassifierName = "Length_In_Classifier"
 let outLengthClassifierName = "Length_Out_Classifier"
 
-let inOffsetRegressorName = "Offset_In_Regressor"
-let outOffsetRegressorName = "Offset_Out_Regressor"
+let inFloatClassifierName = "Float_In_Classifier"
+let outFloatClassifierName = "Float_Out_Classifier"
 let inOffsetClassifierName = "Offset_In_Classifier"
 let outOffsetClassifierName = "Offset_Out_Classifier"
 
@@ -274,6 +295,7 @@ let allFeaturesTimingRegressorMetadata = MLModelMetadata(author: "Operator Found
 let allFeaturesLengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden lengths for a connection given all features", version: "1.0")
 let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 
+let floatClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given float sequence is from an allowed or blocked connection.", version: "1.0")
 let offsetClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given offset sequence is from an allowed or blocked connection.", version: "1.0")
 
 

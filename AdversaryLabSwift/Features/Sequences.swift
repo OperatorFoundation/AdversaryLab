@@ -38,25 +38,25 @@ func processSequences(forConnection connection: ObservedConnection) -> (processe
     return (true, nil)
 }
 
-func scoreAllFloatSequences()
+func scoreAllFloatSequences(configModel: ProcessingConfigurationModel)
 {
     // Outgoing
-    scoreFloatSequences(connectionDirection: .outgoing)
+    scoreFloatSequences(connectionDirection: .outgoing, configModel: configModel)
     
     // Incoming
-    scoreFloatSequences(connectionDirection: .incoming)
+    scoreFloatSequences(connectionDirection: .incoming, configModel: configModel)
 }
 
-func scoreAllOffsetSequences()
+func scoreAllOffsetSequences(configModel: ProcessingConfigurationModel)
 {
     // Outgoing
-    scoreOffsetSequences(connectionDirection: .outgoing)
+    scoreOffsetSequences(connectionDirection: .outgoing, configModel: configModel)
     
     // Incoming
-    scoreOffsetSequences(connectionDirection: .incoming)
+    scoreOffsetSequences(connectionDirection: .incoming, configModel: configModel)
 }
 
-func scoreOffsetSequences(connectionDirection: ConnectionDirection)
+func scoreOffsetSequences(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
 {
     let allowedOffsetKey: String
     let blockedOffsetKey: String
@@ -301,11 +301,11 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection)
         trainingSequenceOffsets.append(bottomRecord.offset)
     }
     
-    SequencesCoreML().trainOffsetModels(connectionDirection: connectionDirection, modelName: model)
+    SequencesCoreML().trainOffsetModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
 }
 
 
-func scoreFloatSequences(connectionDirection: ConnectionDirection)
+func scoreFloatSequences(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
 {
     let allowedFloatKey: String
     let blockedFloatKey: String
@@ -454,6 +454,9 @@ func scoreFloatSequences(connectionDirection: ConnectionDirection)
     }
     
     sequenceScoresSet.delete()
+    
+    //Train or Test depending on UI
+    SequencesCoreML().scoreFloatSequences(connectionDirection: connectionDirection, configModel: configModel)
 }
 
 

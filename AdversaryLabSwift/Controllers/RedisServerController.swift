@@ -329,8 +329,6 @@ class RedisServerController: NSObject
             // Reset dbfilename to the default as we failed to copy the new file over
             Auburn.dbfilename = "dump.rdb"
         }
-
-        
     }
     
     func runRedisScript(path: String, arguments: [String]?, completion:@escaping (_ completion:Bool) -> Void)

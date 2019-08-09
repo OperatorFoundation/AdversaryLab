@@ -21,10 +21,6 @@ class OperatorReportController
     static let sharedInstance = OperatorReportController()
     let formatter = ISO8601DateFormatter()
     
-//    var testResults7Days: [TestResult]?
-//    var testResults30Days: [TestResult]?
-//    var testResultsToday: [TestResult]?
-    
     func createReportTextFile(forModel modelName: String)
     {
         let fileManager = FileManager.default
@@ -122,7 +118,8 @@ class OperatorReportController
         let entropyTableHeader = "\n### Entropy\n"
         let entropyTableHeaderFields = "| Category | Incoming Entropy | Incoming Entropy Accuracy | Outgoing Entropy | Outgoing Entropy Accuracy |\n| :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |\n"
         
-        
+        let floatTableHeader = "\n### Floating Sequences\n"
+        let floatTableFields = "| Category | Incoming Accuracy | Outgoing Accuracy |\n| :-------------: | :-------------: | :-------------: |\n"
         
         DispatchQueue.global(qos: .utility).async
         {
@@ -249,6 +246,30 @@ class OperatorReportController
             let entropyAllowedRow = "| Allowed | \(entInAllowed) | \(entInAllowAccuracy) | \(entOutAllowed) | \(entoutAllowAccuracy) |\n"
             let entropyBlockedRow = "| Blocked | \(entInBlocked) | \(entInBlockAccuracy) | \(entOutBlocked) | \(entOutBlockAccuracy) |\n"
 
+            // Float Sequences
+            let floatInAllowAccuracy: String
+            let floatOutAllowAccuracy: String
+            let floatInBlockAccuracy: String
+            let floatOutBlockAccuracy: String
+            
+            if testResults[allowedIncomingFloatAccuracyKey] != nil, testResults[allowedOutgoingFloatAccuracyKey] != nil, testResults[blockedIncomingFloatAccuracyKey] != nil, testResults[blockedOutgoingFloatAccuracyKey] != nil
+            {
+                floatInAllowAccuracy = String(format: "%.2f", testResults[allowedIncomingFloatAccuracyKey]!)
+                floatOutAllowAccuracy = String(format: "%.2f", testResults[allowedOutgoingFloatAccuracyKey]!)
+                floatInBlockAccuracy = String(format: "%.2f", testResults[blockedIncomingFloatAccuracyKey]!)
+                floatOutBlockAccuracy = String(format: "%.2f", testResults[blockedOutgoingFloatAccuracyKey]!)
+            }
+            else
+            {
+                floatInAllowAccuracy = "--"
+                floatOutAllowAccuracy = "--"
+                floatInBlockAccuracy = "--"
+                floatOutBlockAccuracy = "--"
+            }
+            
+            let floatAllowedRow = "| Allowed | \(floatInAllowAccuracy) | \(floatOutAllowAccuracy) |\n"
+            let floatBlockedRow = "| Allowed | \(floatInBlockAccuracy) | \(floatOutBlockAccuracy) |\n"
+            
             // All Features
             let allFeatAllowInLength: String
             let allFeatAllowOutLength: String
@@ -319,11 +340,14 @@ class OperatorReportController
                 let entropyTableValues = entropyAllowedRow + entropyBlockedRow
                 let entropyTable = entropyTableHeader + entropyTableHeaderFields + entropyTableValues
                 
+                let floatTableValues = floatAllowedRow + floatBlockedRow
+                let floatTable = floatTableHeader + floatTableFields + floatTableValues
+                
                 let allFeaturesTableValues = allFeatAllowedRow + allFeatBlockedRow
                 let allFeaturesTable = allFeaturesTableHeader + allFeaturesTableFields + allFeaturesTableValues
                 
                 //Put it all together and what do you get? m;)
-                completion(tableHeader + lengthTable + entropyTable + timingTable + tlsTable + allFeaturesTable)
+                completion(tableHeader + lengthTable + entropyTable + timingTable + tlsTable + floatTable + allFeaturesTable)
             }
 
         }

@@ -179,8 +179,8 @@ class ConnectionInspector
             {
                 currentProgress += 1
                 ProgressBot.sharedInstance.update(progressMessage: "\(actionString) sequences.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-                scoreAllFloatSequences()
-                scoreAllOffsetSequences()
+                scoreAllFloatSequences(configModel: configModel)
+                scoreAllOffsetSequences(configModel: configModel)
                 sleep(1)
             }
             
