@@ -327,11 +327,11 @@ class ViewController: NSViewController, NSTabViewDelegate
                 let selectedFileURL = panel.urls[0]
                 
                 RedisServerController.sharedInstance.switchDatabaseFile(withFile: selectedFileURL, completion:
-                    {
-                        (success) in
-                        
-                        self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
-                        self.loadLabelData()
+                {
+                    (success) in
+                    
+                    self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
+                    self.loadLabelData()
                 })
             }
         }
@@ -680,7 +680,10 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.inLengthBlockAccuracy = "--"
                 }
                 
-                if lengthOutAllowAccuracy != nil, lengthOutBlockAccuracy != nil, lengthOutAllowed != nil, lengthOutBlocked != nil
+                if lengthOutAllowAccuracy != nil,
+                    lengthOutBlockAccuracy != nil,
+                    lengthOutAllowed != nil,
+                    lengthOutBlocked != nil
                 {
                     self.outLengthAllowed = String(format: "%.2f", lengthOutAllowed!)
                     self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)

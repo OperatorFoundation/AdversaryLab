@@ -277,11 +277,15 @@ class RedisServerController: NSObject
         
         // Rewrite redis.conf to use the dbfilename for the name of the new .rdb file
         // Setting the dbFilename calls config rewrite with the new name in Redis
+        print("Setting new dbFilename to \(newDBName)")
         Auburn.dbfilename = newDBName
 //        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
         
         // Issue a SHUTDOWN command to the Redis server
+        print("\nShutting down Redis Server")
         Auburn.shutdownRedis()
+        sleep(1)
+        print("\nRestarting Redis Server")
         Auburn.restartRedis()
         
         // Copy the .rdb file into the Redis working directory, as specified in redis.conf (defaults to ./, which is the directory the Redis server was run from)
@@ -304,6 +308,7 @@ class RedisServerController: NSObject
                 try fileManager.removeItem(at: destinationURL)
             }
             
+            print("\nCopying new redis DB file.")
             try fileManager.copyItem(at: fileURL, to: destinationURL)
             
             print("\n📂  Copied file from: \n\(fileURL)\nto:\n\(destinationURL)\n")
@@ -349,13 +354,10 @@ class RedisServerController: NSObject
             {
                 (task) in
                 
-                //Main Thread Stuff Here If Needed
-                DispatchQueue.main.async(execute:
-                {
-                    print("Redis Script Has Terminated.")
-                    completion(true)
-                })
+                print("Redis Script Has Terminated.")
+                completion(true)
             }
+            
             self.redisProcess.launch()
         }
     }
