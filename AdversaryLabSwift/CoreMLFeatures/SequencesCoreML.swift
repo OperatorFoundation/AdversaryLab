@@ -18,6 +18,7 @@ class SequencesCoreML
         if configModel.trainingMode
         {
             trainFloatModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
+            trainOffsetModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
@@ -119,6 +120,7 @@ class SequencesCoreML
                 }
                 
                 rowTable.addColumn(sequenceColumn, named: "sequence\(index)")
+                print("\n📊  Created a sequence column: \(sequenceColumn) named: sequence\(index)")
             }
             
             dataTable.append(contentsOf: rowTable)
