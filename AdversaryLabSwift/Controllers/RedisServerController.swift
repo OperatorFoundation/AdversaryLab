@@ -8,6 +8,8 @@
 
 import Foundation
 import Auburn
+import RedShot
+import Datable
 
 class RedisServerController: NSObject
 {
@@ -36,51 +38,21 @@ class RedisServerController: NSObject
                     {
                     case .okay( _):
                         print("\nServer port is available")
-                        
-                        let bundle = Bundle.main
-                        
-                        guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
-                            else
-                        {
-                            print("Unable to launch Redis server: could not find terraform executable.")
-                            completion(.failure("Unable to launch Redis server: could not find terraform executable."))
-                            return
-                        }
-                        
-                        guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
-                            else
-                        {
-                            print("Unable to launch Redis server: could not find terraform executable.")
-                            completion(.failure("Unable to launch Redis server: could not find terraform executable."))
-                            return
-                        }
-                        
-                        guard let redisModulePath = bundle.path(forResource: "subsequences", ofType: "so")
-                            else
-                        {
-                            print("Unable to launch Redis server: could not find the needed module.")
-                            completion(.failure("Unable to launch Redis server: could not find the needed module."))
-                            return
-                        }
-                        
-                        guard let path = bundle.path(forResource: "LaunchRedisServerScript", ofType: "sh")
-                            else
-                        {
-                            print("Unable to launch Redis server. Could not find the script.")
-                            completion(.failure("Unable to launch Redis server. Could not find the script."))
-                            return
-                        }
-                        
-                        print("\n👇👇 Running Script 👇👇:\n")
-                        
-                        self.runRedisScript(path: path, arguments: [redisPath, redisConfigPath, redisModulePath])
-                        {
-                            (hasCompleted) in
+                        print("👇👇 Running Script 👇👇:\n")
+                        self.runLaunchRedisScript
+                        { (redisLaunched) in
                             
                             print("\n🚀 Launch Redis Server Script Complete 🚀")
-                            completion(.okay(nil))
+                            
+                            if redisLaunched
+                            {
+                                completion(.okay(nil))
+                            }
+                            else
+                            {
+                                completion(.failure("Failure running launch script."))
+                            }
                         }
-                        
                     case .otherProcessOnPort(let name):
                         print("\nAnother process is using our port. Process name: \(name)")
                         completion(result)
@@ -274,68 +246,132 @@ class RedisServerController: NSObject
         let currentDirectory = fileManager.currentDirectoryPath
         let newDBName = fileURL.lastPathComponent
         let destinationURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(newDBName)
-        
-        // Rewrite redis.conf to use the dbfilename for the name of the new .rdb file
-        // Setting the dbFilename calls config rewrite with the new name in Redis
-        print("Setting new dbFilename to \(newDBName)")
-        Auburn.dbfilename = newDBName
-//        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
-        
-        // Issue a SHUTDOWN command to the Redis server
-        print("\nShutting down Redis Server")
-        Auburn.shutdownRedis()
-        sleep(1)
-        print("\nRestarting Redis Server")
-        Auburn.restartRedis()
-        
-        // Copy the .rdb file into the Redis working directory, as specified in redis.conf (defaults to ./, which is the directory the Redis server was run from)
-        /*
-        # The working directory.
-        #
-        # The DB will be written inside this directory, with the filename specified
-        # above using the 'dbfilename' configuration directive.
-        #
-        # The Append Only File will also be created inside this directory.
-        #
-        # Note that you must specify a directory here, not a file name.
-         dir ./
-         */
+        var success = false
+        let processQueue = DispatchQueue.global(qos: .background)
+        processQueue.async
+        {
+            // Rewrite redis.conf to use the dbfilename for the name of the new .rdb file
+            // Setting the dbFilename calls config rewrite with the new name in Redis
+            print("\nSetting new dbFilename to \(newDBName)")
+            Auburn.dbfilename = newDBName
+            sleep(1)
+            self.unsubscribeFromNewConnectionsChannel()
+            Auburn.shutdownRedis()
+            sleep(1)
+            
+            Auburn.restartRedis()
+            // Copy the .rdb file into the Redis working directory, as specified in redis.conf (defaults to ./, which is the directory the Redis server was run from)
+            do
+            {
+                if fileManager.fileExists(atPath: destinationURL.path)
+                {
+                    try fileManager.removeItem(at: destinationURL)
+                }
+                
+                print("\nCopying new redis DB file.")
+                try fileManager.copyItem(at: fileURL, to: destinationURL)
+                
+                print("\n📂  Copied file from: \n\(fileURL)\nto:\n\(destinationURL)\n")
+                success = true
+            }
+            catch let copyError
+            {
+                print("\nError copying redis DB file from \(fileURL) to \(currentDirectory):\n\(copyError)")
+                
+                // Reset dbfilename to the default as we failed to copy the new file over
+                Auburn.dbfilename = "dump.rdb"
+                success = false
+            }
 
-        do
-        {
-            if fileManager.fileExists(atPath: destinationURL.path)
-            {
-                try fileManager.removeItem(at: destinationURL)
-            }
+            sleep(3)
+            self.subscribeToNewConnectionsChannel()
             
-            print("\nCopying new redis DB file.")
-            try fileManager.copyItem(at: fileURL, to: destinationURL)
-            
-            print("\n📂  Copied file from: \n\(fileURL)\nto:\n\(destinationURL)\n")
-            // Start Redis
-            launchRedisServer
+            self.launchRedisServer(completion:
             {
-                (success) in
+                (launchResult) in
                 
-                completion(true)
-            }
-        }
-        catch let copyError
-        {
-            print("\nError copying redis DB file from \(fileURL) to \(currentDirectory):\n\(copyError)")
-            // Start Redis
-            launchRedisServer
-            {
-                (success) in
-                
-                completion(true)
-            }
+                switch launchResult
+                {
+                case .okay(_):
+                    DispatchQueue.main.async
+                    {
+                        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
+                        completion(success)
+                    }
+                default:
+                    print("\nFailed to relaunch redis after switching .rdb file.")
+                    
+                }
+            })
             
-            // Reset dbfilename to the default as we failed to copy the new file over
-            Auburn.dbfilename = "dump.rdb"
+            
         }
+        
     }
     
+    func runLaunchRedisScript(completion:@escaping (_ completion:Bool) -> Void)
+    {
+        let bundle = Bundle.main
+        
+        guard let path = bundle.path(forResource: "LaunchRedisServerScript", ofType: "sh")
+            else
+        {
+            print("Unable to launch Redis server. Could not find the script.")
+            completion(false)
+            return
+        }
+        
+        guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
+            else
+        {
+            print("Unable to launch Redis server: could not find terraform executable.")
+            completion(false)
+            return
+        }
+        
+        guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
+            else
+        {
+            print("Unable to launch Redis server: could not find terraform executable.")
+            completion(false)
+            return
+        }
+        
+        guard let redisModulePath = bundle.path(forResource: "subsequences", ofType: "so")
+            else
+        {
+            print("Unable to launch Redis server: could not find the needed module.")
+            completion(false)
+            return
+        }
+        
+        let processQueue = DispatchQueue.global(qos: .background)
+        processQueue.async
+        {
+            print("🚀🚀🚀🚀🚀🚀🚀")
+            self.redisProcess = Process()
+            self.redisProcess.launchPath = path
+            self.redisProcess.arguments = [redisPath, redisConfigPath, redisModulePath]
+            self.redisProcess.launch()
+            sleep(1)
+            self.isRedisServerRunning
+            {
+                (serverIsRunning) in
+                
+                if serverIsRunning
+                {
+                    completion(true)
+                    return
+                }
+                else
+                {
+                    completion(false)
+                    return
+                }
+            }
+        }
+    }
+        
     func runRedisScript(path: String, arguments: [String]?, completion:@escaping (_ completion:Bool) -> Void)
     {
         let processQueue = DispatchQueue.global(qos: .background)
@@ -359,6 +395,72 @@ class RedisServerController: NSObject
             }
             
             self.redisProcess.launch()
+        }
+    }
+    
+    func unsubscribeFromNewConnectionsChannel()
+    {
+        DispatchQueue.global(qos: .utility).async
+        {
+            guard let redis = try? Redis(hostname: "localhost", port: 6379)
+                else
+            {
+                print("Unable to connect to Redis")
+                return
+            }
+            
+            redis.unsubscribe(channel: newConnectionsChannel)
+        }
+    }
+    
+    func subscribeToNewConnectionsChannel()
+    {
+        DispatchQueue.global(qos: .utility).async
+        {
+            guard let redis = try? Redis(hostname: "localhost", port: 6379)
+                else
+            {
+                print("Unable to connect to Redis")
+                return
+            }
+            
+            do
+            {
+                print("\nSubscribing to redis channel.")
+                
+                try redis.subscribe(channel:newConnectionsChannel)
+                {
+                    (maybeRedisType, maybeError) in
+                    
+                    print("\nReceived redis subscribe callback.")
+                    guard let redisList = maybeRedisType as? [Datable]
+                        else
+                    {
+                        return
+                    }
+                    
+                    for each in redisList
+                    {
+                        guard let thisElement = each as? Data
+                            else
+                        { continue }
+                        
+                        guard thisElement.string == newConnectionMessage
+                            else
+                        {
+                            print("\nReceived a message: \(thisElement.string)")
+                            continue
+                        }
+                        
+                        DispatchQueue.main.async
+                        {
+                            NotificationCenter.default.post(name: .updateStats , object: nil)
+                        }
+                    }
+                }
+            }
+            catch
+            { print(error) }
         }
     }
 }

@@ -164,24 +164,27 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
             (result) in
             
-            switch result
+            print("\nReturned from launchRedisServer call.")
+            
+            if Thread.isMainThread
             {
-            case .okay(_):
-                // Update Labels and Progress Indicator
-                self.loadLabelData()
-                self.updateProgressIndicator()
-            case .otherProcessOnPort(let processName):
-                showOtherProcessAlert(processName: processName)
-            case .corruptRedisOnPort(let pidString):
-                self.showCorruptRedisAlert(processPID: pidString)
-            case .failure(let failureString):
-                print("\nReceived failure on launch server: \(failureString ?? "")")
-                quitAdversaryLab()
+                self.handleLaunchRedisResponse(result: result)
+            }
+            else
+            {
+                print("\nWe are not on the main thread.")
+                self.handleLaunchRedisResponse(result: result)
+//                DispatchQueue.main.async
+//                {
+//                    print("\nWe've moved to the main thread!")
+//                    print("\nReturned from launchRedisServer call.")
+//                    self.handleLaunchRedisResponse(result: result)
+//                }
             }
         }
         
         // Subscribe to pubsub to know when to inspect a new connection
-        subscribeToNewConnectionsChannel()
+        RedisServerController.sharedInstance.subscribeToNewConnectionsChannel()
 
         // Also update labels and progress indicator when new data is available
         NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
@@ -192,14 +195,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "unknown"
         }
     }
-    
-    override func viewWillAppear()
-    {
-        super.viewWillAppear()
-        
-        self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
-    }
-    
+
     // MARK: - IBActions
     @IBAction func runClick(_ sender: NSButton)
     {
@@ -330,8 +326,14 @@ class ViewController: NSViewController, NSTabViewDelegate
                 {
                     (success) in
                     
-                    self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "--"
-                    self.loadLabelData()
+                    print("\nCallback received from switchDatabaseFile")
+                    let databaseName = Auburn.dbfilename ?? "--"
+                    DispatchQueue.main.async
+                    {
+                        self.databaseNameLabel.stringValue = databaseName
+                        self.loadLabelData()
+                    }
+                    
                 })
             }
         }
@@ -473,6 +475,28 @@ class ViewController: NSViewController, NSTabViewDelegate
         }
     }
     
+    func handleLaunchRedisResponse(result:ServerCheckResult)
+    {
+        switch result
+        {
+        case .okay(_):
+            // Update Labels and Progress Indicator
+            print("Okay")
+            self.loadLabelData()
+            self.updateProgressIndicator()
+        case .otherProcessOnPort(let processName):
+            print("Process on port")
+            showOtherProcessAlert(processName: processName)
+        case .corruptRedisOnPort(let pidString):
+            print("Corrupt Redis")
+            self.showCorruptRedisAlert(processPID: pidString)
+        case .failure(let failureString):
+            print("Failure")
+            print("\nReceived failure on launch server: \(failureString ?? "")")
+            quitAdversaryLab()
+        }
+    }
+    
     @objc func updateProgressIndicator()
     {
         DispatchQueue.main.async
@@ -512,202 +536,198 @@ class ViewController: NSViewController, NSTabViewDelegate
     @objc func loadLabelData()
     {
         // Updates Labels that are in the main window (always visible)
-        
         // Get redis data in the utility queue and update the labels with the data in the main queue
-        DispatchQueue.global(qos: .utility).async
+        print("\nMain thread?: \(Thread.isMainThread)")
+
+        let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+        let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
+        let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
+        let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
+        let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
+        let redisDatabaseFilename = Auburn.dbfilename ?? "--"
+    
+    
+        DispatchQueue.main.async
         {
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
-            let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
-            let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
-            let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
+            self.databaseNameLabel.stringValue = redisDatabaseFilename
+            self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
+            self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
+            self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
+            self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
             
-            DispatchQueue.main.async
+            guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
+                let currentTab = TabIds(rawValue: identifier)
+                else { return }
+            
+            switch currentTab
             {
-                self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
-                self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
-                self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
-                self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
-                
-                guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
-                    let currentTab = TabIds(rawValue: identifier)
-                    else { return }
-                
-                switch currentTab
-                {
-                case .TrainingMode:
-                    self.loadTrainingLabelData()
-                case .TestMode:
-                    self.loadTestLabelData()
-                }
+            case .TrainingMode:
+                self.loadTrainingLabelData()
+            case .TestMode:
+                self.loadTestLabelData()
             }
         }
-        
-        // Identify which tab we need to update
     }
     
     func loadTestLabelData()
     {
         // Get redis data in the utility queue and update the labels with the data in the main queue
-        DispatchQueue.global(qos: .utility).async
+        let testResults: RMap<String,Double> = RMap(key: testResultsKey)
+        
+        // Timing (milliseconds)
+        let timeBlocked = testResults[blockedTimingKey]
+        let timeBlockAccuracy = testResults[blockedTimingAccuracyKey]
+        let timeAllowed = testResults[allowedTimingKey]
+        let timeAllowAccuracy = testResults[allowedTimingAccuracyKey]
+        
+        // TLS Common Names
+        let tlsBlockAccuracy = testResults[blockedTLSAccuracyKey]
+        let tlsAllowAccuracy = testResults[allowedTLSAccuracyKey]
+        let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
+        let tlsAllowed = tlsResultsDictionary[allowedTLSKey]
+        let tlsBlocked = tlsResultsDictionary[blockedTLSKey]
+        
+        // Lengths
+        let lengthInAllowed = testResults[allowedIncomingLengthKey]
+        let lengthInAllowAccuracy = testResults[allowedIncomingLengthAccuracyKey]
+        let lengthInBlocked = testResults[blockedIncomingLengthKey]
+        let lengthInBlockAccuracy = testResults[blockedIncomingLengthAccuracyKey]
+        let lengthOutAllowed = testResults[allowedOutgoingLengthKey]
+        let lengthOutAllowAccuracy = testResults[allowedOutgoingLengthAccuracyKey]
+        let lengthOutBlocked = testResults[blockedOutgoingLengthKey]
+        let lengthOutBlockAccuracy = testResults[blockedOutgoingLengthAccuracyKey]
+        
+        // Entropy
+        let entInAllowAccuracy = testResults[allowedIncomingEntropyAccuracyKey]
+        let entInBlockAccuracy = testResults[blockedIncomingEntropyAccuracyKey]
+        let entInAllowed = testResults[allowedIncomingEntropyKey]
+        let entInBlocked = testResults[blockedIncomingEntropyKey]
+        
+        let entoutAllowAccuracy = testResults[allowedOutgoingEntropyAccuracyKey]
+        let entOutBlockAccuracy = testResults[blockedOutgoingEntropyAccuracyKey]
+        let entOutAllowed = testResults[allowedOutgoingEntropyKey]
+        let entOutBlocked = testResults[blockedOutgoingEntropyKey]
+        
+        // All Features
+        let allAllowAccuracy = testResults[allowedAllFeaturesAccuracyKey]
+        let allBlockAccuracy = testResults[blockedAllFeaturesAccuracyKey]
+        
+        DispatchQueue.main.async
         {
-            let testResults: RMap<String,Double> = RMap(key: testResultsKey)
+            if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
+            {
+                self.timingAllowed = String(format: "%.2f", timeAllowed!)
+                self.timingAllowAccuracy = String(format: "%.2f", timeAllowAccuracy!)
+                self.timingBlocked = String(format: "%.2f", timeBlocked!)
+                self.timingBlockAccuracy = String(format: "%.2f", timeBlockAccuracy!)
+            }
+            else
+            {
+                self.timingAllowed = "--"
+                self.timingAllowAccuracy = "--"
+                self.timingBlocked = "--"
+                self.timingBlockAccuracy = "--"
+            }
             
-            // Timing (milliseconds)
-            let timeBlocked = testResults[blockedTimingKey]
-            let timeBlockAccuracy = testResults[blockedTimingAccuracyKey]
-            let timeAllowed = testResults[allowedTimingKey]
-            let timeAllowAccuracy = testResults[allowedTimingAccuracyKey]
+            if tlsAllowAccuracy != nil, tlsBlockAccuracy != nil, tlsAllowed != nil, tlsBlocked != nil
+            {
+                self.tls12Allowed = String(format: "%.2f", tlsAllowed!)
+                self.tls12AllowAccuracy = String(format: "%.2f", tlsAllowAccuracy!)
+                self.tls12Blocked = String(format: "%.2f", tlsBlocked!)
+                self.tls12BlockAccuracy = String(format: "%.2f", tlsBlockAccuracy!)
+            }
+            else
+            {
+                self.tls12Allowed = "--"
+                self.tls12AllowAccuracy = "--"
+                self.tls12Blocked = "--"
+                self.tls12BlockAccuracy = "--"
+            }
             
-            // TLS Common Names
-            let tlsBlockAccuracy = testResults[blockedTLSAccuracyKey]
-            let tlsAllowAccuracy = testResults[allowedTLSAccuracyKey]
-            let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
-            let tlsAllowed = tlsResultsDictionary[allowedTLSKey]
-            let tlsBlocked = tlsResultsDictionary[blockedTLSKey]
+            if
+                entInAllowed != nil,
+                entInBlocked != nil,
+                entInAllowAccuracy != nil,
+                entInBlockAccuracy != nil
+            {
+                self.inAllowedEntropy = String(format: "%.2f", entInAllowed!)
+                self.inEntropyAllowAccuracy = String(format: "%.2f", entInAllowAccuracy!)
+                self.inBlockedEntropy = String(format: "%.2f", entInBlocked!)
+                self.inEntropyBlockAccuracy = String(format: "%.2f", entInBlockAccuracy!)
+            }
+            else
+            {
+                self.inAllowedEntropy = "--"
+                self.inEntropyAllowAccuracy = "--"
+                self.inBlockedEntropy = "--"
+                self.inEntropyBlockAccuracy = "--"
+            }
             
-            // Lengths
-            let lengthInAllowed = testResults[allowedIncomingLengthKey]
-            let lengthInAllowAccuracy = testResults[allowedIncomingLengthAccuracyKey]
-            let lengthInBlocked = testResults[blockedIncomingLengthKey]
-            let lengthInBlockAccuracy = testResults[blockedIncomingLengthAccuracyKey]
-            let lengthOutAllowed = testResults[allowedOutgoingLengthKey]
-            let lengthOutAllowAccuracy = testResults[allowedOutgoingLengthAccuracyKey]
-            let lengthOutBlocked = testResults[blockedOutgoingLengthKey]
-            let lengthOutBlockAccuracy = testResults[blockedOutgoingLengthAccuracyKey]
+            if
+                entOutAllowed != nil,
+                entOutBlocked != nil,
+                entoutAllowAccuracy != nil,
+                entOutBlockAccuracy != nil
+            {
+                self.outAllowedEntropy = String(format: "%.2f", entOutAllowed!)
+                self.outBlockedEntropy = String(format: "%.2f", entOutBlocked!)
+                self.outEntropyAllowAccuracy = String(format: "%.2f", entoutAllowAccuracy!)
+                self.outEntropyBlockAccuracy = String(format: "%.2f", entOutBlockAccuracy!)
+            }
+            else
+            {
+                self.outAllowedEntropy = "--"
+                self.outBlockedEntropy = "--"
+                self.outEntropyAllowAccuracy = "--"
+                self.outEntropyBlockAccuracy = "--"
+            }
             
-            // Entropy
-            let entInAllowAccuracy = testResults[allowedIncomingEntropyAccuracyKey]
-            let entInBlockAccuracy = testResults[blockedIncomingEntropyAccuracyKey]
-            let entInAllowed = testResults[allowedIncomingEntropyKey]
-            let entInBlocked = testResults[blockedIncomingEntropyKey]
+            if
+                lengthInAllowAccuracy != nil,
+                lengthInBlockAccuracy != nil,
+                lengthInAllowed != nil,
+                lengthInBlocked != nil
+            {
+                self.inLengthAllowed = String(format: "%.2f", lengthInAllowed!)
+                self.inLengthAllowAccuracy = String(format: "%.2f", lengthInAllowAccuracy!)
+                self.inLengthBlocked = String(format: "%.2f", lengthInBlocked!)
+                self.inLengthBlockAccuracy = String(format: "%.2f", lengthInBlockAccuracy!)
+            }
+            else
+            {
+                self.inLengthAllowed = "--"
+                self.inLengthAllowAccuracy = "--"
+                self.inLengthBlocked = "--"
+                self.inLengthBlockAccuracy = "--"
+            }
             
-            let entoutAllowAccuracy = testResults[allowedOutgoingEntropyAccuracyKey]
-            let entOutBlockAccuracy = testResults[blockedOutgoingEntropyAccuracyKey]
-            let entOutAllowed = testResults[allowedOutgoingEntropyKey]
-            let entOutBlocked = testResults[blockedOutgoingEntropyKey]
+            if lengthOutAllowAccuracy != nil,
+                lengthOutBlockAccuracy != nil,
+                lengthOutAllowed != nil,
+                lengthOutBlocked != nil
+            {
+                self.outLengthAllowed = String(format: "%.2f", lengthOutAllowed!)
+                self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)
+                self.outLengthBlocked = String(format: "%.2f", lengthOutBlocked!)
+                self.outLengthBlockAccuracy = String(format: "%.2f", lengthOutBlockAccuracy!)
+            }
+            else
+            {
+                self.outLengthAllowed = "--"
+                self.outLengthAllowAccuracy = "--"
+                self.outLengthBlocked = "--"
+                self.outLengthBlockAccuracy = "--"
+            }
             
             // All Features
-            let allAllowAccuracy = testResults[allowedAllFeaturesAccuracyKey]
-            let allBlockAccuracy = testResults[blockedAllFeaturesAccuracyKey]
-            
-            DispatchQueue.main.async
-            {
-                if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
-                {
-                    self.timingAllowed = String(format: "%.2f", timeAllowed!)
-                    self.timingAllowAccuracy = String(format: "%.2f", timeAllowAccuracy!)
-                    self.timingBlocked = String(format: "%.2f", timeBlocked!)
-                    self.timingBlockAccuracy = String(format: "%.2f", timeBlockAccuracy!)
-                }
-                else
-                {
-                    self.timingAllowed = "--"
-                    self.timingAllowAccuracy = "--"
-                    self.timingBlocked = "--"
-                    self.timingBlockAccuracy = "--"
-                }
-                
-                if tlsAllowAccuracy != nil, tlsBlockAccuracy != nil, tlsAllowed != nil, tlsBlocked != nil
-                {
-                    self.tls12Allowed = String(format: "%.2f", tlsAllowed!)
-                    self.tls12AllowAccuracy = String(format: "%.2f", tlsAllowAccuracy!)
-                    self.tls12Blocked = String(format: "%.2f", tlsBlocked!)
-                    self.tls12BlockAccuracy = String(format: "%.2f", tlsBlockAccuracy!)
-                }
-                else
-                {
-                    self.tls12Allowed = "--"
-                    self.tls12AllowAccuracy = "--"
-                    self.tls12Blocked = "--"
-                    self.tls12BlockAccuracy = "--"
-                }
-                
-                if
-                    entInAllowed != nil,
-                    entInBlocked != nil,
-                    entInAllowAccuracy != nil,
-                    entInBlockAccuracy != nil
-                {
-                    self.inAllowedEntropy = String(format: "%.2f", entInAllowed!)
-                    self.inEntropyAllowAccuracy = String(format: "%.2f", entInAllowAccuracy!)
-                    self.inBlockedEntropy = String(format: "%.2f", entInBlocked!)
-                    self.inEntropyBlockAccuracy = String(format: "%.2f", entInBlockAccuracy!)
-                }
-                else
-                {
-                    self.inAllowedEntropy = "--"
-                    self.inEntropyAllowAccuracy = "--"
-                    self.inBlockedEntropy = "--"
-                    self.inEntropyBlockAccuracy = "--"
-                }
-                
-                if
-                    entOutAllowed != nil,
-                    entOutBlocked != nil,
-                    entoutAllowAccuracy != nil,
-                    entOutBlockAccuracy != nil
-                {
-                    self.outAllowedEntropy = String(format: "%.2f", entOutAllowed!)
-                    self.outBlockedEntropy = String(format: "%.2f", entOutBlocked!)
-                    self.outEntropyAllowAccuracy = String(format: "%.2f", entoutAllowAccuracy!)
-                    self.outEntropyBlockAccuracy = String(format: "%.2f", entOutBlockAccuracy!)
-                }
-                else
-                {
-                    self.outAllowedEntropy = "--"
-                    self.outBlockedEntropy = "--"
-                    self.outEntropyAllowAccuracy = "--"
-                    self.outEntropyBlockAccuracy = "--"
-                }
-                
-                if
-                    lengthInAllowAccuracy != nil,
-                    lengthInBlockAccuracy != nil,
-                    lengthInAllowed != nil,
-                    lengthInBlocked != nil
-                {
-                    self.inLengthAllowed = String(format: "%.2f", lengthInAllowed!)
-                    self.inLengthAllowAccuracy = String(format: "%.2f", lengthInAllowAccuracy!)
-                    self.inLengthBlocked = String(format: "%.2f", lengthInBlocked!)
-                    self.inLengthBlockAccuracy = String(format: "%.2f", lengthInBlockAccuracy!)
-                }
-                else
-                {
-                    self.inLengthAllowed = "--"
-                    self.inLengthAllowAccuracy = "--"
-                    self.inLengthBlocked = "--"
-                    self.inLengthBlockAccuracy = "--"
-                }
-                
-                if lengthOutAllowAccuracy != nil,
-                    lengthOutBlockAccuracy != nil,
-                    lengthOutAllowed != nil,
-                    lengthOutBlocked != nil
-                {
-                    self.outLengthAllowed = String(format: "%.2f", lengthOutAllowed!)
-                    self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)
-                    self.outLengthBlocked = String(format: "%.2f", lengthOutBlocked!)
-                    self.outLengthBlockAccuracy = String(format: "%.2f", lengthOutBlockAccuracy!)
-                }
-                else
-                {
-                    self.outLengthAllowed = "--"
-                    self.outLengthAllowAccuracy = "--"
-                    self.outLengthBlocked = "--"
-                    self.outLengthBlockAccuracy = "--"
-                }
-                
-                // All Features
-                self.allFeaturesAllowAccuracy = "--"
-                self.allFeaturesBlockAccuracy = "--"
+            self.allFeaturesAllowAccuracy = "--"
+            self.allFeaturesBlockAccuracy = "--"
 
-                if allAllowAccuracy != nil
-                { self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!) }
-                
-                if allBlockAccuracy != nil
-                { self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!) }
-            }
+            if allAllowAccuracy != nil
+            { self.allFeaturesAllowAccuracy = String(format: "%.2f", allAllowAccuracy!) }
+            
+            if allBlockAccuracy != nil
+            { self.allFeaturesBlockAccuracy = String(format: "%.2f", allBlockAccuracy!) }
         }
     }
     
@@ -715,8 +735,8 @@ class ViewController: NSViewController, NSTabViewDelegate
     {
         // Get redis data in the utility queue and update the labels with the data in the main queue
         
-        DispatchQueue.global(qos: .utility).async
-        {
+//        DispatchQueue.global(qos: .utility).async
+//        {
             /// Scores
             
             // Offset Subsequences
@@ -1078,59 +1098,10 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.forbiddenInSequenceAcc = "--"
                 }
             }
-        }
+//        }
     }
     
-    func subscribeToNewConnectionsChannel()
-    {
-        DispatchQueue.global(qos: .utility).async
-        {
-            guard let redis = try? Redis(hostname: "localhost", port: 6379)
-                else
-            {
-                print("Unable to connect to Redis")
-                return
-            }
-            
-            do
-            {
-                print("\nSubscribing to redis channel.")
-                
-                try redis.subscribe(channel:newConnectionsChannel)
-                {
-                    (maybeRedisType, maybeError) in
-                    
-                    print("\nReceived redis subscribe callback.")
-                    guard let redisList = maybeRedisType as? [Datable]
-                        else
-                    {
-                        return
-                    }
-                    
-                    for each in redisList
-                    {
-                        guard let thisElement = each as? Data
-                            else
-                        { continue }
-                        
-                        guard thisElement.string == newConnectionMessage
-                            else
-                        {
-                            print("\nReceived a message: \(thisElement.string)")
-                            continue
-                        }
-                        
-                        DispatchQueue.main.async
-                        {
-                            self.loadLabelData()
-                        }
-                    }
-                }
-            }
-            catch
-            { print(error) }
-        }
-    }
+   
 
 }
 
