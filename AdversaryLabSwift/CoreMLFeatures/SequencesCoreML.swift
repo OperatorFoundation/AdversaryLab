@@ -18,7 +18,6 @@ class SequencesCoreML
         if configModel.trainingMode
         {
             trainFloatModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
-            trainOffsetModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
@@ -32,6 +31,27 @@ class SequencesCoreML
             
             testFloatModel(floatSequences: allowedFloatSequences, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
             testFloatModel(floatSequences: blockedFloatSequences, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+        }
+    }
+    
+    func scoreOffsetSequences(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    {
+        if configModel.trainingMode
+        {
+            trainOffsetModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
+        }
+        else
+        {
+            let (allowedOffsetSequences, blockedOffsetSequences) = getOffsets(forConnectionDirection: connectionDirection)
+            guard blockedOffsetSequences.count > 0
+                else
+            {
+                print("\nUnable to test float sequences. The blocked lengths list is empty.")
+                return
+            }
+            
+            testOffsetModel(offsetSequences: allowedOffsetSequences, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+            testOffsetModel(offsetSequences: blockedOffsetSequences, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
     
@@ -293,6 +313,96 @@ class SequencesCoreML
         }
     }
     
+    func testOffsetModel(offsetSequences: [Data], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    {
+        let classifierName: String
+        let accuracyKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            classifierName = inOffsetClassifierName
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = allowedIncomingOffsetAccuracyKey
+            case .blocked:
+                accuracyKey = blockedIncomingOffsetAccuracyKey
+            }
+        case .outgoing:
+            classifierName = outOffsetClassifierName
+            switch connectionType
+            {
+            case .allowed:
+                accuracyKey = allowedOutgoingOffsetAccuracyKey
+            case .blocked:
+                accuracyKey = blockedOutgoingOffsetAccuracyKey
+            }
+        }
+        
+        do
+        {
+            let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: offsetSequences])
+            
+            guard let appDirectory = getAdversarySupportDirectory()
+                else
+            {
+                print("\nFailed to test models. Unable to locate application document directory.")
+                return
+            }
+            
+            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            
+            // This is the dictionary where we will save our results
+            let offsetDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+            
+            // Classifier
+            if FileManager.default.fileExists(atPath: classifierFileURL.path)
+            {
+                if let classifierPrediction = MLModelController().prediction(fileURL: classifierFileURL, batchFeatureProvider: classifierFeatureProvider)
+                {
+                    guard classifierPrediction.count > 0
+                        else
+                    {
+                        print("\nOffset Sequence classifier prediction has no values.")
+                        return
+                    }
+                    
+                    let featureCount = classifierPrediction.count
+                    
+                    guard featureCount > 0
+                        else
+                    {
+                        print("/nFloat Sequence prediction had no values.")
+                        return
+                    }
+                    
+                    var allowedBlockedCount: Double = 0.0
+                    for index in 0 ..< featureCount
+                    {
+                        let thisFeature = classifierPrediction.features(at: index)
+                        guard let lengthClassification = thisFeature.featureValue(for: "classification")
+                            else { continue }
+                        if lengthClassification.stringValue == connectionType.rawValue
+                        {
+                            allowedBlockedCount += 1
+                        }
+                    }
+                    
+                    let accuracy = allowedBlockedCount/Double(featureCount)
+                    print("\n🔮 Float Sequence prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                    
+                    offsetDictionary[accuracyKey] = accuracy
+                }
+            }
+        }
+        catch
+        {
+            print("Unable to test float sequences: Failed to create the feature provider.")
+        }
+    }
+    
     func getFloats(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedFloats:[Data], blockedFloats: [Data])
     {
         let allowedFloatsKey: String
@@ -317,6 +427,32 @@ class SequencesCoreML
         let blockedFloatsArray = newDataArray(from: [blockedFloatsRSet])
         
         return (allowedFloatsArray, blockedFloatsArray)
+    }
+    
+    func getOffsets(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedFloats:[Data], blockedFloats: [Data])
+    {
+        let allowedOffsetsKey: String
+        let blockedOffsetsKey: String
+        
+        switch connectionDirection
+        {
+        case .incoming:
+            allowedOffsetsKey = allowedIncomingOffsetSequencesKey
+            blockedOffsetsKey = blockedIncomingOffsetSequencesKey
+        case .outgoing:
+            allowedOffsetsKey = allowedOutgoingOffsetSequencesKey
+            blockedOffsetsKey = blockedOutgoingOffsetSequencesKey
+        }
+        
+        /// A is the sorted set of lengths for the Allowed traffic
+        let allowedOffsetsRSet: RSortedSet<Data> = RSortedSet(key: allowedOffsetsKey)
+        let allowedOffsetsArray = newDataArray(from: [allowedOffsetsRSet])
+        
+        /// B is the sorted set of lengths for the Blocked traffic
+        let blockedOffsetsRSet: RSortedSet<Data> = RSortedSet(key: blockedOffsetsKey)
+        let blockedOffsetsArray = newDataArray(from: [blockedOffsetsRSet])
+        
+        return (allowedOffsetsArray, blockedOffsetsArray)
     }
 
     func trainFloatModels(connectionDirection: ConnectionDirection, modelName: String)

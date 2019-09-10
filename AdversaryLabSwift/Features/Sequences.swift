@@ -301,7 +301,7 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection, configModel:
         trainingSequenceOffsets.append(bottomRecord.offset)
     }
     
-    SequencesCoreML().trainOffsetModels(connectionDirection: connectionDirection, modelName: configModel.modelName)
+    SequencesCoreML().scoreOffsetSequences(connectionDirection: connectionDirection, configModel: configModel)
 }
 
 
