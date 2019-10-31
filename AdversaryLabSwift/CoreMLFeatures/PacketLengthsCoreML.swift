@@ -461,23 +461,41 @@ class PacketLengthsCoreML
         return swiftSet
     }
     
-    func newIntArray(from redisSets:[RSortedSet<Int>]) -> [Int]
+}
+
+// TODO: Add this to Auburn instead
+func newIntArray(from redisSets:[RSortedSet<Int>]) -> [Int]
+{
+    var newArray = [Int]()
+    
+    for set in redisSets
     {
-        var newArray = [Int]()
-        
-        for set in redisSets
+        for i in 0 ..< set.count
         {
-            for i in 0 ..< set.count
+            if let newMember: Int = set[i]
             {
-                if let newMember: Int = set[i]
-                {
-                    newArray.append(newMember)
-                }
+                newArray.append(newMember)
             }
         }
-        
-        return newArray
     }
+    
+    return newArray
+}
+
+func newDoubleArray(from intSortedSet: RSortedSet<Int>) -> [Double]
+{
+    var newArray = [Double]()
+    
+    for i in 0 ..< intSortedSet.count
+    {
+        intSortedSet.
+        if let newMember: Int = intSortedSet[i]
+        {
+            newArray.append(Double(newMember))
+        }
+    }
+    
+    return newArray
 }
 
 

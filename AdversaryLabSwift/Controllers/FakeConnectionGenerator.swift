@@ -27,31 +27,6 @@ class FakeConnectionGenerator
         addblockedPackets()
         
         NotificationCenter.default.post(name: .updateStats, object: nil)
-        
-//        guard let redis = try? Redis(hostname: "localhost", port: 6379)
-//            else
-//        {
-//            return
-//        }
-//
-//        analysisQueue.sync
-//        {
-//            addAllowedPackets()
-//            addblockedPackets()
-//            
-//            NotificationCenter.default.post(name: .updateStats, object: nil)
-//        }
-        
-        
-        // Publish: New connections are ready to be analyzed.
-//        do
-//        {
-//            let _ = try redis.publish(channel: newConnectionsChannel, message: newConnectionMessage)
-//        }
-//        catch
-//        {
-//            print(error)
-//        }
     }
     
     func addAllowedPackets()

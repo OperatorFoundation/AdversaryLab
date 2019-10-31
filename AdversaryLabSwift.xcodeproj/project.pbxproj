@@ -50,6 +50,9 @@
 		AE0BC8E02280940D00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
 		AE0BC8E22280941900AD89E7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8E12280941900AD89E7 /* Foundation.framework */; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
+		AE1AE59C233D5F340027E728 /* ZIPFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AEE50A9E228238DE009698CC /* ZIPFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AE27A703234D2FB300974C03 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE27A702234D2FB300974C03 /* Charts.framework */; };
+		AE27A704234D2FB300974C03 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE27A702234D2FB300974C03 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */; };
 		AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
@@ -150,6 +153,13 @@
 			remoteGlobalIDString = AE08E0E2226A9A8C00D94E45;
 			remoteInfo = org.operatorFoundation.AdversaryLabService;
 		};
+		AE27A701234D2FB300974C03 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = "Charts::Charts::Product";
+			remoteInfo = Charts;
+		};
 		AEE50A9D228238DE009698CC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
@@ -166,7 +176,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				AE1AE59C233D5F340027E728 /* ZIPFoundation.framework in Embed Frameworks */,
 				468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */,
+				AE27A704234D2FB300974C03 /* Charts.framework in Embed Frameworks */,
 				468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */,
 				468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */,
 			);
@@ -266,6 +278,7 @@
 				AEE50A9F228238DE009698CC /* ZIPFoundation.framework in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
+				AE27A703234D2FB300974C03 /* Charts.framework in Frameworks */,
 				468B26482023C092000A2B5D /* RedShot.framework in Frameworks */,
 				468B264C2023C099000A2B5D /* Datable.framework in Frameworks */,
 				468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */,
@@ -423,6 +436,7 @@
 				46D85129201FE4B50052DF49 /* AdversaryLabSwiftPackage */,
 				46D85127201FE4B50052DF49 /* AdversaryLabSwiftPackageTests.xctest */,
 				46D8512B201FE4B50052DF49 /* Auburn.framework */,
+				AE27A702234D2FB300974C03 /* Charts.framework */,
 				46D8512F201FE4B50052DF49 /* Datable.framework */,
 				46D8512D201FE4B50052DF49 /* RedShot.framework */,
 				AEE50A9E228238DE009698CC /* ZIPFoundation.framework */,
@@ -665,6 +679,13 @@
 			fileType = wrapper.framework;
 			path = Datable.framework;
 			remoteRef = 46D8512E201FE4B50052DF49 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		AE27A702234D2FB300974C03 /* Charts.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Charts.framework;
+			remoteRef = AE27A701234D2FB300974C03 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		AEE50A9E228238DE009698CC /* ZIPFoundation.framework */ = {

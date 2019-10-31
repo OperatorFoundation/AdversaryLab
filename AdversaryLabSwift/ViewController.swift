@@ -11,9 +11,14 @@ import Auburn
 import RedShot
 import Datable
 import CoreML
+import Charts
 
 class ViewController: NSViewController, NSTabViewDelegate
 {
+    @IBOutlet weak var timingChartView: LineChartView!
+    @IBOutlet weak var entropyChartView: LineChartView!
+    @IBOutlet weak var lengthChartView: LineChartView!
+    
     @objc dynamic var allowedPacketsSeen = "Loading..."
     @objc dynamic var allowedPacketsAnalyzed = "Loading..."
     @objc dynamic var blockedPacketsSeen = "Loading..."
@@ -157,6 +162,7 @@ class ViewController: NSViewController, NSTabViewDelegate
     {
         super.viewDidLoad()
         
+        updateCharts()
         updateConfigModel()
         
         // Launch Redis Server
@@ -225,6 +231,8 @@ class ViewController: NSViewController, NSTabViewDelegate
                 {
                     sender.state = .off
                 }
+            case .DataMode:
+                print("Data mode selected. Nothing to do here.")
             }
         }
         else
@@ -285,9 +293,8 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     @IBAction func loadDataClicked(_ sender: NSButton)
     {
-        
-        guard let window = view.window
-            else { return }
+        loadDataButton.isEnabled = false
+
         guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
             let currentTab = TabIds(rawValue: identifier)
             else { return }
@@ -305,38 +312,221 @@ class ViewController: NSViewController, NSTabViewDelegate
                     configModel.modelName = modelName
                 }
             }
+            
+            loadDataButton.isEnabled = true
   
         case .TrainingMode:
-            let panel = NSOpenPanel()
-            panel.canChooseFiles = true
-            panel.canChooseDirectories = false
-            panel.allowsMultipleSelection = false
-            panel.allowedFileTypes = ["rdb"]
             
-            panel.beginSheetModal(for: window)
+            if let selectedFileURL = showRDBFileAlert()
             {
-                (result) in
-                
-                guard result == NSApplication.ModalResponse.OK
-                    else { return }
-                
-                let selectedFileURL = panel.urls[0]
-                
-                RedisServerController.sharedInstance.switchDatabaseFile(withFile: selectedFileURL, completion:
+                loadRDBFile(fileURL: selectedFileURL)
                 {
-                    (success) in
+                    _ in
                     
-                    print("\nCallback received from switchDatabaseFile")
-                    let databaseName = Auburn.dbfilename ?? "--"
-                    DispatchQueue.main.async
-                    {
-                        self.databaseNameLabel.stringValue = databaseName
-                        self.loadLabelData()
-                    }
-                    
-                })
+                    self.refreshDBUI()
+                }
             }
+            else
+            {
+                refreshDBUI()
+            }
+            
+        case .DataMode:
+            print("Data mode selected. Nothing to do here.")
+            loadDataButton.isEnabled = true
         }
+    }
+    
+    func loadRDBFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
+    {
+        // TODO: Merge RDB files
+        RedisServerController.sharedInstance.switchDatabaseFile(withFile: fileURL, completion:
+        {
+            (_) in
+            
+            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
+            let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
+            let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
+            
+            if allowedPacketsSeenValue == nil && blockedPacketsSeenValue == nil
+            {
+                showNoDataAlert()
+            }
+            
+            if allowedPacketsSeenValue == nil
+            {
+                if let selectedFileURL = showNoAllowedConnectionDataAlert()
+                {
+                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+                    self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+                }
+            }
+
+            if blockedPacketsSeenValue == nil
+            {
+                if let selectedFileURL = showNoBlockedConnectionDataAlert()
+                {
+                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+                    self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+                }
+            }
+            
+            completion(true)
+        })
+    }
+    
+    func refreshDBUI()
+    {
+        let databaseName = Auburn.dbfilename ?? "--"
+        DispatchQueue.main.async
+        {
+            self.databaseNameLabel.stringValue = databaseName
+            self.loadDataButton.isEnabled = true
+            self.loadLabelData()
+        }
+    }
+    
+    // MARK: - Charts
+    
+    func updateCharts()
+    {
+        updateTimeChart()
+        updateEntropyChart()
+        updateLengthChart()
+    }
+    
+    func updateLengthChart()
+    {
+        let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
+        let allowedOutLengths = newDoubleArray(from: allowedOutLengthsSet)
+        let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthKey)
+        let allowedInLengths = newDoubleArray(from: allowedInLengthsSet)
+        let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
+        let blockedOutLengths = newDoubleArray(from: blockedOutLengthsSet)
+        let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
+        let blockedInLengths = newDoubleArray(from: blockedInLengthsSet)
+        
+        let allowedInLengthsEntry = chartDataEntry(fromArray: allowedInLengths)
+        let allowedOutLengthsEntry = chartDataEntry(fromArray: allowedOutLengths)
+        let blockedInLengthsEntry = chartDataEntry(fromArray: blockedInLengths)
+        let blockedOutLengthsEntry = chartDataEntry(fromArray: blockedOutLengths)
+        
+        let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "Allowed Incoming Packet Lengths")
+        allowedInLine.colors = [NSUIColor.blue]
+        allowedInLine.circleColors = [NSUIColor.blue]
+        allowedInLine.circleRadius = 3
+        allowedInLine.drawValuesEnabled = false
+        let allowedOutLine = LineChartDataSet(entries: allowedOutLengthsEntry, label: "Allowed Outgoing Packet Lengths")
+        allowedOutLine.colors = [NSUIColor.gray]
+        allowedOutLine.circleColors = [NSUIColor.gray]
+        allowedOutLine.circleRadius = 3
+        allowedOutLine.drawValuesEnabled = false
+        let blockedInLine = LineChartDataSet(entries: blockedInLengthsEntry, label: "Blocked Incoming Packet Lengths")
+        blockedInLine.colors = [NSUIColor.red]
+        blockedInLine.circleColors = [NSUIColor.red]
+        blockedInLine.circleRadius = 3
+        blockedInLine.drawValuesEnabled = false
+        let blockedOutLine = LineChartDataSet(entries: blockedOutLengthsEntry, label: "Blocked Outgoing Packet Lengths")
+        blockedOutLine.colors = [NSUIColor.orange]
+        blockedOutLine.circleColors = [NSUIColor.orange]
+        blockedOutLine.circleRadius = 3
+        blockedOutLine.drawValuesEnabled = false
+        
+        let data = LineChartData()
+        data.addDataSet(allowedInLine)
+        data.addDataSet(allowedOutLine)
+        data.addDataSet(blockedInLine)
+        data.addDataSet(blockedOutLine)
+        
+        lengthChartView.data = data
+        lengthChartView.chartDescription?.text = "Packet Lengths"
+    }
+    
+    func updateEntropyChart()
+    {
+        let allowedInEntropyList: RList<Double> = RList(key: allowedIncomingEntropyKey)
+        let allowedInEntropy = allowedInEntropyList.array.sorted()
+        let allowedOutEntropyList: RList<Double> = RList(key: allowedOutgoingEntropyKey)
+        let allowedOutEntropy = allowedOutEntropyList.array.sorted()
+        let blockedInEntropyList: RList<Double> = RList(key: blockedIncomingEntropyKey)
+        let blockedInEntropy = blockedInEntropyList.array.sorted()
+        let blockedOutEntropyList: RList<Double> = RList(key: blockedOutgoingEntropyKey)
+        let blockedOutEntropy = blockedOutEntropyList.array.sorted()
+        
+        let allowedInEntropyEntry = chartDataEntry(fromArray: allowedInEntropy)
+        let allowedOutEntropyEntry = chartDataEntry(fromArray: allowedOutEntropy)
+        let blockedInEntropyEntry = chartDataEntry(fromArray: blockedInEntropy)
+        let blockedOutEntropyEntry = chartDataEntry(fromArray: blockedOutEntropy)
+        
+        let allowedInLine = LineChartDataSet(entries: allowedInEntropyEntry, label: "Allowed Incoming Entropy")
+        allowedInLine.colors = [NSUIColor.blue]
+        allowedInLine.circleColors = [NSUIColor.blue]
+        allowedInLine.circleRadius = 3
+        allowedInLine.drawValuesEnabled = false
+        let allowedOutLine = LineChartDataSet(entries: allowedOutEntropyEntry, label: "Allowed Outgoing Entropy")
+        allowedOutLine.colors = [NSUIColor.gray]
+        allowedOutLine.circleColors = [NSUIColor.gray]
+        allowedOutLine.circleRadius = 3
+        allowedOutLine.drawValuesEnabled = false
+        let blockedInLine = LineChartDataSet(entries: blockedInEntropyEntry, label: "Blocked Incoming Entropy")
+        blockedInLine.colors = [NSUIColor.red]
+        blockedInLine.circleColors = [NSUIColor.red]
+        blockedInLine.circleRadius = 3
+        blockedInLine.drawValuesEnabled = false
+        let blockedOutLine = LineChartDataSet(entries: blockedOutEntropyEntry, label: "Blocked Outgoing Entropy")
+        blockedOutLine.colors = [NSUIColor.orange]
+        blockedOutLine.circleColors = [NSUIColor.orange]
+        blockedOutLine.circleRadius = 3
+        blockedOutLine.drawValuesEnabled = false
+        
+        let data = LineChartData()
+        data.addDataSet(allowedInLine)
+        data.addDataSet(allowedOutLine)
+        data.addDataSet(blockedInLine)
+        data.addDataSet(blockedOutLine)
+        
+        entropyChartView.data = data
+        entropyChartView.chartDescription?.text = "Entropy"
+    }
+    
+    func updateTimeChart()
+    {
+        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
+        let allowedTimeDifferences = allowedTimeDifferenceList.array.sorted()
+        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
+        let blockedTimeDifferences = blockedTimeDifferenceList.array.sorted()
+        
+        let allowedLineChartEntry = chartDataEntry(fromArray: allowedTimeDifferences)
+        let blockedLineChartEntry = chartDataEntry(fromArray: blockedTimeDifferences)
+        
+        let line1 = LineChartDataSet(entries: allowedLineChartEntry, label: "Allowed")
+        line1.colors = [NSUIColor.blue]
+        line1.circleColors = [NSUIColor.blue]
+        line1.circleRadius = 3
+        
+        let line2 = LineChartDataSet(entries: blockedLineChartEntry, label: "Blocked")
+        line2.colors = [NSUIColor.red]
+        line2.circleColors = [NSUIColor.red]
+        line2.circleRadius = 3
+        
+        let data = LineChartData()
+        
+        data.addDataSet(line1)
+        data.addDataSet(line2)
+        timingChartView.data = data
+        timingChartView.chartDescription?.text = "Time Differences"
+    }
+    
+    func chartDataEntry(fromArray dataArray:[Double]) -> [ChartDataEntry]
+    {
+        var lineChartData = [ChartDataEntry]()
+        for i in 0..<dataArray.count
+        {
+            let value = ChartDataEntry(x: Double(i), y: dataArray[i])
+            lineChartData.append(value)
+        }
+        
+        return lineChartData
     }
     
     // MARK: - TabView Delegate
@@ -352,12 +542,21 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
         case .TrainingMode:
             configModel.trainingMode = true
+            self.loadDataButton.isEnabled = true
             self.loadDataButton.title = "Load DB File"
+            self.processPacketsButton.isEnabled = true
             self.processPacketsButton.title = "Train With Data"
         case .TestMode:
             configModel.trainingMode = false
+            self.loadDataButton.isEnabled = true
             self.loadDataButton.title = "Load Model File"
+            self.processPacketsButton.isEnabled = true
             self.processPacketsButton.title = "Test Data"
+        case .DataMode:
+            configModel.trainingMode = false
+            self.updateCharts()
+            self.loadDataButton.isEnabled = false
+            self.processPacketsButton.isEnabled = false
         }
     }
     
@@ -470,7 +669,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
         case .TrainingMode:
             configModel.trainingMode = true
-        case .TestMode:
+        default:
             configModel.trainingMode = false
         }
     }
@@ -565,6 +764,8 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.loadTrainingLabelData()
             case .TestMode:
                 self.loadTestLabelData()
+            case .DataMode:
+                print("Switched to Data tab.")
             }
         }
     }
@@ -1111,5 +1312,6 @@ enum TabIds: String
 {
     case TrainingMode
     case TestMode
+    case DataMode
 }
 

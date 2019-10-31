@@ -297,8 +297,7 @@ let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundati
 
 let floatClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given float sequence is from an allowed or blocked connection.", version: "1.0")
 let offsetClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given offset sequence is from an allowed or blocked connection.", version: "1.0")
-
-
+ 
 // MARK: - Helper Tool
 let helperToolName = "org.operatorFoundation.AdversaryLabService"
 

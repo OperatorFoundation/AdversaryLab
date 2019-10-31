@@ -6,8 +6,17 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Auburn.git",
         "state": {
           "branch": null,
-          "revision": "dc7115e4a5aff277b52a311c1d69c0ad4897ab69",
-          "version": "0.2.5"
+          "revision": "c1fc4250ddb5718d8d64a1860950b477c16ba30c",
+          "version": "0.3.0"
+        }
+      },
+      {
+        "package": "Charts",
+        "repositoryURL": "https://github.com/danielgindi/Charts",
+        "state": {
+          "branch": null,
+          "revision": "dbf7fa2891270f88aeafc872ea0beddb344af94b",
+          "version": "3.4.0"
         }
       },
       {
@@ -24,8 +33,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
         "state": {
           "branch": null,
-          "revision": "b70bc0f28ad8a65b1aa3000740743782fe3e9bbf",
-          "version": "0.5.0"
+          "revision": "d1406f8f321322fb3d3ebbc9743638851890767f",
+          "version": "0.6.1"
         }
       },
       {

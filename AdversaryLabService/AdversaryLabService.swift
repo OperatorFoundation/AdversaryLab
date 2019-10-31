@@ -68,16 +68,42 @@ class AdversaryLabService: NSObject, AdversaryLabServiceProtocol, NSXPCListenerD
     
     func startAdversaryLabClient(allowBlock: String, port: String, pathToClient: String)
     {
-        writeToLog(logDirectory: appDirectory, content: "\n******* START Adversary Lab Client Called *******")
-       
-        //Arguments
-        let mode = "capture"
-        let dataset = "testing"
-        let adversaryLabeClientArgs: [String] = [mode, dataset, allowBlock, port]
+//        writeToLog(logDirectory: appDirectory, content: "\n******* START Adversary Lab Client Called *******")
+//
+//        //Arguments
+//        let adversaryLabeClientArgs: [String] = [port, allowBlock]
+//
+//        _ = runAdversaryLabClientScript(arguments: adversaryLabeClientArgs, pathToExecutable: pathToClient)
+//
+//        writeToLog(logDirectory: appDirectory, content: "START Adversary Lab Client END OF FUNCTION")
+        let executableURL = URL(fileURLWithPath: pathToClient)
+        launchAdversaryLab(forPort: port, executableURL: executableURL)
+    }
+    
+    private var pipe = Pipe()
+    
+    func launchAdversaryLab(forPort port: String, executableURL: URL)
+    {
+        print("🔬  Launching Adversary Lab.")
         
-        _ = runAdversaryLabClientScript(arguments: adversaryLabeClientArgs, pathToExecutable: pathToClient)
+        let arguments = [port]
         
-        writeToLog(logDirectory: appDirectory, content: "START Adversary Lab Client END OF FUNCTION")
+        if AdversaryLabService.connectTask != nil
+        {
+            print("🔬  AdversaryLab process isn't nil.")
+            AdversaryLabService.connectTask!.terminate()
+        }
+
+        AdversaryLabService.connectTask = Process()
+        AdversaryLabService.connectTask!.executableURL = executableURL
+        AdversaryLabService.connectTask!.arguments = arguments
+        
+        // Refresh our pipe just in case we've already used it.
+        pipe = Pipe()
+        AdversaryLabService.connectTask!.standardInput = pipe
+        print("🔬  Assigned standard input to pipe.")
+        
+        AdversaryLabService.connectTask!.launch()
     }
     
     func stopAdversaryLabClient()

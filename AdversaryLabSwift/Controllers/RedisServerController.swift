@@ -300,13 +300,243 @@ class RedisServerController: NSObject
                     }
                 default:
                     print("\nFailed to relaunch redis after switching .rdb file.")
+                    completion(success)
                     
                 }
             })
-            
-            
+        }
+    }
+    
+    func mergeIntoCurrentDatabase(mergeFile: URL)
+    {
+        let fileManager = FileManager.default
+        let currentDirectory = fileManager.currentDirectoryPath
+        
+        guard let currentDBName = Auburn.dbfilename
+            else
+        {
+            print("Unable to merge into current DB, database filename not found.")
+            return
         }
         
+        let newDBName = currentDBName + "_merged"
+        let currentDBURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(currentDBName)
+        let destinationURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(newDBName)
+        
+        merge(rdbFileA: mergeFile, rdbFileB: currentDBURL, destinationFile: destinationURL)
+    }
+    
+    
+    func merge(rdbFileA: URL, rdbFileB: URL, destinationFile: URL )
+    {
+        let dataMapKeys = [allowedIncomingKey, allowedOutgoingKey, blockedIncomingKey, blockedOutgoingKey]
+        let floatMapKeys = [allowedIncomingDatesKey, allowedOutgoingDatesKey,blockedIncomingDatesKey, blockedOutgoingDatesKey]
+        let stringListKeys = [allowedConnectionsKey, blockedConnectionsKey]
+
+        mergeIntHashes(rdbFileA: rdbFileA, rdbFileB: rdbFileB, destinationFile: destinationFile, for: packetStatsKey)
+        
+        for listKey in stringListKeys
+        {
+            mergeStringLists(rdbFileA: rdbFileA, rdbFileB: rdbFileB, destinationFile: destinationFile, for:listKey )
+        }
+        
+        for mapKey in dataMapKeys
+        {
+            mergeDataHashes(rdbFileA: rdbFileA, rdbFileB: rdbFileB, destinationFile: destinationFile, for: mapKey)
+        }
+        
+        for mapKey in floatMapKeys
+        {
+            mergeFloatHashes(rdbFileA: rdbFileA, rdbFileB: rdbFileB, destinationFile: destinationFile, for: mapKey)
+        }
+    }
+    
+    // TODO: Consolidate merge functions passing type as parameter maybe
+    
+    func mergeFloatHashes(rdbFileA: URL, rdbFileB: URL, destinationFile: URL, for key: String)
+    {
+        switchDatabaseFile(withFile: rdbFileA)
+        { (_) in
+            
+            var mergeDictionary = [String: Float]()
+            let mergeMapA = RMap<String, Float>(key: key)
+            let mapAKeys: [String] = mergeMapA.keys
+            
+            for mapKey in mapAKeys
+            {
+                mergeDictionary[mapKey] = mergeMapA[mapKey]
+            }
+            
+            self.switchDatabaseFile(withFile: rdbFileB)
+            {
+                (_) in
+                
+                let mergeMapB = RMap<String, Float>(key: key)
+                let mapBKeys: [String] = mergeMapB.keys
+                
+                for mapBKey in mapBKeys
+                {
+                    guard let newValue = mergeMapB[mapBKey]
+                    else {
+                        continue
+                    }
+                    
+                    if let oldValue = mergeDictionary[mapBKey]
+                    {
+                        let combinedValue = newValue + oldValue
+                        mergeDictionary[mapBKey] = combinedValue
+                    }
+                    else
+                    {
+                        mergeDictionary[mapBKey] = newValue
+                    }
+                }
+                
+                self.switchDatabaseFile(withFile: destinationFile)
+                {
+                    (_) in
+                    
+                    let mergedMap = RMap<String, Float>(key: key)
+                    
+                    for (key, value) in mergeDictionary
+                    {
+                        mergedMap[key] = value
+                    }
+                }
+            }
+        }
+    }
+    
+    func mergeDataHashes(rdbFileA: URL, rdbFileB: URL, destinationFile: URL, for key: String)
+    {
+        switchDatabaseFile(withFile: rdbFileA)
+        {
+            (_) in
+            
+            var mergeDictionary = [String: Data]()
+            let mergeMapA = RMap<String, Data>(key: key)
+            let mapAKeys: [String] = mergeMapA.keys
+            
+            for mapKey in mapAKeys
+            {
+                mergeDictionary[mapKey] = mergeMapA[mapKey]
+            }
+            
+            self.switchDatabaseFile(withFile: rdbFileB)
+            {
+                (_) in
+                
+                let mergeMapB = RMap<String, Data>(key: key)
+                let mapBKeys: [String] = mergeMapB.keys
+                
+                for mapBKey in mapBKeys
+                {
+                    guard let newValue = mergeMapB[mapBKey]
+                    else {
+                        continue
+                    }
+                    
+                    mergeDictionary[mapBKey] = newValue
+                }
+                
+                self.switchDatabaseFile(withFile: destinationFile)
+                {
+                    (_) in
+                    
+                    let mergedMap = RMap<String, Data>(key: key)
+                    
+                    for (key, value) in mergeDictionary
+                    {
+                        mergedMap[key] = value
+                    }
+                }
+            }
+        }
+    }
+    
+    func mergeStringLists(rdbFileA: URL, rdbFileB: URL, destinationFile: URL, for key: String)
+    {
+        switchDatabaseFile(withFile: rdbFileA)
+        {
+            (_) in
+
+            let mergeListA = RList<String>(key: key)
+            let mergeSetA = Set(mergeListA.list)
+            
+            self.switchDatabaseFile(withFile: rdbFileB)
+            {
+                (_) in
+                
+                let mergeListB = RList<String>(key: key)
+                let mergedSet = mergeSetA.union(Set(mergeListB.list))
+                
+                self.switchDatabaseFile(withFile: destinationFile)
+                {
+                    (_) in
+                    
+                    let mergedList = RList<String>(key: key)
+                    
+                    for item in mergedSet
+                    {
+                        mergedList.append(item)
+                    }
+                }
+            }
+        }
+    }
+    
+    func mergeIntHashes(rdbFileA: URL, rdbFileB: URL, destinationFile: URL, for key: String)
+    {
+        switchDatabaseFile(withFile: rdbFileA)
+        { (_) in
+            
+            var mergeDictionary = [String: Int]()
+            let mergeMapA = RMap<String, Int>(key: key)
+            let mapAKeys: [String] = mergeMapA.keys
+            
+            for mapKey in mapAKeys
+            {
+                mergeDictionary[mapKey] = mergeMapA[mapKey]
+            }
+            
+            self.switchDatabaseFile(withFile: rdbFileB)
+            {
+                (_) in
+                
+                let mergeMapB = RMap<String, Int>(key: key)
+                let mapBKeys: [String] = mergeMapB.keys
+                
+                for mapBKey in mapBKeys
+                {
+                    guard let newValue = mergeMapB[mapBKey]
+                    else {
+                        continue
+                    }
+                    
+                    if let oldValue = mergeDictionary[mapBKey]
+                    {
+                        let combinedValue = newValue + oldValue
+                        mergeDictionary[mapBKey] = combinedValue
+                    }
+                    else
+                    {
+                        mergeDictionary[mapBKey] = newValue
+                    }
+                }
+                
+                self.switchDatabaseFile(withFile: destinationFile)
+                {
+                    (_) in
+                    
+                    let mergedMap = RMap<String, Int>(key: key)
+                    
+                    for (key, value) in mergeDictionary
+                    {
+                        mergedMap[key] = value
+                    }
+                }
+            }
+        }
     }
     
     func runLaunchRedisScript(completion:@escaping (_ completion:Bool) -> Void)
@@ -402,7 +632,7 @@ class RedisServerController: NSObject
     {
         DispatchQueue.global(qos: .utility).async
         {
-            guard let redis = try? Redis(hostname: "localhost", port: 6379)
+            guard let redis = try? Redis(hostname: "localhost", port: 6380)
                 else
             {
                 print("Unable to connect to Redis")
@@ -417,7 +647,7 @@ class RedisServerController: NSObject
     {
         DispatchQueue.global(qos: .utility).async
         {
-            guard let redis = try? Redis(hostname: "localhost", port: 6379)
+            guard let redis = try? Redis(hostname: "localhost", port: 6380)
                 else
             {
                 print("Unable to connect to Redis")

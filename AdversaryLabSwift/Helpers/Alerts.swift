@@ -13,7 +13,7 @@ func showNoDataAlert()
 {
     let alert = NSAlert()
     alert.messageText = "No packets to process"
-    alert.informativeText = "There is no valid data in the selected database file to process."
+    alert.informativeText = "There is no valid data in the selected database file."
     alert.runModal()
 }
 
@@ -51,6 +51,40 @@ func showNameModelAlert() -> String?
     return textfield.stringValue
 }
 
+func showNoAllowedConnectionDataAlert() -> URL?
+{
+    let alert = NSAlert()
+    alert.messageText = "No allowed connections in file"
+    alert.informativeText = "There are no allowed connections in the selected file. Would you like to add another file to the data?"
+    
+    let result = alert.runModal()
+    if result == NSApplication.ModalResponse.OK
+    {
+        return showRDBFileAlert()
+    }
+    
+    return nil
+}
+
+func showNoBlockedConnectionDataAlert() -> URL?
+{
+    let alert = NSAlert()
+    alert.messageText = "No blocked connections in file"
+    alert.informativeText = "There are no blocked connections in the selected file. Would you like to add another file to the data?"
+    alert.addButton(withTitle: "Add File")
+    alert.addButton(withTitle: "Cancel")
+    alert.runModal()
+    
+    let result = alert.runModal()
+    if result == .alertFirstButtonReturn
+    {
+        print("User chose to add another file. Calling showRDBFileAlert.")
+        return showRDBFileAlert()
+    }
+    
+    return nil
+}
+
 func showSelectAdversaryFileAlert() -> URL?
 {
     let panel = NSOpenPanel()
@@ -64,6 +98,21 @@ func showSelectAdversaryFileAlert() -> URL?
         else { return nil }
     
     return panel.urls[0]    
+}
+
+func showRDBFileAlert() -> URL?
+{
+    let panel = NSOpenPanel()
+    panel.canChooseFiles = true
+    panel.canChooseDirectories = false
+    panel.allowsMultipleSelection = false
+    panel.allowedFileTypes = ["rdb"]
+    
+    let result = panel.runModal()
+    guard result == NSApplication.ModalResponse.OK
+        else { return nil }
+    
+    return panel.urls[0]
 }
 
 func showCaptureAlert()

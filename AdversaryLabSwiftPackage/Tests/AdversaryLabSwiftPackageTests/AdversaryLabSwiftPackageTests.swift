@@ -39,23 +39,6 @@ class AdversaryLabSwiftPackageTests: XCTestCase
         testList.delete()
     }
     
-    func testPubSub()
-    {
-//        guard let redis = try? Redis(hostname: "localhost", port: 6379)
-//        else
-//        {
-//            XCTFail()
-//            return
-//        }
-//        
-//        redis.subscribe(channel:allowedChannel)
-//        { (maybeRedisType, maybeError) in
-//            //
-//        }
-//
-//        redis.publish(channel: allowedChannel, message: "Allowed Connections Added")
-    }
-    
     func testRedisInput()
     {
         let packetString = String(bytes: packetData, encoding: .utf8)!

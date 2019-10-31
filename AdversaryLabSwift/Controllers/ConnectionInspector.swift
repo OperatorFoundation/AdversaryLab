@@ -335,10 +335,8 @@ class ConnectionInspector
         allowedOutLengthsSet.delete()
         let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthKey)
         allowedInLengthsSet.delete()
-        
         let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
         blockedOutLengthsSet.delete()
-        
         let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
         blockedInLengthsSet.delete()
         
