@@ -50,7 +50,7 @@ class OperatorReportController
                 }
                 catch
                 {
-                    print("\nFailed to create a folder \(folderURL)")
+                    print("Failed to create a folder \(folderURL)")
                     print(error.localizedDescription)
                 }
             }

@@ -43,10 +43,10 @@ class HelperAppInstaller: NSObject
                 {
                     try fileManager.createDirectory(at: directoryPath, withIntermediateDirectories: true, attributes: nil)
                 }
-                catch let theError
+                catch
                 {
                     // Handle the error.
-                    print(theError)
+                    print("Error creating directory at \(directoryPath): \(error)")
                 }
             }
         }

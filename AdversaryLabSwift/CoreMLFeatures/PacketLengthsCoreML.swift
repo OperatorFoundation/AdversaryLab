@@ -375,11 +375,11 @@ class PacketLengthsCoreML
         
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
+        let allowedLengthsArray = newIntArrayUniqueValues(from: [allowedLengthsRSet])
         
         /// B is the sorted set of lengths for the Blocked traffic
         let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let blockedLengthsArray = newIntArray(from: [blockedLengthsRSet])
+        let blockedLengthsArray = newIntArrayUniqueValues(from: [blockedLengthsRSet])
         
         return (allowedLengthsArray, blockedLengthsArray)
     }
@@ -404,11 +404,11 @@ class PacketLengthsCoreML
         
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let allowedLengthsArray = newIntArray(from: [allowedLengthsRSet])
+        let allowedLengthsArray = newIntArrayUniqueValues(from: [allowedLengthsRSet])
         
         /// B is the sorted set of lengths for the Blocked traffic
         let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let blockedLengthsArray = newIntArray(from: [blockedLengthsRSet])
+        let blockedLengthsArray = newIntArrayUniqueValues(from: [blockedLengthsRSet])
         
         for length in allowedLengthsArray
         {
@@ -464,7 +464,12 @@ class PacketLengthsCoreML
 }
 
 // TODO: Add this to Auburn instead
-func newIntArray(from redisSets:[RSortedSet<Int>]) -> [Int]
+
+/// Returns one array containing each element in all of the sorted sets provided. This method takes an array of sorted sets of Ints and returns an array of Ints. Values are not repeated based on score. Each value will be added to the array only one time
+/// - Parameters:
+///     - redisSets: [RSortedSet<Int>], an array of sorted sets to turn in to one array of Ints.
+/// - Returns: [Int], an array of Ints.
+func newIntArrayUniqueValues(from redisSets:[RSortedSet<Int>]) -> [Int]
 {
     var newArray = [Int]()
     
@@ -482,17 +487,29 @@ func newIntArray(from redisSets:[RSortedSet<Int>]) -> [Int]
     return newArray
 }
 
-func newDoubleArray(from intSortedSet: RSortedSet<Int>) -> [Double]
+/// Returns an array of doubles created using the elements in the sorted set of Ints. The number of times a given element is added to the array is equal to the score of that element in the set.
+/// - Parameters:
+///     - intSortedSet: RSortedSet<Int>, the sorted set of Ints to use to create the array.
+/// - Returns: [Double], An array of Doubles.
+func newDoubleArrayUsingScores(from intSortedSet: RSortedSet<Int>) -> [Double]
 {
     var newArray = [Double]()
     
     for i in 0 ..< intSortedSet.count
     {
-        intSortedSet.
-        if let newMember: Int = intSortedSet[i]
+        guard let value: Int = intSortedSet[i]
+            else { continue }
+        
+        guard let score = intSortedSet.getScore(for: value)
+            else { continue }
+        
+        // The score is the number of times we saw a given value
+        // Add the value to the array "score" times
+        for _ in 0..<Int(score)
         {
-            newArray.append(Double(newMember))
+            newArray.append(Double(value))
         }
+        
     }
     
     return newArray

@@ -271,17 +271,17 @@ class ConnectionInspector
         {
             if let packetLengthError = maybePacketlengthError
             {
-                print(packetLengthError)
+                print("Packet length error: \(packetLengthError)")
             }
 
             if let packetTimingError = maybePacketTimingError
             {
-                print(packetTimingError)
+                print("Packet timing error: \(packetTimingError)")
             }
 
             if let offsetError = maybeSubsequenceError
             {
-                print(offsetError)
+                print("Offset error: \(offsetError)")
             }
         }
         

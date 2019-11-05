@@ -171,22 +171,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             (result) in
             
             print("\nReturned from launchRedisServer call.")
-            
-            if Thread.isMainThread
-            {
-                self.handleLaunchRedisResponse(result: result)
-            }
-            else
-            {
-                print("\nWe are not on the main thread.")
-                self.handleLaunchRedisResponse(result: result)
-//                DispatchQueue.main.async
-//                {
-//                    print("\nWe've moved to the main thread!")
-//                    print("\nReturned from launchRedisServer call.")
-//                    self.handleLaunchRedisResponse(result: result)
-//                }
-            }
+            self.handleLaunchRedisResponse(result: result)
         }
         
         // Subscribe to pubsub to know when to inspect a new connection
@@ -361,8 +346,7 @@ class ViewController: NSViewController, NSTabViewDelegate
                     self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
                 }
             }
-
-            if blockedPacketsSeenValue == nil
+            else if blockedPacketsSeenValue == nil
             {
                 if let selectedFileURL = showNoBlockedConnectionDataAlert()
                 {
@@ -398,13 +382,13 @@ class ViewController: NSViewController, NSTabViewDelegate
     func updateLengthChart()
     {
         let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
-        let allowedOutLengths = newDoubleArray(from: allowedOutLengthsSet)
+        let allowedOutLengths = newDoubleArrayUsingScores(from: allowedOutLengthsSet)
         let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthKey)
-        let allowedInLengths = newDoubleArray(from: allowedInLengthsSet)
+        let allowedInLengths = newDoubleArrayUsingScores(from: allowedInLengthsSet)
         let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
-        let blockedOutLengths = newDoubleArray(from: blockedOutLengthsSet)
+        let blockedOutLengths = newDoubleArrayUsingScores(from: blockedOutLengthsSet)
         let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
-        let blockedInLengths = newDoubleArray(from: blockedInLengthsSet)
+        let blockedInLengths = newDoubleArrayUsingScores(from: blockedInLengthsSet)
         
         let allowedInLengthsEntry = chartDataEntry(fromArray: allowedInLengths)
         let allowedOutLengthsEntry = chartDataEntry(fromArray: allowedOutLengths)
@@ -617,11 +601,11 @@ class ViewController: NSViewController, NSTabViewDelegate
             switch response
             {
             case .alertFirstButtonReturn:
-                print("\nUser chose to quit Adversary Lab rather than kill server.")
+                print("User chose to quit Adversary Lab rather than kill server.")
                 quitAdversaryLab()
             case .alertSecondButtonReturn:
                 // TODO: Kill Redis Server
-                print("\nUser chose to manually kill Redis server with PID: \(processPID)")
+                print("User chose to manually kill Redis server with PID: \(processPID)")
                 RedisServerController.sharedInstance.killProcess(pid: processPID, completion:
                 {
                     (_) in
@@ -642,13 +626,13 @@ class ViewController: NSViewController, NSTabViewDelegate
                         case .corruptRedisOnPort(let pidString):
                             self.showCorruptRedisAlert(processPID: pidString)
                         case .failure(let failureString):
-                            print("\nReceived failure on launch server: \(failureString ?? "")")
+                            print("Received failure on launch server: \(failureString ?? "")")
                             quitAdversaryLab()
                         }
                     }
                 })
             default:
-                print("\nUnknown error user chose unknown option for redis server alert.")
+                print("Unknown error user chose unknown option for redis server alert.")
             }
         }
     }
@@ -690,8 +674,7 @@ class ViewController: NSViewController, NSTabViewDelegate
             print("Corrupt Redis")
             self.showCorruptRedisAlert(processPID: pidString)
         case .failure(let failureString):
-            print("Failure")
-            print("\nReceived failure on launch server: \(failureString ?? "")")
+            print("Received failure on launch server: \(failureString ?? "")")
             quitAdversaryLab()
         }
     }
@@ -736,7 +719,7 @@ class ViewController: NSViewController, NSTabViewDelegate
     {
         // Updates Labels that are in the main window (always visible)
         // Get redis data in the utility queue and update the labels with the data in the main queue
-        print("\nMain thread?: \(Thread.isMainThread)")
+        print("Main thread?: \(Thread.isMainThread)")
 
         let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
         let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]

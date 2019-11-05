@@ -156,9 +156,7 @@ class RedisServerController: NSObject
             // Get the data
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-            
-            print(output ?? "no output")
-            
+                        
             if output == "PONG\n"
             {
                 print("\nWe received a pong, server is already running!!")
@@ -299,9 +297,11 @@ class RedisServerController: NSObject
                         completion(success)
                     }
                 default:
-                    print("\nFailed to relaunch redis after switching .rdb file.")
-                    completion(success)
-                    
+                    DispatchQueue.main.async
+                    {
+                        print("\nFailed to relaunch redis after switching .rdb file.")
+                        completion(success)
+                    }
                 }
             })
         }
@@ -319,7 +319,7 @@ class RedisServerController: NSObject
             return
         }
         
-        let newDBName = currentDBName + "_merged"
+        let newDBName = currentDBName.replacingOccurrences(of: ".rdb", with: "_merged.rdb")
         let currentDBURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(currentDBName)
         let destinationURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(newDBName)
         
@@ -656,13 +656,13 @@ class RedisServerController: NSObject
             
             do
             {
-                print("\nSubscribing to redis channel.")
+                print("Subscribing to redis channel.")
                 
                 try redis.subscribe(channel:newConnectionsChannel)
                 {
                     (maybeRedisType, maybeError) in
                     
-                    print("\nReceived redis subscribe callback.")
+                    print("Received redis subscribe callback.")
                     guard let redisList = maybeRedisType as? [Datable]
                         else
                     {
@@ -678,7 +678,7 @@ class RedisServerController: NSObject
                         guard thisElement.string == newConnectionMessage
                             else
                         {
-                            print("\nReceived a message: \(thisElement.string)")
+                            print("Received a message: \(thisElement.string)")
                             continue
                         }
                         
@@ -690,7 +690,7 @@ class RedisServerController: NSObject
                 }
             }
             catch
-            { print(error) }
+            { print("Error subscribing to Redis channel: \(error)") }
         }
     }
 }

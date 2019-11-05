@@ -56,10 +56,13 @@ func showNoAllowedConnectionDataAlert() -> URL?
     let alert = NSAlert()
     alert.messageText = "No allowed connections in file"
     alert.informativeText = "There are no allowed connections in the selected file. Would you like to add another file to the data?"
+    alert.addButton(withTitle: "Add File")
+    alert.addButton(withTitle: "Cancel")
     
     let result = alert.runModal()
-    if result == NSApplication.ModalResponse.OK
+    if result == .alertFirstButtonReturn
     {
+        print("User chose to add another file. Calling showRDBFileAlert.")
         return showRDBFileAlert()
     }
     
@@ -73,7 +76,6 @@ func showNoBlockedConnectionDataAlert() -> URL?
     alert.informativeText = "There are no blocked connections in the selected file. Would you like to add another file to the data?"
     alert.addButton(withTitle: "Add File")
     alert.addButton(withTitle: "Cancel")
-    alert.runModal()
     
     let result = alert.runModal()
     if result == .alertFirstButtonReturn
