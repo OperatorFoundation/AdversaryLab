@@ -18,6 +18,7 @@ class ViewController: NSViewController, NSTabViewDelegate
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
+    @IBOutlet weak var activityIndicator: NSProgressIndicator!
     
     @objc dynamic var allowedPacketsSeen = "Loading..."
     @objc dynamic var allowedPacketsAnalyzed = "Loading..."
@@ -170,7 +171,6 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
             (result) in
             
-            print("\nReturned from launchRedisServer call.")
             self.handleLaunchRedisResponse(result: result)
         }
         
@@ -279,7 +279,8 @@ class ViewController: NSViewController, NSTabViewDelegate
     @IBAction func loadDataClicked(_ sender: NSButton)
     {
         loadDataButton.isEnabled = false
-
+        activityIndicator.startAnimation(nil)
+        
         guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
             let currentTab = TabIds(rawValue: identifier)
             else { return }
@@ -324,50 +325,108 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     func loadRDBFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
     {
-        // TODO: Merge RDB files
+        DispatchQueue.main.async {
+            self.activityIndicator.startAnimation(nil)
+        }
+        
         RedisServerController.sharedInstance.switchDatabaseFile(withFile: fileURL, completion:
         {
             (_) in
             
-            let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-            let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
-            let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
-            
-            if allowedPacketsSeenValue == nil && blockedPacketsSeenValue == nil
+            let _ = ConnectionData
             {
-                showNoDataAlert()
-            }
-            
-            if allowedPacketsSeenValue == nil
-            {
-                if let selectedFileURL = showNoAllowedConnectionDataAlert()
+                currentData in
+                                
+                if !currentData.allowedConnections.isEmpty && !currentData.blockedConnections.isEmpty
                 {
-                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-                    self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+                    DispatchQueue.main.async {
+                        completion(true)
+                    }
+                }
+                else if currentData.allowedConnections.isEmpty && currentData.blockedConnections.isEmpty
+                {
+                    showNoDataAlert()
+                }
+                else if currentData.allowedConnections.isEmpty
+                {
+                    if let selectedFileURL = showNoAllowedConnectionDataAlert()
+                    {
+                        RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+                        {
+                            maybeConnectionData in
+                            
+                            if let connectionData = maybeConnectionData
+                            {
+                                if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
+                                {
+                                    DispatchQueue.main.async {
+                                        completion(true)
+                                    }
+                                    return
+                                }
+                            }
+                            
+                            self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+                        }
+                    }
+                    else
+                    {
+                        DispatchQueue.main.async {
+                            completion(false)
+                        }
+                    }
+                }
+                else if currentData.blockedConnections.isEmpty
+                {
+                    if let selectedFileURL = showNoBlockedConnectionDataAlert()
+                    {
+                        RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+                        {
+                            maybeConnectionData in
+                            
+                            if let connectionData = maybeConnectionData
+                            {
+                                if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
+                                {
+                                    DispatchQueue.main.async {
+                                        completion(true)
+                                    }
+                                    return
+                                }
+                            }
+                            
+                            self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+                        }
+                    }
+                    else
+                    {
+                        DispatchQueue.main.async {
+                            completion(false)
+                        }
+                    }
                 }
             }
-            else if blockedPacketsSeenValue == nil
-            {
-                if let selectedFileURL = showNoBlockedConnectionDataAlert()
-                {
-                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-                    self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
-                }
-            }
-            
-            completion(true)
         })
     }
     
     func refreshDBUI()
     {
         let databaseName = Auburn.dbfilename ?? "--"
-        DispatchQueue.main.async
+        
+        let _ = ConnectionData()
         {
-            self.databaseNameLabel.stringValue = databaseName
-            self.loadDataButton.isEnabled = true
-            self.loadLabelData()
+            connectionData in
+            
+            DispatchQueue.main.async
+            {
+                self.databaseNameLabel.stringValue = databaseName
+                self.loadDataButton.isEnabled = true
+                self.loadLabelData()
+                self.activityIndicator.stopAnimation(nil)
+            }
+            
         }
+        
     }
     
     // MARK: - Charts
@@ -498,7 +557,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         data.addDataSet(line1)
         data.addDataSet(line2)
         timingChartView.data = data
-        timingChartView.chartDescription?.text = "Time Differences"
+        timingChartView.chartDescription?.text = "Time Intervals"
     }
     
     func chartDataEntry(fromArray dataArray:[Double]) -> [ChartDataEntry]
@@ -664,7 +723,6 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
         case .okay(_):
             // Update Labels and Progress Indicator
-            print("Okay")
             self.loadLabelData()
             self.updateProgressIndicator()
         case .otherProcessOnPort(let processName):
@@ -719,38 +777,46 @@ class ViewController: NSViewController, NSTabViewDelegate
     {
         // Updates Labels that are in the main window (always visible)
         // Get redis data in the utility queue and update the labels with the data in the main queue
-        print("Main thread?: \(Thread.isMainThread)")
-
-        let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
-        let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
-        let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
-        let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
-        let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
-        let redisDatabaseFilename = Auburn.dbfilename ?? "--"
-    
-    
-        DispatchQueue.main.async
-        {
-            self.databaseNameLabel.stringValue = redisDatabaseFilename
-            self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
-            self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
-            self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
-            self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
+        //print("Main thread?: \(Thread.isMainThread)")
+        let _ = ConnectionData
+        { (connectionData) in
             
-            guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
-                let currentTab = TabIds(rawValue: identifier)
-                else { return }
+            let redisDatabaseFilename = Auburn.dbfilename ?? "--"
             
-            switch currentTab
+            DispatchQueue.main.async
             {
-            case .TrainingMode:
-                self.loadTrainingLabelData()
-            case .TestMode:
-                self.loadTestLabelData()
-            case .DataMode:
-                print("Switched to Data tab.")
+                let packetStatsDict = connectionData.packetStats
+                let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
+                let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
+                let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
+                let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
+                self.databaseNameLabel.stringValue = redisDatabaseFilename
+                self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
+                self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
+                self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
+                self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
+                
+                guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
+                    let currentTab = TabIds(rawValue: identifier)
+                    else { return }
+                
+                switch currentTab
+                {
+                case .TrainingMode:
+                    self.loadTrainingLabelData()
+                case .TestMode:
+                    self.loadTestLabelData()
+                case .DataMode:
+                    print("Switched to Data tab.")
+                }
+                
             }
         }
+        
+        
+        
+    
+        
     }
     
     func loadTestLabelData()

@@ -60,6 +60,7 @@
 		AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */; };
 		AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE859055225656B3003B21C0 /* TLS12CoreML.swift */; };
 		AE929725226521F6005C1FBB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
+		AEC00A2423733A0800E5582B /* ConnectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionData.swift */; };
 		AECB0C7D226A9F1D00567BEA /* org.operatorFoundation.AdversaryLabService in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE08E0E3226A9A8C00D94E45 /* org.operatorFoundation.AdversaryLabService */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
 		AEDE2BDF226A9DB600A6219A /* AdversaryLabServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */; };
@@ -256,6 +257,7 @@
 		AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntropyCoreML.swift; sourceTree = "<group>"; };
 		AE859055225656B3003B21C0 /* TLS12CoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLS12CoreML.swift; sourceTree = "<group>"; };
 		AE929724226521F6005C1FBB /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		AEC00A2323733A0800E5582B /* ConnectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionData.swift; sourceTree = "<group>"; };
 		AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdversaryLabServiceProtocol.swift; sourceTree = "<group>"; };
 		AEC9D55622651810008F32F2 /* AdversaryLabServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdversaryLabServiceDelegate.swift; sourceTree = "<group>"; };
 		AEC9D55922651810008F32F2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -426,6 +428,7 @@
 				468B26512023D016000A2B5D /* ObservedConnections.swift */,
 				5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */,
 				462E73A62091421400C59B80 /* ProgressBot.swift */,
+				AEC00A2323733A0800E5582B /* ConnectionData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -750,6 +753,7 @@
 			files = (
 				AE08E0C2226A6ABF00D94E45 /* HelperAppInstaller.swift in Sources */,
 				AE08E0CB226A6ACC00D94E45 /* HelperAppController.swift in Sources */,
+				AEC00A2423733A0800E5582B /* ConnectionData.swift in Sources */,
 				AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */,
 				AEE50AA222875905009698CC /* AdversaryFeaturesModel.swift in Sources */,
 				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,

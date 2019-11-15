@@ -7,31 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5F2AF7B7-D1E3-417D-A0D8-A308AA7BE458"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "AdversaryLabSwift/Controllers/RedisServerController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
-            landmarkName = "merge(rdbFileA:rdbFileB:destinationFile:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "3CDAD4B4-7492-4548-9275-E7AB2080DEB7"
+            uuid = "97257452-24F6-4E92-A321-E976173283C4"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AdversaryLabSwift/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
+            startingLineNumber = "387"
+            endingLineNumber = "387"
             landmarkName = "loadRDBFile(fileURL:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -39,64 +23,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "FDE659FF-B4F5-405A-BD5F-50F7F1A54628"
+            uuid = "3EA2B73F-4221-4906-8635-3DC2D1AA4D58"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "AdversaryLabSwift/Controllers/RedisServerController.swift"
+            filePath = "AdversaryLabSwift/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "243"
-            endingLineNumber = "243"
-            landmarkName = "switchDatabaseFile(withFile:completion:)"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
+            landmarkName = "loadRDBFile(fileURL:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7EF694C6-0B2D-43F1-8538-829F5A3F7C37"
+            uuid = "2C170B67-8C0C-42AE-A2EC-68F110B90CF3"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "AdversaryLabSwift/Controllers/RedisServerController.swift"
+            filePath = "AdversaryLabSwift/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
-            landmarkName = "switchDatabaseFile(withFile:completion:)"
+            startingLineNumber = "369"
+            endingLineNumber = "369"
+            landmarkName = "loadRDBFile(fileURL:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "51865F9E-C8F8-4E2D-9240-6BE4CF24E0C5"
+            uuid = "D525AF29-F219-4FA9-BEDC-CC544A0465B4"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "AdversaryLabSwift/Controllers/RedisServerController.swift"
+            filePath = "AdversaryLabSwift/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "416"
-            endingLineNumber = "416"
-            landmarkName = "mergeDataHashes(rdbFileA:rdbFileB:destinationFile:for:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "35BA521E-34EE-45EC-A0C0-E06353257577"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "AdversaryLabSwift/Controllers/RedisServerController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
-            landmarkName = "switchDatabaseFile(withFile:completion:)"
+            startingLineNumber = "358"
+            endingLineNumber = "358"
+            landmarkName = "loadRDBFile(fileURL:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
