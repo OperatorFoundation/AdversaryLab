@@ -21,52 +21,47 @@ class RedisServerController: NSObject
     
     func launchRedisServer(completion:@escaping (_ completion: ServerCheckResult) -> Void)
     {
-        isRedisServerRunning
+        if Auburn.redisIsRunning()
         {
-            (serverIsRunning) in
-            
-            if serverIsRunning
+            completion(.okay(nil))
+            return
+        }
+        else
+        {
+            self.checkServerPortIsAvailable(completion:
             {
-                completion(.okay(nil))
-                return
-            }
-            else
-            {
-                self.checkServerPortIsAvailable(completion:
+                (result) in
+                
+                switch result
                 {
-                    (result) in
-                    
-                    switch result
-                    {
-                    case .okay( _):
-                        print("\nServer port is available")
-                        print("👇👇 Running Script 👇👇:\n")
-                        self.runLaunchRedisScript
-                        { (redisLaunched) in
-                            
-                            print("\n🚀 Launch Redis Server Script Complete 🚀")
-                            
-                            if redisLaunched
-                            {
-                                completion(.okay(nil))
-                            }
-                            else
-                            {
-                                completion(.failure("Failure running launch script."))
-                            }
+                case .okay( _):
+                    print("\nServer port is available")
+                    print("👇👇 Running Script 👇👇:\n")
+                    self.runLaunchRedisScript
+                    { (redisLaunched) in
+                        
+                        print("\n🚀 Launch Redis Server Script Complete 🚀")
+                        
+                        if redisLaunched
+                        {
+                            completion(.okay(nil))
                         }
-                    case .otherProcessOnPort(let name):
-                        print("\nAnother process is using our port. Process name: \(name)")
-                        completion(result)
-                    case .corruptRedisOnPort(let pid):
-                        print("\nBroken redis is already using our port. PID: \(pid)")
-                        completion(result)
-                    case .failure(let failureString):
-                        print("\nFailed to check server port: \(failureString ?? "")")
-                        completion(result)
+                        else
+                        {
+                            completion(.failure("Failure running launch script."))
+                        }
                     }
-                })
-            }
+                case .otherProcessOnPort(let name):
+                    print("\nAnother process is using our port. Process name: \(name)")
+                    completion(result)
+                case .corruptRedisOnPort(let pid):
+                    print("\nBroken redis is already using our port. PID: \(pid)")
+                    completion(result)
+                case .failure(let failureString):
+                    print("\nFailed to check server port: \(failureString ?? "")")
+                    completion(result)
+                }
+            })
         }
     }
     
@@ -126,52 +121,6 @@ class RedisServerController: NSObject
         
         process.launch()
         process.waitUntilExit()
-    }
-    
-    func isRedisServerRunning(completion:@escaping (_ completion:Bool) -> Void)
-    {
-        guard let redisCliPath = Bundle.main.path(forResource: "redis-cli", ofType: nil)
-            else
-        {
-            print("Unable to ping Redis server. Could not find terraform executable.")
-            completion(false)
-            return
-        }
-        
-        guard let path = Bundle.main.path(forResource: "CheckRedisServerScript", ofType: "sh")
-            else
-        {
-            print("Unable to ping Redis server. Could not find the script.")
-            completion(false)
-            return
-        }
-        
-        let process = Process()
-        process.launchPath = path
-        process.arguments = [redisCliPath]
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.terminationHandler =
-        {
-            (task) in
-            
-            // Get the data
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let output = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-                        
-            if output == "PONG\n"
-            {
-                print("\nWe received a pong, server is already running!!")
-                completion(true)
-            }
-            else
-            {
-                print("\nNo Pong, launch the server!!")
-                completion(false)
-            }
-        }
-        process.waitUntilExit()
-        process.launch()
     }
     
     func checkServerPortIsAvailable(completion:@escaping (_ completion: ServerCheckResult) -> Void)
@@ -415,21 +364,18 @@ class RedisServerController: NSObject
             self.redisProcess.launchPath = path
             self.redisProcess.arguments = [redisPath, redisConfigPath, redisModulePath]
             self.redisProcess.launch()
+            
             sleep(1)
-            self.isRedisServerRunning
+            
+            if Auburn.redisIsRunning()
             {
-                (serverIsRunning) in
-                
-                if serverIsRunning
-                {
-                    completion(true)
-                    return
-                }
-                else
-                {
-                    completion(false)
-                    return
-                }
+                completion(true)
+                return
+            }
+            else
+            {
+                completion(false)
+                return
             }
         }
     }
