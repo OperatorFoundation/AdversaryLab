@@ -204,6 +204,8 @@ class RedisServerController: NSObject
         self.unsubscribeFromNewConnectionsChannel()
         Auburn.shutdownRedis()
         sleep(1)
+        shutdownRedisServer()
+        sleep(2)
         
         redisQueue.async
         {
@@ -360,6 +362,7 @@ class RedisServerController: NSObject
         processQueue.async
         {
             print("🚀🚀🚀🚀🚀🚀🚀")
+            print("Redis config path: \(redisConfigPath)")
             self.redisProcess = Process()
             self.redisProcess.launchPath = path
             self.redisProcess.arguments = [redisPath, redisConfigPath, redisModulePath]
@@ -472,4 +475,3 @@ class RedisServerController: NSObject
         }
     }
 }
-

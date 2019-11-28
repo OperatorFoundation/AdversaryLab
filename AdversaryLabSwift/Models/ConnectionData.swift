@@ -12,6 +12,9 @@ import Auburn
 class ConnectionData
 {
     var packetStats: [String: Int]
+    var allowedConnections: [String]
+    var blockedConnections: [String]
+    
     var allowedIncoming: [String: Data]
     var allowedOutgoing: [String: Data]
     var blockedIncoming: [String: Data]
@@ -20,8 +23,16 @@ class ConnectionData
     var allowedOutgoingDates: [String: Float]
     var blockedIncomingDates: [String: Float]
     var blockedOutgoingDates: [String: Float]
-    var allowedConnections: [String]
-    var blockedConnections: [String]
+
+//    var rawPackets: [String:[RawPacket]]
+//        
+//    struct RawPacket
+//    {
+//        var ipHeader: Data
+//        var tcpHeader: Data?
+//        var payload: Data?
+//        var timestamp: Float
+//    }
     
     init()
     {
