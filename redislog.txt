@@ -1,5 +1,0 @@
-1828:C 19 Apr 13:41:34.198 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-1828:C 19 Apr 13:41:34.198 # Redis version=4.0.6, bits=64, commit=00000000, modified=0, pid=1828, just started
-1828:C 19 Apr 13:41:34.199 # Configuration loaded
-1829:M 19 Apr 13:41:34.200 * Increased maximum number of open files to 10032 (it was originally set to 4864).
-1829:M 19 Apr 13:41:34.201 # Creating Server TCP listening socket 127.0.0.1:6379: bind: Address already in use
