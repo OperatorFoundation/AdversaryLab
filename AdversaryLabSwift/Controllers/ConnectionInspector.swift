@@ -271,7 +271,7 @@ class ConnectionInspector
         {
             if let packetLengthError = maybePacketlengthError
             {
-                print("Packet length error: \(packetLengthError)")
+                print("Packet length error: \(packetLengthError.localizedDescription)")
             }
 
             if let packetTimingError = maybePacketTimingError

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -5188,8 +5188,8 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
-                                            <rect key="frame" x="869" y="18" width="131" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Load Database" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
+                                            <rect key="frame" x="898" y="18" width="102" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -5208,7 +5208,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OUu-jG-iwO">
-                                            <rect key="frame" x="752" y="18" width="117" height="32"/>
+                                            <rect key="frame" x="781" y="18" width="117" height="32"/>
                                             <buttonCell key="cell" type="push" title="Live Capture" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfp-qe-CeD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>

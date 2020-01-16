@@ -63,7 +63,7 @@ func showNoAllowedConnectionDataAlert() -> URL?
     if result == .alertFirstButtonReturn
     {
         print("User chose to add another file. Calling showRDBFileAlert.")
-        return showRDBFileAlert()
+        return showRethinkFileAlert()
     }
     
     return nil
@@ -81,7 +81,7 @@ func showNoBlockedConnectionDataAlert() -> URL?
     if result == .alertFirstButtonReturn
     {
         print("User chose to add another file. Calling showRDBFileAlert.")
-        return showRDBFileAlert()
+        return showRethinkFileAlert()
     }
     
     return nil
@@ -102,19 +102,89 @@ func showSelectAdversaryFileAlert() -> URL?
     return panel.urls[0]    
 }
 
-func showRDBFileAlert() -> URL?
+//func showRDBFileAlert() -> URL?
+//{
+//    let panel = NSOpenPanel()
+//    panel.canChooseFiles = true
+//    panel.canChooseDirectories = false
+//    panel.allowsMultipleSelection = false
+//    panel.allowedFileTypes = ["rdb"]
+//
+//    let result = panel.runModal()
+//    guard result == NSApplication.ModalResponse.OK
+//        else { return nil }
+//
+//    return panel.urls[0]
+//}
+
+func showRethinkFileAlert() -> URL?
 {
     let panel = NSOpenPanel()
     panel.canChooseFiles = true
     panel.canChooseDirectories = false
     panel.allowsMultipleSelection = false
-    panel.allowedFileTypes = ["rdb"]
+    panel.allowedFileTypes = ["gz"]
     
     let result = panel.runModal()
     guard result == NSApplication.ModalResponse.OK
         else { return nil }
     
     return panel.urls[0]
+}
+
+func showChooseBlockedConnectionsAlert(transportNames: [String]) -> (allowedTransport: String, remainingTransports: [String])?
+{
+    let alert = NSAlert()
+    alert.messageText = "Which group of connections is blocked?"
+    
+    let blockedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
+    blockedPopup.addItems(withTitles: transportNames)
+    alert.accessoryView = blockedPopup
+    
+    alert.addButton(withTitle: "OK")
+    alert.addButton(withTitle: "Cancel")
+    
+    let result = alert.runModal()
+    if result == .alertFirstButtonReturn
+    {
+        let index = blockedPopup.indexOfSelectedItem
+        if index >= 0, index < transportNames.count, let selectedTransport = blockedPopup.titleOfSelectedItem
+        {
+            
+            var remainingTransports = transportNames
+            _ = remainingTransports.remove(at: index)
+            return (selectedTransport, remainingTransports)
+        }
+    }
+    
+    return nil
+}
+
+func showChooseAllowedConnectionsAlert(transportNames: [String]) -> (allowedTransport: String, remainingTransports: [String])?
+{
+    let alert = NSAlert()
+    alert.messageText = "Which group of connections is allowed?"
+    
+    let allowedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
+    allowedPopup.addItems(withTitles: transportNames)
+    alert.accessoryView = allowedPopup
+    alert.addButton(withTitle: "OK")
+    alert.addButton(withTitle: "Cancel")
+    
+    let result = alert.runModal()
+    if result == .alertFirstButtonReturn
+    {
+        let index = allowedPopup.indexOfSelectedItem
+        if index >= 0, index < transportNames.count, let selectedTransport = allowedPopup.titleOfSelectedItem
+        {
+            
+            var remainingTransports = transportNames
+            _ = remainingTransports.remove(at: index)
+            return (selectedTransport, remainingTransports)
+        }
+    }
+    
+    return nil
 }
 
 func showCaptureAlert()

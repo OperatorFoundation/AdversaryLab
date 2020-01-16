@@ -19,20 +19,86 @@ class ConnectionData
     var allowedOutgoing: [String: Data]
     var blockedIncoming: [String: Data]
     var blockedOutgoing: [String: Data]
-    var allowedIncomingDates: [String: Float]
-    var allowedOutgoingDates: [String: Float]
-    var blockedIncomingDates: [String: Float]
-    var blockedOutgoingDates: [String: Float]
-
-//    var rawPackets: [String:[RawPacket]]
-//        
-//    struct RawPacket
-//    {
-//        var ipHeader: Data
-//        var tcpHeader: Data?
-//        var payload: Data?
-//        var timestamp: Float
-//    }
+    var allowedIncomingDates: [String: Double]
+    var allowedOutgoingDates: [String: Double]
+    var blockedIncomingDates: [String: Double]
+    var blockedOutgoingDates: [String: Double]
+    
+    /// Initializes Redis compatible connection data with Rethink connection data
+    init(allowedRethinkPackets: [RethinkPacket], blockedRethinkPackets: [RethinkPacket])
+    {
+        packetStats = [String: Int]()
+        
+        allowedConnections = [String]()
+        allowedIncoming = [String: Data]()
+        allowedOutgoing = [String: Data]()
+        allowedIncomingDates = [String: Double]()
+        allowedOutgoingDates = [String: Double]()
+        
+        blockedConnections = [String]()
+        blockedIncoming = [String: Data]()
+        blockedOutgoing = [String: Data]()
+        blockedIncomingDates = [String: Double]()
+        blockedOutgoingDates = [String: Double]()
+        
+        for allowedConnection in allowedRethinkPackets
+        {
+            // Handshake true indicates that the packet is contained in the pair of first request/response packets
+            if allowedConnection.handshake == false
+            {
+                continue
+            }
+            
+            // inOut == true means an incoming connection
+            if allowedConnection.inOut
+            {
+                allowedIncoming[allowedConnection.connectionID] = allowedConnection.payload.packetData
+                allowedIncomingDates[allowedConnection.connectionID] = allowedConnection.timestamp
+            }
+            else
+            {
+                allowedOutgoing[allowedConnection.connectionID] = allowedConnection.payload.packetData
+                allowedOutgoingDates[allowedConnection.connectionID] = allowedConnection.timestamp
+            }
+            
+            // Add this connection ID to the list if it is not already there
+            if !allowedConnections.contains(allowedConnection.connectionID)
+            {
+                allowedConnections.append(allowedConnection.connectionID)
+            }
+        }
+        
+        packetStats[allowedPacketsSeenKey] = allowedConnections.count
+        
+        for blockedConnection in blockedRethinkPackets
+        {
+            // Handshake true indicates that the packet is contained in the pair of first request/response packets
+            if blockedConnection.handshake == false
+            {
+                continue
+            }
+            
+            // inOut == true means an incoming connection
+            if blockedConnection.inOut
+            {
+                blockedIncoming[blockedConnection.connectionID] = blockedConnection.payload.packetData
+                blockedIncomingDates[blockedConnection.connectionID] = blockedConnection.timestamp
+            }
+            else
+            {
+                blockedOutgoing[blockedConnection.connectionID] = blockedConnection.payload.packetData
+                blockedOutgoingDates[blockedConnection.connectionID] = blockedConnection.timestamp
+            }
+            
+            // Add this connection ID to the list if it is not already there
+            if !blockedConnections.contains(blockedConnection.connectionID)
+            {
+                blockedConnections.append(blockedConnection.connectionID)
+            }
+        }
+        
+        packetStats[blockedPacketsSeenKey] = blockedConnections.count
+    }
     
     init()
     {
@@ -44,10 +110,10 @@ class ConnectionData
         self.allowedOutgoing = ConnectionData.dataDictionary(from: allowedOutgoingKey)
         self.blockedIncoming = ConnectionData.dataDictionary(from: blockedIncomingKey)
         self.blockedOutgoing = ConnectionData.dataDictionary(from: blockedOutgoingKey)
-        self.allowedIncomingDates = ConnectionData.floatDictionary(from: allowedIncomingDatesKey)
-        self.allowedOutgoingDates = ConnectionData.floatDictionary(from: allowedOutgoingDatesKey)
-        self.blockedIncomingDates = ConnectionData.floatDictionary(from: blockedIncomingDatesKey)
-        self.blockedOutgoingDates = ConnectionData.floatDictionary(from: blockedOutgoingDatesKey)
+        self.allowedIncomingDates = ConnectionData.doubleDictionary(from: allowedIncomingDatesKey)
+        self.allowedOutgoingDates = ConnectionData.doubleDictionary(from: allowedOutgoingDatesKey)
+        self.blockedIncomingDates = ConnectionData.doubleDictionary(from: blockedIncomingDatesKey)
+        self.blockedOutgoingDates = ConnectionData.doubleDictionary(from: blockedOutgoingDatesKey)
         self.allowedConnections = allowedConnectionsList.array
         self.blockedConnections = blockedConnectionsList.array        
     }
@@ -59,10 +125,10 @@ class ConnectionData
         allowedOutgoing = merge(primaryDictionary: allowedOutgoing, with: newData.allowedOutgoing) as! [String : Data]
         blockedIncoming = merge(primaryDictionary: blockedIncoming, with: newData.blockedIncoming) as! [String: Data]
         blockedOutgoing = merge(primaryDictionary: blockedOutgoing, with: newData.blockedOutgoing) as! [String: Data]
-        allowedIncomingDates = merge(primaryDictionary: allowedIncomingDates, with: newData.allowedIncomingDates) as! [String: Float]
-        allowedOutgoingDates = merge(primaryDictionary: allowedOutgoingDates, with: newData.allowedOutgoingDates) as! [String : Float]
-        blockedIncomingDates = merge(primaryDictionary: blockedIncomingDates, with: newData.blockedIncomingDates) as! [String : Float]
-        blockedOutgoingDates = merge(primaryDictionary: blockedOutgoingDates, with: newData.blockedOutgoingDates) as! [String : Float]
+        allowedIncomingDates = merge(primaryDictionary: allowedIncomingDates, with: newData.allowedIncomingDates) as! [String: Double]
+        allowedOutgoingDates = merge(primaryDictionary: allowedOutgoingDates, with: newData.allowedOutgoingDates) as! [String : Double]
+        blockedIncomingDates = merge(primaryDictionary: blockedIncomingDates, with: newData.blockedIncomingDates) as! [String : Double]
+        blockedOutgoingDates = merge(primaryDictionary: blockedOutgoingDates, with: newData.blockedOutgoingDates) as! [String : Double]
         
         // Combine the arrays with no duplicates
         allowedConnections = Array(Set(allowedConnections + newData.allowedConnections))
@@ -85,13 +151,13 @@ class ConnectionData
             blockedIncomingMap.key = blockedIncomingKey
             let blockedOutgoingMap = RMap<String, Data>(dictionary: self.blockedOutgoing)
             blockedOutgoingMap.key = blockedOutgoingKey
-            let allowedIncomingDatesMap = RMap<String, Float>(dictionary: self.allowedIncomingDates)
+            let allowedIncomingDatesMap = RMap<String, Double>(dictionary: self.allowedIncomingDates)
             allowedIncomingDatesMap.key = allowedIncomingDatesKey
-            let allowedOutgoingDatesMap = RMap<String, Float>(dictionary: self.allowedOutgoingDates)
+            let allowedOutgoingDatesMap = RMap<String, Double>(dictionary: self.allowedOutgoingDates)
             allowedOutgoingDatesMap.key = allowedOutgoingDatesKey
-            let blockedIncomingDatesMap = RMap<String, Float>(dictionary: self.blockedIncomingDates)
+            let blockedIncomingDatesMap = RMap<String, Double>(dictionary: self.blockedIncomingDates)
             blockedIncomingDatesMap.key = blockedIncomingDatesKey
-            let blockedOutgoingDatesMap = RMap<String, Float>(dictionary: self.blockedOutgoingDates)
+            let blockedOutgoingDatesMap = RMap<String, Double>(dictionary: self.blockedOutgoingDates)
             blockedOutgoingDatesMap.key = blockedOutgoingDatesKey
             let allowedConnectionsList = RList<String>(array: self.allowedConnections)
             allowedConnectionsList.key = allowedConnectionsKey
@@ -140,6 +206,21 @@ class ConnectionData
         }
         
         return dataDictionary
+    }
+    
+    static func doubleDictionary(from key: String) -> [String: Double]
+    {
+        let doubleMap = RMap<String, Double>(key: key)
+        var doubleDictionary = [String: Double]()
+        
+        let mapKeys: [String] = doubleMap.keys
+        
+        for mapKey in mapKeys
+        {
+            doubleDictionary[mapKey] = doubleMap[mapKey]
+        }
+        
+        return doubleDictionary
     }
     
     static func floatDictionary(from key: String) -> [String: Float]

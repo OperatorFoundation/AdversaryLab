@@ -302,10 +302,9 @@ class ViewController: NSViewController, NSTabViewDelegate
             loadDataButton.isEnabled = true
   
         case .TrainingMode:
-            
-            if let selectedFileURL = showRDBFileAlert()
+            if let selectedFileURL = showRethinkFileAlert()
             {
-                loadRDBFile(fileURL: selectedFileURL)
+                loadRethinkFile(fileURL: selectedFileURL)
                 {
                     _ in
                     
@@ -323,88 +322,103 @@ class ViewController: NSViewController, NSTabViewDelegate
         }
     }
     
-    func loadRDBFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
+    func loadRethinkFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
     {
         DispatchQueue.main.async {
             self.activityIndicator.startAnimation(nil)
         }
         
-        RedisServerController.sharedInstance.switchDatabaseFile(withFile: fileURL, completion:
+        RethinkDBController.sharedInstance.launchRethinkDB
         {
-            (_) in
+            success in
             
-            let currentData = ConnectionData()
-            
-            if !currentData.allowedConnections.isEmpty && !currentData.blockedConnections.isEmpty
-            {
-                DispatchQueue.main.async {
-                    completion(true)
-                }
-            }
-            else if currentData.allowedConnections.isEmpty && currentData.blockedConnections.isEmpty
-            {
-                showNoDataAlert()
-            }
-            else if currentData.allowedConnections.isEmpty
-            {
-                if let selectedFileURL = showNoAllowedConnectionDataAlert()
-                {
-                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-                    {
-                        maybeConnectionData in
-                        
-                        if let connectionData = maybeConnectionData
-                        {
-                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
-                            {
-                                DispatchQueue.main.async {
-                                    completion(true)
-                                }
-                                return
-                            }
-                        }
-                        
-                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
-                    }
-                }
-                else
-                {
-                    DispatchQueue.main.async {
-                        completion(false)
-                    }
-                }
-            }
-            else if currentData.blockedConnections.isEmpty
-            {
-                if let selectedFileURL = showNoBlockedConnectionDataAlert()
-                {
-                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-                    {
-                        maybeConnectionData in
-                        
-                        if let connectionData = maybeConnectionData
-                        {
-                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
-                            {
-                                DispatchQueue.main.async {
-                                    completion(true)
-                                }
-                                return
-                            }
-                        }
-                        
-                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
-                    }
-                }
-                else
-                {
-                    DispatchQueue.main.async {
-                        completion(false)
-                    }
-                }
-            }
-        })
+            RethinkDBController.sharedInstance.restoreDB(fromFile: fileURL)
+            completion(success)
+        }
     }
+    
+//    func loadRDBFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
+//    {
+//        DispatchQueue.main.async {
+//            self.activityIndicator.startAnimation(nil)
+//        }
+//        
+//        RedisServerController.sharedInstance.switchDatabaseFile(withFile: fileURL, completion:
+//        {
+//            (_) in
+//            
+//            let currentData = ConnectionData()
+//            
+//            if !currentData.allowedConnections.isEmpty && !currentData.blockedConnections.isEmpty
+//            {
+//                DispatchQueue.main.async {
+//                    completion(true)
+//                }
+//            }
+//            else if currentData.allowedConnections.isEmpty && currentData.blockedConnections.isEmpty
+//            {
+//                showNoDataAlert()
+//            }
+//            else if currentData.allowedConnections.isEmpty
+//            {
+//                if let selectedFileURL = showNoAllowedConnectionDataAlert()
+//                {
+//                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+//                    {
+//                        maybeConnectionData in
+//                        
+//                        if let connectionData = maybeConnectionData
+//                        {
+//                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
+//                            {
+//                                DispatchQueue.main.async {
+//                                    completion(true)
+//                                }
+//                                return
+//                            }
+//                        }
+//                        
+//                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+//                    }
+//                }
+//                else
+//                {
+//                    DispatchQueue.main.async {
+//                        completion(false)
+//                    }
+//                }
+//            }
+//            else if currentData.blockedConnections.isEmpty
+//            {
+//                if let selectedFileURL = showNoBlockedConnectionDataAlert()
+//                {
+//                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
+//                    {
+//                        maybeConnectionData in
+//                        
+//                        if let connectionData = maybeConnectionData
+//                        {
+//                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
+//                            {
+//                                DispatchQueue.main.async {
+//                                    completion(true)
+//                                }
+//                                return
+//                            }
+//                        }
+//                        
+//                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
+//                    }
+//                }
+//                else
+//                {
+//                    DispatchQueue.main.async {
+//                        completion(false)
+//                    }
+//                }
+//            }
+//        })
+//    }
     
     func refreshDBUI()
     {
@@ -575,7 +589,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         case .TrainingMode:
             configModel.trainingMode = true
             self.loadDataButton.isEnabled = true
-            self.loadDataButton.title = "Load DB File"
+            self.loadDataButton.title = "Load Data"
             self.processPacketsButton.isEnabled = true
             self.processPacketsButton.title = "Train With Data"
         case .TestMode:

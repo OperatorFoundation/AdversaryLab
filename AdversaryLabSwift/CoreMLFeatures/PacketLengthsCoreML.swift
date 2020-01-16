@@ -509,9 +509,9 @@ func newDoubleArrayUsingScores(from intSortedSet: RSortedSet<Int>) -> [Double]
         {
             newArray.append(Double(value))
         }
-        
     }
     
+    newArray.sort()
     return newArray
 }
 

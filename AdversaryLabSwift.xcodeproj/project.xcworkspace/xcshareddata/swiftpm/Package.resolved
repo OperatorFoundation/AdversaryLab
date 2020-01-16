@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Rethink",
+        "repositoryURL": "https://github.com/OperatorFoundation/rethink-swift",
+        "state": {
+          "branch": null,
+          "revision": "f8a2e7c7aa424066b8cc8b4aedd73edf180ef3d8",
+          "version": "1.1.0"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation/",
+        "state": {
+          "branch": null,
+          "revision": "3f38d518c5e41f1cf25ff6a1d28c46db5e79a0b9",
+          "version": "0.9.10"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

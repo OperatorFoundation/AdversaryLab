@@ -33,17 +33,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
         "state": {
           "branch": null,
-          "revision": "ecad8b5b13ce310d1977391cce553ccaa1239eea",
-          "version": "0.8.0"
-        }
-      },
-      {
-        "package": "ZIPFoundation",
-        "repositoryURL": "https://github.com/weichsel/ZIPFoundation/",
-        "state": {
-          "branch": null,
-          "revision": "edbeaa39b426e54702194b0a601342322f01e400",
-          "version": "0.9.9"
+          "revision": "0c735c1b2a1dc5def701572782671dd7c6bfe487",
+          "version": "0.8.1"
         }
       }
     ]
