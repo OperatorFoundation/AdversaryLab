@@ -13,29 +13,43 @@ class RethinkDBController
 {
     static let sharedInstance = RethinkDBController()
     let rethinkdb = "/usr/local/bin/rethinkdb"
+    let python = "python -m"
     let tableName = "Packets"
     var rethinkConnection: ReConnection?
 
     func launchRethinkDB(completion: @escaping (Bool) -> Void)
     {
+        // Launch Server First
+        
+        // Now connect with client
         R.connect(URL(string: "rethinkdb://localhost:28015")!) { (connectError, reConnection) in
             
             if let rethinkError = connectError
             {
                 print("Error connecting to the rethink database: \(rethinkError)")
+                completion(false)
             }
             
             self.rethinkConnection = reConnection
-            self.mergeIntoCurrentDatabase
+            
+            self.deleteDatabase
             {
-                success in
+                (deleted) in
                 
-                print("\nReturned from merging DB.\n")
-                completion(success)
+                if !deleted
+                {
+                    print("\nFailed to delete old rethink data.")
+                }
+                
+                self.mergeIntoCurrentDatabase
+                {
+                    success in
+                    
+                    print("\nReturned from merging DB.\n")
+                    completion(success)
+                }
             }
         }
-        
-        
     }
     
     func restoreDB(fromFile fileURL: URL)
@@ -67,6 +81,42 @@ class RethinkDBController
         
         //Go ahead and run the process/task
         dumpTask.launch()
+    }
+    
+    func deleteDatabase(completion: @escaping (Bool) -> Void)
+    {
+        // Make sure that we have a connection to the database
+        guard let connection = rethinkConnection
+            else {
+                print("Unable to merge rethink data into current database. There is no connection to rethink.")
+                completion(false)
+                return
+        }
+        
+        
+        ///Scan rethinkdb for transports with available data
+        R.dbList().run(connection)
+        {
+            (response) in
+            
+            guard let dbNames = response.value as? [String]
+                else {
+                    print("Unexpected response from rethink query dbList: \(response)")
+                    completion(false)
+                    return
+            }
+            
+            for dbName in dbNames
+            {
+                R.dbDrop(dbName).run(connection)
+                { (dbDropResponse) in
+                    
+                    print("Rethink database drop response: \(dbDropResponse)")
+                }
+            }
+            
+            completion(true)
+        }
     }
     
     func mergeIntoCurrentDatabase(completion: @escaping (Bool) -> Void)

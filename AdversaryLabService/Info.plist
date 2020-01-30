@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>org.operatorFoundation.AdversaryLabService</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -22,7 +22,7 @@
 	<string>Copyright © 2019 Operator Foundation. All rights reserved.</string>
 	<key>SMAuthorizedClients</key>
 	<array>
-		<string>identifier "org.operatorFoundation.AdversaryLabSwift" and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Adelita Schule (MZ3MR7KVAN)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+		<string>identifier "org.operatorFoundation.AdversaryLabSwift" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: Adelita Schule (MZ3MR7KVAN)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
 	</array>
 </dict>
 </plist>
