@@ -328,11 +328,10 @@ class ViewController: NSViewController, NSTabViewDelegate
             self.activityIndicator.startAnimation(nil)
         }
         
-        RethinkDBController.sharedInstance.launchRethinkDB
+        RethinkDBController.sharedInstance.launchRethinkDB(fromFile: fileURL)
         {
             success in
             
-            RethinkDBController.sharedInstance.restoreDB(fromFile: fileURL)
             completion(success)
         }
     }

@@ -12,12 +12,13 @@ import Rethink
 class RethinkDBController
 {
     static let sharedInstance = RethinkDBController()
-    let rethinkdb = "/usr/local/bin/rethinkdb"
-    let python = "python -m"
+    //let rethinkdb = "/usr/local/bin/rethinkdb"
+    let rethinkdb = "rethinkdb"
+    let python = "/usr/local/bin/python3"
     let tableName = "Packets"
     var rethinkConnection: ReConnection?
 
-    func launchRethinkDB(completion: @escaping (Bool) -> Void)
+    func launchRethinkDB(fromFile fileURL: URL, completion: @escaping (Bool) -> Void)
     {
         // Launch Server First
         
@@ -41,6 +42,8 @@ class RethinkDBController
                     print("\nFailed to delete old rethink data.")
                 }
                 
+                self.restoreDB(fromFile: fileURL)
+                
                 self.mergeIntoCurrentDatabase
                 {
                     success in
@@ -55,8 +58,8 @@ class RethinkDBController
     func restoreDB(fromFile fileURL: URL)
     {
        let restoreTask = Process()
-       restoreTask.executableURL = URL(fileURLWithPath: rethinkdb, isDirectory: false)
-       restoreTask.arguments = ["restore", fileURL.path]
+       restoreTask.executableURL = URL(fileURLWithPath: python, isDirectory: false)
+       restoreTask.arguments = ["-m", rethinkdb, "restore", fileURL.path]
        
        print("Current Directory: \(FileManager.default.currentDirectoryPath)")
        print("Launching restoreDB process.")
@@ -129,7 +132,6 @@ class RethinkDBController
                 return
         }
         
-        
         ///Scan rethinkdb for transports with available data
         R.dbList().run(connection)
         {
@@ -141,7 +143,6 @@ class RethinkDBController
                     completion(false)
                     return
             }
-            
             ///Ask the user which transport is allowed and which is blocked
             DispatchQueue.main.async {
                 guard let (allowedTransport, remainingTransports) = showChooseAllowedConnectionsAlert(transportNames: dbNames)
