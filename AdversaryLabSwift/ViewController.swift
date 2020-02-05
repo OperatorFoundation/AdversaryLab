@@ -205,17 +205,32 @@ class ViewController: NSViewController, NSTabViewDelegate
             case .TestMode:
                 runTest()
             case .TrainingMode: // In Training mode we need a name so we can save the model files
-                if let name = showNameModelAlert()
-                {
-                    print("Time to analyze some things.")
-                    configModel.modelName = name
-                    connectionInspector.analyzeConnections(configModel: configModel)
-                    updateProgressIndicator()
+                
+                let packetStatsDict = ConnectionData().packetStats
+                guard let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey]
+                    else {
+                        showNoDataAlert()
+                        return
                 }
-                else
+                
+                if allowedPacketsSeenValue > 0, blockedPacketsSeenValue > 0
                 {
-                    sender.state = .off
+                    if let name = showNameModelAlert()
+                    {
+                        print("Time to analyze some things.")
+                        configModel.modelName = name
+                        connectionInspector.analyzeConnections(configModel: configModel)
+                        updateProgressIndicator()
+                    }
+                    else
+                    {
+                        sender.state = .off
+                    }
                 }
+                else {
+                    showNoDataAlert()
+                }
+                
             case .DataMode:
                 print("Data mode selected. Nothing to do here.")
             }
@@ -288,17 +303,17 @@ class ViewController: NSViewController, NSTabViewDelegate
         switch currentTab
         {
         case .TestMode:
-            if modelDirectoryURL == nil
+            // Get the user to select the correct .adversary file
+            if let selectedURL = showSelectAdversaryFileAlert()
             {
-                // Get the user to select the correct .adversary file
-                if let selectedURL = showSelectAdversaryFileAlert()
-                {
-                    // Model Group Name should be the same as the directory
-                    modelName = selectedURL.deletingPathExtension().lastPathComponent
-                    configModel.modelName = modelName
-                }
+                // Model Group Name should be the same as the directory
+                modelName = selectedURL.deletingPathExtension().lastPathComponent
+                configModel.modelName = modelName
+                
+                // Unpack to a temporary directory
+                modelDirectoryURL = MLModelController().unpack(adversaryURL: selectedURL)
+                runTest()
             }
-            
             loadDataButton.isEnabled = true
   
         case .TrainingMode:
@@ -610,6 +625,11 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     func runTest()
     {
+        if !activityIndicator.isHidden
+        {
+            activityIndicator.stopAnimation(nil)
+        }
+        
         let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
         guard blockedConnectionList.count > 1
             else
@@ -1250,42 +1270,53 @@ class ViewController: NSViewController, NSTabViewDelegate
                 if rOutEntropy != nil,
                     fOutEntropy != nil,
                     outEntropyTrainingAccuracy != nil,
-                    outEntropyValidationAccuracy != nil,
                     outEntropyEvaluationAccuracy != nil
                 {
                     self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!)
                     self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!)
                     self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!)
-                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
                     self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!)
+                    
+                    if outEntropyValidationAccuracy != nil
+                    {
+                        self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
+                    }
+                    else
+                    {
+                        self.outEntropyVAcc = "--"
+                    }
                 }
                 else
                 {
                     self.requiredOutEntropy = "--"
                     self.forbiddenOutEntropy = "--"
                     self.outEntropyTAcc = "--"
-                    self.outEntropyVAcc = "--"
                     self.outEntropyEAcc = "--"
                 }
-                
+                                
                 if rInEntropy != nil,
                     fInEntropy != nil,
                     inEntropyTrainingAccuracy != nil,
-                    inEntropyValidationAccuracy != nil,
                     inEntropyEvaluationAccuracy != nil
                 {
                     self.requiredInEntropy = String(format: "%.2f", rInEntropy!)
                     self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!)
                     self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!)
-                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
                     self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!)
+                    if inEntropyValidationAccuracy != nil
+                    {
+                        self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
+                    }
+                    else
+                    {
+                        self.inEntropyVAcc = "--"
+                    }
                 }
                 else
                 {
                     self.requiredInEntropy = "--"
                     self.forbiddenInEntropy = "--"
                     self.inEntropyTAcc = "--"
-                    self.inEntropyVAcc = "--"
                     self.inEntropyEAcc = "--"
                 }
                 

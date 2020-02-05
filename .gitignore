@@ -88,3 +88,5 @@ iOSInjectionProject/
 
 # End of https://www.gitignore.io/api/swift
 *.xcbkptlist
+rethinkdb_data/log_file
+rethinkdb_data/metadata

@@ -12,7 +12,7 @@ import Rethink
 class RethinkDBController
 {
     static let sharedInstance = RethinkDBController()
-    //let rethinkdb = "/usr/local/bin/rethinkdb"
+    let rethinkdbExecutablePath = "/usr/local/bin/rethinkdb"
     let rethinkdb = "rethinkdb"
     let python = "/usr/local/bin/python3"
     let tableName = "Packets"
@@ -21,6 +21,7 @@ class RethinkDBController
     func launchRethinkDB(fromFile fileURL: URL, completion: @escaping (Bool) -> Void)
     {
         // Launch Server First
+        launchServer()
         
         // Now connect with client
         R.connect(URL(string: "rethinkdb://localhost:28015")!) { (connectError, reConnection) in
@@ -55,6 +56,14 @@ class RethinkDBController
         }
     }
     
+    func launchServer()
+    {
+       let restoreTask = Process()
+       restoreTask.executableURL = URL(fileURLWithPath: rethinkdbExecutablePath, isDirectory: false)
+       //restoreTask.arguments = ["-m", rethinkdb]
+       restoreTask.launch()
+    }
+    
     func restoreDB(fromFile fileURL: URL)
     {
        let restoreTask = Process()
@@ -63,7 +72,7 @@ class RethinkDBController
        
        print("Current Directory: \(FileManager.default.currentDirectoryPath)")
        print("Launching restoreDB process.")
-       print("Execuatable URL: \(rethinkdb)")
+       print("Execuatable URL: \(python)")
        print("Arguments: \(restoreTask.arguments!)")
        restoreTask.launch()
     }
