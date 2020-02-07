@@ -99,14 +99,14 @@ class TimingCoreML
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferences])
             let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
                 else
             {
                 print("\nFailed to test models. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
             

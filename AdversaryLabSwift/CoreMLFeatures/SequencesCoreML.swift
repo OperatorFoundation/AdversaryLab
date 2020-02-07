@@ -254,14 +254,14 @@ class SequencesCoreML
         {
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: floatSequences])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
                 else
             {
                 print("\nFailed to test models. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
             // This is the dictionary where we will save our results
@@ -344,14 +344,14 @@ class SequencesCoreML
         {
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: offsetSequences])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
                 else
             {
                 print("\nFailed to test models. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
             // This is the dictionary where we will save our results

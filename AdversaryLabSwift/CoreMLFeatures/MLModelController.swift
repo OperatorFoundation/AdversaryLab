@@ -237,7 +237,7 @@ class MLModelController
     func unpack(adversaryURL: URL) -> URL?
     {
         let fileManager = FileManager.default
-        let modelGroupName = adversaryURL.deletingPathExtension().lastPathComponent
+        //let modelGroupName = adversaryURL.deletingPathExtension().lastPathComponent
         
         guard let appDirectory = getAdversarySupportDirectory()
             else
@@ -246,7 +246,8 @@ class MLModelController
             return nil
         }
         
-        let temporaryDirURL = appDirectory.appendingPathComponent("\(modelGroupName)/temp", isDirectory: true)
+        let modelGroupPath = "temp"
+        let temporaryDirURL = appDirectory.appendingPathComponent(modelGroupPath, isDirectory: true)
         
         do
         {
@@ -259,15 +260,26 @@ class MLModelController
             
             let fileURLS = try fileManager.contentsOfDirectory(at: temporaryDirURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
             
-            for fileURL in fileURLS
+            print("\nUnzipped item at: \(adversaryURL.path)\nto: \(temporaryDirURL.path)")
+            if fileURLS.count == 1, fileURLS[0].hasDirectoryPath
             {
-                if fileURL.pathExtension == "mlmodel"
-                {
-                    print("\nFound an mlm file in the chosen directory: \(fileURL)")
-                }
+                print("Unpacked model files to: \(fileURLS[0])")
+                return fileURLS[0]
             }
-            
-            return temporaryDirURL
+            else
+            {
+                for fileURL in fileURLS
+                {
+                    print("\nFound file: \(fileURL.path)")
+                    if fileURL.pathExtension == "mlmodel"
+                    {
+                        print("\nFound an mlm file in the chosen directory: \(fileURL)")
+                    }
+                }
+                
+                print("Unpacked model files to: \(temporaryDirURL)")
+                return temporaryDirURL
+            }
         }
         catch let unzipError
         {

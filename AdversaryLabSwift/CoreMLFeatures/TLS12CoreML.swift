@@ -155,14 +155,14 @@ class TLS12CoreML
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.tlsNames.rawValue: tlsNames])
             let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversarySupportDirectory()
                 else
             {
                 print("\nFailed to test TLS model. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(modelName)/temp/\(modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
 

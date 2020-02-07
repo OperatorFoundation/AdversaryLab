@@ -225,14 +225,14 @@ class EntropyCoreML
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.entropy.rawValue: entropyList])
             let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
                 else
             {
                 print("\nFailed to test entropy model. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(entropyClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(entropyRegressorName).appendingPathExtension(modelFileExtension)
             

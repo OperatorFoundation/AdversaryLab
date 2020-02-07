@@ -119,14 +119,14 @@ class AllFeatures
     {
         do
         {
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
                 else
             {
                 print("\nFailed to test all features model. Unable to locate the application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(allClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
 
             if FileManager.default.fileExists(atPath: classifierFileURL.path)

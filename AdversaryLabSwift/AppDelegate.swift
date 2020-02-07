@@ -40,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate
         guard let adversaryDirectory = getAdversarySupportDirectory()
             else { return }
         
-        let temporaryDirectory = adversaryDirectory.appendingPathComponent("Temporary", isDirectory: true)
+        let temporaryDirectory = adversaryDirectory.appendingPathComponent("temp", isDirectory: true)
         
         do
         {

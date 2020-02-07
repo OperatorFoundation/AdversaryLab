@@ -143,14 +143,14 @@ class PacketLengthsCoreML
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths])
             let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
-            guard let appDirectory = getAdversarySupportDirectory()
+            guard let tempDirURL = getAdversaryTempDirectory()
             else
             {
                 print("\nFailed to test models. Unable to locate application document directory.")
                 return
             }
             
-            let temporaryDirURL = appDirectory.appendingPathComponent("\(configModel.modelName)/temp/\(configModel.modelName)", isDirectory: true)
+            let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
@@ -179,6 +179,11 @@ class PacketLengthsCoreML
                     print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue).")
                     lengthDictionary[lengthKey] = thisFeatureValue.doubleValue
                 }
+            }
+            else
+            {
+                print("\nFailed to find regressor file in the expected location: \(regressorFileURL.path)")
+                
             }
             
             // Classifier
@@ -219,6 +224,10 @@ class PacketLengthsCoreML
                     
                     lengthDictionary[accuracyKey] = accuracy
                 }
+            }
+            else
+            {
+                print("\nFailed to find classifier file at the expected location: \(classifierFileURL.path)")
             }
         }
         catch let featureProviderError

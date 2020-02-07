@@ -660,7 +660,13 @@ class ViewController: NSViewController, NSTabViewDelegate
             return
         }
         
-        configModel.modelName = modelName
+        if !modelDirectoryURL!.hasDirectoryPath
+        {
+            // Unpack to a temporary directory
+            modelDirectoryURL = MLModelController().unpack(adversaryURL: modelDirectoryURL!)
+        }
+        
+        configModel.modelName = modelDirectoryURL!.deletingPathExtension().lastPathComponent
         connectionInspector.analyzeConnections(configModel: configModel)
         updateProgressIndicator()
     }

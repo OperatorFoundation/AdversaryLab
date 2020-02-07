@@ -21,3 +21,15 @@ func getAdversarySupportDirectory() -> URL?
     
     return nil
 }
+
+func getAdversaryTempDirectory() -> URL?
+{
+    guard let appDirectory = getAdversarySupportDirectory()
+    else
+    {
+        print("\nFailed to test models. Unable to locate application document directory.")
+        return nil
+    }
+    
+    return appDirectory.appendingPathComponent("temp", isDirectory: true)
+}
