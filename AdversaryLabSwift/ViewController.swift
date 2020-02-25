@@ -625,6 +625,8 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     func runTest()
     {
+        configModel.processingEnabled = true
+        
         if !activityIndicator.isHidden
         {
             activityIndicator.stopAnimation(nil)

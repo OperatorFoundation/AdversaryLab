@@ -318,17 +318,17 @@ class PacketLengthsCoreML
                 let allowedPredictionColumn = try regressor.predictions(from: allowedTable)
                 let blockedPredictionColumn = try regressor.predictions(from: blockedTable)
                 
-                guard let allowedLengths = allowedPredictionColumn.doubles
+                guard let allowedLengths = allowedPredictionColumn.strings
                     else
                 {
-                    print("Failed to get allowed lengths from allowed column.")
+                    print("Failed to get allowed lengths from allowed column.\(allowedPredictionColumn)")
                     return
                 }
                 
-                guard let blockedLengths = blockedPredictionColumn.doubles
+                guard let blockedLengths = blockedPredictionColumn.strings
                     else
                 {
-                    print("Failed to get blocked lengths from blocked column.")
+                    print("Failed to get blocked lengths from blocked column. \(blockedPredictionColumn)")
                     return
                 }
 
@@ -337,8 +337,19 @@ class PacketLengthsCoreML
                 
                 // Save Scores
                 let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
-                lengthsDictionary[requiredLengthKey] = predictedAllowedLength
-                lengthsDictionary[forbiddenLengthKey] = predictedBlockedLength
+                
+                let allowedLengthDouble = Double(string: predictedAllowedLength)
+                if allowedLengthDouble != 0
+                {
+                    lengthsDictionary[requiredLengthKey] = allowedLengthDouble
+                }
+                
+                let blockedLengthDouble = Double(string: predictedBlockedLength)
+                if blockedLengthDouble != 0
+                {
+                    lengthsDictionary[forbiddenLengthKey] = blockedLengthDouble
+                }
+                
                 lengthsDictionary[lengthsTAccKey] = trainingAccuracy
                 lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
                 
@@ -393,9 +404,9 @@ class PacketLengthsCoreML
         return (allowedLengthsArray, blockedLengthsArray)
     }
     
-    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], classifications: [String])
+    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [String], classifications: [String])
     {
-        var lengths = [Int]()
+        var lengths = [String]()
         var classificationLabels = [String]()
         
         let allowedLengthsKey: String
@@ -431,7 +442,7 @@ class PacketLengthsCoreML
             
             for _ in 0 ..< count
             {
-                lengths.append(length)
+                lengths.append("\(length)")
                 classificationLabels.append(ClassificationLabel.allowed.rawValue)
             }
         }
@@ -445,7 +456,7 @@ class PacketLengthsCoreML
             
             for _ in 0 ..< count
             {
-                lengths.append(length)
+                lengths.append("\(length)")
                 classificationLabels.append(ClassificationLabel.blocked.rawValue)
             }
         }

@@ -232,6 +232,14 @@ class ConnectionInspector
             ProgressBot.sharedInstance.progressMessage = "Analyzing Packet Timing for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
         let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(forConnection: connection)
+        if let packetLengthError = maybePacketlengthError
+        {
+            print("Packet length error: \(packetLengthError.localizedDescription)")
+        }
+        if let packetTimingError = maybePacketTimingError
+        {
+            print("Packet timing error: \(packetTimingError)")
+        }
         
         // Process Offset and Float Sequences
         DispatchQueue.main.async
@@ -246,13 +254,20 @@ class ConnectionInspector
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }
+        if let offsetError = maybeSubsequenceError
+        {
+            print("Offset error: \(offsetError)")
+        }
         
         // Process Entropy
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (entropyProcessed,_, _, _) = EntropyCoreML().processEntropy(forConnection: connection)
-        
+        let (entropyProcessed,_, _, maybeEntropyError) = EntropyCoreML().processEntropy(forConnection: connection)
+        if let entropyError = maybeEntropyError
+        {
+            print("Entropy error: \(entropyError)")
+        }
         
         // Process All Features
         DispatchQueue.main.async
@@ -262,29 +277,12 @@ class ConnectionInspector
         let allFeaturesProcessed = AllFeatures.sharedInstance.processData(forConnection: connection)
         
         // Increment Packets Analyzed Field as we are done analyzing this connection
-        if packetLengthProcessed, timingProcessed, subsequenceNoErrors, entropyProcessed, allFeaturesProcessed
+        if packetLengthProcessed || timingProcessed || subsequenceNoErrors || entropyProcessed || allFeaturesProcessed
         {
             let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
             let _ = packetsAnalyzedDictionary.increment(field: connection.packetsAnalyzedKey)
         }
-        else
-        {
-            if let packetLengthError = maybePacketlengthError
-            {
-                print("Packet length error: \(packetLengthError.localizedDescription)")
-            }
 
-            if let packetTimingError = maybePacketTimingError
-            {
-                print("Packet timing error: \(packetTimingError)")
-            }
-
-            if let offsetError = maybeSubsequenceError
-            {
-                print("Offset error: \(offsetError)")
-            }
-        }
-        
         if configModel.enableTLSAnalysis
         {
             DispatchQueue.main.async
