@@ -240,7 +240,7 @@ class RedisServerController: NSObject
                     {
                         Auburn.restartRedis()
                         self.subscribeToNewConnectionsChannel()
-                        NotificationCenter.default.post(name: .updateDBFilename, object: nil)
+                        //NotificationCenter.default.post(name: .updateDBFilename, object: nil)
                         completion(true)
                     }
                 default:
@@ -465,7 +465,7 @@ class RedisServerController: NSObject
                         
                         DispatchQueue.main.async
                         {
-                            NotificationCenter.default.post(name: .updateStats , object: nil)
+                            //NotificationCenter.default.post(name: .updateStats , object: nil)
                         }
                     }
                 }

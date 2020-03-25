@@ -290,8 +290,12 @@ class EntropyCoreML
                     }
                 }
                 
-                let accuracy = allowedBlockedCount/Double(classifierFeatureCount)
-                print("🔮 Entropy classification prediction accuracy: \(accuracy * 100) \(connectionType.rawValue).")
+                var accuracy = allowedBlockedCount/Double(classifierFeatureCount)
+                // Round it to 3 decimal places
+                accuracy = (accuracy * 1000).rounded()/1000
+                // Show the accuracy as a percentage value
+                accuracy = accuracy * 100
+                print("🔮 Entropy classification prediction accuracy: \(accuracy) \(connectionType.rawValue).")
                 
                 entropyDictionary[accuracyKey] = accuracy
             }

@@ -16,7 +16,7 @@ class ProgressBot: NSObject
     {
         didSet
         {
-            NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
+            //NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
     
@@ -24,7 +24,7 @@ class ProgressBot: NSObject
     {
         didSet
         {
-            NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
+            //NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
     
@@ -32,7 +32,7 @@ class ProgressBot: NSObject
     {
         didSet
         {
-            NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
+            //NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
     
@@ -40,7 +40,7 @@ class ProgressBot: NSObject
     {
         didSet
         {
-            NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
+            //NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
     

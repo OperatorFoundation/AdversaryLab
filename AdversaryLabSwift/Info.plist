@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDocumentTypes</key>
@@ -58,7 +60,7 @@
 	<key>SMPrivilegedExecutables</key>
 	<dict>
 		<key>org.operatorFoundation.AdversaryLabService</key>
-		<string>identifier "org.operatorFoundation.AdversaryLabService" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: Adelita Schule (MZ3MR7KVAN)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
+		<string>identifier &quot;org.operatorFoundation.AdversaryLabService&quot; and anchor apple generic and certificate leaf[subject.CN] = &quot;Apple Development: Adelita Schule (MZ3MR7KVAN)&quot; and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
 	</dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>

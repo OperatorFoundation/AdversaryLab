@@ -266,8 +266,8 @@ let outEntropyRegressorName = "Entropy_Out_Regressor"
 let inEntropyClassifierName = "Entropy_In_Classifier"
 let outEntropyClassifierName = "Entropy_Out_Classifier"
 
-let inLengthRegressorName = "Length_In_Regressor"
-let outLengthRegressorName = "Length_Out_Regressor"
+let inLengthRecommenderName = "Length_In_Recommender"
+let outLengthRecommenderName = "Length_Out_Recommender"
 let inLengthClassifierName = "Length_In_Classifier"
 let outLengthClassifierName = "Length_Out_Classifier"
 
@@ -284,7 +284,7 @@ let entropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", sh
 let entropyClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
 let timingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection", version: "1.0")
 let timingClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
-let lengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden length for a connection", version: "1.0")
+let lengthsRecommenderMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden length for a connection", version: "1.0")
 let lengthsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
 let tlsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 let tlsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a TLS name is from an allowed or blocked connection.", version: "1.0")
@@ -336,7 +336,9 @@ enum ClassificationLabel: String
 
 enum ColumnLabel: String
 {
+    case itemID = "item ID"
     case length = "length"
+    case score = "score"
     case outLength = "outgoingLength"
     case inLength = "incomingLength"
     case entropy = "entropy"

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -708,13 +707,13 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="AdversaryLabSwift" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" identifier="mainView" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="1150" height="800"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1041" height="800"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box identifier="settingsBox" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="7kG-4K-h0L">
-                                <rect key="frame" x="0.0" y="696" width="1150" height="104"/>
+                                <rect key="frame" x="0.0" y="696" width="1041" height="104"/>
                                 <view key="contentView" id="4OY-m4-WrU">
-                                    <rect key="frame" x="1" y="1" width="1148" height="102"/>
+                                    <rect key="frame" x="1" y="1" width="1039" height="102"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
@@ -903,31 +902,31 @@
                                 <color key="fillColor" red="0.25098039215686274" green="0.38039215686274508" blue="0.50196078431372548" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
                             <box identifier="resultsBox" boxType="custom" borderType="line" cornerRadius="4" title="Results" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="bLg-zh-5Y8">
-                                <rect key="frame" x="0.0" y="0.0" width="1150" height="698"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1041" height="698"/>
                                 <view key="contentView" id="rEU-zU-uAX">
-                                    <rect key="frame" x="1" y="1" width="1148" height="696"/>
+                                    <rect key="frame" x="1" y="1" width="1039" height="696"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="XH8-rE-kw3">
-                                            <rect key="frame" x="558" y="332" width="32" height="32"/>
+                                            <rect key="frame" x="504" y="332" width="32" height="32"/>
                                         </progressIndicator>
                                         <tabView type="bottomTabsBezelBorder" translatesAutoresizingMaskIntoConstraints="NO" id="U3K-mm-fOh">
-                                            <rect key="frame" x="-7" y="74" width="1162" height="618"/>
+                                            <rect key="frame" x="-7" y="74" width="1053" height="618"/>
                                             <font key="font" metaFont="system"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Data" identifier="DataMode" id="lzk-GG-MO3">
                                                     <view key="view" id="ksq-IL-4hz">
-                                                        <rect key="frame" x="10" y="7" width="1142" height="580"/>
+                                                        <rect key="frame" x="10" y="7" width="1033" height="580"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MmQ-Yo-R8n" customClass="LineChartView" customModule="Charts">
                                                                 <rect key="frame" x="17" y="281" width="529" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="dYG-fi-xdx" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="597" y="281" width="528" height="282"/>
+                                                                <rect key="frame" x="597" y="281" width="419" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Cwd-sz-D6E" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="307" y="-9" width="528" height="282"/>
+                                                                <rect key="frame" x="307" y="-9" width="419" height="282"/>
                                                             </customView>
                                                         </subviews>
                                                         <constraints>
@@ -5171,7 +5170,7 @@
                                             </connections>
                                         </tabView>
                                         <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
-                                            <rect key="frame" x="19" y="5" width="1109" height="20"/>
+                                            <rect key="frame" x="19" y="5" width="1000" height="20"/>
                                         </progressIndicator>
                                         <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-D3-1sv">
                                             <rect key="frame" x="17" y="25" width="126" height="17"/>
@@ -5188,17 +5187,17 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
-                                            <rect key="frame" x="898" y="18" width="102" height="32"/>
+                                            <rect key="frame" x="789" y="18" width="102" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="loadDataClicked:" target="XfG-lQ-9wD" id="ypH-uk-wiR"/>
+                                                <action selector="loadDataClickedWithSender:" target="XfG-lQ-9wD" id="J8r-dp-vJp"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
-                                            <rect key="frame" x="1000" y="18" width="134" height="32"/>
+                                            <rect key="frame" x="891" y="18" width="134" height="32"/>
                                             <buttonCell key="cell" type="push" title="Train With Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5207,8 +5206,8 @@
                                                 <action selector="runClick:" target="XfG-lQ-9wD" id="eZM-It-fdq"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OUu-jG-iwO">
-                                            <rect key="frame" x="781" y="18" width="117" height="32"/>
+                                        <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OUu-jG-iwO">
+                                            <rect key="frame" x="672" y="18" width="117" height="32"/>
                                             <buttonCell key="cell" type="push" title="Live Capture" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfp-qe-CeD">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5278,7 +5277,7 @@
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="bzY-MI-M55"/>
             </objects>
-            <point key="canvasLocation" x="1359" y="222"/>
+            <point key="canvasLocation" x="1413.5" y="222"/>
         </scene>
     </scenes>
 </document>

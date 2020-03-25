@@ -155,8 +155,12 @@ class TimingCoreML
                     }
                 }
                 
-                let accuracy = allowedBlockedCount/Double(featureCount)
-                print("\n🔮 Timing prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                var accuracy = allowedBlockedCount/Double(featureCount)
+                // Round it to 3 decimal places
+                accuracy = (accuracy * 1000).rounded()/1000
+                // Show the accuracy as a percentage value
+                accuracy = accuracy * 100
+                print("\n🔮 Timing prediction: \(accuracy) \(connectionType.rawValue).")
                 
                 timingDictionary[accuracyKey] = accuracy
             }

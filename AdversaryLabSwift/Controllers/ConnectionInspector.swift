@@ -55,7 +55,7 @@ class ConnectionInspector
                         
                         DispatchQueue.main.async
                         {
-                            NotificationCenter.default.post(name: .updateStats, object: nil)
+                            //NotificationCenter.default.post(name: .updateStats, object: nil)
                             self.pauseBuddy.currentIndex = index + 1
                         }
                     }
@@ -95,7 +95,7 @@ class ConnectionInspector
                     self.analyze(connection: blockedConnection, configModel: configModel)
                     
                     // Let the UI know it needs an update
-                    NotificationCenter.default.post(name: .updateStats, object: nil)
+                    //NotificationCenter.default.post(name: .updateStats, object: nil)
                     self.pauseBuddy.currentIndex = index + 1
                 }
                 else
@@ -195,7 +195,7 @@ class ConnectionInspector
         DispatchQueue.main.async
         {
             ProgressBot.sharedInstance.analysisComplete = true
-            NotificationCenter.default.post(name: .updateStats, object: nil)
+            //NotificationCenter.default.post(name: .updateStats, object: nil)
         }
         
         deleteTemporaryModelDirectory(named: configModel.modelName)

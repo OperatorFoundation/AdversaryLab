@@ -33,7 +33,6 @@ class PacketLengthsCoreML
             print("\n### Outpacket count = \(String(outPacket.count))")
             print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
         }
-        ///
         
         // Increment the score of this particular outgoing packet length
         let _ = outgoingLengthSet.incrementScore(ofField: outPacket.count, byIncrement: 1)
@@ -51,7 +50,6 @@ class PacketLengthsCoreML
             print("\n### Inpacket count = \(String(inPacket.count))\n")
             print("\n⁉️  We got a weird in packet size... \(String(describing: String(data: outPacket, encoding: .utf8))) <---\n")
         }
-        ///
         
         // Increment the score of this particular incoming packet length
         let newInScore = incomingLengthSet.incrementScore(ofField: inPacket.count, byIncrement: 1)
@@ -69,7 +67,6 @@ class PacketLengthsCoreML
      - Parameter modelName: A String that will be used to save the resulting mlm file.
      */
     func scoreAllPacketLengths(configModel: ProcessingConfigurationModel)
-        //(modelName: String, trainingMode: Bool)
     {
         // Outgoing Lengths Scoring
         scorePacketLengths(connectionDirection: .outgoing, configModel: configModel)
@@ -82,12 +79,16 @@ class PacketLengthsCoreML
     {
         if configModel.trainingMode
         {
-            let lengthsTable = createLengthTable(connectionDirection: connectionDirection)
-            trainModels(lengthsTable: lengthsTable, connectionDirection: connectionDirection, modelName: configModel.modelName)
+            let classifierTable = createLengthClassifierTable(connectionDirection: connectionDirection)
+            guard let recommenderTable = createLengthRecommenderTable(connectionDirection: connectionDirection)
+            else
+            { return }
+            
+            trainModels(lengthsClassifierTable: classifierTable, lengthsRecommenderTable: recommenderTable, connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
-            let (allowedLengths, blockedLengths) = getLengths(forConnectionDirection: connectionDirection)
+            let (allowedLengths, allowedScores, blockedLengths, blockedScores) = getLengthsAndScores(forConnectionDirection: connectionDirection)
             
             guard blockedLengths.count > 0
             else
@@ -97,17 +98,17 @@ class PacketLengthsCoreML
             }
             
             // Allowed
-            testModel(lengths: allowedLengths, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+            testModel(lengths: allowedLengths, scores:allowedScores, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
             
             // Blocked
-            testModel(lengths: blockedLengths, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+            testModel(lengths: blockedLengths, scores: blockedScores, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
     
-    func testModel(lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(lengths: [Int], scores: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let classifierName: String
-        let regressorName: String
+        let recommenderName: String
         let accuracyKey: String
         let lengthKey: String
         
@@ -115,7 +116,7 @@ class PacketLengthsCoreML
         {
         case .incoming:
             classifierName = inLengthClassifierName
-            regressorName = inLengthRegressorName
+            recommenderName = inLengthRecommenderName
             switch connectionType
             {
             case .allowed:
@@ -127,7 +128,7 @@ class PacketLengthsCoreML
             }
         case .outgoing:
             classifierName = outLengthClassifierName
-            regressorName = outLengthRegressorName
+            recommenderName = outLengthRecommenderName
             switch connectionType
             {
             case .allowed:
@@ -141,7 +142,6 @@ class PacketLengthsCoreML
         do
         {
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue: lengths])
-            let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
             
             guard let tempDirURL = getAdversaryTempDirectory()
             else
@@ -152,37 +152,50 @@ class PacketLengthsCoreML
             
             let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
-            let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
+            let recommenderFileURL = temporaryDirURL.appendingPathComponent(recommenderName, isDirectory: false).appendingPathExtension(modelFileExtension)
             
             // This is the dictionary where we will save our results
             let lengthDictionary: RMap<String,Double> = RMap(key: testResultsKey)
             
-            // Regressor
-            if FileManager.default.fileExists(atPath: regressorFileURL.path)
+            // TODO: MLRecommender
+            if FileManager.default.fileExists(atPath: recommenderFileURL.path)
             {
-                if let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+                var input = [Int: NSNumber]()
+                
+                // Create a dictionary of length-score pairs
+                for (index, length) in lengths.enumerated()
                 {
-                    guard regressorPrediction.count > 0
+                    input[length] = NSNumber(value: scores[index])
+                }
+                
+                let featureProvider = try MLFeatureValue(dictionary: input)
+                
+                let recommenderFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue : [lengths], ColumnLabel.score.rawValue: [scores], ColumnLabel.classification.rawValue: [connectionType]])
+                //let results = try  model.prediction(input: input)
+                
+                if let recommenderPrediction = MLModelController().prediction(fileURL: recommenderFileURL, batchFeatureProvider: recommenderFeatureProvider)
+                {
+                    guard recommenderPrediction.count > 0
                         else { return }
-                    
+
                     // We are only expecting one result
-                    let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
-                    
+                    let thisFeatureNames = recommenderPrediction.features(at: 0).featureNames
+
                     // Check that we received a result with a feature named 'entropy' and that it has a value.
                     guard let firstFeatureName = thisFeatureNames.first
                         else { return }
                     guard firstFeatureName == ColumnLabel.length.rawValue
                         else { return }
-                    guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+                    guard let thisFeatureValue = recommenderPrediction.features(at: 0).featureValue(for: firstFeatureName)
                         else { return }
-                    
+
                     print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue).")
                     lengthDictionary[lengthKey] = thisFeatureValue.doubleValue
                 }
             }
             else
             {
-                print("\nFailed to find regressor file in the expected location: \(regressorFileURL.path)")
+                print("\nFailed to find regressor file in the expected location: \(recommenderFileURL.path)")
                 
             }
             
@@ -219,8 +232,12 @@ class PacketLengthsCoreML
                         }
                     }
                     
-                    let accuracy = allowedBlockedCount/Double(featureCount)
-                    print("\n🔮 Length prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                    var accuracy = allowedBlockedCount/Double(featureCount)
+                    // Round it to 3 decimal places
+                    accuracy = (accuracy * 1000).rounded()/1000
+                    // Show the accuracy as a percentage value
+                    accuracy = accuracy * 100
+                    print("\n🔮 Length prediction: \(accuracy) \(connectionType.rawValue).")
                     
                     lengthDictionary[accuracyKey] = accuracy
                 }
@@ -236,28 +253,62 @@ class PacketLengthsCoreML
         }
     }
     
-    func createLengthTable(connectionDirection: ConnectionDirection) -> MLDataTable
+    func createLengthClassifierTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
-        let (lengths, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
-        
+        let (lengths, scores, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
         // Create the Lengths Table
         var lengthsTable = MLDataTable()
         let lengthsColumn = MLDataColumn(lengths)
+        let scoresColumn = MLDataColumn(scores)
         let classyLabelColumn = MLDataColumn(classificationLabels)
         lengthsTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
+        lengthsTable.addColumn(scoresColumn, named: ColumnLabel.score.rawValue)
         lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
         
         return lengthsTable
     }
     
-    func trainModels(lengthsTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
+    func createLengthRecommenderTable(connectionDirection: ConnectionDirection) -> MLDataTable?
+    {
+        var recommenderTable = MLDataTable()
+        let (lengths, scores, classifications) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
+        
+        let itemIDs = [Int](0..<lengths.count)
+        print("-----COLUMN ARRAYS----")
+        let userColumn = MLDataColumn(classifications)
+        let itemIDColumn = MLDataColumn(itemIDs)
+        let lengthsColumn = MLDataColumn(lengths)
+        
+        guard let scaledScores = scale(scores: scores)
+        else {
+            print("Failed to scale length scores for training.")
+            return nil
+        }
+
+        let scoresColumn = MLDataColumn(scaledScores)
+        
+        recommenderTable.addColumn(userColumn, named: ColumnLabel.classification.rawValue)
+        recommenderTable.addColumn(itemIDColumn, named: ColumnLabel.itemID.rawValue)
+        recommenderTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
+        recommenderTable.addColumn(scoresColumn, named: ColumnLabel.score.rawValue)
+        
+        print("User column: ", recommenderTable[ColumnLabel.classification.rawValue])
+        print("item ID: ", recommenderTable[ColumnLabel.itemID.rawValue])
+        print("lengths: ", recommenderTable[ColumnLabel.length.rawValue])
+        print("scores: ", recommenderTable[ColumnLabel.score.rawValue])
+        print("lengths training table: \(recommenderTable.description)")
+        
+        return recommenderTable
+    }
+    
+    func trainModels(lengthsClassifierTable: MLDataTable, lengthsRecommenderTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
     {
         let requiredLengthKey: String
         let forbiddenLengthKey: String
         let lengthsTAccKey: String
         let lengthsVAccKey: String
         let lengthsEAccKey: String
-        let regressorName: String
+        let recommenderName: String
         let classifierName: String
         
         switch connectionDirection
@@ -268,7 +319,7 @@ class PacketLengthsCoreML
             lengthsTAccKey = incomingLengthsTAccKey
             lengthsVAccKey = incomingLengthsVAccKey
             lengthsEAccKey = incomingLengthsEAccKey
-            regressorName = inLengthRegressorName
+            recommenderName = inLengthRecommenderName
             classifierName = inLengthClassifierName
         case .outgoing:
             requiredLengthKey = outgoingRequiredLengthKey
@@ -276,27 +327,29 @@ class PacketLengthsCoreML
             lengthsTAccKey = outgoingLengthsTAccKey
             lengthsVAccKey = outgoingLengthsVAccKey
             lengthsEAccKey = outgoingLengthsEAccKey
-            regressorName = outLengthRegressorName
+            recommenderName = outLengthRecommenderName
             classifierName = outLengthClassifierName
         }
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
-        let (lengthsEvaluationTable, lengthsTrainingTable) = lengthsTable.randomSplit(by: 0.20)
+        let (classifierEvaluationTable, classifierTrainingTable) = lengthsClassifierTable.randomSplit(by: 0.20)
         
         // Train the classifier
         do
         {
-            let classifier = try MLClassifier(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
+            let classifier = try MLClassifier(trainingData: classifierTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
+
             let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
-            let classifierEvaluation = classifier.evaluation(on: lengthsEvaluationTable)
+            let classifierEvaluation = classifier.evaluation(on: classifierEvaluationTable)
             let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
-            
+
             let validationError = classifier.validationMetrics.classificationError
             let validationAccuracy: Double?
-            
+
             // Sometimes we get a negative number, this is not valid for our purposes
             if validationError < 0
             {
+                print("We received a negative number for lengths validation error. this means we cannot calculate the validation accuracy.")
                 validationAccuracy = nil
             }
             else
@@ -306,70 +359,98 @@ class PacketLengthsCoreML
             
             do
             {
-                let regressor = try MLRegressor(trainingData: lengthsTrainingTable, targetColumn: ColumnLabel.length.rawValue)
-                
-                guard let (allowedTable, blockedTable) = MLModelController().createAllowedBlockedTables(fromTable: lengthsTable)
-                    else
+                for row in lengthsRecommenderTable.rows
                 {
-                    print("\nUnable to get allowed/blocked tables from lengths data table.")
+                    print("\n", row)
+                }
+                let recommender = try MLRecommender(trainingData: lengthsRecommenderTable, userColumn: ColumnLabel.classification.rawValue, itemColumn: ColumnLabel.itemID.rawValue, ratingColumn: ColumnLabel.score.rawValue)
+                
+                /// Allowed recommendation
+                let allowedRecommendations = try recommender.recommendations(fromUsers: [ClassificationLabel.allowed.rawValue])
+                
+                // Recommendations will only return the ID.
+                // Join with the original table so that we have easy access to the actual length
+                let mergedAllowedLengthsTable = allowedRecommendations.join(with: lengthsRecommenderTable, on: ColumnLabel.itemID.rawValue)
+                print("\n --> Allowed Lengths recommendations: ", mergedAllowedLengthsTable)
+
+                // Get the #1 Ranked row from the table
+                guard let topAllowedRecommendation = mergedAllowedLengthsTable.rows.first(where:
+                {
+                    (row) -> Bool in
+                    row["rank"]?.intValue == 1
+                })
+                else
+                {
+                    print("Unable to get top allowed recommendation for packet length.")
                     return
                 }
                 
-                let allowedPredictionColumn = try regressor.predictions(from: allowedTable)
-                let blockedPredictionColumn = try regressor.predictions(from: blockedTable)
-                
-                guard let allowedLengths = allowedPredictionColumn.strings
-                    else
+                // Get the length from top ranked row
+                guard let recommendedAllowedLength = topAllowedRecommendation[ColumnLabel.length.rawValue]?.intValue
+                else
                 {
-                    print("Failed to get allowed lengths from allowed column.\(allowedPredictionColumn)")
-                    return
-                }
-                
-                guard let blockedLengths = blockedPredictionColumn.strings
-                    else
-                {
-                    print("Failed to get blocked lengths from blocked column. \(blockedPredictionColumn)")
+                    print("Unable to get top allowed recommendation for packet length.")
                     return
                 }
 
-                let predictedAllowedLength = allowedLengths[0]
-                let predictedBlockedLength = blockedLengths[0]
+                print("\ntop allowed recommendation: ", recommendedAllowedLength)
+                
+                /// Blocked recommendation
+                let blockedRecommendations = try recommender.recommendations(fromUsers: [ClassificationLabel.blocked.rawValue])
+                
+                // Recommendations will only return the ID.
+                // Join with the original table so that we have easy access to the actual length
+                let mergedBlockedLengthsTable = blockedRecommendations.join(with: lengthsRecommenderTable, on: ColumnLabel.itemID.rawValue)
+                print("\n --> Blocked lengths recommendations: ", mergedBlockedLengthsTable)
+                
+                // Get the #1 Ranked row from the table
+                guard let topBlockedRecommendation = mergedBlockedLengthsTable.rows.first(where:
+                {
+                    (row) -> Bool in
+                    row["rank"]?.intValue == 1
+                })
+                else
+                {
+                    print("Unable to get top blocked recommendation for packet length.")
+                    return
+                }
+                
+                // Get the length from top ranked row
+                guard let recommendedBlockedLength = topBlockedRecommendation[ColumnLabel.length.rawValue]?.intValue
+                    else
+                {
+                    print("Unable to get top blocked recommendation for packet length.")
+                    return
+                }
+                print("\ntop blocked recommendation: ", recommendedBlockedLength)
                 
                 // Save Scores
                 let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
-                
-                let allowedLengthDouble = Double(string: predictedAllowedLength)
-                if allowedLengthDouble != 0
+
+                if recommendedAllowedLength != 0
                 {
-                    lengthsDictionary[requiredLengthKey] = allowedLengthDouble
+                    lengthsDictionary[requiredLengthKey] = Double(recommendedAllowedLength)
                 }
-                
-                let blockedLengthDouble = Double(string: predictedBlockedLength)
-                if blockedLengthDouble != 0
+
+                if recommendedBlockedLength != 0
                 {
-                    lengthsDictionary[forbiddenLengthKey] = blockedLengthDouble
+                    lengthsDictionary[forbiddenLengthKey] = Double(recommendedBlockedLength)
                 }
-                
+
                 lengthsDictionary[lengthsTAccKey] = trainingAccuracy
                 lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
-                
+
                 if validationAccuracy != nil
                 {
                     lengthsDictionary[lengthsVAccKey] = validationAccuracy!
                 }
-                
+
                 // Save the models to a file
-                MLModelController().saveModel(classifier: classifier,
-                                              classifierMetadata: lengthsClassifierMetadata,
-                                              classifierFileName: classifierName,
-                                              regressor: regressor,
-                                              regressorMetadata: lengthsRegressorMetadata,
-                                              regressorFileName: regressorName,
-                                              groupName: modelName)
+                MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, classifierFileName: classifierName, recommender: recommender, recommenderMetadata: lengthsRecommenderMetadata, recommenderFileName: recommenderName, groupName: modelName)
             }
-            catch let regressorError
+            catch let recommenderError
             {
-                print("\nError creating lengths regressor: \(regressorError)")
+                print("\nError creating lengths recommender: \(recommenderError)")
             }
         }
         catch let error
@@ -378,7 +459,25 @@ class PacketLengthsCoreML
         }
     }
     
-    func getLengths(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths:[Int], blockedLengths: [Int])
+    func scale(scores: [Double]) -> [Double]?
+    {
+        guard !scores.isEmpty, let max = scores.max()
+        else {
+            return nil
+        }
+        
+        let scaleFactor = 5/max
+        
+        let scaled = scores.map
+        { (score) -> Double in
+            
+            return score * scaleFactor
+        }
+        
+        return scaled
+    }
+    
+    func getLengthsAndScores(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths:[Int], allowedLengthScores:[Double], blockedLengths: [Int], blockedLengthScores: [Double])
     {
         let allowedLengthsKey: String
         let blockedLengthsKey: String
@@ -395,18 +494,19 @@ class PacketLengthsCoreML
         
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let allowedLengthsArray = newIntArrayUniqueValues(from: [allowedLengthsRSet])
+        let (allowedLengthsArray, allowedScoresArray) = arrays(from: [allowedLengthsRSet])
         
         /// B is the sorted set of lengths for the Blocked traffic
         let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let blockedLengthsArray = newIntArrayUniqueValues(from: [blockedLengthsRSet])
+        let (blockedLengthsArray, blockedScoresArray) = arrays(from: [blockedLengthsRSet])
         
-        return (allowedLengthsArray, blockedLengthsArray)
+        return (allowedLengthsArray, allowedScoresArray, blockedLengthsArray, blockedScoresArray)
     }
     
-    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [String], classifications: [String])
+    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Double], classifications: [String])
     {
-        var lengths = [String]()
+        var lengths = [Int]()
+        var scores = [Double]()
         var classificationLabels = [String]()
         
         let allowedLengthsKey: String
@@ -424,44 +524,27 @@ class PacketLengthsCoreML
         
         /// A is the sorted set of lengths for the Allowed traffic
         let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let allowedLengthsArray = newIntArrayUniqueValues(from: [allowedLengthsRSet])
+        let (allowedLengthsArray, allowedLengthScores) = arrays(from: [allowedLengthsRSet])
         
         /// B is the sorted set of lengths for the Blocked traffic
         let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let blockedLengthsArray = newIntArrayUniqueValues(from: [blockedLengthsRSet])
+        let (blockedLengthsArray, blockedLengthsScores) = arrays(from: [blockedLengthsRSet])
         
-        for length in allowedLengthsArray
+        lengths.append(contentsOf: allowedLengthsArray)
+        scores.append(contentsOf: allowedLengthScores)
+        for _ in allowedLengthsArray
         {
-            guard let score: Float = allowedLengthsRSet[length]
-                else
-            {
-                continue
-            }
-            
-            let count = Int(score)
-            
-            for _ in 0 ..< count
-            {
-                lengths.append("\(length)")
-                classificationLabels.append(ClassificationLabel.allowed.rawValue)
-            }
+            classificationLabels.append(ClassificationLabel.allowed.rawValue)
         }
         
-        for length in blockedLengthsArray
+        lengths.append(contentsOf: blockedLengthsArray)
+        scores.append(contentsOf: blockedLengthsScores)
+        for _ in blockedLengthsArray
         {
-            guard let score: Float = blockedLengthsRSet[length]
-                else { continue }
-            
-            let count = Int(score)
-            
-            for _ in 0 ..< count
-            {
-                lengths.append("\(length)")
-                classificationLabels.append(ClassificationLabel.blocked.rawValue)
-            }
+            classificationLabels.append(ClassificationLabel.blocked.rawValue)
         }
         
-        return(lengths, classificationLabels)
+        return(lengths, scores, classificationLabels)
     }
     
     func newIntSet(from redisSets:[RSortedSet<Int>]) -> Set<Int>
@@ -489,22 +572,37 @@ class PacketLengthsCoreML
 /// - Parameters:
 ///     - redisSets: [RSortedSet<Int>], an array of sorted sets to turn in to one array of Ints.
 /// - Returns: [Int], an array of Ints.
-func newIntArrayUniqueValues(from redisSets:[RSortedSet<Int>]) -> [Int]
+func arrays(from redisSets:[RSortedSet<Int>]) -> (values: [Int], scores: [Double])
 {
-    var newArray = [Int]()
+    var valueArray = [Int]()
+    var scoreArray = [Double]()
     
     for set in redisSets
     {
+        if set.count == 1
+        {
+            if let newMember: Int = set[0], let score: Float = set.getScore(for: newMember)
+            {
+                valueArray.append(newMember)
+                scoreArray.append(Double(score))
+                
+                // Add the one value to the arrays twice because MLCreate requires more than one
+                scoreArray.append(Double(score))
+                valueArray.append(newMember)
+            }
+        }
+        
         for i in 0 ..< set.count
         {
-            if let newMember: Int = set[i]
+            if let newMember: Int = set[i], let score: Float = set.getScore(for: newMember)
             {
-                newArray.append(newMember)
+                valueArray.append(newMember)
+                scoreArray.append(Double(score))
             }
         }
     }
     
-    return newArray
+    return (valueArray, scoreArray)
 }
 
 /// Returns an array of doubles created using the elements in the sorted set of Ints. The number of times a given element is added to the array is equal to the score of that element in the set.

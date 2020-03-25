@@ -157,12 +157,19 @@ class ViewController: NSViewController, NSTabViewDelegate
     @objc dynamic var outAllowedEntropy = "--"
     @objc dynamic var outBlockedEntropy = "--"
     
+    let circleRadius: CGFloat = 0.5
     var modelDirectoryURL: URL?
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
         
+        // Identify which tab was selected
+        guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
+            let currentTab = TabIds(rawValue: identifier)
+            else { return }
+        
+        updateButtons(currentTab: currentTab)
         updateCharts()
         updateConfigModel()
         
@@ -178,7 +185,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         RedisServerController.sharedInstance.subscribeToNewConnectionsChannel()
 
         // Also update labels and progress indicator when new data is available
-        NotificationCenter.default.addObserver(self, selector: #selector(loadLabelData), name: .updateStats, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateStats), name: .updateStats, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateProgressIndicator), name: .updateProgressIndicator, object: nil)
         
         NotificationCenter.default.addObserver(forName: .updateDBFilename, object: nil, queue: .main)
@@ -186,10 +193,34 @@ class ViewController: NSViewController, NSTabViewDelegate
             self.databaseNameLabel.stringValue = Auburn.dbfilename ?? "unknown"
         }
     }
+    
+    @objc func updateStats()
+    {
+        DispatchQueue.main.async
+        {
+            if !self.activityIndicator.isHidden
+            {
+                self.activityIndicator.stopAnimation(nil)
+            }
+            
+            if self.loadDataButton.state == .on
+            {
+                self.loadDataButton.state = .off
+            }
+            
+            if self.processPacketsButton.state == .on
+            {
+                self.processPacketsButton.state = .off
+            }
+        }
+        
+        loadLabelData()
+    }
 
     // MARK: - IBActions
     @IBAction func runClick(_ sender: NSButton)
     {
+        activityIndicator.startAnimation(nil)
         print("\nYou clicked the process packets button 👻")
         updateConfigModel()
         
@@ -225,6 +256,7 @@ class ViewController: NSViewController, NSTabViewDelegate
                     else
                     {
                         sender.state = .off
+                        refreshDBUI()
                     }
                 }
                 else {
@@ -240,8 +272,6 @@ class ViewController: NSViewController, NSTabViewDelegate
             print("Pause bot engage!! 🤖")
             updateProgressIndicator()
         }
-        
-        self.loadLabelData()
     }
     
     @IBAction func liveCaptureClick(_ sender: NSButton)
@@ -291,7 +321,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         }
     }
     
-    @IBAction func loadDataClicked(_ sender: NSButton)
+    @IBAction func loadDataClicked(sender: NSButton)
     {
         loadDataButton.isEnabled = false
         activityIndicator.startAnimation(nil)
@@ -333,7 +363,6 @@ class ViewController: NSViewController, NSTabViewDelegate
             
         case .DataMode:
             print("Data mode selected. Nothing to do here.")
-            loadDataButton.isEnabled = true
         }
     }
     
@@ -350,89 +379,6 @@ class ViewController: NSViewController, NSTabViewDelegate
             completion(success)
         }
     }
-    
-//    func loadRDBFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
-//    {
-//        DispatchQueue.main.async {
-//            self.activityIndicator.startAnimation(nil)
-//        }
-//        
-//        RedisServerController.sharedInstance.switchDatabaseFile(withFile: fileURL, completion:
-//        {
-//            (_) in
-//            
-//            let currentData = ConnectionData()
-//            
-//            if !currentData.allowedConnections.isEmpty && !currentData.blockedConnections.isEmpty
-//            {
-//                DispatchQueue.main.async {
-//                    completion(true)
-//                }
-//            }
-//            else if currentData.allowedConnections.isEmpty && currentData.blockedConnections.isEmpty
-//            {
-//                showNoDataAlert()
-//            }
-//            else if currentData.allowedConnections.isEmpty
-//            {
-//                if let selectedFileURL = showNoAllowedConnectionDataAlert()
-//                {
-//                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-//                    {
-//                        maybeConnectionData in
-//                        
-//                        if let connectionData = maybeConnectionData
-//                        {
-//                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
-//                            {
-//                                DispatchQueue.main.async {
-//                                    completion(true)
-//                                }
-//                                return
-//                            }
-//                        }
-//                        
-//                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
-//                    }
-//                }
-//                else
-//                {
-//                    DispatchQueue.main.async {
-//                        completion(false)
-//                    }
-//                }
-//            }
-//            else if currentData.blockedConnections.isEmpty
-//            {
-//                if let selectedFileURL = showNoBlockedConnectionDataAlert()
-//                {
-//                    RedisServerController.sharedInstance.mergeIntoCurrentDatabase(mergeFile: selectedFileURL)
-//                    {
-//                        maybeConnectionData in
-//                        
-//                        if let connectionData = maybeConnectionData
-//                        {
-//                            if !connectionData.allowedConnections.isEmpty && !connectionData.blockedConnections.isEmpty
-//                            {
-//                                DispatchQueue.main.async {
-//                                    completion(true)
-//                                }
-//                                return
-//                            }
-//                        }
-//                        
-//                        self.loadRDBFile(fileURL: selectedFileURL, completion: completion)
-//                    }
-//                }
-//                else
-//                {
-//                    DispatchQueue.main.async {
-//                        completion(false)
-//                    }
-//                }
-//            }
-//        })
-//    }
     
     func refreshDBUI()
     {
@@ -474,22 +420,22 @@ class ViewController: NSViewController, NSTabViewDelegate
         let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "Allowed Incoming Packet Lengths")
         allowedInLine.colors = [NSUIColor.blue]
         allowedInLine.circleColors = [NSUIColor.blue]
-        allowedInLine.circleRadius = 3
+        allowedInLine.circleRadius = circleRadius
         allowedInLine.drawValuesEnabled = false
         let allowedOutLine = LineChartDataSet(entries: allowedOutLengthsEntry, label: "Allowed Outgoing Packet Lengths")
         allowedOutLine.colors = [NSUIColor.gray]
         allowedOutLine.circleColors = [NSUIColor.gray]
-        allowedOutLine.circleRadius = 3
+        allowedOutLine.circleRadius = circleRadius
         allowedOutLine.drawValuesEnabled = false
         let blockedInLine = LineChartDataSet(entries: blockedInLengthsEntry, label: "Blocked Incoming Packet Lengths")
         blockedInLine.colors = [NSUIColor.red]
         blockedInLine.circleColors = [NSUIColor.red]
-        blockedInLine.circleRadius = 3
+        blockedInLine.circleRadius = circleRadius
         blockedInLine.drawValuesEnabled = false
         let blockedOutLine = LineChartDataSet(entries: blockedOutLengthsEntry, label: "Blocked Outgoing Packet Lengths")
         blockedOutLine.colors = [NSUIColor.orange]
         blockedOutLine.circleColors = [NSUIColor.orange]
-        blockedOutLine.circleRadius = 3
+        blockedOutLine.circleRadius = circleRadius
         blockedOutLine.drawValuesEnabled = false
         
         let data = LineChartData()
@@ -498,6 +444,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         data.addDataSet(blockedInLine)
         data.addDataSet(blockedOutLine)
         
+        lengthChartView.highlightPerDragEnabled = true
         lengthChartView.data = data
         lengthChartView.chartDescription?.text = "Packet Lengths"
     }
@@ -521,22 +468,22 @@ class ViewController: NSViewController, NSTabViewDelegate
         let allowedInLine = LineChartDataSet(entries: allowedInEntropyEntry, label: "Allowed Incoming Entropy")
         allowedInLine.colors = [NSUIColor.blue]
         allowedInLine.circleColors = [NSUIColor.blue]
-        allowedInLine.circleRadius = 3
+        allowedInLine.circleRadius = circleRadius
         allowedInLine.drawValuesEnabled = false
         let allowedOutLine = LineChartDataSet(entries: allowedOutEntropyEntry, label: "Allowed Outgoing Entropy")
         allowedOutLine.colors = [NSUIColor.gray]
         allowedOutLine.circleColors = [NSUIColor.gray]
-        allowedOutLine.circleRadius = 3
+        allowedOutLine.circleRadius = circleRadius
         allowedOutLine.drawValuesEnabled = false
         let blockedInLine = LineChartDataSet(entries: blockedInEntropyEntry, label: "Blocked Incoming Entropy")
         blockedInLine.colors = [NSUIColor.red]
         blockedInLine.circleColors = [NSUIColor.red]
-        blockedInLine.circleRadius = 3
+        blockedInLine.circleRadius = circleRadius
         blockedInLine.drawValuesEnabled = false
         let blockedOutLine = LineChartDataSet(entries: blockedOutEntropyEntry, label: "Blocked Outgoing Entropy")
         blockedOutLine.colors = [NSUIColor.orange]
         blockedOutLine.circleColors = [NSUIColor.orange]
-        blockedOutLine.circleRadius = 3
+        blockedOutLine.circleRadius = circleRadius
         blockedOutLine.drawValuesEnabled = false
         
         let data = LineChartData()
@@ -548,7 +495,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         entropyChartView.data = data
         entropyChartView.chartDescription?.text = "Entropy"
     }
-    
+        
     func updateTimeChart()
     {
         let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
@@ -562,12 +509,12 @@ class ViewController: NSViewController, NSTabViewDelegate
         let line1 = LineChartDataSet(entries: allowedLineChartEntry, label: "Allowed")
         line1.colors = [NSUIColor.blue]
         line1.circleColors = [NSUIColor.blue]
-        line1.circleRadius = 3
+        line1.circleRadius = circleRadius
         
         let line2 = LineChartDataSet(entries: blockedLineChartEntry, label: "Blocked")
         line2.colors = [NSUIColor.red]
         line2.circleColors = [NSUIColor.red]
-        line2.circleRadius = 3
+        line2.circleRadius = circleRadius
         
         let data = LineChartData()
         
@@ -598,6 +545,11 @@ class ViewController: NSViewController, NSTabViewDelegate
             let currentTab = TabIds(rawValue: identifier)
             else { return }
         
+        updateButtons(currentTab: currentTab)
+    }
+    
+    func updateButtons(currentTab: TabIds)
+    {
         switch currentTab
         {
         case .TrainingMode:
@@ -626,11 +578,6 @@ class ViewController: NSViewController, NSTabViewDelegate
     func runTest()
     {
         configModel.processingEnabled = true
-        
-        if !activityIndicator.isHidden
-        {
-            activityIndicator.stopAnimation(nil)
-        }
         
         let blockedConnectionList: RList<String> = RList(key: blockedConnectionsKey)
         guard blockedConnectionList.count > 1
@@ -835,9 +782,8 @@ class ViewController: NSViewController, NSTabViewDelegate
             case .TestMode:
                 self.loadTestLabelData()
             case .DataMode:
-                print("Switched to Data tab.")
+                return
             }
-            
         }   
     }
     
@@ -886,6 +832,8 @@ class ViewController: NSViewController, NSTabViewDelegate
         
         DispatchQueue.main.async
         {
+            self.activityIndicator.stopAnimation(nil)
+            
             if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
             {
                 self.timingAllowed = String(format: "%.2f", timeAllowed!)
@@ -1116,6 +1064,8 @@ class ViewController: NSViewController, NSTabViewDelegate
             
             DispatchQueue.main.async
             {
+                self.activityIndicator.stopAnimation(nil)
+                
                 self.allEvaluationAccuracy = "--"
                 self.allAllowedOutLength = "--"
                 self.allBlockedOutLength = "--"

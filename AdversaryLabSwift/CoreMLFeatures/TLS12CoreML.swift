@@ -218,8 +218,12 @@ class TLS12CoreML
                     }
                 }
                 
-                let accuracy = allowedBlockedCount/Double(featureCount)
-                print("\n🔮 TLS12 prediction: \(accuracy * 100) \(connectionType.rawValue).")
+                var accuracy = allowedBlockedCount/Double(featureCount)
+                // Round it to 3 decimal places
+                accuracy = (accuracy * 1000).rounded()/1000
+                // Show the accuracy as a percentage value
+                accuracy = accuracy * 100
+                print("\n🔮 TLS12 prediction: \(accuracy) \(connectionType.rawValue).")
                 
                 // This is the dictionary where we will save our results
                 let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)

@@ -25,6 +25,18 @@ class MLModelController
     }
     
     func saveModel(classifier: MLClassifier,
+    classifierMetadata: MLModelMetadata,
+    classifierFileName: String,
+    recommender: MLRecommender,
+    recommenderMetadata: MLModelMetadata,
+    recommenderFileName: String,
+    groupName: String)
+    {
+        save(classifier: classifier, classifierMetadata: classifierMetadata, fileName: classifierFileName, groupName: groupName)
+        save(recommender: recommender, recommenderMetadata: recommenderMetadata, fileName: recommenderFileName, groupName: groupName)
+    }
+    
+    func saveModel(classifier: MLClassifier,
                    classifierMetadata: MLModelMetadata,
                    classifierFileName: String,
                    regressor: MLRegressor,
@@ -145,6 +157,56 @@ class MLModelController
         catch let saveClassyError
         {
             print("\nError saving Classification model: \(saveClassyError)")
+        }
+    }
+    
+    func save(recommender: MLRecommender,
+              recommenderMetadata: MLModelMetadata,
+              fileName: String,
+              groupName: String)
+    {
+        let fileManager = FileManager.default
+        guard let appDirectory = getAdversarySupportDirectory()
+            else
+        {
+            print("Failed to save the regressor, could not find the application document directory.")
+            return
+        }
+        let modelGroupURL = appDirectory.appendingPathComponent(groupName)
+        
+        if !fileManager.fileExists(atPath: modelGroupURL.path)
+        {
+            do
+            {
+                _ = try fileManager.createDirectory(at: modelGroupURL, withIntermediateDirectories: true, attributes: nil)
+            }
+            catch let directoryError
+            {
+                print("\nError creating model directory: \(directoryError)")
+            }
+        }
+        
+        let recommenderFileURL = modelGroupURL.appendingPathComponent("\(fileName).mlmodel")
+        
+        if fileManager.fileExists(atPath: recommenderFileURL.path)
+        {
+            do
+            {
+                try FileManager.default.removeItem(at: recommenderFileURL)
+            }
+            catch let removeFileError
+            {
+                print("Error removing file at \(recommenderFileURL.path): \(removeFileError)")
+            }
+        }
+        
+        do
+        {
+            try recommender.write(to: recommenderFileURL, metadata: recommenderMetadata)
+        }
+        catch let saveModelError
+        {
+            print("Error saving tls regressor model: \(saveModelError)")
         }
     }
     
@@ -343,7 +405,6 @@ class MLModelController
                 }
                 
                 let prediction = try model.predictions(from: batchFeatureProvider, options: MLPredictionOptions())
-                print("\n🔮  Made a prediction: \(prediction)  🔮")
                 return prediction
             }
             catch let predictionError
@@ -358,4 +419,5 @@ class MLModelController
         
         return nil
     }
+    
 }
