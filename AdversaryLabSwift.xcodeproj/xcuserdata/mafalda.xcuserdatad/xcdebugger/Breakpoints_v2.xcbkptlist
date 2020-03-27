@@ -14,8 +14,8 @@
             filePath = "AdversaryLabSwift/CoreMLFeatures/PacketLengthsCoreML.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "455"
-            endingLineNumber = "455"
+            startingLineNumber = "458"
+            endingLineNumber = "458"
             landmarkName = "trainModels(lengthsClassifierTable:lengthsRecommenderTable:connectionDirection:modelName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -23,15 +23,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "09F3F729-436B-4FBA-B594-30F5D18D3AF5"
+            uuid = "E592001A-C16E-4150-B5B3-306982CFE490"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AdversaryLabSwift/CoreMLFeatures/PacketLengthsCoreML.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
+            startingLineNumber = "190"
+            endingLineNumber = "190"
             landmarkName = "testModel(lengths:scores:connectionType:connectionDirection:configModel:)"
             landmarkType = "7">
          </BreakpointContent>

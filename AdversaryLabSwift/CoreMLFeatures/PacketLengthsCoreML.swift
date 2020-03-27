@@ -160,17 +160,15 @@ class PacketLengthsCoreML
             // TODO: MLRecommender
             if FileManager.default.fileExists(atPath: recommenderFileURL.path)
             {
-                var input = [Int: NSNumber]()
+//                var input = [Int: Double]()
+//
+//                // Create a dictionary of length-score pairs
+//                for (index, length) in lengths.enumerated()
+//                {
+//                    input[length] = scores[index]
+//                }
                 
-                // Create a dictionary of length-score pairs
-                for (index, length) in lengths.enumerated()
-                {
-                    input[length] = NSNumber(value: scores[index])
-                }
-                
-                let featureProvider = try MLFeatureValue(dictionary: input)
-                
-                let recommenderFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.length.rawValue : [lengths], ColumnLabel.score.rawValue: [scores], ColumnLabel.classification.rawValue: [connectionType]])
+                let recommenderFeatureProvider = try MLArrayBatchProvider(dictionary: ["items": [lengths]])
                 //let results = try  model.prediction(input: input)
                 
                 if let recommenderPrediction = MLModelController().prediction(fileURL: recommenderFileURL, batchFeatureProvider: recommenderFeatureProvider)
@@ -184,13 +182,18 @@ class PacketLengthsCoreML
                     // Check that we received a result with a feature named 'entropy' and that it has a value.
                     guard let firstFeatureName = thisFeatureNames.first
                         else { return }
-                    guard firstFeatureName == ColumnLabel.length.rawValue
+                    guard firstFeatureName == "recommendations"
                         else { return }
                     guard let thisFeatureValue = recommenderPrediction.features(at: 0).featureValue(for: firstFeatureName)
                         else { return }
+                    
+                    if let nextFeatureValue = recommenderPrediction.features(at: 0).featureValue(for: "scores")
+                    {
+                        print("🔮 Length Recommender Scores: ", nextFeatureValue.dictionaryValue)
+                    }
 
-                    print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue).")
-                    lengthDictionary[lengthKey] = thisFeatureValue.doubleValue
+                    print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue.sequenceValue!.int64Values).")
+                    //lengthDictionary[lengthKey] = thisFeatureValue.sequenceValue
                 }
             }
             else
