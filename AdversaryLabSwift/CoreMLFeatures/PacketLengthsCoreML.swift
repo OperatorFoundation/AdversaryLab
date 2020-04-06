@@ -10,6 +10,73 @@ import Foundation
 import Auburn
 import CreateML
 import CoreML
+//import Song
+
+struct LengthRecommender: Codable {
+    let allowedLength: Int
+    let allowedScore: Double
+    let blockedLength: Int
+    let blockedScore: Double
+}
+
+extension LengthRecommender {
+    
+    /// Assuming that these arrays are parallel
+    init?(connectionDirection: ConnectionDirection)
+    {
+        guard let (aLength, aScore, bLength, bScore) = getHighestScoredLength(forConnectionDirection: connectionDirection)
+        else {
+            return nil
+        }
+        
+        self.allowedLength = aLength
+        self.allowedScore = aScore
+        self.blockedLength = bLength
+        self.blockedScore = bScore
+    }
+    
+    func write(to fileURL: URL) throws
+    {
+        let encoder = JSONEncoder()
+        let result = try encoder.encode(self)
+        try result.write(to: fileURL)
+//        let encoder = SongEncoder()
+//        let result = try encoder.encode(self)
+//        try result.write(to: fileURL)
+    }
+}
+
+func getHighestScoredLength(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths: Int, allowedLengthScore: Double, blockedLength: Int, blockedLengthScore: Double)?
+{
+    let allowedLengthsKey: String
+    let blockedLengthsKey: String
+    
+    switch connectionDirection
+    {
+    case .incoming:
+        allowedLengthsKey = allowedIncomingLengthKey
+        blockedLengthsKey = blockedIncomingLengthKey
+    case .outgoing:
+        allowedLengthsKey = allowedOutgoingLengthKey
+        blockedLengthsKey = blockedOutgoingLengthKey
+    }
+    
+    /// A is the sorted set of lengths for the Allowed traffic
+    let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
+    guard let (allowedLength, allowedScore) = allowedLengthsRSet.first
+        else {
+            return nil
+    }
+    
+    /// B is the sorted set of lengths for the Blocked traffic
+    let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
+    guard let (blockedLength, blockedScore) = blockedLengthsRSet.first
+        else {
+            return nil
+    }
+    
+    return (allowedLength, Double(allowedScore), blockedLength, Double(blockedScore))
+}
 
 class PacketLengthsCoreML
 {
@@ -80,11 +147,11 @@ class PacketLengthsCoreML
         if configModel.trainingMode
         {
             let classifierTable = createLengthClassifierTable(connectionDirection: connectionDirection)
-            guard let recommenderTable = createLengthRecommenderTable(connectionDirection: connectionDirection)
+            guard let lengthRecommender = LengthRecommender(connectionDirection: connectionDirection)
             else
             { return }
             
-            trainModels(lengthsClassifierTable: classifierTable, lengthsRecommenderTable: recommenderTable, connectionDirection: connectionDirection, modelName: configModel.modelName)
+            trainModels(lengthsClassifierTable: classifierTable, lengthRecommender: lengthRecommender, connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
@@ -152,7 +219,8 @@ class PacketLengthsCoreML
             
             let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
-            let recommenderFileURL = temporaryDirURL.appendingPathComponent(recommenderName, isDirectory: false).appendingPathExtension(modelFileExtension)
+                       
+            let recommenderFileURL = temporaryDirURL.appendingPathComponent(recommenderName, isDirectory: false).appendingPathExtension(songFileExtension)
             
             // This is the dictionary where we will save our results
             let lengthDictionary: RMap<String,Double> = RMap(key: testResultsKey)
@@ -160,46 +228,25 @@ class PacketLengthsCoreML
             // TODO: MLRecommender
             if FileManager.default.fileExists(atPath: recommenderFileURL.path)
             {
-//                var input = [Int: Double]()
-//
-//                // Create a dictionary of length-score pairs
-//                for (index, length) in lengths.enumerated()
-//                {
-//                    input[length] = scores[index]
-//                }
+                let decoder = JSONDecoder()
+                let recommenderData = try Data(contentsOf: recommenderFileURL)
+                let result = try decoder.decode(LengthRecommender.self, from: recommenderData)
+//                let decoder = SongDecoder()
+//                let recommenderData = try Data(contentsOf: recommenderFileURL)
+//                let result = try decoder.decode(LengthRecommender.self, from: recommenderData)
+                print("🔮 Length prediction for \(lengthKey): \(result).")
                 
-                let recommenderFeatureProvider = try MLArrayBatchProvider(dictionary: ["items": [lengths]])
-                //let results = try  model.prediction(input: input)
-                
-                if let recommenderPrediction = MLModelController().prediction(fileURL: recommenderFileURL, batchFeatureProvider: recommenderFeatureProvider)
+                switch connectionType
                 {
-                    guard recommenderPrediction.count > 0
-                        else { return }
-
-                    // We are only expecting one result
-                    let thisFeatureNames = recommenderPrediction.features(at: 0).featureNames
-
-                    // Check that we received a result with a feature named 'entropy' and that it has a value.
-                    guard let firstFeatureName = thisFeatureNames.first
-                        else { return }
-                    guard firstFeatureName == "recommendations"
-                        else { return }
-                    guard let thisFeatureValue = recommenderPrediction.features(at: 0).featureValue(for: firstFeatureName)
-                        else { return }
-                    
-                    if let nextFeatureValue = recommenderPrediction.features(at: 0).featureValue(for: "scores")
-                    {
-                        print("🔮 Length Recommender Scores: ", nextFeatureValue.dictionaryValue)
-                    }
-
-                    print("🔮 Length prediction for \(lengthKey): \(thisFeatureValue.sequenceValue!.int64Values).")
-                    //lengthDictionary[lengthKey] = thisFeatureValue.sequenceValue
+                case .allowed:
+                    lengthDictionary[lengthKey] = Double(result.allowedLength)
+                case .blocked:
+                    lengthDictionary[lengthKey] = Double(result.blockedLength)
                 }
             }
             else
             {
-                print("\nFailed to find regressor file in the expected location: \(recommenderFileURL.path)")
-                
+                print("\nFailed to find recommender file in the expected location: \(recommenderFileURL.path)")
             }
             
             // Classifier
@@ -250,22 +297,36 @@ class PacketLengthsCoreML
                 print("\nFailed to find classifier file at the expected location: \(classifierFileURL.path)")
             }
         }
-        catch let featureProviderError
+        catch let lengthRecommenderError
         {
-            print("\nError creating lengths feature provider: \(featureProviderError)")
+            print("\n❗️ Error decoding length recommender: \(lengthRecommenderError)")
         }
     }
     
     func createLengthClassifierTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
+        var expandedLengths = [Int]()
+        var expandedClassificationLabels = [String]()
         let (lengths, scores, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
+        
+        for (index, length) in lengths.enumerated()
+        {
+            let score: Double = scores[index]
+            let classification = classificationLabels[index]
+            let count = Int(score)
+            
+            for _ in 0 ..< count
+            {
+                expandedLengths.append(length)
+                expandedClassificationLabels.append(classification)
+            }
+        }
+        
         // Create the Lengths Table
         var lengthsTable = MLDataTable()
-        let lengthsColumn = MLDataColumn(lengths)
-        let scoresColumn = MLDataColumn(scores)
-        let classyLabelColumn = MLDataColumn(classificationLabels)
+        let lengthsColumn = MLDataColumn(expandedLengths)
+        let classyLabelColumn = MLDataColumn(expandedClassificationLabels)
         lengthsTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
-        lengthsTable.addColumn(scoresColumn, named: ColumnLabel.score.rawValue)
         lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
         
         return lengthsTable
@@ -304,7 +365,7 @@ class PacketLengthsCoreML
         return recommenderTable
     }
     
-    func trainModels(lengthsClassifierTable: MLDataTable, lengthsRecommenderTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
+    func trainModels(lengthsClassifierTable: MLDataTable, lengthRecommender: LengthRecommender, connectionDirection: ConnectionDirection, modelName: String)
     {
         let requiredLengthKey: String
         let forbiddenLengthKey: String
@@ -360,101 +421,22 @@ class PacketLengthsCoreML
                 validationAccuracy = (1.0 - validationError) * 100
             }
             
-            do
+            // Save Length Recommendations
+            let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
+            lengthsDictionary[requiredLengthKey] = Double(lengthRecommender.allowedLength)
+            lengthsDictionary[forbiddenLengthKey] = Double(lengthRecommender.blockedLength)
+
+            // Save Classifier Accuracies
+            lengthsDictionary[lengthsTAccKey] = trainingAccuracy
+            lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
+
+            if validationAccuracy != nil
             {
-                for row in lengthsRecommenderTable.rows
-                {
-                    print("\n", row)
-                }
-                let recommender = try MLRecommender(trainingData: lengthsRecommenderTable, userColumn: ColumnLabel.classification.rawValue, itemColumn: ColumnLabel.itemID.rawValue, ratingColumn: ColumnLabel.score.rawValue)
-                
-                /// Allowed recommendation
-                let allowedRecommendations = try recommender.recommendations(fromUsers: [ClassificationLabel.allowed.rawValue])
-                
-                // Recommendations will only return the ID.
-                // Join with the original table so that we have easy access to the actual length
-                let mergedAllowedLengthsTable = allowedRecommendations.join(with: lengthsRecommenderTable, on: ColumnLabel.itemID.rawValue)
-                print("\n --> Allowed Lengths recommendations: ", mergedAllowedLengthsTable)
-
-                // Get the #1 Ranked row from the table
-                guard let topAllowedRecommendation = mergedAllowedLengthsTable.rows.first(where:
-                {
-                    (row) -> Bool in
-                    row["rank"]?.intValue == 1
-                })
-                else
-                {
-                    print("Unable to get top allowed recommendation for packet length.")
-                    return
-                }
-                
-                // Get the length from top ranked row
-                guard let recommendedAllowedLength = topAllowedRecommendation[ColumnLabel.length.rawValue]?.intValue
-                else
-                {
-                    print("Unable to get top allowed recommendation for packet length.")
-                    return
-                }
-
-                print("\ntop allowed recommendation: ", recommendedAllowedLength)
-                
-                /// Blocked recommendation
-                let blockedRecommendations = try recommender.recommendations(fromUsers: [ClassificationLabel.blocked.rawValue])
-                
-                // Recommendations will only return the ID.
-                // Join with the original table so that we have easy access to the actual length
-                let mergedBlockedLengthsTable = blockedRecommendations.join(with: lengthsRecommenderTable, on: ColumnLabel.itemID.rawValue)
-                print("\n --> Blocked lengths recommendations: ", mergedBlockedLengthsTable)
-                
-                // Get the #1 Ranked row from the table
-                guard let topBlockedRecommendation = mergedBlockedLengthsTable.rows.first(where:
-                {
-                    (row) -> Bool in
-                    row["rank"]?.intValue == 1
-                })
-                else
-                {
-                    print("Unable to get top blocked recommendation for packet length.")
-                    return
-                }
-                
-                // Get the length from top ranked row
-                guard let recommendedBlockedLength = topBlockedRecommendation[ColumnLabel.length.rawValue]?.intValue
-                    else
-                {
-                    print("Unable to get top blocked recommendation for packet length.")
-                    return
-                }
-                print("\ntop blocked recommendation: ", recommendedBlockedLength)
-                
-                // Save Scores
-                let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
-
-                if recommendedAllowedLength != 0
-                {
-                    lengthsDictionary[requiredLengthKey] = Double(recommendedAllowedLength)
-                }
-
-                if recommendedBlockedLength != 0
-                {
-                    lengthsDictionary[forbiddenLengthKey] = Double(recommendedBlockedLength)
-                }
-
-                lengthsDictionary[lengthsTAccKey] = trainingAccuracy
-                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
-
-                if validationAccuracy != nil
-                {
-                    lengthsDictionary[lengthsVAccKey] = validationAccuracy!
-                }
-
-                // Save the models to a file
-                MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, classifierFileName: classifierName, recommender: recommender, recommenderMetadata: lengthsRecommenderMetadata, recommenderFileName: recommenderName, groupName: modelName)
+                lengthsDictionary[lengthsVAccKey] = validationAccuracy!
             }
-            catch let recommenderError
-            {
-                print("\nError creating lengths recommender: \(recommenderError)")
-            }
+
+            // Save the models to a file
+            MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, classifierFileName: classifierName, recommender: lengthRecommender, recommenderFileName: recommenderName, groupName: modelName)
         }
         catch let error
         {

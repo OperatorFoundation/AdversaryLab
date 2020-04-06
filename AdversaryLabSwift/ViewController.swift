@@ -902,41 +902,48 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.outEntropyBlockAccuracy = "--"
             }
             
-            if
-                lengthInAllowAccuracy != nil,
-                lengthInBlockAccuracy != nil,
-                lengthInAllowed != nil,
-                lengthInBlocked != nil
+            if lengthInAllowAccuracy != nil, lengthInBlockAccuracy != nil
             {
-                self.inLengthAllowed = String(format: "%.2f", lengthInAllowed!)
                 self.inLengthAllowAccuracy = String(format: "%.2f", lengthInAllowAccuracy!)
-                self.inLengthBlocked = String(format: "%.2f", lengthInBlocked!)
                 self.inLengthBlockAccuracy = String(format: "%.2f", lengthInBlockAccuracy!)
             }
             else
             {
-                self.inLengthAllowed = "--"
                 self.inLengthAllowAccuracy = "--"
-                self.inLengthBlocked = "--"
                 self.inLengthBlockAccuracy = "--"
             }
             
-            if lengthOutAllowAccuracy != nil,
-                lengthOutBlockAccuracy != nil,
-                lengthOutAllowed != nil,
-                lengthOutBlocked != nil
+            if lengthInAllowed != nil, lengthInBlocked != nil
             {
-                self.outLengthAllowed = String(format: "%.2f", lengthOutAllowed!)
+                self.inLengthAllowed = "\(Int(lengthInAllowed!))"
+                self.inLengthBlocked = "\(Int(lengthInBlocked!))"
+            }
+            else
+            {
+                self.inLengthAllowed = "--"
+                self.inLengthBlocked = "--"
+            }
+            
+            if lengthOutAllowAccuracy != nil, lengthOutBlockAccuracy != nil
+            {
                 self.outLengthAllowAccuracy = String(format: "%.2f", lengthOutAllowAccuracy!)
-                self.outLengthBlocked = String(format: "%.2f", lengthOutBlocked!)
                 self.outLengthBlockAccuracy = String(format: "%.2f", lengthOutBlockAccuracy!)
             }
             else
             {
-                self.outLengthAllowed = "--"
                 self.outLengthAllowAccuracy = "--"
-                self.outLengthBlocked = "--"
                 self.outLengthBlockAccuracy = "--"
+            }
+            
+            if lengthOutAllowed != nil, lengthOutBlocked != nil
+            {
+                self.outLengthAllowed = "\(Int(lengthOutAllowed!))"
+                self.outLengthBlocked = "\(Int(lengthOutBlocked!))"
+            }
+            else
+            {
+                self.outLengthAllowed = "--"
+                self.outLengthBlocked = "--"
             }
             
             // All Features

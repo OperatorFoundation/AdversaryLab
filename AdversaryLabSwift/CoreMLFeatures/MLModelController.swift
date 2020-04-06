@@ -27,13 +27,12 @@ class MLModelController
     func saveModel(classifier: MLClassifier,
     classifierMetadata: MLModelMetadata,
     classifierFileName: String,
-    recommender: MLRecommender,
-    recommenderMetadata: MLModelMetadata,
+    recommender: LengthRecommender,
     recommenderFileName: String,
     groupName: String)
     {
         save(classifier: classifier, classifierMetadata: classifierMetadata, fileName: classifierFileName, groupName: groupName)
-        save(recommender: recommender, recommenderMetadata: recommenderMetadata, fileName: recommenderFileName, groupName: groupName)
+        save(recommender: recommender, fileName: recommenderFileName, groupName: groupName)
     }
     
     func saveModel(classifier: MLClassifier,
@@ -160,8 +159,7 @@ class MLModelController
         }
     }
     
-    func save(recommender: MLRecommender,
-              recommenderMetadata: MLModelMetadata,
+    func save(recommender: LengthRecommender,
               fileName: String,
               groupName: String)
     {
@@ -169,7 +167,7 @@ class MLModelController
         guard let appDirectory = getAdversarySupportDirectory()
             else
         {
-            print("Failed to save the regressor, could not find the application document directory.")
+            print("Failed to save the recommender, could not find the application document directory.")
             return
         }
         let modelGroupURL = appDirectory.appendingPathComponent(groupName)
@@ -186,7 +184,7 @@ class MLModelController
             }
         }
         
-        let recommenderFileURL = modelGroupURL.appendingPathComponent("\(fileName).mlmodel")
+        let recommenderFileURL = modelGroupURL.appendingPathComponent("\(fileName).\(songFileExtension)")
         
         if fileManager.fileExists(atPath: recommenderFileURL.path)
         {
@@ -202,7 +200,7 @@ class MLModelController
         
         do
         {
-            try recommender.write(to: recommenderFileURL, metadata: recommenderMetadata)
+            try recommender.write(to: recommenderFileURL)
         }
         catch let saveModelError
         {

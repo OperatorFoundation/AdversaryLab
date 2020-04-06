@@ -249,6 +249,7 @@ let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 // MARK: - Models
 // MARK: Model Filenames
 let modelFileExtension = "mlmodel"
+let songFileExtension = "json"
 
 let allClassifierName = "AllFeatures_Classifier"
 //let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
