@@ -29,7 +29,6 @@
 		468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512B201FE4B50052DF49 /* Auburn.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26482023C092000A2B5D /* RedShot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; };
 		468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		468B264C2023C099000A2B5D /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
 		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
 		46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */ = {isa = PBXBuildFile; fileRef = 46CD66032093B100009E1141 /* AdversaryLabClient */; };
@@ -65,6 +64,7 @@
 		AEBC57592411E15A00D9BFB0 /* libswiftCreateML.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AEBC57582411E15A00D9BFB0 /* libswiftCreateML.dylib */; };
 		AEBC575A2411E15A00D9BFB0 /* libswiftCreateML.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AEBC57582411E15A00D9BFB0 /* libswiftCreateML.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AEC00A2423733A0800E5582B /* ConnectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionData.swift */; };
+		AECAD6A62491417C00142C4C /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
 		AECB0C7D226A9F1D00567BEA /* org.operatorFoundation.AdversaryLabService in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE08E0E3226A9A8C00D94E45 /* org.operatorFoundation.AdversaryLabService */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
 		AEDE2BDF226A9DB600A6219A /* AdversaryLabServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC9D55522651810008F32F2 /* AdversaryLabServiceProtocol.swift */; };
@@ -74,6 +74,7 @@
 		AEDE2BE3226A9DCA00A6219A /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
 		AEE50AA222875905009698CC /* AdversaryFeaturesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AA122875905009698CC /* AdversaryFeaturesModel.swift */; };
 		AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AFE228FBE8C009698CC /* Alerts.swift */; };
+		AEFDFD9B2433C28D003571DB /* Song in Frameworks */ = {isa = PBXBuildFile; productRef = AEFDFD9A2433C28D003571DB /* Song */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
 		CAA6C98320642A2D00EE8DF1 /* KnownProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97A20642A2D00EE8DF1 /* KnownProtocols.swift */; };
 		CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA6C97B20642A2D00EE8DF1 /* TLS12.swift */; };
@@ -275,13 +276,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AECAD6A62491417C00142C4C /* Datable.framework in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
 				AE27A703234D2FB300974C03 /* Charts.framework in Frameworks */,
 				468B26482023C092000A2B5D /* RedShot.framework in Frameworks */,
 				AE5D5E4523C3D8F500C8646B /* Rethink in Frameworks */,
 				AEBC57592411E15A00D9BFB0 /* libswiftCreateML.dylib in Frameworks */,
-				468B264C2023C099000A2B5D /* Datable.framework in Frameworks */,
+				AEFDFD9B2433C28D003571DB /* Song in Frameworks */,
 				468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */,
 				AE5D5E6623D0E7B000C8646B /* ZIPFoundation in Frameworks */,
 			);
@@ -533,6 +535,7 @@
 			packageProductDependencies = (
 				AE5D5E4423C3D8F500C8646B /* Rethink */,
 				AE5D5E6523D0E7B000C8646B /* ZIPFoundation */,
+				AEFDFD9A2433C28D003571DB /* Song */,
 			);
 			productName = AdversaryLabSwift;
 			productReference = 4651A14D20083BF700037D31 /* AdversaryLabSwift.app */;
@@ -636,6 +639,7 @@
 			packageReferences = (
 				AE5D5E4323C3D8F500C8646B /* XCRemoteSwiftPackageReference "rethink-swift" */,
 				AE5D5E6423D0E7B000C8646B /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				AEFDFD992433C28D003571DB /* XCRemoteSwiftPackageReference "Song" */,
 			);
 			productRefGroup = 4651A14E20083BF700037D31 /* Products */;
 			projectDirPath = "";
@@ -658,14 +662,14 @@
 /* Begin PBXReferenceProxy section */
 		46D85127201FE4B50052DF49 /* AdversaryLabSwiftPackageTests.xctest */ = {
 			isa = PBXReferenceProxy;
-			fileType = file;
+			fileType = wrapper.cfbundle;
 			path = AdversaryLabSwiftPackageTests.xctest;
 			remoteRef = 46D85126201FE4B50052DF49 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		46D85129201FE4B50052DF49 /* AdversaryLabSwiftPackage */ = {
 			isa = PBXReferenceProxy;
-			fileType = text;
+			fileType = "compiled.mach-o.executable";
 			path = AdversaryLabSwiftPackage;
 			remoteRef = 46D85128201FE4B50052DF49 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -1240,6 +1244,14 @@
 				minimumVersion = 0.9.10;
 			};
 		};
+		AEFDFD992433C28D003571DB /* XCRemoteSwiftPackageReference "Song" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Song.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1252,6 +1264,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AE5D5E6423D0E7B000C8646B /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;
+		};
+		AEFDFD9A2433C28D003571DB /* Song */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AEFDFD992433C28D003571DB /* XCRemoteSwiftPackageReference "Song" */;
+			productName = Song;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

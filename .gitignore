@@ -90,3 +90,9 @@ iOSInjectionProject/
 *.xcbkptlist
 rethinkdb_data/log_file
 rethinkdb_data/metadata
+AdversaryLabSwift.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+AdversaryLabSwift.xcodeproj/project.pbxproj
+*.xcuserstate
+*.xcscheme
+*.xcbkptlist
+AdversaryLabSwift.xcodeproj/xcuserdata/mafalda.xcuserdatad/xcschemes/xcschememanagement.plist

@@ -157,7 +157,7 @@ class ViewController: NSViewController, NSTabViewDelegate
     @objc dynamic var outAllowedEntropy = "--"
     @objc dynamic var outBlockedEntropy = "--"
     
-    let circleRadius: CGFloat = 0.5
+    let circleRadius: CGFloat = 2.5
     var modelDirectoryURL: URL?
     
     override func viewDidLoad()
@@ -420,22 +420,34 @@ class ViewController: NSViewController, NSTabViewDelegate
         let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "Allowed Incoming Packet Lengths")
         allowedInLine.colors = [NSUIColor.blue]
         allowedInLine.circleColors = [NSUIColor.blue]
-        allowedInLine.circleRadius = circleRadius
+        allowedInLine.circleRadius = 3
+        allowedInLine.drawCirclesEnabled = true
+        allowedInLine.circleHoleRadius = 1
+        allowedInLine.circleHoleColor = NSUIColor.clear
         allowedInLine.drawValuesEnabled = false
         let allowedOutLine = LineChartDataSet(entries: allowedOutLengthsEntry, label: "Allowed Outgoing Packet Lengths")
-        allowedOutLine.colors = [NSUIColor.gray]
-        allowedOutLine.circleColors = [NSUIColor.gray]
-        allowedOutLine.circleRadius = circleRadius
+        allowedOutLine.colors = [NSUIColor.magenta]
+        allowedOutLine.circleColors = [NSUIColor.magenta]
+        allowedOutLine.circleRadius = 4.5
+        allowedOutLine.drawCirclesEnabled = true
+        allowedOutLine.circleHoleRadius = 2.5
+        allowedOutLine.circleHoleColor = NSUIColor.clear
         allowedOutLine.drawValuesEnabled = false
         let blockedInLine = LineChartDataSet(entries: blockedInLengthsEntry, label: "Blocked Incoming Packet Lengths")
         blockedInLine.colors = [NSUIColor.red]
         blockedInLine.circleColors = [NSUIColor.red]
-        blockedInLine.circleRadius = circleRadius
+        blockedInLine.circleRadius = 6
+        blockedInLine.drawCirclesEnabled = true
+        blockedInLine.circleHoleRadius = 4.5
+        blockedInLine.circleHoleColor = NSUIColor.clear
         blockedInLine.drawValuesEnabled = false
         let blockedOutLine = LineChartDataSet(entries: blockedOutLengthsEntry, label: "Blocked Outgoing Packet Lengths")
-        blockedOutLine.colors = [NSUIColor.orange]
-        blockedOutLine.circleColors = [NSUIColor.orange]
-        blockedOutLine.circleRadius = circleRadius
+        blockedOutLine.colors = [NSUIColor.systemGreen ]
+        blockedOutLine.circleColors = [NSUIColor.systemGreen]
+        blockedOutLine.circleRadius = 7.5
+        blockedOutLine.drawCirclesEnabled = true
+        blockedOutLine.circleHoleRadius = 5.5
+        blockedOutLine.circleHoleColor = NSUIColor.clear
         blockedOutLine.drawValuesEnabled = false
         
         let data = LineChartData()
@@ -468,22 +480,34 @@ class ViewController: NSViewController, NSTabViewDelegate
         let allowedInLine = LineChartDataSet(entries: allowedInEntropyEntry, label: "Allowed Incoming Entropy")
         allowedInLine.colors = [NSUIColor.blue]
         allowedInLine.circleColors = [NSUIColor.blue]
-        allowedInLine.circleRadius = circleRadius
+        allowedInLine.circleRadius = 2
+        allowedInLine.drawCirclesEnabled = true
+        allowedInLine.circleHoleRadius = 1
+        allowedInLine.circleHoleColor = NSUIColor.clear
         allowedInLine.drawValuesEnabled = false
         let allowedOutLine = LineChartDataSet(entries: allowedOutEntropyEntry, label: "Allowed Outgoing Entropy")
-        allowedOutLine.colors = [NSUIColor.gray]
-        allowedOutLine.circleColors = [NSUIColor.gray]
-        allowedOutLine.circleRadius = circleRadius
+        allowedOutLine.colors = [NSUIColor.magenta]
+        allowedOutLine.circleColors = [NSUIColor.magenta]
+        allowedOutLine.circleRadius = 3.5
+        allowedOutLine.drawCirclesEnabled = true
+        allowedOutLine.circleHoleRadius = 2.5
+        allowedOutLine.circleHoleColor = NSUIColor.clear
         allowedOutLine.drawValuesEnabled = false
         let blockedInLine = LineChartDataSet(entries: blockedInEntropyEntry, label: "Blocked Incoming Entropy")
         blockedInLine.colors = [NSUIColor.red]
         blockedInLine.circleColors = [NSUIColor.red]
-        blockedInLine.circleRadius = circleRadius
+        blockedInLine.circleRadius = 5
+        blockedInLine.drawCirclesEnabled = true
+        blockedInLine.circleHoleRadius = 4.5
+        blockedInLine.circleHoleColor = NSUIColor.clear
         blockedInLine.drawValuesEnabled = false
         let blockedOutLine = LineChartDataSet(entries: blockedOutEntropyEntry, label: "Blocked Outgoing Entropy")
-        blockedOutLine.colors = [NSUIColor.orange]
-        blockedOutLine.circleColors = [NSUIColor.orange]
-        blockedOutLine.circleRadius = circleRadius
+        blockedOutLine.colors = [NSUIColor.systemGreen ]
+        blockedOutLine.circleColors = [NSUIColor.systemGreen]
+        blockedOutLine.circleRadius = 6.5
+        blockedOutLine.drawCirclesEnabled = true
+        blockedOutLine.circleHoleRadius = 5.5
+        blockedOutLine.circleHoleColor = NSUIColor.clear
         blockedOutLine.drawValuesEnabled = false
         
         let data = LineChartData()
@@ -510,11 +534,16 @@ class ViewController: NSViewController, NSTabViewDelegate
         line1.colors = [NSUIColor.blue]
         line1.circleColors = [NSUIColor.blue]
         line1.circleRadius = circleRadius
+        line1.drawCirclesEnabled = true
+        line1.circleHoleColor = NSUIColor.clear
         
         let line2 = LineChartDataSet(entries: blockedLineChartEntry, label: "Blocked")
         line2.colors = [NSUIColor.red]
         line2.circleColors = [NSUIColor.red]
-        line2.circleRadius = circleRadius
+        line2.circleRadius = circleRadius + 0.5
+        line2.drawCirclesEnabled = true
+        line2.circleHoleRadius = circleRadius - 0.5
+        line2.circleHoleColor = NSUIColor.clear
         
         let data = LineChartData()
         

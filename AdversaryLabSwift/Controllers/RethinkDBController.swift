@@ -105,7 +105,6 @@ class RethinkDBController
                 return
         }
         
-        
         ///Scan rethinkdb for transports with available data
         R.dbList().run(connection)
         {
@@ -121,7 +120,8 @@ class RethinkDBController
             for dbName in dbNames
             {
                 R.dbDrop(dbName).run(connection)
-                { (dbDropResponse) in
+                {
+                    (dbDropResponse) in
                     
                     print("Rethink database drop response: \(dbDropResponse)")
                 }
@@ -152,6 +152,10 @@ class RethinkDBController
                     completion(false)
                     return
             }
+            
+            print("Current dbConnection URL: \(connection.url)")
+            print("Found transports in database: \(dbNames)")
+            
             ///Ask the user which transport is allowed and which is blocked
             DispatchQueue.main.async {
                 guard let (allowedTransport, remainingTransports) = showChooseAllowedConnectionsAlert(transportNames: dbNames)
