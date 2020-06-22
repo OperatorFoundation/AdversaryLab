@@ -18,7 +18,7 @@ For instance, a simulated adversary could allow HTTP, but block HTTPS. By traini
 
 ### Prerequisites
 
-Swift 5.0, included in Xcode 9
+Swift 5.0, included in Xcode 11
 
 Install and run Redis.
 
