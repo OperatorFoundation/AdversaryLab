@@ -18,7 +18,7 @@ For instance, a simulated adversary could allow HTTP, but block HTTPS. By traini
 
 ### Prerequisites
 
-Swift 4.0, included in Xcode 9
+Swift 5.0, included in Xcode 9
 
 Install and run Redis.
 
@@ -49,11 +49,14 @@ swift package generate-xcodeproj
 cd ..
 ```
 
-Open the graphical interface project in code
+Add the following executables to the AdversaryLab/Executables/ folder: redis-cli, redis-server, and [AdversaryLabClient](https://github.com/OperatorFoundation/AdversaryLabClientSwift)
+
+Open the graphical interface project in Xcode. Please note that at this time using SwiftPackageManager in this way will set the macOS deployment target to 10.10 in your project settings. The project will not compile unless you change it to 10.15 or higher.
 
 ```
 open AdversaryLabSwift.xcodeproj
 ```
+
 
 ## Deployment
 
