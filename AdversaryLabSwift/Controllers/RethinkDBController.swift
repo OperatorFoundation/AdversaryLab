@@ -147,7 +147,8 @@ class RethinkDBController
             (response) in
             
             guard let dbNames = response.value as? [String]
-                else {
+                else
+            {
                     print("Unexpected response from rethink query dbList: \(response)")
                     completion(false)
                     return
@@ -157,14 +158,18 @@ class RethinkDBController
             print("Found transports in database: \(dbNames)")
             
             ///Ask the user which transport is allowed and which is blocked
-            DispatchQueue.main.async {
+            DispatchQueue.main.async
+            {
                 guard let (allowedTransport, remainingTransports) = showChooseAllowedConnectionsAlert(transportNames: dbNames)
-                    else {
+                    else
+                {
                         completion(false)
                         return
                 }
+                    
                 guard let (blockedTransport, _) = showChooseBlockedConnectionsAlert(transportNames: remainingTransports)
-                    else {
+                    else
+                {
                     completion(false)
                     return
                 }
@@ -234,24 +239,31 @@ class RethinkDBController
     func getPacketsArray(from reThinkDBName: String, connection: ReConnection, completion: @escaping (Array<Dictionary<String, Any>>?) -> Void)
     {
         R.db(reThinkDBName).table(self.tableName).indexWait().run(connection)
-        { (waitResponse) in
+        {
+            (waitResponse) in
             
             guard !waitResponse.isError
-                else {
+                else
+            {
                     print("Error waiting for table: \(waitResponse)")
                     completion(nil)
                     return
             }
             
-            R.db(reThinkDBName).table(self.tableName).count().run(connection) { (countResponse) in
+            R.db(reThinkDBName).table(self.tableName).count().run(connection)
+            {
+                (countResponse) in
                 guard let docCount = countResponse.value as? Int
-                    else {
+                    else
+                {
                         print("Count response was not an int: \(countResponse)")
                         completion(nil)
                         return
                 }
                 
-                R.db(reThinkDBName).table(self.tableName).sample(docCount).run(connection) { (sampleResponse) in
+                R.db(reThinkDBName).table(self.tableName).sample(docCount).run(connection)
+                {
+                    (sampleResponse) in
                     
                     guard let rawValues = sampleResponse.value as? Array<Dictionary<String,Any>>
                         else {

@@ -29,19 +29,26 @@ struct RethinkPacket
             let idValue = reThinkData[ReThinkKey.id.rawValue] as? String,
             let connectionIDValue = reThinkData[ReThinkKey.connectionID.rawValue] as? String,
             let timestampValue = reThinkData[ReThinkKey.timestamp.rawValue] as? Int
-            else {
-                return nil
-        }
+            else { return nil }
         
-        guard let tcpDict = reThinkData[ReThinkKey.tcpPacket.rawValue] as? Dictionary<String, Any>, let ipDict = reThinkData[ReThinkKey.ipPacket.rawValue] as? Dictionary<String, Any>, let payloadDict = reThinkData[ReThinkKey.payload.rawValue] as? Dictionary<String, Any>
-            else {
-                return nil
-        }
+//        guard let tcpDict = reThinkData[ReThinkKey.tcpPacket.rawValue] as? Dictionary<String, Any>,
+//            let ipDict = reThinkData[ReThinkKey.ipPacket.rawValue] as? Dictionary<String, Any>,
+//            let payloadDict = reThinkData[ReThinkKey.payload.rawValue] as? Dictionary<String, Any>
+//            else { return nil }
+//
+//        guard let tcpValue = Payload(packetDictionary: tcpDict),
+//            let ipValue = Payload(packetDictionary: ipDict),
+//            let payloadValue = Payload(packetDictionary: payloadDict)
+//            else { return nil }
         
-        guard let tcpValue = Payload(packetDictionary: tcpDict), let ipValue = Payload(packetDictionary: ipDict), let payloadValue = Payload(packetDictionary: payloadDict)
-            else {
-                return nil
-        }
+        guard let tcpValueString = reThinkData[ReThinkKey.tcpPacket.rawValue] as? String,
+            let ipValueString = reThinkData[ReThinkKey.ipPacket.rawValue] as? String,
+            let payloadValueString = reThinkData[ReThinkKey.payload.rawValue] as? String
+            else { return nil }
+        
+        let tcpValue = Payload(type: ReQLType.binary, packetData: Data(tcpValueString.utf8))
+        let ipValue = Payload(type: ReQLType.binary, packetData: Data(ipValueString.utf8))
+        let payloadValue = Payload(type: ReQLType.binary, packetData: Data(payloadValueString.utf8))
         
         self.inOut = inOutValue
         self.handshake = handshakeValue
@@ -61,13 +68,20 @@ struct Payload
     let type: ReQLType
     let packetData: Data
     
+    init(type: ReQLType, packetData: Data)
+    {
+        self.type = type
+        self.packetData = packetData
+    }
+    
     init?(packetDictionary: Dictionary<String, Any>)
     {
-        guard let typeString = packetDictionary[ReThinkKey.reQLType.rawValue] as? String, let packetValue = packetDictionary[ReThinkKey.packetData.rawValue] as? String
-        else
-        {
-            return nil
-        }
+        guard let typeString = packetDictionary[ReThinkKey.reQLType.rawValue] as? String,
+            let packetValue = packetDictionary[ReThinkKey.packetData.rawValue] as? String
+        else { return nil }
+        
+        guard let decodedData = Data(base64Encoded: packetValue)
+        else { return nil }
         
         // TODO: Account for more than one type
         guard typeString == ReQLType.binary.rawValue
@@ -83,7 +97,9 @@ struct Payload
         }
         
         self.type = ReQLType.binary
-        self.packetData = Data(packetValue.utf8)
+    
+        self.packetData = decodedData
+        //self.packetData = Data(packetValue.utf8)
     }
 }
 
