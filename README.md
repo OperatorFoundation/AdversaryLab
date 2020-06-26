@@ -63,7 +63,7 @@ open AdversaryLabSwift.xcodeproj
 Open the Xcode project and click the Run button to run the Adversary Lab graphical interface. Make sure Redis is already running, as Adversary Lab will  not start Redis for you.
 
 To add network traffic to Adversary Lab for analysis, you need the AdversaryLabClient command line tool. For the [installation
-instructions](https://github.com/OperatorFoundation/AdversaryLabClient) to install and use the command line tool.
+instructions](https://github.com/OperatorFoundation/AdversaryLabClientSwift) to install and use the command line tool.
 
 ## Built With
 
