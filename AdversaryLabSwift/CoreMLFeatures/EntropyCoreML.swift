@@ -458,20 +458,3 @@ class EntropyCoreML
     }
 
 }
-
-func newDoubleSet(from redisSets:[RSortedSet<Double>]) -> Set<Double>
-{
-    var swiftSet = Set<Double>()
-    for set in redisSets
-    {
-        for i in 0 ..< set.count
-        {
-            if let newMember: Double = set[i]
-            {
-                swiftSet.insert(newMember)
-            }
-        }
-    }
-    
-    return swiftSet
-}

@@ -417,25 +417,6 @@ class TLS12CoreML
         return range.lowerBound
     }
     
-    func newStringSet(from redisSets:[RSortedSet<String>]) -> Set<String>
-    {
-        var swiftSet = Set<String>()
-        for set in redisSets
-        {
-            for i in 0 ..< set.count
-            {
-                if let newMember: String = set[i]
-                {
-                    swiftSet.insert(newMember)
-                }
-            }
-        }
-        
-        return swiftSet
-    }
-    
-    
-    
     private func extract(_ outPacket: Data, _ begin: Int, _ end: Int) -> Data {
         return outPacket[begin+2...end]
     }

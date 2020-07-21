@@ -14,17 +14,6 @@ import ZIPFoundation
 class MLModelController
 {
     func saveModel(classifier: MLClassifier,
-                   classifierMetadata: MLModelMetadata,
-                   regressor: MLRegressor,
-                   regressorMetadata: MLModelMetadata,
-                   fileName: String,
-                   groupName: String)
-    {
-        save(classifier: classifier, classifierMetadata: classifierMetadata, fileName: fileName, groupName: groupName)
-        save(regressor: regressor, regressorMetadata: regressorMetadata, fileName: fileName, groupName: groupName)
-    }
-    
-    func saveModel(classifier: MLClassifier,
     classifierMetadata: MLModelMetadata,
     classifierFileName: String,
     recommender: LengthRecommender,
@@ -201,56 +190,6 @@ class MLModelController
         do
         {
             try recommender.write(to: recommenderFileURL)
-        }
-        catch let saveModelError
-        {
-            print("Error saving tls regressor model: \(saveModelError)")
-        }
-    }
-    
-    func save(regressor: MLRegressor,
-              regressorMetadata: MLModelMetadata,
-              fileName: String,
-              groupName: String)
-    {
-        let fileManager = FileManager.default
-        guard let appDirectory = getAdversarySupportDirectory()
-            else
-        {
-            print("Failed to save the regressor, could not find the application document directory.")
-            return
-        }
-        let modelGroupURL = appDirectory.appendingPathComponent(groupName)
-        
-        if !fileManager.fileExists(atPath: modelGroupURL.path)
-        {
-            do
-            {
-                _ = try fileManager.createDirectory(at: modelGroupURL, withIntermediateDirectories: true, attributes: nil)
-            }
-            catch let directoryError
-            {
-                print("\nError creating model directory: \(directoryError)")
-            }
-        }
-        
-        let regressorFileURL = modelGroupURL.appendingPathComponent("\(fileName).mlmodel")
-        
-        if fileManager.fileExists(atPath: regressorFileURL.path)
-        {
-            do
-            {
-                try FileManager.default.removeItem(at: regressorFileURL)
-            }
-            catch let removeFileError
-            {
-                print("Error removing file at \(regressorFileURL.path): \(removeFileError)")
-            }
-        }
-        
-        do
-        {
-            try regressor.write(to: regressorFileURL, metadata: regressorMetadata)
         }
         catch let saveModelError
         {

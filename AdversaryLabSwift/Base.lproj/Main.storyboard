@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -707,13 +707,13 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="AdversaryLabSwift" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" identifier="mainView" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="1041" height="800"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1150" height="800"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box identifier="settingsBox" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="7kG-4K-h0L">
-                                <rect key="frame" x="0.0" y="696" width="1041" height="104"/>
+                                <rect key="frame" x="0.0" y="696" width="1150" height="104"/>
                                 <view key="contentView" id="4OY-m4-WrU">
-                                    <rect key="frame" x="1" y="1" width="1039" height="102"/>
+                                    <rect key="frame" x="1" y="1" width="1148" height="102"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
@@ -794,6 +794,9 @@
                                                             <font key="font" metaFont="systemSemibold" size="13"/>
                                                             <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            <connections>
+                                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsCountLabel" id="5BQ-6F-WQa"/>
+                                                            </connections>
                                                         </textFieldCell>
                                                     </textField>
                                                 </gridCell>
@@ -817,6 +820,9 @@
                                                             <font key="font" metaFont="systemSemibold" size="13"/>
                                                             <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            <connections>
+                                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsAnalyzedLabel" id="fMx-5C-LU6"/>
+                                                            </connections>
                                                         </textFieldCell>
                                                     </textField>
                                                 </gridCell>
@@ -840,6 +846,9 @@
                                                             <font key="font" metaFont="systemSemibold" size="13"/>
                                                             <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            <connections>
+                                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsCountLabel" id="Q8S-YX-nuw"/>
+                                                            </connections>
                                                         </textFieldCell>
                                                     </textField>
                                                 </gridCell>
@@ -863,6 +872,9 @@
                                                             <font key="font" metaFont="systemSemibold" size="13"/>
                                                             <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            <connections>
+                                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsAnalyzedLabel" id="VYJ-tf-JuK"/>
+                                                            </connections>
                                                         </textFieldCell>
                                                     </textField>
                                                 </gridCell>
@@ -902,31 +914,31 @@
                                 <color key="fillColor" red="0.25098039215686274" green="0.38039215686274508" blue="0.50196078431372548" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
                             <box identifier="resultsBox" boxType="custom" borderType="line" cornerRadius="4" title="Results" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="bLg-zh-5Y8">
-                                <rect key="frame" x="0.0" y="0.0" width="1041" height="698"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1150" height="698"/>
                                 <view key="contentView" id="rEU-zU-uAX">
-                                    <rect key="frame" x="1" y="1" width="1039" height="696"/>
+                                    <rect key="frame" x="1" y="1" width="1148" height="696"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="XH8-rE-kw3">
-                                            <rect key="frame" x="504" y="332" width="32" height="32"/>
+                                            <rect key="frame" x="558" y="332" width="32" height="32"/>
                                         </progressIndicator>
                                         <tabView type="bottomTabsBezelBorder" translatesAutoresizingMaskIntoConstraints="NO" id="U3K-mm-fOh">
-                                            <rect key="frame" x="-7" y="74" width="1053" height="618"/>
+                                            <rect key="frame" x="-7" y="74" width="1162" height="618"/>
                                             <font key="font" metaFont="system"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Data" identifier="DataMode" id="lzk-GG-MO3">
                                                     <view key="view" id="ksq-IL-4hz">
-                                                        <rect key="frame" x="10" y="7" width="1033" height="580"/>
+                                                        <rect key="frame" x="10" y="7" width="1142" height="580"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MmQ-Yo-R8n" customClass="LineChartView" customModule="Charts">
                                                                 <rect key="frame" x="17" y="281" width="529" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="dYG-fi-xdx" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="597" y="281" width="419" height="282"/>
+                                                                <rect key="frame" x="597" y="281" width="528" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Cwd-sz-D6E" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="307" y="-9" width="419" height="282"/>
+                                                                <rect key="frame" x="307" y="-9" width="528" height="282"/>
                                                             </customView>
                                                         </subviews>
                                                         <constraints>
@@ -3349,6 +3361,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aTimingLabel" id="CxT-yM-qc4"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NDS-kR-R7F">
                                                                                         <rect key="frame" x="102" y="0.0" width="17" height="16"/>
@@ -3381,6 +3396,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aTimingAccuracyLabel" id="vLM-dD-mf4"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mav-eB-M9K">
                                                                                         <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3413,6 +3431,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bTimingLabel" id="Eg7-KO-rm8"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lgl-ST-aM8">
                                                                                         <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3445,6 +3466,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bTimingAccuracyLabel" id="l9K-Qk-DpR"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="e8E-YY-kx7">
                                                                                         <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -3520,6 +3544,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aTLS12Label" id="vHu-EO-ywM"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="foo-ZT-dtf">
                                                                                         <rect key="frame" x="85" y="0.0" width="17" height="16"/>
@@ -3552,6 +3579,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aTLS12AccuracyLabel" id="PA2-RS-ucZ"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aTL-IN-UZ6">
                                                                                         <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3584,6 +3614,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bTLS12Label" id="Tza-oH-Vtm"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pZ6-bJ-jBq">
                                                                                         <rect key="frame" x="86" y="0.0" width="17" height="16"/>
@@ -3616,6 +3649,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bTLS12AccuracyLabel" id="N1T-o7-Eu4"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bav-0l-eyX">
                                                                                         <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -3702,6 +3738,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aOutLengthLabel" id="khI-NC-TYY"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2wx-S5-IgD">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3734,6 +3773,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aOutLengthAccuracyLabel" id="acA-JN-BCS"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cd0-SQ-wjF">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3766,6 +3808,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bOutLengthLabel" id="B3H-h8-jkU"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Of-Xr-CDP">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -3798,6 +3843,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bOutLengthAccuracyLabel" id="VS3-mo-ubW"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2eh-8x-hz7">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -3857,6 +3905,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aInLengthLabel" id="aQN-pX-aZl"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rpT-H5-j3c">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3889,6 +3940,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aInLengthAccuracyLabel" id="52r-ha-ooP"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sxl-5n-HPz">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -3921,6 +3975,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bInLengthLabel" id="qzd-HG-KZw"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kGB-l5-Ai3">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -3953,6 +4010,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bInLengthAccuracyLabel" id="xE8-21-OKz"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="grl-As-UNL">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -4051,6 +4111,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aOutEntropyLabel" id="7d2-Ro-cKg"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g0h-0p-IeK">
                                                                                                 <rect key="frame" x="108" y="0.0" width="17" height="16"/>
@@ -4083,6 +4146,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aOutEntropyAccuracyLabel" id="RSv-fg-He9"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uZV-uP-7qo">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -4115,6 +4181,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bOutEntropyLabel" id="Dc7-Nk-lPD"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="702-nq-hnn">
                                                                                                 <rect key="frame" x="109" y="0.0" width="17" height="16"/>
@@ -4147,6 +4216,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bOutEntropyAccuracyLabel" id="g3q-AM-g9k"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fcc-A9-3Vp">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -4206,6 +4278,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aInEntropyLabel" id="bdg-5c-CqJ"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gcv-TJ-Ktq">
                                                                                                 <rect key="frame" x="108" y="0.0" width="17" height="16"/>
@@ -4238,6 +4313,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aInEntropyAccuracyLabel" id="mIv-dh-Kpv"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pyb-2S-OT5">
                                                                                                 <rect key="frame" x="103" y="0.0" width="17" height="16"/>
@@ -4270,6 +4348,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bInEntropyLabel" id="QWb-Wz-UMb"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6vV-h8-1Tv">
                                                                                                 <rect key="frame" x="109" y="0.0" width="17" height="16"/>
@@ -4302,6 +4383,9 @@
                                                                                                     <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                 </textFieldCell>
+                                                                                                <connections>
+                                                                                                    <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bInEntropyAccuracyLabel" id="VI0-ul-rHl"/>
+                                                                                                </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dSa-en-ZnI">
                                                                                                 <rect key="frame" x="104" y="0.0" width="17" height="16"/>
@@ -4765,6 +4849,9 @@
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.allFeaturesAAccuracyLabel" id="v7W-SE-eKN"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JuE-yJ-whW">
                                                                                         <rect key="frame" x="183" y="0.0" width="17" height="16"/>
@@ -4796,7 +4883,13 @@
                                                                                             <font key="font" metaFont="system"/>
                                                                                             <color key="textColor" red="0.090196078430000007" green="0.1764705882" blue="0.21960784310000001" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                                            <connections>
+                                                                                                <binding destination="XfG-lQ-9wD" name="value" keyPath="self.allFeaturesAAccuracyLabel" id="9Ae-oo-QjC"/>
+                                                                                            </connections>
                                                                                         </textFieldCell>
+                                                                                        <connections>
+                                                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.allFeaturesBAccuracyLabel" id="ffO-L5-Wtl"/>
+                                                                                        </connections>
                                                                                     </textField>
                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HWA-fs-Lcp">
                                                                                         <rect key="frame" x="184" y="0.0" width="17" height="16"/>
@@ -5169,10 +5262,7 @@
                                                 <outlet property="delegate" destination="XfG-lQ-9wD" id="CMl-0p-sRS"/>
                                             </connections>
                                         </tabView>
-                                        <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
-                                            <rect key="frame" x="19" y="5" width="1000" height="20"/>
-                                        </progressIndicator>
-                                        <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-D3-1sv">
+                                        <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-D3-1sv">
                                             <rect key="frame" x="17" y="25" width="126" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="17" id="os9-Um-ZtI"/>
@@ -5187,7 +5277,7 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
-                                            <rect key="frame" x="789" y="18" width="102" height="32"/>
+                                            <rect key="frame" x="898" y="18" width="102" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5197,7 +5287,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
-                                            <rect key="frame" x="891" y="18" width="134" height="32"/>
+                                            <rect key="frame" x="1000" y="18" width="134" height="32"/>
                                             <buttonCell key="cell" type="push" title="Train With Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5206,22 +5296,14 @@
                                                 <action selector="runClick:" target="XfG-lQ-9wD" id="eZM-It-fdq"/>
                                             </connections>
                                         </button>
-                                        <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OUu-jG-iwO">
-                                            <rect key="frame" x="672" y="18" width="117" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Live Capture" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yfp-qe-CeD">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="liveCaptureClick:" target="XfG-lQ-9wD" id="haC-JR-qYU"/>
-                                            </connections>
-                                        </button>
+                                        <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
+                                            <rect key="frame" x="19" y="5" width="1109" height="20"/>
+                                        </progressIndicator>
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="PUo-Tn-R9n" secondAttribute="trailing" constant="20" id="44a-dY-X4K"/>
                                         <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="PUo-Tn-R9n" secondAttribute="bottom" constant="1" id="6WT-fe-2ds"/>
                                         <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="xh2-hi-Cpw" secondAttribute="bottom" constant="1" id="9vH-69-Fhz"/>
-                                        <constraint firstItem="SuX-tc-4bk" firstAttribute="top" secondItem="OUu-jG-iwO" secondAttribute="bottom" constant="1" id="BPQ-3F-Fmb"/>
                                         <constraint firstItem="PUo-Tn-R9n" firstAttribute="leading" secondItem="xh2-hi-Cpw" secondAttribute="trailing" constant="12" id="Bak-iN-UE5"/>
                                         <constraint firstAttribute="bottom" secondItem="SuX-tc-4bk" secondAttribute="bottom" constant="6" id="Ca2-5Q-SFO"/>
                                         <constraint firstItem="U3K-mm-fOh" firstAttribute="leading" secondItem="rEU-zU-uAX" secondAttribute="leading" id="EHQ-Je-gHN"/>
@@ -5232,13 +5314,8 @@
                                         <constraint firstItem="XH8-rE-kw3" firstAttribute="centerX" secondItem="rEU-zU-uAX" secondAttribute="centerX" id="RWS-XQ-Cj9"/>
                                         <constraint firstItem="OYu-D3-1sv" firstAttribute="leading" secondItem="SuX-tc-4bk" secondAttribute="leading" id="WD9-xM-h0L"/>
                                         <constraint firstAttribute="trailing" secondItem="U3K-mm-fOh" secondAttribute="trailing" id="XDR-KE-IGe"/>
-                                        <constraint firstItem="OUu-jG-iwO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rEU-zU-uAX" secondAttribute="leading" constant="20" symbolic="YES" id="aml-Qo-yF6"/>
                                         <constraint firstItem="PUo-Tn-R9n" firstAttribute="leading" secondItem="xh2-hi-Cpw" secondAttribute="trailing" constant="12" id="eSG-O5-Na6"/>
                                         <constraint firstAttribute="bottom" secondItem="U3K-mm-fOh" secondAttribute="bottom" constant="80" id="gFt-fG-Hw7"/>
-                                        <constraint firstItem="OUu-jG-iwO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="OYu-D3-1sv" secondAttribute="trailing" constant="8" symbolic="YES" id="jNj-uc-pxN"/>
-                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="leading" secondItem="OUu-jG-iwO" secondAttribute="trailing" constant="12" id="tIL-bE-OBZ"/>
-                                        <constraint firstItem="xh2-hi-Cpw" firstAttribute="leading" secondItem="OUu-jG-iwO" secondAttribute="trailing" constant="12" id="u8v-bf-3Jf"/>
-                                        <constraint firstItem="OYu-D3-1sv" firstAttribute="bottom" secondItem="OUu-jG-iwO" secondAttribute="bottom" id="ujp-TL-1yo"/>
                                     </constraints>
                                 </view>
                                 <constraints>

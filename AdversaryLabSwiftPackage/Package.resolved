@@ -2,12 +2,30 @@
   "object": {
     "pins": [
       {
+        "package": "AdversaryLabClientSwift",
+        "repositoryURL": "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "ca74de2fc3936e33325c0a7eb710a71c5385c37b",
+          "version": "0.0.3"
+        }
+      },
+      {
         "package": "Auburn",
         "repositoryURL": "https://github.com/OperatorFoundation/Auburn.git",
         "state": {
           "branch": null,
-          "revision": "e3a30d482bc83e355000bbcc88b7e46c95c3500a",
-          "version": "0.6.0"
+          "revision": "b2747ebe6a8e5ee60962c87c2eef1112e96151f9",
+          "version": "0.6.2"
+        }
+      },
+      {
+        "package": "Bits",
+        "repositoryURL": "https://github.com/OperatorFoundation/Bits.git",
+        "state": {
+          "branch": null,
+          "revision": "d6bdf981268cae74ac670b07b27602ac35fee77f",
+          "version": "1.0.5"
         }
       },
       {
@@ -15,8 +33,8 @@
         "repositoryURL": "https://github.com/danielgindi/Charts",
         "state": {
           "branch": null,
-          "revision": "dbf7fa2891270f88aeafc872ea0beddb344af94b",
-          "version": "3.4.0"
+          "revision": "7ac4a05e83d279bac305a472af9128c2a0eca3d7",
+          "version": "3.5.0"
         }
       },
       {
@@ -24,8 +42,17 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Datable.git",
         "state": {
           "branch": null,
-          "revision": "eccbedd3c89007691034b951a1fc0780e54701ea",
-          "version": "1.1.1"
+          "revision": "1c23f2b72d0d0cf4386fad05f8a5db4b91e8d304",
+          "version": "3.0.2"
+        }
+      },
+      {
+        "package": "InternetProtocols",
+        "repositoryURL": "https://github.com/OperatorFoundation/InternetProtocols.git",
+        "state": {
+          "branch": null,
+          "revision": "40d48b54e7b37a06bef0fd2c36c86dc523cc716d",
+          "version": "1.0.5"
         }
       },
       {
@@ -33,8 +60,80 @@
         "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
         "state": {
           "branch": null,
-          "revision": "a1826ba9fd3601edabd9f200ed724bdd254f581d",
-          "version": "0.8.2"
+          "revision": "d610adbedaa5273f7cd8c928816e4e8c3edc01af",
+          "version": "0.8.5"
+        }
+      },
+      {
+        "package": "Rethink",
+        "repositoryURL": "https://github.com/OperatorFoundation/rethink-swift",
+        "state": {
+          "branch": null,
+          "revision": "f8a2e7c7aa424066b8cc8b4aedd73edf180ef3d8",
+          "version": "1.1.0"
+        }
+      },
+      {
+        "package": "Song",
+        "repositoryURL": "https://github.com/OperatorFoundation/Song.git",
+        "state": {
+          "branch": null,
+          "revision": "70b719bbac16b68d107d5fe8ce2352a9d4e623ab",
+          "version": "0.0.19"
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
+        "state": {
+          "branch": null,
+          "revision": "eb51f949cdd0c9d88abba9ce79d37eb7ea1231d0",
+          "version": "0.2.0"
+        }
+      },
+      {
+        "package": "swift-ast",
+        "repositoryURL": "https://github.com/yanagiba/swift-ast",
+        "state": {
+          "branch": null,
+          "revision": "e8507d78b32dbd33ea5ea975bbbc82b7613870a1",
+          "version": "0.19.9"
+        }
+      },
+      {
+        "package": "SwiftHexTools",
+        "repositoryURL": "https://github.com/OperatorFoundation/SwiftHexTools",
+        "state": {
+          "branch": null,
+          "revision": "f77314abd933e1a4a1c8c5c5ce1ba5d0cb39c81d",
+          "version": "1.1.3"
+        }
+      },
+      {
+        "package": "SwiftPCAP",
+        "repositoryURL": "https://github.com/OperatorFoundation/SwiftPCAP.git",
+        "state": {
+          "branch": null,
+          "revision": "4ac0911d2f3d5611baa9c8a4ba56e4841c90ebb4",
+          "version": "1.1.8"
+        }
+      },
+      {
+        "package": "SwiftQueue",
+        "repositoryURL": "https://github.com/OperatorFoundation/SwiftQueue.git",
+        "state": {
+          "branch": null,
+          "revision": "0e5979acbb104516a427bb2bb09debc50ca100b4",
+          "version": "0.0.3"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation/",
+        "state": {
+          "branch": null,
+          "revision": "ec32d62d412578542c0ffb7a6ce34d3e64b43b94",
+          "version": "0.9.11"
         }
       }
     ]

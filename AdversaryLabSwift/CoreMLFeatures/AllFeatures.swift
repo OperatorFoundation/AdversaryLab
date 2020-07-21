@@ -214,54 +214,54 @@ class AllFeatures
         }
     }
     
-    func test(feature resultsKey: String, regressorName: String, temporaryDirURL: URL, connectionType: ClassificationLabel, expectedFeatureName: String, featureValueType: MLFeatureType)
-    {
-        let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
-        
-        if FileManager.default.fileExists(atPath: regressorFileURL.path)
-        {
-            do
-            {
-                let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
-                
-                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
-                    else { return }
-                
-                guard regressorPrediction.count > 0
-                    else { return }
-                
-                // We are only expecting one result
-                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
-                
-                guard let firstFeatureName = thisFeatureNames.first
-                    else { return }
-                guard firstFeatureName == expectedFeatureName
-                    else { return }
-                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
-                    else { return }
-                
-                print("🔮 AllFeatures prediction for \(expectedFeatureName): \(thisFeatureValue).")
-                switch featureValueType
-                {
-                case .string:
-                    // This is the dictionary where we will save our results
-                    // TLS Values are the only non Double results currently
-                    let resultsDictionary: RMap<String,String> = RMap(key: allFeaturesTLSTestResultsKey)
-                    resultsDictionary[resultsKey] = thisFeatureValue.stringValue
-                case .double:
-                    // This is the dictionary where we will save our results
-                    let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
-                    resultsDictionary[resultsKey] = thisFeatureValue.doubleValue
-                default:
-                    print("Received an unexpected value type from a regressor prediction: \(featureValueType)")
-                }
-            }
-            catch
-            {
-                print("\nError testing all features model \(resultsKey): \(error)")
-            }
-        }
-    }
+//    func test(feature resultsKey: String, regressorName: String, temporaryDirURL: URL, connectionType: ClassificationLabel, expectedFeatureName: String, featureValueType: MLFeatureType)
+//    {
+//        let regressorFileURL = temporaryDirURL.appendingPathComponent(regressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
+//        
+//        if FileManager.default.fileExists(atPath: regressorFileURL.path)
+//        {
+//            do
+//            {
+//                let regressorFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.classification.rawValue: [connectionType.rawValue]])
+//                
+//                guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
+//                    else { return }
+//                
+//                guard regressorPrediction.count > 0
+//                    else { return }
+//                
+//                // We are only expecting one result
+//                let thisFeatureNames = regressorPrediction.features(at: 0).featureNames
+//                
+//                guard let firstFeatureName = thisFeatureNames.first
+//                    else { return }
+//                guard firstFeatureName == expectedFeatureName
+//                    else { return }
+//                guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
+//                    else { return }
+//                
+//                print("🔮 AllFeatures prediction for \(expectedFeatureName): \(thisFeatureValue).")
+//                switch featureValueType
+//                {
+//                case .string:
+//                    // This is the dictionary where we will save our results
+//                    // TLS Values are the only non Double results currently
+//                    let resultsDictionary: RMap<String,String> = RMap(key: allFeaturesTLSTestResultsKey)
+//                    resultsDictionary[resultsKey] = thisFeatureValue.stringValue
+//                case .double:
+//                    // This is the dictionary where we will save our results
+//                    let resultsDictionary: RMap<String,Double> = RMap(key: testResultsKey)
+//                    resultsDictionary[resultsKey] = thisFeatureValue.doubleValue
+//                default:
+//                    print("Received an unexpected value type from a regressor prediction: \(featureValueType)")
+//                }
+//            }
+//            catch
+//            {
+//                print("\nError testing all features model \(resultsKey): \(error)")
+//            }
+//        }
+//    }
     
     func trainAllFeatures(configModel: ProcessingConfigurationModel)
     {

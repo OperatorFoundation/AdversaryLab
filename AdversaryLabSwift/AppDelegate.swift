@@ -11,23 +11,10 @@ import ZIPFoundation
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate
-{
-    let fileManager = FileManager.default
-    
+{    
     func applicationDidFinishLaunching(_ aNotification: Notification)
     {
         createAppSupportDirectory()
-        
-        //Install God-Mode Helper
-        if !HelperAppInstaller.blessHelper(label: helperToolName)
-        {
-            print("Could not install AdversaryLab Helper App")
-        }
-        else
-        {
-            helperClient = HelperAppController.connectToXPCService()
-            
-        }
     }
     
     func application(_ application: NSApplication, open urls: [URL])

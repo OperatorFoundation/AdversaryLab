@@ -12,9 +12,7 @@ import RedShot
 import Datable
 
 class FakeConnectionGenerator
-{
-    let addPacketsQueue = DispatchQueue(label: "AnalysisQueue")
-    
+{    
     func createFakePacket(minSize: UInt32, maxSize: UInt32) -> Data
     {
         let packetSize = Int(arc4random_uniform(1 + maxSize - minSize) + minSize)

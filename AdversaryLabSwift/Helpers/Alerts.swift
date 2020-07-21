@@ -51,42 +51,6 @@ func showNameModelAlert() -> String?
     return textfield.stringValue
 }
 
-func showNoAllowedConnectionDataAlert() -> URL?
-{
-    let alert = NSAlert()
-    alert.messageText = "No allowed connections in file"
-    alert.informativeText = "There are no allowed connections in the selected file. Would you like to add another file to the data?"
-    alert.addButton(withTitle: "Add File")
-    alert.addButton(withTitle: "Cancel")
-    
-    let result = alert.runModal()
-    if result == .alertFirstButtonReturn
-    {
-        print("User chose to add another file. Calling showRDBFileAlert.")
-        return showRethinkFileAlert()
-    }
-    
-    return nil
-}
-
-func showNoBlockedConnectionDataAlert() -> URL?
-{
-    let alert = NSAlert()
-    alert.messageText = "No blocked connections in file"
-    alert.informativeText = "There are no blocked connections in the selected file. Would you like to add another file to the data?"
-    alert.addButton(withTitle: "Add File")
-    alert.addButton(withTitle: "Cancel")
-    
-    let result = alert.runModal()
-    if result == .alertFirstButtonReturn
-    {
-        print("User chose to add another file. Calling showRDBFileAlert.")
-        return showRethinkFileAlert()
-    }
-    
-    return nil
-}
-
 func showSelectAdversaryFileAlert() -> URL?
 {
     let panel = NSOpenPanel()
@@ -101,21 +65,6 @@ func showSelectAdversaryFileAlert() -> URL?
     
     return panel.urls[0]    
 }
-
-//func showRDBFileAlert() -> URL?
-//{
-//    let panel = NSOpenPanel()
-//    panel.canChooseFiles = true
-//    panel.canChooseDirectories = false
-//    panel.allowsMultipleSelection = false
-//    panel.allowedFileTypes = ["rdb"]
-//
-//    let result = panel.runModal()
-//    guard result == NSApplication.ModalResponse.OK
-//        else { return nil }
-//
-//    return panel.urls[0]
-//}
 
 func showRethinkFileAlert() -> URL?
 {
@@ -132,10 +81,10 @@ func showRethinkFileAlert() -> URL?
     return panel.urls[0]
 }
 
-func showChooseBlockedConnectionsAlert(transportNames: [String]) -> (allowedTransport: String, remainingTransports: [String])?
+func showChooseBConnectionsAlert(transportNames: [String]) -> (transportB: String, remainingTransports: [String])?
 {
     let alert = NSAlert()
-    alert.messageText = "Which group of connections is blocked?"
+    alert.messageText = "Select the other transport you want to use for your analysis."
     
     let blockedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
     blockedPopup.addItems(withTitles: transportNames)
@@ -153,6 +102,7 @@ func showChooseBlockedConnectionsAlert(transportNames: [String]) -> (allowedTran
             
             var remainingTransports = transportNames
             _ = remainingTransports.remove(at: index)
+            transportB = selectedTransport
             return (selectedTransport, remainingTransports)
         }
     }
@@ -160,10 +110,10 @@ func showChooseBlockedConnectionsAlert(transportNames: [String]) -> (allowedTran
     return nil
 }
 
-func showChooseAllowedConnectionsAlert(transportNames: [String]) -> (allowedTransport: String, remainingTransports: [String])?
+func showChooseAConnectionsAlert(transportNames: [String]) -> (transportA: String, remainingTransports: [String])?
 {
     let alert = NSAlert()
-    alert.messageText = "Which group of connections is allowed?"
+    alert.messageText = "Select one of the transports you want to analyze."
     
     let allowedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
     allowedPopup.addItems(withTitles: transportNames)
@@ -180,64 +130,12 @@ func showChooseAllowedConnectionsAlert(transportNames: [String]) -> (allowedTran
             
             var remainingTransports = transportNames
             _ = remainingTransports.remove(at: index)
+            transportA = selectedTransport
             return (selectedTransport, remainingTransports)
         }
     }
     
     return nil
-}
-
-func showCaptureAlert()
-{
-    guard let helper = helperClient
-        else
-    {
-        print("\nUnable to start live capture, the helper app is not initialized.")
-        return
-    }
-    
-    guard let adversaryLabClientPath = Bundle.main.path(forResource: "AdversaryLabClient", ofType: nil)
-        else
-    {
-        print("Could not find AdversaryLabClient executable. This should be in the app bundle.")
-        return
-    }
-    
-    let alert = NSAlert()
-    alert.messageText = "Please enter your capture options"
-    alert.informativeText = "Enter the desired port to listen on and choose whether this is an allowed or a blocked connection."
-    
-    let textfield = NSTextField(frame: NSRect(x: 0, y: 0, width: 100, height: 21))
-    textfield.placeholderString = "Port Number"
-    alert.accessoryView = textfield
-    alert.addButton(withTitle: "Capture Allowed Traffic")
-    alert.addButton(withTitle: "Capture Blocked Traffic")
-    alert.addButton(withTitle: "Cancel")
-    
-    let response = alert.runModal()
-    
-    guard textfield.stringValue != ""
-        else
-    {
-        return
-    }
-    
-    switch response
-    {
-    case .alertFirstButtonReturn:
-        // Allowed Traffic
-        print("\nCapture requested for allowed connection on port:\(textfield.stringValue)")
-        helper.startAdversaryLabClient(allowBlock: "allow", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
-        
-    case .alertSecondButtonReturn:
-        // Blocked traffic
-        print("\nCapture requested for blocked connection on port:\(textfield.stringValue)")
-        helper.startAdversaryLabClient(allowBlock: "block", port: textfield.stringValue, pathToClient: adversaryLabClientPath)
-        
-    default:
-        // Cancel Button
-        return
-    }
 }
 
 func quitAdversaryLab()

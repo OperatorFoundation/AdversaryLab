@@ -76,12 +76,6 @@ struct ObservedConnection
     }
 }
 
-//enum ConnectionType: String
-//{
-//    case allowed = ClassificationLabel.allowed.rawValue
-//    case blocked
-//}
-
 enum ConnectionDirection
 {
     case incoming

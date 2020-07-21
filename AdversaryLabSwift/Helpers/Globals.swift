@@ -9,8 +9,8 @@
 import Foundation
 import Cocoa
 
-var helperClient: AdversaryLabServiceProtocol?
-var appDirectory = ""
+var transportA = ""
+var transportB = ""
 
 func getAdversarySupportDirectory() -> URL?
 {

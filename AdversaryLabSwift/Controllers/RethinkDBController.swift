@@ -77,24 +77,6 @@ class RethinkDBController
        restoreTask.launch()
     }
     
-    func dumpDB(filename: String?)
-    {
-        let dumpTask = Process()
-        dumpTask.executableURL = URL(fileURLWithPath: rethinkdb, isDirectory: false)
-        
-        //Arguments will pass the arguments to the executable, as though typed directly into terminal.
-        var arguments = ["dump"]
-        if filename != nil
-        {
-            arguments.append("-f")
-            arguments.append("\(filename!).tar.gz")
-        }
-        dumpTask.arguments = arguments
-        
-        //Go ahead and run the process/task
-        dumpTask.launch()
-    }
-    
     func deleteDatabase(completion: @escaping (Bool) -> Void)
     {
         // Make sure that we have a connection to the database
@@ -133,9 +115,12 @@ class RethinkDBController
     
     func mergeIntoCurrentDatabase(completion: @escaping (Bool) -> Void)
     {
+        let processor = DataProcessing()
+        
         // Make sure that we have a connection to the database
         guard let connection = rethinkConnection
-            else {
+            else
+        {
                 print("Unable to merge rethink data into current database. There is no connection to rethink.")
                 completion(false)
                 return
@@ -160,78 +145,73 @@ class RethinkDBController
             ///Ask the user which transport is allowed and which is blocked
             DispatchQueue.main.async
             {
-                guard let (allowedTransport, remainingTransports) = showChooseAllowedConnectionsAlert(transportNames: dbNames)
+                guard let (aTransport, remainingTransports) = showChooseAConnectionsAlert(transportNames: dbNames)
                     else
                 {
                         completion(false)
                         return
                 }
                     
-                guard let (blockedTransport, _) = showChooseBlockedConnectionsAlert(transportNames: remainingTransports)
+                guard let (bTransport, _) = showChooseBConnectionsAlert(transportNames: remainingTransports)
                     else
                 {
                     completion(false)
                     return
                 }
                 
-                ///Load the data for those transports into Swift data structures
-                var allowedRethinks = [RethinkPacket]()
-                var blockedRethinks = [RethinkPacket]()
-                
-                self.getPacketsArray(from: allowedTransport, connection: connection)
+                self.packetArraysFromRethink(for: aTransport, transportB: bTransport, rethinkConnection: connection)
                 {
-                    (maybeAllowedArray) in
+                    (maybeARethinks, maybeBRethinks) in
                     
-                    if let allowedArray = maybeAllowedArray
+                    ///Write Swift data structures to Redis database
+                    guard let aRethinks = maybeARethinks, let bRethinks = maybeBRethinks
+                        else
                     {
-                        ///Write Swift data structures to Redis database
-                        
-                        for allowedDictionary in allowedArray
-                        {
-                            if let aRethink = RethinkPacket(reThinkData: allowedDictionary)
-                            {
-                                allowedRethinks.append(aRethink)
-                            }
-                        }
-                        
-                        print("Parsed \(allowedRethinks.count) allowed RethinkPackets.")
+                        print("Failed to get both blocked and allowed packets from Rethink.")
+                        completion(false)
+                        return
                     }
                     
-                    self.getPacketsArray(from: blockedTransport, connection: connection)
+                    let redisConnectionData = processor.connectionData(fromARethinkPackets: aRethinks, bRethinkPackets: bRethinks)
+                    
+                    processor.saveToRedis(connectionData: redisConnectionData)
                     {
-                        (maybeBlockedArray) in
+                        (saved) in
                         
-                        if let blockedArray = maybeBlockedArray
-                        {
-                            for blockedDictionary in blockedArray
-                            {
-                                if let bRethink = RethinkPacket(reThinkData: blockedDictionary)
-                                {
-                                    blockedRethinks.append(bRethink)
-                                }
-                            }
-                            ///Write Swift data structures to Redis database
-                            print("Parsed \(blockedRethinks.count) blocked RethinkPackets")
-                            
-                            guard !allowedRethinks.isEmpty, !blockedRethinks.isEmpty
-                                else
-                            {
-                                print("Failed to get both blocked and allowed packets from Rethink.")
-                                completion(false)
-                                return
-                            }
-                            
-                            let redisConnectionData = ConnectionData(allowedRethinkPackets: allowedRethinks, blockedRethinkPackets: blockedRethinks)
-                            redisConnectionData.saveToRedis
-                            {
-                                (saved) in
-                                
-                                print("\nSaved our Rethink data to Redis!\n")
-                                completion(saved)
-                            }
-                        }
+                        print("\nSaved our Rethink data to Redis!\n")
+                        completion(saved)
                     }
                 }
+            }
+        }
+    }
+    
+    func packetArraysFromRethink(for transportA: String, transportB: String, rethinkConnection: ReConnection, completion: @escaping (_ allowedRethinks: [RethinkPacket]?, _ blockedRethinks: [RethinkPacket]?) -> Void)
+    {
+        let dataProcessing = DataProcessing()
+        
+        var maybeAs: [RethinkPacket]?
+        var maybeBs: [RethinkPacket]?
+        
+        self.getPacketsArray(from: transportA, connection: rethinkConnection)
+        {
+            (maybeAArray) in
+            
+            if let aArray = maybeAArray
+            {
+                maybeAs = dataProcessing.packets(fromArray: aArray)
+            }
+            
+            self.getPacketsArray(from: transportB, connection: rethinkConnection)
+            {
+                (maybeBArray) in
+                
+                if let bArray = maybeBArray
+                {
+                    maybeBs = dataProcessing.packets(fromArray: bArray)
+                }
+                
+                completion(maybeAs, maybeBs)
             }
         }
     }

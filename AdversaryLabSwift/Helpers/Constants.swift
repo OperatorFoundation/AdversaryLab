@@ -235,16 +235,11 @@ let newConnectionsChannel = "New:Connections:Channel"
 // MARK: -  Human Readable Strings
 let analyzingAllowedConnectionsString = "Analyzing allowed connection"
 let analyzingBlockedConnectionString = "Analyzing blocked connection"
-let scoringPacketLengthsString = "Scoring packet lengths"
-let scoringPacketTimingString = "Scoring packet timing"
-let scoringEntropyString = "Scoring entropy"
-let scoringTLSNamesString = "Scoring TLS names"
 let scoringOffsetsString = "Scoring offset sequences"
 let scoringFloatSequencesString = "Scoring float sequences"
 
 // MARK: - Queues
 let analysisQueue = DispatchQueue(label: "AnalysisQueue")
-let testQueue = DispatchQueue(label: "AdversaryTestQueue")
 
 // MARK: - Models
 // MARK: Model Filenames
@@ -252,12 +247,6 @@ let modelFileExtension = "mlmodel"
 let songFileExtension = "json"
 
 let allClassifierName = "AllFeatures_Classifier"
-//let allTimingRegressorName = "AllFeatures_TimeDifference_Regressor"
-//let allInEntropyRegressorName = "AllFeatures_Entropy_In_Regressor"
-//let allOutEntropyRegressorName = "AllFeatures_Entropy_Out_Regressor"
-//let allInPacketLengthRegressorName = "AllFeatures_PacketLength_In_Regressor"
-//let allOutPacketLengthRegressorName = "AllFeatures_PacketLength_Out_Regressor"
-//let allTLSRegressorName = "AllFeatures_TLS_Regressor"
 
 let timingRegressorName = "TimeDifference_Regressor"
 let timingClassifierName = "TimeDifference_Classifier"
@@ -285,22 +274,14 @@ let entropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", sh
 let entropyClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given entropy is from an allowed or blocked connection.", version: "1.0")
 let timingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection", version: "1.0")
 let timingClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a timing is from an allowed or blocked connection.", version: "1.0")
-let lengthsRecommenderMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden length for a connection", version: "1.0")
 let lengthsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a packet length is from an allowed or blocked connection.", version: "1.0")
 let tlsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 let tlsClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a TLS name is from an allowed or blocked connection.", version: "1.0")
 
 let allFeaturesClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given set of features is from an allowed or blocked connection.", version: "1.0")
-let allFeaturesEntropyRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts Required/Forbidden entropy for a connection given all features", version: "1.0")
-let allFeaturesTimingRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden entropy for a connection given all features", version: "1.0")
-let allFeaturesLengthsRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden lengths for a connection given all features", version: "1.0")
-let allFeaturesTLSRegressorMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts required/forbidden TLS name for a connection", version: "1.0")
 
 let floatClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given float sequence is from an allowed or blocked connection.", version: "1.0")
 let offsetClassifierMetadata = MLModelMetadata(author: "Operator Foundation", shortDescription: "Predicts whether a given offset sequence is from an allowed or blocked connection.", version: "1.0")
- 
-// MARK: - Helper Tool
-let helperToolName = "org.operatorFoundation.AdversaryLabService"
 
 // MARK: - Notifications
 extension Notification.Name
@@ -326,7 +307,6 @@ enum PacketTimingError: Error
 {
     case noOutPacketDateForConnection(String)
     case noInPacketDateForConnection(String)
-    case unableToAddTimeDifference(timeDifference: TimeInterval, connectionID: String)
 }
 
 enum ClassificationLabel: String
@@ -349,12 +329,6 @@ enum ColumnLabel: String
     case tlsNames = "tlsNames"
     case classification = "classification"
     case direction = "direction"
-}
-
-enum PredictionKey: String
-{
-    case classificationProbability
-    case classification
 }
 
 enum ServerCheckResult

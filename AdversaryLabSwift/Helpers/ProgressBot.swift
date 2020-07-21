@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ProgressBot: NSObject
+class ProgressBot
 {
     static let sharedInstance = ProgressBot()
     

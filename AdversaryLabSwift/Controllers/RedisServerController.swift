@@ -255,8 +255,9 @@ class RedisServerController: NSObject
         }
     }
     
-    func mergeIntoCurrentDatabase(mergeFile: URL, completion: @escaping (ConnectionData?) -> Void)
+    func mergeIntoCurrentDatabase(mergeFile: URL, completion: @escaping (ConnectionGroupData?) -> Void)
     {
+        let processor = DataProcessing()
         let fileManager = FileManager.default
         let currentDirectory = fileManager.currentDirectoryPath
         let mergeGroup = DispatchGroup.init()
@@ -280,9 +281,9 @@ class RedisServerController: NSObject
         mergeQueue.async
         {
             
-            let connectionDataA = ConnectionData()
+            let connectionGroupData = ConnectionGroupData()
             
-            print("\nenter 1")
+            print("\nEnter 1")
             mergeGroup.enter()
             self.switchDatabaseFile(withFile: mergeFile)
             {
@@ -293,8 +294,8 @@ class RedisServerController: NSObject
             }
             mergeGroup.wait()
             
-            let connectionDataB = ConnectionData()
-            let mergedConnectionData = connectionDataA.merge(with: connectionDataB)
+            let newConnectionGroupData = ConnectionGroupData()
+            let mergedConnectionData = processor.merge(connectionGroupData: connectionGroupData, with: newConnectionGroupData)
             
             mergeGroup.enter()
             print("\nEnter 2")
@@ -310,7 +311,7 @@ class RedisServerController: NSObject
             
             print("\nEnter 3")
             mergeGroup.enter()
-            mergedConnectionData.saveToRedis()
+            processor.saveToRedis(connectionData: mergedConnectionData)
             {
                 _ in
                 

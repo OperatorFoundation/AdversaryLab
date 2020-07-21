@@ -155,7 +155,7 @@ class PacketLengthsCoreML
         }
         else
         {
-            let (allowedLengths, allowedScores, blockedLengths, blockedScores) = getLengthsAndScores(forConnectionDirection: connectionDirection)
+            let (allowedLengths, _, blockedLengths, _) = getLengthsAndScores(forConnectionDirection: connectionDirection)
             
             guard blockedLengths.count > 0
             else
@@ -165,14 +165,20 @@ class PacketLengthsCoreML
             }
             
             // Allowed
-            testModel(lengths: allowedLengths, scores:allowedScores, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+            testModel(lengths: allowedLengths,
+                      connectionType: .allowed,
+                      connectionDirection: connectionDirection,
+                      configModel: configModel)
             
             // Blocked
-            testModel(lengths: blockedLengths, scores: blockedScores, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+            testModel(lengths: blockedLengths,
+                      connectionType: .blocked,
+                      connectionDirection: connectionDirection,
+                      configModel: configModel)
         }
     }
     
-    func testModel(lengths: [Int], scores: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let classifierName: String
         let recommenderName: String
@@ -330,39 +336,6 @@ class PacketLengthsCoreML
         lengthsTable.addColumn(classyLabelColumn, named: ColumnLabel.classification.rawValue)
         
         return lengthsTable
-    }
-    
-    func createLengthRecommenderTable(connectionDirection: ConnectionDirection) -> MLDataTable?
-    {
-        var recommenderTable = MLDataTable()
-        let (lengths, scores, classifications) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
-        
-        let itemIDs = [Int](0..<lengths.count)
-        print("-----COLUMN ARRAYS----")
-        let userColumn = MLDataColumn(classifications)
-        let itemIDColumn = MLDataColumn(itemIDs)
-        let lengthsColumn = MLDataColumn(lengths)
-        
-        guard let scaledScores = scale(scores: scores)
-        else {
-            print("Failed to scale length scores for training.")
-            return nil
-        }
-
-        let scoresColumn = MLDataColumn(scaledScores)
-        
-        recommenderTable.addColumn(userColumn, named: ColumnLabel.classification.rawValue)
-        recommenderTable.addColumn(itemIDColumn, named: ColumnLabel.itemID.rawValue)
-        recommenderTable.addColumn(lengthsColumn, named: ColumnLabel.length.rawValue)
-        recommenderTable.addColumn(scoresColumn, named: ColumnLabel.score.rawValue)
-        
-        print("User column: ", recommenderTable[ColumnLabel.classification.rawValue])
-        print("item ID: ", recommenderTable[ColumnLabel.itemID.rawValue])
-        print("lengths: ", recommenderTable[ColumnLabel.length.rawValue])
-        print("scores: ", recommenderTable[ColumnLabel.score.rawValue])
-        print("lengths training table: \(recommenderTable.description)")
-        
-        return recommenderTable
     }
     
     func trainModels(lengthsClassifierTable: MLDataTable, lengthRecommender: LengthRecommender, connectionDirection: ConnectionDirection, modelName: String)
@@ -530,23 +503,6 @@ class PacketLengthsCoreML
         }
         
         return(lengths, scores, classificationLabels)
-    }
-    
-    func newIntSet(from redisSets:[RSortedSet<Int>]) -> Set<Int>
-    {
-        var swiftSet = Set<Int>()
-        for set in redisSets
-        {
-            for i in 0 ..< set.count
-            {
-                if let newMember: Int = set[i]
-                {
-                    swiftSet.insert(newMember)
-                }
-            }
-        }
-        
-        return swiftSet
     }
     
 }

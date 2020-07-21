@@ -13,16 +13,20 @@ import Datable
 import CoreML
 import Charts
 
-class ViewController: NSViewController, NSTabViewDelegate
+class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
 {
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
     @IBOutlet weak var activityIndicator: NSProgressIndicator!
     
+    @objc dynamic var aConnectionsCountLabel = "Connections"
     @objc dynamic var allowedPacketsSeen = "Loading..."
+    @objc dynamic var aConnectionsAnalyzedLabel = "Connections Analyzed"
     @objc dynamic var allowedPacketsAnalyzed = "Loading..."
+    @objc dynamic var bConnectionsCountLabel = "Connections"
     @objc dynamic var blockedPacketsSeen = "Loading..."
+    @objc dynamic var bConnectionsAnalyzedLabel = "Connections Analyzed"
     @objc dynamic var blockedPacketsAnalyzed = "Loading..."
     
     @objc dynamic var requiredTiming = "--"
@@ -126,37 +130,63 @@ class ViewController: NSViewController, NSTabViewDelegate
     // MARK: - Test Mode Labels
     @objc dynamic var modelName = "--"
 
+    @objc dynamic var allFeaturesAAccuracyLabel = "Predictions Accuracy"
     @objc dynamic var allFeaturesAllowAccuracy = "--"
+    @objc dynamic var allFeaturesBAccuracyLabel = "Predictions Accuracy"
     @objc dynamic var allFeaturesBlockAccuracy = "--"
     
-    @objc dynamic var timingBlocked = "--"
-    @objc dynamic var timingBlockAccuracy = "--"
+    @objc dynamic var aTimingLabel = "Timing: "
     @objc dynamic var timingAllowed = "--"
+    @objc dynamic var aTimingAccuracyLabel = "Timing Accuracy: "
     @objc dynamic var timingAllowAccuracy = "--"
+    @objc dynamic var bTimingLabel = "Timing: "
+    @objc dynamic var timingBlocked = "--"
+    @objc dynamic var bTimingAccuracyLabel = "Timing Accuracy: "
+    @objc dynamic var timingBlockAccuracy = "--"
     
+    @objc dynamic var aTLS12Label = "TLS: "
     @objc dynamic var tls12Allowed = "--"
+    @objc dynamic var aTLS12AccuracyLabel = "TLS Accuracy: "
     @objc dynamic var tls12AllowAccuracy = "--"
+    @objc dynamic var bTLS12Label = "TLS"
     @objc dynamic var tls12Blocked = "--"
+    @objc dynamic var bTLS12AccuracyLabel = "TLS Accuracy: "
     @objc dynamic var tls12BlockAccuracy = "--"
     
-    @objc dynamic var inLengthAllowAccuracy = "--"
-    @objc dynamic var inLengthBlockAccuracy = "--"
-    @objc dynamic var inLengthAllowed = "--"
-    @objc dynamic var inLengthBlocked = "--"
-    @objc dynamic var outLengthAllowAccuracy = "--"
-    @objc dynamic var outLengthBlockAccuracy = "--"
+    @objc dynamic var aOutLengthLabel = "Out Length: "
     @objc dynamic var outLengthAllowed = "--"
+    @objc dynamic var aOutLengthAccuracyLabel = "Out Length Accuracy: "
+    @objc dynamic var outLengthAllowAccuracy = "--"
+    @objc dynamic var bOutLengthLabel = "Out Length: "
     @objc dynamic var outLengthBlocked = "--"
-    
-    @objc dynamic var inEntropyAllowAccuracy = "--"
-    @objc dynamic var inEntropyBlockAccuracy = "--"
-    @objc dynamic var inBlockedEntropy = "--"
-    @objc dynamic var inAllowedEntropy = "--"
-    @objc dynamic var outEntropyAllowAccuracy = "--"
-    @objc dynamic var outEntropyBlockAccuracy = "--"
+    @objc dynamic var bOutLengthAccuracyLabel = "Out Length Accuracy: "
+    @objc dynamic var outLengthBlockAccuracy = "--"
+    @objc dynamic var aInLengthLabel = "In Length: "
+    @objc dynamic var inLengthAllowed = "--"
+    @objc dynamic var aInLengthAccuracyLabel = "In Length Accuracy: "
+    @objc dynamic var inLengthAllowAccuracy = "--"
+    @objc dynamic var bInLengthLabel = "In Length: "
+    @objc dynamic var inLengthBlocked = "--"
+    @objc dynamic var bInLengthAccuracyLabel = "In Length Accuracy: "
+    @objc dynamic var inLengthBlockAccuracy = "--"
+
+    @objc dynamic var aOutEntropyLabel = "Out Entropy: "
     @objc dynamic var outAllowedEntropy = "--"
+    @objc dynamic var aOutEntropyAccuracyLabel = "Out Entropy Accuracy: "
+    @objc dynamic var outEntropyAllowAccuracy = "--"
+    @objc dynamic var bOutEntropyLabel = "Out Entropy: "
     @objc dynamic var outBlockedEntropy = "--"
-    
+    @objc dynamic var bOutEntropyAccuracyLabel = "Out Entropy Accuracy: "
+    @objc dynamic var outEntropyBlockAccuracy = "--"
+    @objc dynamic var aInEntropyLabel = "In Entropy: "
+    @objc dynamic var inAllowedEntropy = "--"
+    @objc dynamic var aInEntropyAccuracyLabel = "In Entropy Accuracy: "
+    @objc dynamic var inEntropyAllowAccuracy = "--"
+    @objc dynamic var bInEntropyLabel = "In Entropy: "
+    @objc dynamic var inBlockedEntropy = "--"
+    @objc dynamic var bInEntropyAccuracyLabel = "In Entropy Accuracy: "
+    @objc dynamic var inEntropyBlockAccuracy = "--"
+
     let circleRadius: CGFloat = 2.5
     var modelDirectoryURL: URL?
     
@@ -237,7 +267,7 @@ class ViewController: NSViewController, NSTabViewDelegate
                 runTest()
             case .TrainingMode: // In Training mode we need a name so we can save the model files
                 
-                let packetStatsDict = ConnectionData().packetStats
+                let packetStatsDict = ConnectionGroupData().packetStats
                 guard let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey]
                     else {
                         showNoDataAlert()
@@ -271,25 +301,6 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
             print("Pause bot engage!! 🤖")
             updateProgressIndicator()
-        }
-    }
-    
-    @IBAction func liveCaptureClick(_ sender: NSButton)
-    {
-        print("\n⏺  You clicked the live capture button 👻")
-        
-        if sender.state == .on
-        {
-            print("Time to record some packets.")
-            showCaptureAlert()
-        }
-        else
-        {
-            print("🛑  Stop recording!! 🛑")
-            guard let helper = helperClient
-                else { return }
-            
-            helper.stopAdversaryLabClient()
         }
     }
     
@@ -394,6 +405,19 @@ class ViewController: NSViewController, NSTabViewDelegate
     
     // MARK: - Charts
     
+    func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight)
+    {
+        print("📈 Chart was clicked.")
+        
+        let chartViewController = ConnectionChartViewController()
+        chartViewController.titleString = entry.description
+        
+        let popover = NSPopover()
+        popover.behavior = .transient
+        popover.contentViewController = chartViewController
+        popover.show(relativeTo: chartView.bounds, of: chartView, preferredEdge: NSRectEdge.minY)
+    }
+    
     func updateCharts()
     {
         updateTimeChart()
@@ -456,6 +480,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         data.addDataSet(blockedInLine)
         data.addDataSet(blockedOutLine)
         
+        lengthChartView.delegate = self
         lengthChartView.highlightPerDragEnabled = true
         lengthChartView.data = data
         lengthChartView.chartDescription?.text = "Packet Lengths"
@@ -516,6 +541,7 @@ class ViewController: NSViewController, NSTabViewDelegate
         data.addDataSet(blockedInLine)
         data.addDataSet(blockedOutLine)
         
+        entropyChartView.delegate = self
         entropyChartView.data = data
         entropyChartView.chartDescription?.text = "Entropy"
     }
@@ -546,9 +572,10 @@ class ViewController: NSViewController, NSTabViewDelegate
         line2.circleHoleColor = NSUIColor.clear
         
         let data = LineChartData()
-        
         data.addDataSet(line1)
         data.addDataSet(line2)
+        
+        timingChartView.delegate = self
         timingChartView.data = data
         timingChartView.chartDescription?.text = "Time Intervals"
     }
@@ -784,21 +811,25 @@ class ViewController: NSViewController, NSTabViewDelegate
         // Updates Labels that are in the main window (always visible)
         // Get redis data in the utility queue and update the labels with the data in the main queue
         //print("Main thread?: \(Thread.isMainThread)")
-        let connectionData = ConnectionData()
+        let connectionData = ConnectionGroupData()
         let redisDatabaseFilename = Auburn.dbfilename ?? "--"
         
         DispatchQueue.main.async
         {
             let packetStatsDict = connectionData.packetStats
-            let allowedPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
-            let allowedPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
-            let blockedPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
-            let blockedPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
+            let aPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
+            let aPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
+            let bPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
+            let bPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
             self.databaseNameLabel.stringValue = redisDatabaseFilename
-            self.allowedPacketsSeen = "\(allowedPacketsSeenValue ?? 0)"
-            self.allowedPacketsAnalyzed = "\(allowedPacketsAnalyzedValue ?? 0)"
-            self.blockedPacketsSeen = "\(blockedPacketsSeenValue ?? 0)"
-            self.blockedPacketsAnalyzed = "\(blockedPacketsAnalyzedValue ?? 0)"
+            self.aConnectionsCountLabel = "\(transportA) connections: "
+            self.allowedPacketsSeen = "\(aPacketsSeenValue ?? 0)"
+            self.aConnectionsAnalyzedLabel = "\(transportA) connections analyzed: "
+            self.allowedPacketsAnalyzed = "\(aPacketsAnalyzedValue ?? 0)"
+            self.bConnectionsCountLabel = "\(transportB) connections: "
+            self.blockedPacketsSeen = "\(bPacketsSeenValue ?? 0)"
+            self.bConnectionsAnalyzedLabel = "\(transportB) connections analyzed: "
+            self.blockedPacketsAnalyzed = "\(bPacketsAnalyzedValue ?? 0)"
             
             guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
                 let currentTab = TabIds(rawValue: identifier)
@@ -863,6 +894,10 @@ class ViewController: NSViewController, NSTabViewDelegate
         {
             self.activityIndicator.stopAnimation(nil)
             
+            self.aTimingLabel = "\(transportA) Timing: "
+            self.aTimingAccuracyLabel = "\(transportA) Timing Accuracy: "
+            self.bTimingLabel = "\(transportB)"
+            self.bTimingAccuracyLabel = "\(transportB) Timing Accuracy: "
             if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
             {
                 self.timingAllowed = String(format: "%.2f", timeAllowed!)
@@ -878,6 +913,10 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.timingBlockAccuracy = "--"
             }
             
+            self.aTLS12Label = "\(transportA) TLS: "
+            self.aTLS12AccuracyLabel = "\(transportA) TLS Accuracy: "
+            self.bTLS12Label = "\(transportB) TLS: "
+            self.bTLS12AccuracyLabel = "\(transportB) TLS Accuracy: "
             if tlsAllowAccuracy != nil, tlsBlockAccuracy != nil, tlsAllowed != nil, tlsBlocked != nil
             {
                 self.tls12Allowed = String(format: "%.2f", tlsAllowed!)
@@ -893,6 +932,14 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.tls12BlockAccuracy = "--"
             }
             
+            self.aInEntropyLabel = "\(transportA) In Entropy: "
+            self.aInEntropyAccuracyLabel = "\(transportA) In Entropy Accurcy: "
+            self.aOutEntropyLabel = "\(transportA) Out Entropy: "
+            self.aOutEntropyAccuracyLabel = "\(transportA) Out Entropy Accuracy: "
+            self.bInEntropyLabel = "\(transportB) In Entropy: "
+            self.bInEntropyAccuracyLabel = "\(transportB) In Entropy Accuracy: "
+            self.bOutEntropyLabel = "\(transportB) Out Entropy: "
+            self.bOutEntropyAccuracyLabel = "\(transportB) Out Entropy Accuracy: "
             if
                 entInAllowed != nil,
                 entInBlocked != nil,
@@ -930,6 +977,15 @@ class ViewController: NSViewController, NSTabViewDelegate
                 self.outEntropyAllowAccuracy = "--"
                 self.outEntropyBlockAccuracy = "--"
             }
+            
+            self.aInLengthLabel = "\(transportA) In Length: "
+            self.aInLengthAccuracyLabel = "\(transportA) In Length Accuracy: "
+            self.aOutLengthLabel = "\(transportA) Out Length: "
+            self.aOutLengthAccuracyLabel = "\(transportA) Out Length Accuracy: "
+            self.bInLengthLabel = "\(transportB) In Length: "
+            self.bInLengthAccuracyLabel = "\(transportB) In Length Accuracy: "
+            self.bOutLengthLabel = "\(transportB) Out Length: "
+            self.bOutLengthAccuracyLabel = "\(transportB) Out Length Accuracy: "
             
             if lengthInAllowAccuracy != nil, lengthInBlockAccuracy != nil
             {
@@ -976,7 +1032,9 @@ class ViewController: NSViewController, NSTabViewDelegate
             }
             
             // All Features
+            self.allFeaturesAAccuracyLabel = "\(transportA) Prediction Accuracy: "
             self.allFeaturesAllowAccuracy = "--"
+            self.allFeaturesBAccuracyLabel = "\(transportB) Prediction Accuracy: "
             self.allFeaturesBlockAccuracy = "--"
 
             if allAllowAccuracy != nil
