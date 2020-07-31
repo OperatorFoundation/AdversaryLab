@@ -7,27 +7,56 @@
 //
 
 import Foundation
-import Rethink
+import ZIPFoundation
 import Symphony
 import RawPacket
 
 class SymphonyController
 {
     static let sharedInstance = SymphonyController()
-    let rethinkdb = "rethinkdb"
-    let python = "/usr/local/bin/python3"
+    
     let tableName = "Packets"
+    var transportNames: [String] = []
     var symphony: Symphony?
+    var tablesURL: URL?
 
     func launchSymphony(fromFile fileURL: URL, completion: @escaping (Bool) -> Void)
     {
-        symphony = Symphony(root: fileURL)
-        saveSymphonyDataToRedis
+        // Unzip the directory
+        guard let songDirectory = unzipSong(sourceURL: fileURL)
+            else
         {
-            (success) in
+                completion(false)
+                return
+        }
+        
+        symphony = Symphony(root: songDirectory)
+        
+        // FIXME: We need to actually get the list of transport names from Symphony, this functionality does not exist yet
+        // Get the list of transports in the Symphony DB
+        
+        do
+        {
+            let tables = try FileManager().contentsOfDirectory(at: songDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            tablesURL = songDirectory
+            for tableURL in tables
+            {
+                transportNames.append(tableURL.lastPathComponent)
+            }
             
-            print("\nReturned from saving Symphony Data to Redis DB.\n")
-            completion(success)
+            saveSymphonyDataToRedis
+            {
+                (success) in
+                
+                print("\nReturned from saving Symphony Data to Redis DB.\n")
+                completion(success)
+            }
+        }
+        catch let error
+        {
+            print("Error looking for transport directories: \(error)")
+            completion(false)
+            return
         }
     }
     
@@ -42,11 +71,7 @@ class SymphonyController
             completion(false)
             return
         }
-        
-        // FIXME: We need to actually get the list of transport names from Symphony, this functionality does not exist yet
-        // Get the list of transports in the Symphony DB
-        let transportNames: [String] = []
-        
+
         guard transportNames.count > 1 else
         {
             print("Unable to add Symphony data to Redis, we need at least two transports.")
@@ -59,7 +84,7 @@ class SymphonyController
         ///Ask the user which transport is allowed and which is blocked
         DispatchQueue.main.async
         {
-            guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: transportNames)
+            guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: self.transportNames)
                 else
             {
                     completion(false)
@@ -94,6 +119,30 @@ class SymphonyController
         }
     }
     
+    /// File management
+    func unzipSong(sourceURL: URL) -> URL?
+    {
+        let fileManager = FileManager()
+        let currentWorkingURL = URL(fileURLWithPath: fileManager.currentDirectoryPath)
+        let destinationURL = currentWorkingURL.appendingPathComponent("adversary_data")
+        do
+        {
+            // Overwrite any old data at this directory
+            if fileManager.fileExists(atPath: destinationURL.path)
+            {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            
+            try fileManager.unzipItem(at: sourceURL, to: currentWorkingURL)
+            return destinationURL
+        }
+        catch
+        {
+            print("Extraction of ZIP archive failed with error:\(error)")
+            return nil
+        }
+    }
+    
     /// ValueSequence is our own custom Array type
     func packetArraysFromSymphony(for transportA: String, transportB: String) -> (ValueSequence<RawPacket>, ValueSequence<RawPacket>)?
     {
@@ -111,7 +160,7 @@ class SymphonyController
         guard let symphonyDB = symphony
             else { return nil }
         
-        let tableURL = URL(fileURLWithPath: self.tableName)
+        let tableURL = URL(fileURLWithPath: reThinkDBName)
         let table = symphonyDB.readSequence(elementType: RawPacket.self, at: tableURL)
         
         return table

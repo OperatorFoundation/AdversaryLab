@@ -37,6 +37,7 @@ class ConnectionGroupData
                                               outgoingPackets: processor.dataDictionary(from: allowedOutgoingKey),
                                               outgoingDates: processor.doubleDictionary(from: allowedOutgoingDatesKey),
                                               connections: allowedConnectionsList.array)
+        
         self.bConnectionData = ConnectionData(incomingPackets: processor.dataDictionary(from: blockedIncomingKey),
                                               incomingDates: processor.doubleDictionary(from: blockedIncomingDatesKey),
                                               outgoingPackets: processor.dataDictionary(from: blockedOutgoingKey),

@@ -7,82 +7,12 @@
 //
 
 import Foundation
-import Rethink
 import Auburn
 import Symphony
 import RawPacket
 
 class DataProcessing
 {
-    // TODO: Remove after transition to Song
-    ///Load the data for those transports into Swift data structures
-    func packets(fromArray array: Array<Dictionary<String, Any>> ) -> [RethinkPacket]?
-    {
-        var packets = [RethinkPacket]()
-        
-        for aDictionary in array
-        {
-            if let aPacket = createPacket(packetDictionary: aDictionary)
-            {
-                packets.append(aPacket)
-            }
-        }
-        
-        if packets.isEmpty
-        {
-            return nil
-        }
-        else
-        {
-            return packets
-        }
-    }
-    
-    
-    // TODO: Remove after transition to Song
-    func createPacket(packetDictionary: Dictionary<String, Any>) -> RethinkPacket?
-    {
-        guard let inOutValue = packetDictionary[ReThinkKey.inOut.rawValue] as? Bool,
-                    let handshakeValue = packetDictionary[ReThinkKey.handshake.rawValue] as? Bool,
-                    let allowBlockValue = packetDictionary[ReThinkKey.allowBlock.rawValue] as? Bool,
-                    let idValue = packetDictionary[ReThinkKey.id.rawValue] as? String,
-                    let connectionIDValue = packetDictionary[ReThinkKey.connectionID.rawValue] as? String,
-                    let timestampValue = packetDictionary[ReThinkKey.timestamp.rawValue] as? Int
-                    else { return nil }
-                
-        guard let tcpValueString = packetDictionary[ReThinkKey.tcpPacket.rawValue] as? String,
-            let ipValueString = packetDictionary[ReThinkKey.ipPacket.rawValue] as? String,
-            let payloadValueString = packetDictionary[ReThinkKey.payload.rawValue] as? String
-            else { return nil }
-        
-        guard let tcpData = Data(base64Encoded: tcpValueString)
-        else
-        {
-            print("Attempted to create RethinkPacket with invalid tcp value.")
-            return nil
-        }
-        let tcpValue = Payload(type: ReQLType.binary, packetData: tcpData)
-        
-        guard let ipData = Data(base64Encoded: ipValueString)
-        else
-        {
-            print("Attempted to create RethinkPacket with invalid ip value.")
-            return nil
-        }
-        let ipValue = Payload(type: ReQLType.binary, packetData: ipData)
-        
-        guard let payloadData = Data(base64Encoded: payloadValueString)
-            else
-        {
-            print("Attempted to create RethinkPacket with invalid payload value.")
-            return nil
-        }
-        let payloadValue = Payload(type: ReQLType.binary, packetData: payloadData)
-        print("New RethinkPacket payload: \(payloadData.hexDescription)")
-        
-        return RethinkPacket(inOut: inOutValue, handshake: handshakeValue, allowBlock: allowBlockValue, id: idValue, connectionID: connectionIDValue, timestamp: Double(timestampValue), tcpPacket: tcpValue, ipPacket: ipValue, payload: payloadValue)
-    }
-    
     func connectionData(forTransportA transportA:String, aRawPackets: ValueSequence<RawPacket>, transportB: String, bRawPackets: ValueSequence<RawPacket>) -> ConnectionGroupData
     {
         var packetStats = [String: Int]()

@@ -72,7 +72,7 @@ func showRethinkFileAlert() -> URL?
     panel.canChooseFiles = true
     panel.canChooseDirectories = false
     panel.allowsMultipleSelection = false
-    panel.allowedFileTypes = ["gz"]
+    panel.allowedFileTypes = ["zip"]
     
     let result = panel.runModal()
     guard result == NSApplication.ModalResponse.OK

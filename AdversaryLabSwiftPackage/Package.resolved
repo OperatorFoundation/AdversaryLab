@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/OperatorFoundation/InternetProtocols.git",
         "state": {
           "branch": null,
-          "revision": "40d48b54e7b37a06bef0fd2c36c86dc523cc716d",
-          "version": "1.0.5"
+          "revision": "85a03a837c7c38497e5c11964375e844da531aef",
+          "version": "1.0.6"
         }
       },
       {
@@ -65,21 +65,12 @@
         }
       },
       {
-        "package": "Rethink",
-        "repositoryURL": "https://github.com/OperatorFoundation/rethink-swift",
-        "state": {
-          "branch": null,
-          "revision": "f8a2e7c7aa424066b8cc8b4aedd73edf180ef3d8",
-          "version": "1.1.0"
-        }
-      },
-      {
         "package": "Song",
         "repositoryURL": "https://github.com/OperatorFoundation/Song.git",
         "state": {
           "branch": null,
-          "revision": "70b719bbac16b68d107d5fe8ce2352a9d4e623ab",
-          "version": "0.0.19"
+          "revision": "e28ac4620ba3216c9b45bc306c40b63c13f68685",
+          "version": "0.0.23"
         }
       },
       {

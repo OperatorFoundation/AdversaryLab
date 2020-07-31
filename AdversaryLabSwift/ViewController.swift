@@ -360,12 +360,11 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         case .TrainingMode:
             if let selectedFileURL = showRethinkFileAlert()
             {
-                loadRethinkFile(fileURL: selectedFileURL)
-                {
-                    _ in
-                    
+                loadSongFile(fileURL: selectedFileURL)
+                { (_) in
                     self.refreshDBUI()
                 }
+
             }
             else
             {
@@ -377,16 +376,15 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         }
     }
     
-    func loadRethinkFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
+    func loadSongFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
     {
         DispatchQueue.main.async {
             self.activityIndicator.startAnimation(nil)
         }
         
-        RethinkDBController.sharedInstance.launchRethinkDB(fromFile: fileURL)
+        SymphonyController().launchSymphony(fromFile: fileURL)
         {
-            success in
-            
+            (success) in
             completion(success)
         }
     }
@@ -407,10 +405,15 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight)
     {
-        print("📈 Chart was clicked.")
-        
         let chartViewController = ConnectionChartViewController()
-        chartViewController.titleString = entry.description
+        var chartDescription = ""
+        if let description = chartView.chartDescription, let descriptionText = description.text
+        {
+            chartDescription = descriptionText
+        }
+        
+        chartViewController.titleString = "\(chartDescription): \(entry.y)"
+        
         
         let popover = NSPopover()
         popover.behavior = .transient
@@ -483,63 +486,82 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         lengthChartView.delegate = self
         lengthChartView.highlightPerDragEnabled = true
         lengthChartView.data = data
-        lengthChartView.chartDescription?.text = "Packet Lengths"
+        lengthChartView.chartDescription?.text = "Packet Length"
     }
     
     func updateEntropyChart()
     {
-        let allowedInEntropyList: RList<Double> = RList(key: allowedIncomingEntropyKey)
-        let allowedInEntropy = allowedInEntropyList.array.sorted()
-        let allowedOutEntropyList: RList<Double> = RList(key: allowedOutgoingEntropyKey)
-        let allowedOutEntropy = allowedOutEntropyList.array.sorted()
-        let blockedInEntropyList: RList<Double> = RList(key: blockedIncomingEntropyKey)
-        let blockedInEntropy = blockedInEntropyList.array.sorted()
-        let blockedOutEntropyList: RList<Double> = RList(key: blockedOutgoingEntropyKey)
-        let blockedOutEntropy = blockedOutEntropyList.array.sorted()
+        let aInEntropyList: RList<Double> = RList(key: allowedIncomingEntropyKey)
+        var aInEntropy = aInEntropyList.array.sorted()
+        for index in 0 ..< aInEntropy.count
+        {
+            aInEntropy[index] = (aInEntropy[index]*1000).rounded()/1000
+        }
         
-        let allowedInEntropyEntry = chartDataEntry(fromArray: allowedInEntropy)
-        let allowedOutEntropyEntry = chartDataEntry(fromArray: allowedOutEntropy)
-        let blockedInEntropyEntry = chartDataEntry(fromArray: blockedInEntropy)
-        let blockedOutEntropyEntry = chartDataEntry(fromArray: blockedOutEntropy)
+        let aOutEntropyList: RList<Double> = RList(key: allowedOutgoingEntropyKey)
+        var aOutEntropy = aOutEntropyList.array.sorted()
+        for index in 0 ..< aOutEntropy.count
+        {
+            aOutEntropy[index] = (aOutEntropy[index]*1000).rounded()/1000
+        }
         
-        let allowedInLine = LineChartDataSet(entries: allowedInEntropyEntry, label: "Allowed Incoming Entropy")
-        allowedInLine.colors = [NSUIColor.blue]
-        allowedInLine.circleColors = [NSUIColor.blue]
-        allowedInLine.circleRadius = 2
-        allowedInLine.drawCirclesEnabled = true
-        allowedInLine.circleHoleRadius = 1
-        allowedInLine.circleHoleColor = NSUIColor.clear
-        allowedInLine.drawValuesEnabled = false
-        let allowedOutLine = LineChartDataSet(entries: allowedOutEntropyEntry, label: "Allowed Outgoing Entropy")
-        allowedOutLine.colors = [NSUIColor.magenta]
-        allowedOutLine.circleColors = [NSUIColor.magenta]
-        allowedOutLine.circleRadius = 3.5
-        allowedOutLine.drawCirclesEnabled = true
-        allowedOutLine.circleHoleRadius = 2.5
-        allowedOutLine.circleHoleColor = NSUIColor.clear
-        allowedOutLine.drawValuesEnabled = false
-        let blockedInLine = LineChartDataSet(entries: blockedInEntropyEntry, label: "Blocked Incoming Entropy")
-        blockedInLine.colors = [NSUIColor.red]
-        blockedInLine.circleColors = [NSUIColor.red]
-        blockedInLine.circleRadius = 5
-        blockedInLine.drawCirclesEnabled = true
-        blockedInLine.circleHoleRadius = 4.5
-        blockedInLine.circleHoleColor = NSUIColor.clear
-        blockedInLine.drawValuesEnabled = false
-        let blockedOutLine = LineChartDataSet(entries: blockedOutEntropyEntry, label: "Blocked Outgoing Entropy")
-        blockedOutLine.colors = [NSUIColor.systemGreen ]
-        blockedOutLine.circleColors = [NSUIColor.systemGreen]
-        blockedOutLine.circleRadius = 6.5
-        blockedOutLine.drawCirclesEnabled = true
-        blockedOutLine.circleHoleRadius = 5.5
-        blockedOutLine.circleHoleColor = NSUIColor.clear
-        blockedOutLine.drawValuesEnabled = false
+        let bInEntropyList: RList<Double> = RList(key: blockedIncomingEntropyKey)
+        var bInEntropy = bInEntropyList.array.sorted()
+        for index in 0 ..< bInEntropy.count
+        {
+            bInEntropy[index] = (bInEntropy[index]*1000).rounded()/1000
+        }
+        
+        let bOutEntropyList: RList<Double> = RList(key: blockedOutgoingEntropyKey)
+        var bOutEntropy = bOutEntropyList.array.sorted()
+        for index in 0 ..< bOutEntropy.count
+        {
+            bOutEntropy[index] = (bOutEntropy[index]*1000).rounded()/1000
+        }
+        
+        let aInEntropyEntry = chartDataEntry(fromArray: aInEntropy)
+        let aOutEntropyEntry = chartDataEntry(fromArray: aOutEntropy)
+        let bInEntropyEntry = chartDataEntry(fromArray: bInEntropy)
+        let bOutEntropyEntry = chartDataEntry(fromArray: bOutEntropy)
+        
+        let aInLine = LineChartDataSet(entries: aInEntropyEntry, label: "Allowed Incoming Entropy")
+        aInLine.colors = [NSUIColor.blue]
+        aInLine.circleColors = [NSUIColor.blue]
+        aInLine.circleRadius = 2
+        aInLine.drawCirclesEnabled = true
+        aInLine.circleHoleRadius = 1
+        aInLine.circleHoleColor = NSUIColor.clear
+        aInLine.drawValuesEnabled = false
+        let aOutLine = LineChartDataSet(entries: aOutEntropyEntry, label: "Allowed Outgoing Entropy")
+        aOutLine.colors = [NSUIColor.magenta]
+        aOutLine.circleColors = [NSUIColor.magenta]
+        aOutLine.circleRadius = 3.5
+        aOutLine.drawCirclesEnabled = true
+        aOutLine.circleHoleRadius = 2.5
+        aOutLine.circleHoleColor = NSUIColor.clear
+        aOutLine.drawValuesEnabled = false
+        let bInLine = LineChartDataSet(entries: bInEntropyEntry, label: "Blocked Incoming Entropy")
+        bInLine.colors = [NSUIColor.red]
+        bInLine.circleColors = [NSUIColor.red]
+        bInLine.circleRadius = 5
+        bInLine.drawCirclesEnabled = true
+        bInLine.circleHoleRadius = 4.5
+        bInLine.circleHoleColor = NSUIColor.clear
+        bInLine.drawValuesEnabled = false
+        let bOutLine = LineChartDataSet(entries: bOutEntropyEntry, label: "Blocked Outgoing Entropy")
+        bOutLine.colors = [NSUIColor.systemGreen ]
+        bOutLine.circleColors = [NSUIColor.systemGreen]
+        bOutLine.circleRadius = 6.5
+        bOutLine.drawCirclesEnabled = true
+        bOutLine.circleHoleRadius = 5.5
+        bOutLine.circleHoleColor = NSUIColor.clear
+        bOutLine.drawValuesEnabled = false
         
         let data = LineChartData()
-        data.addDataSet(allowedInLine)
-        data.addDataSet(allowedOutLine)
-        data.addDataSet(blockedInLine)
-        data.addDataSet(blockedOutLine)
+        data.addDataSet(aInLine)
+        data.addDataSet(aOutLine)
+        data.addDataSet(bInLine)
+        data.addDataSet(bOutLine)
         
         entropyChartView.delegate = self
         entropyChartView.data = data
@@ -548,22 +570,33 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         
     func updateTimeChart()
     {
-        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
-        let allowedTimeDifferences = allowedTimeDifferenceList.array.sorted()
-        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
-        let blockedTimeDifferences = blockedTimeDifferenceList.array.sorted()
+        let aTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
+        var aTimeDifferences = aTimeDifferenceList.array.sorted()
+        for index in 0 ..< aTimeDifferences.count
+        {
+            // Convert microseconds to milliseconds
+            aTimeDifferences[index] = aTimeDifferences[index]/1000
+        }
         
-        let allowedLineChartEntry = chartDataEntry(fromArray: allowedTimeDifferences)
-        let blockedLineChartEntry = chartDataEntry(fromArray: blockedTimeDifferences)
+        let bTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
+        var bTimeDifferences = bTimeDifferenceList.array.sorted()
+        for index in 0 ..< bTimeDifferences.count
+        {
+            // Convert microseconds to milliseconds
+            bTimeDifferences[index] = bTimeDifferences[index]/1000
+        }
         
-        let line1 = LineChartDataSet(entries: allowedLineChartEntry, label: "Allowed")
+        let aLineChartEntry = chartDataEntry(fromArray: aTimeDifferences)
+        let bLineChartEntry = chartDataEntry(fromArray: bTimeDifferences)
+        
+        let line1 = LineChartDataSet(entries: aLineChartEntry, label: "Allowed")
         line1.colors = [NSUIColor.blue]
         line1.circleColors = [NSUIColor.blue]
         line1.circleRadius = circleRadius
         line1.drawCirclesEnabled = true
         line1.circleHoleColor = NSUIColor.clear
         
-        let line2 = LineChartDataSet(entries: blockedLineChartEntry, label: "Blocked")
+        let line2 = LineChartDataSet(entries: bLineChartEntry, label: "Blocked")
         line2.colors = [NSUIColor.red]
         line2.circleColors = [NSUIColor.red]
         line2.circleRadius = circleRadius + 0.5
@@ -577,7 +610,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         
         timingChartView.delegate = self
         timingChartView.data = data
-        timingChartView.chartDescription?.text = "Time Intervals"
+        timingChartView.chartDescription?.text = "Time Interval"
     }
     
     func chartDataEntry(fromArray dataArray:[Double]) -> [ChartDataEntry]
@@ -602,6 +635,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             else { return }
         
         updateButtons(currentTab: currentTab)
+        loadLabelData()
     }
     
     func updateButtons(currentTab: TabIds)
@@ -852,7 +886,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         // Get redis data in the utility queue and update the labels with the data in the main queue
         let testResults: RMap<String,Double> = RMap(key: testResultsKey)
         
-        // Timing (milliseconds)
+        // Timing (microseconds)
         let timeBlocked = testResults[blockedTimingKey]
         let timeBlockAccuracy = testResults[blockedTimingAccuracyKey]
         let timeAllowed = testResults[allowedTimingKey]
@@ -900,9 +934,9 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             self.bTimingAccuracyLabel = "\(transportB) Timing Accuracy: "
             if timeAllowed != nil, timeAllowAccuracy != nil, timeBlocked != nil, timeBlockAccuracy != nil
             {
-                self.timingAllowed = String(format: "%.2f", timeAllowed!)
+                self.timingAllowed = String(format: "%.2f", timeAllowed!/1000)
                 self.timingAllowAccuracy = String(format: "%.2f", timeAllowAccuracy!)
-                self.timingBlocked = String(format: "%.2f", timeBlocked!)
+                self.timingBlocked = String(format: "%.2f", timeBlocked!/1000)
                 self.timingBlockAccuracy = String(format: "%.2f", timeBlockAccuracy!)
             }
             else
@@ -1078,7 +1112,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             let forbiddenInOffsetIndexString = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
             let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
             
-            // Timing (milliseconds)
+            // Timing (microseconds)
             let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
             let rTiming = timingDictionary[requiredTimeDiffKey]
             let fTiming = timingDictionary[forbiddenTimeDiffKey]
@@ -1201,10 +1235,10 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 { self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!) }
                 
                 if allFeaturesTrainAllowedTiming != nil
-                { self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!) }
+                { self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!/1000) }
                 
                 if allFeaturesTrainBlockedTiming != nil
-                { self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!) }
+                { self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!/1000) }
 
                 self.allAllowedTLS = allFeaturesTrainAllowedTLS ?? "--"
                 self.allBlockedTLS = allFeaturesTrainBlockedTLS ?? "--"
@@ -1230,7 +1264,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
                 self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
                 
-                // Timing (milliseconds)
+                // Timing (microseconds displayed in milliseconds)
                 self.requiredTiming = "--"
                 self.forbiddenTiming = "--"
                 self.timeTAcc = "--"
@@ -1238,10 +1272,10 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 self.timeEAcc = "--"
                 
                 if rTiming != nil
-                { self.requiredTiming = String(format: "%.2f", rTiming!) + "ms" }
+                { self.requiredTiming = String(format: "%.2f", rTiming!/1000) + "ms" }
                 
                 if fTiming != nil
-                { self.forbiddenTiming = String(format: "%.2f", fTiming!) + "ms" }
+                { self.forbiddenTiming = String(format: "%.2f", fTiming!/1000) + "ms" }
                 
                 if timeDiffTAcc != nil
                 { self.timeTAcc = String(format: "%.2f", timeDiffTAcc!) }

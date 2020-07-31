@@ -39,30 +39,25 @@
 		AE0BC8D5226FAC6500AD89E7 /* CheckRedisServerPortScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */; };
 		AE0BC8D72273831500AD89E7 /* KillRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8D62273831500AD89E7 /* KillRedisServerScript.sh */; };
 		AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
+		AE0FAAF724D08F1C00947C10 /* Expressible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FA324B50A9F007F0075 /* Expressible.framework */; };
+		AE0FAAF824D08F1C00947C10 /* Expressible.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FA324B50A9F007F0075 /* Expressible.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AE0FAAF924D08F3A00947C10 /* Symphony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; };
+		AE0FAAFA24D08F3A00947C10 /* Symphony.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
 		AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */; };
 		AE435EFE24B3DA12007F0075 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF124B3D921007F0075 /* Charts.framework */; };
 		AE435EFF24B3DA12007F0075 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF124B3D921007F0075 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE435F0024B3DA19007F0075 /* Rethink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF524B3D921007F0075 /* Rethink.framework */; };
-		AE435F0124B3DA19007F0075 /* Rethink.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF524B3D921007F0075 /* Rethink.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE435F0224B3DA1F007F0075 /* ZIPFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF924B3D921007F0075 /* ZIPFoundation.framework */; };
 		AE435F0324B3DA1F007F0075 /* ZIPFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF924B3D921007F0075 /* ZIPFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE435F0424B3DA3C007F0075 /* SCRAM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF724B3D921007F0075 /* SCRAM.framework */; };
-		AE435F0524B3DA3C007F0075 /* SCRAM.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF724B3D921007F0075 /* SCRAM.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE435F0624B3DA4E007F0075 /* GCDAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF324B3D921007F0075 /* GCDAsyncSocket.framework */; };
-		AE435F0724B3DA4E007F0075 /* GCDAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF324B3D921007F0075 /* GCDAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE435F0A24B4D570007F0075 /* ConnectionChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F0824B4D570007F0075 /* ConnectionChartViewController.swift */; };
 		AE435F0B24B4D570007F0075 /* ConnectionChartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AE435F0924B4D570007F0075 /* ConnectionChartViewController.xib */; };
 		AE435F0D24B4DD7C007F0075 /* DataProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F0C24B4DD7C007F0075 /* DataProcessing.swift */; };
 		AE435F8324B50A9E007F0075 /* SymphonyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F8224B50A9E007F0075 /* SymphonyController.swift */; };
 		AE43608E24B5310F007F0075 /* RawPacket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608B24B5310F007F0075 /* RawPacket.framework */; };
 		AE43608F24B5310F007F0075 /* RawPacket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608B24B5310F007F0075 /* RawPacket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE43610C24B7D684007F0075 /* Symphony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; };
-		AE43610D24B7D684007F0075 /* Symphony.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE43610E24B7D689007F0075 /* Song.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FAB24B50A9F007F0075 /* Song.framework */; };
 		AE43610F24B7D689007F0075 /* Song.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FAB24B50A9F007F0075 /* Song.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */; };
-		AE5D5DFE23C01AD200C8646B /* RethinkDBController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5D5DFD23C01AD200C8646B /* RethinkDBController.swift */; };
 		AE5D5E6223CD44CB00C8646B /* RethinkPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
@@ -151,6 +146,13 @@
 			remoteGlobalIDString = "Datable::Datable::Product";
 			remoteInfo = Datable;
 		};
+		AE178D6A24D0910B00620B5E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = "Song::Symphony";
+			remoteInfo = Symphony;
+		};
 		AE435EDF24B3D921007F0075 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
@@ -165,40 +167,12 @@
 			remoteGlobalIDString = "Charts::Charts::Product";
 			remoteInfo = Charts;
 		};
-		AE435EF224B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Rethink::GCDAsyncSocket::Product";
-			remoteInfo = GCDAsyncSocket;
-		};
-		AE435EF424B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Rethink::Rethink::Product";
-			remoteInfo = Rethink;
-		};
-		AE435EF624B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Rethink::SCRAM::Product";
-			remoteInfo = SCRAM;
-		};
 		AE435EF824B3D921007F0075 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = "ZIPFoundation::ZIPFoundation::Product";
 			remoteInfo = ZIPFoundation;
-		};
-		AE435EFA24B3D954007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "Rethink::Rethink";
-			remoteInfo = Rethink;
 		};
 		AE435EFC24B3D967007F0075 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -294,17 +268,15 @@
 			dstSubfolderSpec = 10;
 			files = (
 				468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */,
-				AE435F0524B3DA3C007F0075 /* SCRAM.framework in Embed Frameworks */,
-				AE435F0724B3DA4E007F0075 /* GCDAsyncSocket.framework in Embed Frameworks */,
+				AE0FAAF824D08F1C00947C10 /* Expressible.framework in Embed Frameworks */,
 				AEBC575A2411E15A00D9BFB0 /* libswiftCreateML.dylib in Embed Frameworks */,
-				AE435F0124B3DA19007F0075 /* Rethink.framework in Embed Frameworks */,
 				AE43610F24B7D689007F0075 /* Song.framework in Embed Frameworks */,
-				AE43610D24B7D684007F0075 /* Symphony.framework in Embed Frameworks */,
 				AE435EFF24B3DA12007F0075 /* Charts.framework in Embed Frameworks */,
 				468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */,
 				468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */,
 				AE435F0324B3DA1F007F0075 /* ZIPFoundation.framework in Embed Frameworks */,
 				AE43608F24B5310F007F0075 /* RawPacket.framework in Embed Frameworks */,
+				AE0FAAFA24D08F3A00947C10 /* Symphony.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -365,7 +337,6 @@
 		AE435F8224B50A9E007F0075 /* SymphonyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymphonyController.swift; sourceTree = "<group>"; };
 		AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = exampleData.csv; sourceTree = "<group>"; };
 		AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllFeatures.swift; sourceTree = "<group>"; };
-		AE5D5DFD23C01AD200C8646B /* RethinkDBController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RethinkDBController.swift; sourceTree = "<group>"; };
 		AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RethinkPacket.swift; sourceTree = "<group>"; };
 		AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketLengthsCoreML.swift; sourceTree = "<group>"; };
 		AE85902D2253E178003B21C0 /* TimingCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingCoreML.swift; sourceTree = "<group>"; };
@@ -387,15 +358,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AECAD6A62491417C00142C4C /* Datable.framework in Frameworks */,
+				AE0FAAF924D08F3A00947C10 /* Symphony.framework in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE435F0224B3DA1F007F0075 /* ZIPFoundation.framework in Frameworks */,
-				AE435F0024B3DA19007F0075 /* Rethink.framework in Frameworks */,
-				AE435F0624B3DA4E007F0075 /* GCDAsyncSocket.framework in Frameworks */,
 				AE43608E24B5310F007F0075 /* RawPacket.framework in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
-				AE43610C24B7D684007F0075 /* Symphony.framework in Frameworks */,
-				AE435F0424B3DA3C007F0075 /* SCRAM.framework in Frameworks */,
 				AE43610E24B7D689007F0075 /* Song.framework in Frameworks */,
+				AE0FAAF724D08F1C00947C10 /* Expressible.framework in Frameworks */,
 				AE435EFE24B3DA12007F0075 /* Charts.framework in Frameworks */,
 				468B26482023C092000A2B5D /* RedShot.framework in Frameworks */,
 				AEBC57592411E15A00D9BFB0 /* libswiftCreateML.dylib in Frameworks */,
@@ -436,7 +405,6 @@
 				46175B74202D2CDE009311D6 /* ConnectionInspector.swift */,
 				460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */,
 				AED8490522B8465000998CC6 /* OperatorReportController.swift */,
-				AE5D5DFD23C01AD200C8646B /* RethinkDBController.swift */,
 				AE435F0C24B4DD7C007F0075 /* DataProcessing.swift */,
 				AE435F8224B50A9E007F0075 /* SymphonyController.swift */,
 			);
@@ -555,13 +523,10 @@
 				46D8512F201FE4B50052DF49 /* Datable.framework */,
 				AE435FA124B50A9F007F0075 /* Diagnostic.framework */,
 				AE435FA324B50A9F007F0075 /* Expressible.framework */,
-				AE435EF324B3D921007F0075 /* GCDAsyncSocket.framework */,
 				AE435FA524B50A9F007F0075 /* Lexer.framework */,
 				AE435FA724B50A9F007F0075 /* Parser.framework */,
 				AE43608B24B5310F007F0075 /* RawPacket.framework */,
 				46D8512D201FE4B50052DF49 /* RedShot.framework */,
-				AE435EF524B3D921007F0075 /* Rethink.framework */,
-				AE435EF724B3D921007F0075 /* SCRAM.framework */,
 				AE435FA924B50A9F007F0075 /* Sema.framework */,
 				AE435FAB24B50A9F007F0075 /* Song.framework */,
 				AE435FAD24B50A9F007F0075 /* Source.framework */,
@@ -632,8 +597,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				AE178D6B24D0910B00620B5E /* PBXTargetDependency */,
 				AE435EFD24B3D967007F0075 /* PBXTargetDependency */,
-				AE435EFB24B3D954007F0075 /* PBXTargetDependency */,
 				AE435EE024B3D921007F0075 /* PBXTargetDependency */,
 				468B26472023C082000A2B5D /* PBXTargetDependency */,
 				468B264B2023C092000A2B5D /* PBXTargetDependency */,
@@ -749,7 +714,7 @@
 		};
 		46D85129201FE4B50052DF49 /* AdversaryLabSwiftPackage */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
+			fileType = text;
 			path = AdversaryLabSwiftPackage;
 			remoteRef = 46D85128201FE4B50052DF49 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -780,27 +745,6 @@
 			fileType = wrapper.framework;
 			path = Charts.framework;
 			remoteRef = AE435EF024B3D921007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435EF324B3D921007F0075 /* GCDAsyncSocket.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = GCDAsyncSocket.framework;
-			remoteRef = AE435EF224B3D921007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435EF524B3D921007F0075 /* Rethink.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Rethink.framework;
-			remoteRef = AE435EF424B3D921007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435EF724B3D921007F0075 /* SCRAM.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = SCRAM.framework;
-			remoteRef = AE435EF624B3D921007F0075 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		AE435EF924B3D921007F0075 /* ZIPFoundation.framework */ = {
@@ -936,7 +880,6 @@
 				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,
 				AE435F0A24B4D570007F0075 /* ConnectionChartViewController.swift in Sources */,
 				462E73A72091421400C59B80 /* ProgressBot.swift in Sources */,
-				AE5D5DFE23C01AD200C8646B /* RethinkDBController.swift in Sources */,
 				AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */,
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
@@ -1008,15 +951,15 @@
 			name = Datable;
 			targetProxy = 468B264E2023C099000A2B5D /* PBXContainerItemProxy */;
 		};
+		AE178D6B24D0910B00620B5E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Symphony;
+			targetProxy = AE178D6A24D0910B00620B5E /* PBXContainerItemProxy */;
+		};
 		AE435EE024B3D921007F0075 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Charts;
 			targetProxy = AE435EDF24B3D921007F0075 /* PBXContainerItemProxy */;
-		};
-		AE435EFB24B3D954007F0075 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Rethink;
-			targetProxy = AE435EFA24B3D954007F0075 /* PBXContainerItemProxy */;
 		};
 		AE435EFD24B3D967007F0075 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
