@@ -301,11 +301,11 @@ class MLModelController
             currentTable = currentTable.suffix(currentTable.rows.count - 1)
             
             // This is an allowed Row
-            if currentRow?[ColumnLabel.classification.rawValue][0] == ClassificationLabel.allowed.rawValue
+            if currentRow?[ColumnLabel.classification.rawValue][0] == ClassificationLabel.transportA.rawValue
             {
                 allowedTable = currentRow
             }
-            else if currentRow?[ColumnLabel.classification.rawValue][0] == ClassificationLabel.blocked.rawValue
+            else if currentRow?[ColumnLabel.classification.rawValue][0] == ClassificationLabel.transportB.rawValue
             {
                 blockedTable = currentRow
             }

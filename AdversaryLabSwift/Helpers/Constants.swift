@@ -311,8 +311,8 @@ enum PacketTimingError: Error
 
 enum ClassificationLabel: String
 {
-    case allowed = "allowed"
-    case blocked = "blocked"
+    case transportA = "transportA"
+    case transportB = "transportB"
 }
 
 enum ColumnLabel: String

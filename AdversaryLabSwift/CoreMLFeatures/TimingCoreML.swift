@@ -71,11 +71,11 @@ class TimingCoreML
             return
         }
         
-        testModel(connectionType: .blocked, timeDifferences: blockedTimeDifferences, configModel: configModel)
+        testModel(connectionType: .transportB, timeDifferences: blockedTimeDifferences, configModel: configModel)
         
         if allowedTimeDifferences.count > 0
         {
-            testModel(connectionType: .allowed, timeDifferences: allowedTimeDifferences, configModel: configModel)
+            testModel(connectionType: .transportA, timeDifferences: allowedTimeDifferences, configModel: configModel)
         }
     }
     
@@ -86,10 +86,10 @@ class TimingCoreML
         
         switch connectionType
         {
-        case .allowed:
+        case .transportA:
             accuracyKey = allowedTimingAccuracyKey
             timingKey = allowedTimingKey
-        case .blocked:
+        case .transportB:
             accuracyKey = blockedTimingAccuracyKey
             timingKey = blockedTimingKey
         }
@@ -320,7 +320,7 @@ class TimingCoreML
             }
             
             timeDifferenceList.append(aTimeDifference)
-            classificationLabels.append(ClassificationLabel.allowed.rawValue)
+            classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         /// TimeDifferences for the Blocked traffic
@@ -335,7 +335,7 @@ class TimingCoreML
             }
             
             timeDifferenceList.append(bTimeDifference)
-            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }
         
         return (timeDifferenceList, classificationLabels)

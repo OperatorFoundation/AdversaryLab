@@ -99,7 +99,7 @@ class TLS12CoreML
         {
             let tlsName = allowedTLSArray[tlsIndex]
             allTLSNames.append(tlsName)
-            classificationLabels.append(ClassificationLabel.allowed.rawValue)
+            classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         /// B is the sorted set of TLS names for the Blocked traffic
@@ -110,7 +110,7 @@ class TLS12CoreML
         {
             let tlsName = blockedTLSArray[tlsIndex]
             allTLSNames.append(tlsName)
-            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }
         
         return (allTLSNames, classificationLabels)
@@ -128,12 +128,12 @@ class TLS12CoreML
             print("\nUnable to test TLS names. Blocked names list is empty.")
             return
         }
-        testModel(connectionType: .blocked, tlsNames: blockedTLSNames, modelName: name)
+        testModel(connectionType: .transportB, tlsNames: blockedTLSNames, modelName: name)
         
         // Allowed
         let allowedTLSNamesSet: RSortedSet<String> = RSortedSet(key: allowedTlsCommonNameKey)
         let allowedTLSNames = newStringArray(from: [allowedTLSNamesSet])
-        testModel(connectionType: .allowed, tlsNames: allowedTLSNames, modelName: name)
+        testModel(connectionType: .transportA, tlsNames: allowedTLSNames, modelName: name)
     }
     
     func testModel(connectionType: ClassificationLabel, tlsNames: [String], modelName: String)
@@ -143,10 +143,10 @@ class TLS12CoreML
         
         switch connectionType
         {
-        case .allowed:
+        case .transportA:
             accuracyKey = allowedTLSAccuracyKey
             tlsKey = allowedTLSKey
-        case .blocked:
+        case .transportB:
             accuracyKey = blockedTLSAccuracyKey
             tlsKey =  blockedTLSKey
         }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -25,11 +25,6 @@
 		4651A16F20083BF700037D31 /* AdversaryLabSwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A16E20083BF700037D31 /* AdversaryLabSwiftUITests.swift */; };
 		4651A1A82009403800037D31 /* AdversaryLabSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A1A72009403800037D31 /* AdversaryLabSwiftTests.swift */; };
 		467E493A2017F166008B19E3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467E49392017F166008B19E3 /* Constants.swift */; };
-		468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512B201FE4B50052DF49 /* Auburn.framework */; settings = {ATTRIBUTES = (Required, ); }; };
-		468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512B201FE4B50052DF49 /* Auburn.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		468B26482023C092000A2B5D /* RedShot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; };
-		468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512D201FE4B50052DF49 /* RedShot.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
 		46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */ = {isa = PBXBuildFile; fileRef = 46CD66032093B100009E1141 /* AdversaryLabClient */; };
 		5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */; };
@@ -39,24 +34,21 @@
 		AE0BC8D5226FAC6500AD89E7 /* CheckRedisServerPortScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */; };
 		AE0BC8D72273831500AD89E7 /* KillRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8D62273831500AD89E7 /* KillRedisServerScript.sh */; };
 		AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8DE2280923E00AD89E7 /* Security.framework */; };
-		AE0FAAF724D08F1C00947C10 /* Expressible.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FA324B50A9F007F0075 /* Expressible.framework */; };
-		AE0FAAF824D08F1C00947C10 /* Expressible.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FA324B50A9F007F0075 /* Expressible.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE0FAAF924D08F3A00947C10 /* Symphony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; };
-		AE0FAAFA24D08F3A00947C10 /* Symphony.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608D24B5310F007F0075 /* Symphony.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AE17917624D9FFA300620B5E /* PacketLengths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17917524D9FFA300620B5E /* PacketLengths.swift */; };
+		AE17920624DCC53800620B5E /* RawPacket in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920524DCC53800620B5E /* RawPacket */; };
+		AE17920924DCC55F00620B5E /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920824DCC55F00620B5E /* ZIPFoundation */; };
+		AE17920C24DCC5AB00620B5E /* Symphony in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920B24DCC5AB00620B5E /* Symphony */; };
+		AE17920E24DCC5AB00620B5E /* Song in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920D24DCC5AB00620B5E /* Song */; };
+		AE17921124DCC5CE00620B5E /* Auburn in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921024DCC5CE00620B5E /* Auburn */; };
+		AE17921424DCC5E900620B5E /* Datable in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921324DCC5E900620B5E /* Datable */; };
+		AE17921724DCC61500620B5E /* Abacus in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921624DCC61500620B5E /* Abacus */; };
+		AE17921A24DCC67A00620B5E /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921924DCC67A00620B5E /* Charts */; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
 		AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */; };
-		AE435EFE24B3DA12007F0075 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF124B3D921007F0075 /* Charts.framework */; };
-		AE435EFF24B3DA12007F0075 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF124B3D921007F0075 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE435F0224B3DA1F007F0075 /* ZIPFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF924B3D921007F0075 /* ZIPFoundation.framework */; };
-		AE435F0324B3DA1F007F0075 /* ZIPFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435EF924B3D921007F0075 /* ZIPFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE435F0A24B4D570007F0075 /* ConnectionChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F0824B4D570007F0075 /* ConnectionChartViewController.swift */; };
 		AE435F0B24B4D570007F0075 /* ConnectionChartViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AE435F0924B4D570007F0075 /* ConnectionChartViewController.xib */; };
 		AE435F0D24B4DD7C007F0075 /* DataProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F0C24B4DD7C007F0075 /* DataProcessing.swift */; };
 		AE435F8324B50A9E007F0075 /* SymphonyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE435F8224B50A9E007F0075 /* SymphonyController.swift */; };
-		AE43608E24B5310F007F0075 /* RawPacket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608B24B5310F007F0075 /* RawPacket.framework */; };
-		AE43608F24B5310F007F0075 /* RawPacket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE43608B24B5310F007F0075 /* RawPacket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AE43610E24B7D689007F0075 /* Song.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FAB24B50A9F007F0075 /* Song.framework */; };
-		AE43610F24B7D689007F0075 /* Song.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AE435FAB24B50A9F007F0075 /* Song.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */; };
 		AE5D5E6223CD44CB00C8646B /* RethinkPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
@@ -67,7 +59,6 @@
 		AEBC57592411E15A00D9BFB0 /* libswiftCreateML.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AEBC57582411E15A00D9BFB0 /* libswiftCreateML.dylib */; };
 		AEBC575A2411E15A00D9BFB0 /* libswiftCreateML.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AEBC57582411E15A00D9BFB0 /* libswiftCreateML.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AEC00A2423733A0800E5582B /* ConnectionGroupData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */; };
-		AECAD6A62491417C00142C4C /* Datable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46D8512F201FE4B50052DF49 /* Datable.framework */; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
 		AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AFE228FBE8C009698CC /* Alerts.swift */; };
 		CA727CD42050A3580051A01B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CA727CD32050A3580051A01B /* README.md */; };
@@ -90,174 +81,6 @@
 			remoteGlobalIDString = 4651A14C20083BF700037D31;
 			remoteInfo = AdversaryLabSwift;
 		};
-		468B26462023C082000A2B5D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "Auburn::Auburn";
-			remoteInfo = Auburn;
-		};
-		468B264A2023C092000A2B5D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "RedShot::RedShot";
-			remoteInfo = RedShot;
-		};
-		468B264E2023C099000A2B5D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "Datable::Datable";
-			remoteInfo = Datable;
-		};
-		46D85126201FE4B50052DF49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "AdversaryLabSwiftPackage::AdversaryLabSwiftPackageTests::Product";
-			remoteInfo = AdversaryLabSwiftPackageTests;
-		};
-		46D85128201FE4B50052DF49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "AdversaryLabSwiftPackage::AdversaryLabSwiftPackage::Product";
-			remoteInfo = AdversaryLabSwiftPackage;
-		};
-		46D8512A201FE4B50052DF49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Auburn::Auburn::Product";
-			remoteInfo = Auburn;
-		};
-		46D8512C201FE4B50052DF49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "RedShot::RedShot::Product";
-			remoteInfo = RedShot;
-		};
-		46D8512E201FE4B50052DF49 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Datable::Datable::Product";
-			remoteInfo = Datable;
-		};
-		AE178D6A24D0910B00620B5E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "Song::Symphony";
-			remoteInfo = Symphony;
-		};
-		AE435EDF24B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "Charts::Charts";
-			remoteInfo = Charts;
-		};
-		AE435EF024B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Charts::Charts::Product";
-			remoteInfo = Charts;
-		};
-		AE435EF824B3D921007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "ZIPFoundation::ZIPFoundation::Product";
-			remoteInfo = ZIPFoundation;
-		};
-		AE435EFC24B3D967007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = "ZIPFoundation::ZIPFoundation";
-			remoteInfo = ZIPFoundation;
-		};
-		AE435F9C24B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::AST::Product";
-			remoteInfo = AST;
-		};
-		AE435F9E24B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Bocho::Product";
-			remoteInfo = Bocho;
-		};
-		AE435FA024B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Diagnostic::Product";
-			remoteInfo = Diagnostic;
-		};
-		AE435FA224B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Song::Expressible::Product";
-			remoteInfo = Expressible;
-		};
-		AE435FA424B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Lexer::Product";
-			remoteInfo = Lexer;
-		};
-		AE435FA624B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Parser::Product";
-			remoteInfo = Parser;
-		};
-		AE435FA824B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Sema::Product";
-			remoteInfo = Sema;
-		};
-		AE435FAA24B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Song::Song::Product";
-			remoteInfo = Song;
-		};
-		AE435FAC24B50A9F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "swift-ast::Source::Product";
-			remoteInfo = Source;
-		};
-		AE43608A24B5310F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "AdversaryLabClientSwift::RawPacket::Product";
-			remoteInfo = RawPacket;
-		};
-		AE43608C24B5310F007F0075 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = "Song::Symphony::Product";
-			remoteInfo = Symphony;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -267,16 +90,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				468B26492023C092000A2B5D /* RedShot.framework in Embed Frameworks */,
-				AE0FAAF824D08F1C00947C10 /* Expressible.framework in Embed Frameworks */,
 				AEBC575A2411E15A00D9BFB0 /* libswiftCreateML.dylib in Embed Frameworks */,
-				AE43610F24B7D689007F0075 /* Song.framework in Embed Frameworks */,
-				AE435EFF24B3DA12007F0075 /* Charts.framework in Embed Frameworks */,
-				468B264D2023C099000A2B5D /* Datable.framework in Embed Frameworks */,
-				468B26452023C082000A2B5D /* Auburn.framework in Embed Frameworks */,
-				AE435F0324B3DA1F007F0075 /* ZIPFoundation.framework in Embed Frameworks */,
-				AE43608F24B5310F007F0075 /* RawPacket.framework in Embed Frameworks */,
-				AE0FAAFA24D08F3A00947C10 /* Symphony.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -293,7 +107,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AdversaryLabSwiftPackage.xcodeproj; path = ../AdversaryLabSwiftPackage/AdversaryLabSwiftPackage.xcodeproj; sourceTree = "<group>"; };
 		460CF7D220758D2C00FB3723 /* redis-server */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "redis-server"; sourceTree = "<group>"; };
 		460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedisServerController.swift; sourceTree = "<group>"; };
 		460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = LaunchRedisServerScript.sh; sourceTree = "<group>"; };
@@ -329,6 +142,7 @@
 		AE0BC8D62273831500AD89E7 /* KillRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = KillRedisServerScript.sh; sourceTree = "<group>"; };
 		AE0BC8DE2280923E00AD89E7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AE0BC8E12280941900AD89E7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		AE17917524D9FFA300620B5E /* PacketLengths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketLengths.swift; sourceTree = "<group>"; };
 		AE1AC6F92258020500555456 /* MLModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLModelController.swift; sourceTree = "<group>"; };
 		AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequencesCoreML.swift; sourceTree = "<group>"; };
 		AE435F0824B4D570007F0075 /* ConnectionChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionChartViewController.swift; sourceTree = "<group>"; };
@@ -357,18 +171,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AECAD6A62491417C00142C4C /* Datable.framework in Frameworks */,
-				AE0FAAF924D08F3A00947C10 /* Symphony.framework in Frameworks */,
+				AE17921424DCC5E900620B5E /* Datable in Frameworks */,
+				AE17920624DCC53800620B5E /* RawPacket in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
-				AE435F0224B3DA1F007F0075 /* ZIPFoundation.framework in Frameworks */,
-				AE43608E24B5310F007F0075 /* RawPacket.framework in Frameworks */,
+				AE17921724DCC61500620B5E /* Abacus in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
-				AE43610E24B7D689007F0075 /* Song.framework in Frameworks */,
-				AE0FAAF724D08F1C00947C10 /* Expressible.framework in Frameworks */,
-				AE435EFE24B3DA12007F0075 /* Charts.framework in Frameworks */,
-				468B26482023C092000A2B5D /* RedShot.framework in Frameworks */,
+				AE17921124DCC5CE00620B5E /* Auburn in Frameworks */,
+				AE17920C24DCC5AB00620B5E /* Symphony in Frameworks */,
+				AE17920E24DCC5AB00620B5E /* Song in Frameworks */,
+				AE17921A24DCC67A00620B5E /* Charts in Frameworks */,
 				AEBC57592411E15A00D9BFB0 /* libswiftCreateML.dylib in Frameworks */,
-				468B26412023BBB6000A2B5D /* Auburn.framework in Frameworks */,
+				AE17920924DCC55F00620B5E /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,13 +239,13 @@
 		4651A14420083BF700037D31 = {
 			isa = PBXGroup;
 			children = (
-				AE0BC8D822739B5600AD89E7 /* Scripts */,
-				AE0BC8D922739BB800AD89E7 /* Executables */,
 				CA727CD32050A3580051A01B /* README.md */,
 				460CF7E92076EB0800FB3723 /* redis.conf */,
-				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
+				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A16D20083BF700037D31 /* AdversaryLabSwiftUITests */,
+				AE0BC8D822739B5600AD89E7 /* Scripts */,
+				AE0BC8D922739BB800AD89E7 /* Executables */,
 				4651A14E20083BF700037D31 /* Products */,
 				468B26402023BBB6000A2B5D /* Frameworks */,
 			);
@@ -457,7 +270,6 @@
 				46175B76202D2DBE009311D6 /* Helpers */,
 				46175B6020253F33009311D6 /* Controllers */,
 				468B26502023CFF8000A2B5D /* Models */,
-				46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */,
 				4651A15020083BF700037D31 /* AppDelegate.swift */,
 				4651A15220083BF700037D31 /* ViewController.swift */,
 				AE435F0824B4D570007F0075 /* ConnectionChartViewController.swift */,
@@ -507,33 +319,9 @@
 				5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */,
 				AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */,
 				AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */,
+				AE17917524D9FFA300620B5E /* PacketLengths.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		46D8511A201FE4B50052DF49 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				AE435F9D24B50A9F007F0075 /* AST.framework */,
-				46D85129201FE4B50052DF49 /* AdversaryLabSwiftPackage */,
-				46D85127201FE4B50052DF49 /* AdversaryLabSwiftPackageTests.xctest */,
-				46D8512B201FE4B50052DF49 /* Auburn.framework */,
-				AE435F9F24B50A9F007F0075 /* Bocho.framework */,
-				AE435EF124B3D921007F0075 /* Charts.framework */,
-				46D8512F201FE4B50052DF49 /* Datable.framework */,
-				AE435FA124B50A9F007F0075 /* Diagnostic.framework */,
-				AE435FA324B50A9F007F0075 /* Expressible.framework */,
-				AE435FA524B50A9F007F0075 /* Lexer.framework */,
-				AE435FA724B50A9F007F0075 /* Parser.framework */,
-				AE43608B24B5310F007F0075 /* RawPacket.framework */,
-				46D8512D201FE4B50052DF49 /* RedShot.framework */,
-				AE435FA924B50A9F007F0075 /* Sema.framework */,
-				AE435FAB24B50A9F007F0075 /* Song.framework */,
-				AE435FAD24B50A9F007F0075 /* Source.framework */,
-				AE43608D24B5310F007F0075 /* Symphony.framework */,
-				AE435EF924B3D921007F0075 /* ZIPFoundation.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		AE0BC8D822739B5600AD89E7 /* Scripts */ = {
@@ -597,15 +385,17 @@
 			buildRules = (
 			);
 			dependencies = (
-				AE178D6B24D0910B00620B5E /* PBXTargetDependency */,
-				AE435EFD24B3D967007F0075 /* PBXTargetDependency */,
-				AE435EE024B3D921007F0075 /* PBXTargetDependency */,
-				468B26472023C082000A2B5D /* PBXTargetDependency */,
-				468B264B2023C092000A2B5D /* PBXTargetDependency */,
-				468B264F2023C099000A2B5D /* PBXTargetDependency */,
 			);
 			name = AdversaryLabSwift;
 			packageProductDependencies = (
+				AE17920524DCC53800620B5E /* RawPacket */,
+				AE17920824DCC55F00620B5E /* ZIPFoundation */,
+				AE17920B24DCC5AB00620B5E /* Symphony */,
+				AE17920D24DCC5AB00620B5E /* Song */,
+				AE17921024DCC5CE00620B5E /* Auburn */,
+				AE17921324DCC5E900620B5E /* Datable */,
+				AE17921624DCC61500620B5E /* Abacus */,
+				AE17921924DCC67A00620B5E /* Charts */,
 			);
 			productName = AdversaryLabSwift;
 			productReference = 4651A14D20083BF700037D31 /* AdversaryLabSwift.app */;
@@ -686,15 +476,16 @@
 			);
 			mainGroup = 4651A14420083BF700037D31;
 			packageReferences = (
+				AE17920424DCC53800620B5E /* XCRemoteSwiftPackageReference "AdversaryLabClientSwift" */,
+				AE17920724DCC55F00620B5E /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */,
+				AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */,
+				AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */,
+				AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */,
+				AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */,
 			);
 			productRefGroup = 4651A14E20083BF700037D31 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 46D8511A201FE4B50052DF49 /* Products */;
-					ProjectRef = 46037C7A200FDB5100FC368F /* AdversaryLabSwiftPackage.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				4651A14C20083BF700037D31 /* AdversaryLabSwift */,
@@ -703,135 +494,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		46D85127201FE4B50052DF49 /* AdversaryLabSwiftPackageTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = file;
-			path = AdversaryLabSwiftPackageTests.xctest;
-			remoteRef = 46D85126201FE4B50052DF49 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		46D85129201FE4B50052DF49 /* AdversaryLabSwiftPackage */ = {
-			isa = PBXReferenceProxy;
-			fileType = text;
-			path = AdversaryLabSwiftPackage;
-			remoteRef = 46D85128201FE4B50052DF49 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		46D8512B201FE4B50052DF49 /* Auburn.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Auburn.framework;
-			remoteRef = 46D8512A201FE4B50052DF49 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		46D8512D201FE4B50052DF49 /* RedShot.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = RedShot.framework;
-			remoteRef = 46D8512C201FE4B50052DF49 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		46D8512F201FE4B50052DF49 /* Datable.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Datable.framework;
-			remoteRef = 46D8512E201FE4B50052DF49 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435EF124B3D921007F0075 /* Charts.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Charts.framework;
-			remoteRef = AE435EF024B3D921007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435EF924B3D921007F0075 /* ZIPFoundation.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = ZIPFoundation.framework;
-			remoteRef = AE435EF824B3D921007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435F9D24B50A9F007F0075 /* AST.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = AST.framework;
-			remoteRef = AE435F9C24B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435F9F24B50A9F007F0075 /* Bocho.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Bocho.framework;
-			remoteRef = AE435F9E24B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FA124B50A9F007F0075 /* Diagnostic.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Diagnostic.framework;
-			remoteRef = AE435FA024B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FA324B50A9F007F0075 /* Expressible.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Expressible.framework;
-			remoteRef = AE435FA224B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FA524B50A9F007F0075 /* Lexer.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Lexer.framework;
-			remoteRef = AE435FA424B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FA724B50A9F007F0075 /* Parser.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Parser.framework;
-			remoteRef = AE435FA624B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FA924B50A9F007F0075 /* Sema.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Sema.framework;
-			remoteRef = AE435FA824B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FAB24B50A9F007F0075 /* Song.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Song.framework;
-			remoteRef = AE435FAA24B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE435FAD24B50A9F007F0075 /* Source.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Source.framework;
-			remoteRef = AE435FAC24B50A9F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE43608B24B5310F007F0075 /* RawPacket.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = RawPacket.framework;
-			remoteRef = AE43608A24B5310F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		AE43608D24B5310F007F0075 /* Symphony.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Symphony.framework;
-			remoteRef = AE43608C24B5310F007F0075 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4651A14B20083BF700037D31 /* Resources */ = {
@@ -900,6 +562,7 @@
 				AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */,
 				AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
+				AE17917624D9FFA300620B5E /* PacketLengths.swift in Sources */,
 				5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */,
 				CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */,
 				46175B7C202D46AF009311D6 /* Sequences.swift in Sources */,
@@ -935,36 +598,6 @@
 			isa = PBXTargetDependency;
 			target = 4651A14C20083BF700037D31 /* AdversaryLabSwift */;
 			targetProxy = 4651A16B20083BF700037D31 /* PBXContainerItemProxy */;
-		};
-		468B26472023C082000A2B5D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Auburn;
-			targetProxy = 468B26462023C082000A2B5D /* PBXContainerItemProxy */;
-		};
-		468B264B2023C092000A2B5D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = RedShot;
-			targetProxy = 468B264A2023C092000A2B5D /* PBXContainerItemProxy */;
-		};
-		468B264F2023C099000A2B5D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Datable;
-			targetProxy = 468B264E2023C099000A2B5D /* PBXContainerItemProxy */;
-		};
-		AE178D6B24D0910B00620B5E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Symphony;
-			targetProxy = AE178D6A24D0910B00620B5E /* PBXContainerItemProxy */;
-		};
-		AE435EE024B3D921007F0075 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Charts;
-			targetProxy = AE435EDF24B3D921007F0075 /* PBXContainerItemProxy */;
-		};
-		AE435EFD24B3D967007F0075 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = ZIPFoundation;
-			targetProxy = AE435EFC24B3D967007F0075 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1092,7 +725,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -1107,7 +741,11 @@
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1126,7 +764,11 @@
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = AdversaryLabSwift/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1144,7 +786,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1163,7 +809,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1180,7 +830,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1196,7 +850,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 67Y4NSLDQ3;
 				INFOPLIST_FILE = AdversaryLabSwiftUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.operatorFoundation.AdversaryLabSwiftUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1244,6 +902,108 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AE17920424DCC53800620B5E /* XCRemoteSwiftPackageReference "AdversaryLabClientSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.3;
+			};
+		};
+		AE17920724DCC55F00620B5E /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.11;
+			};
+		};
+		AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Song.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.23;
+			};
+		};
+		AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Auburn.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.2;
+			};
+		};
+		AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Datable.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.2;
+			};
+		};
+		AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Abacus.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielgindi/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AE17920524DCC53800620B5E /* RawPacket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17920424DCC53800620B5E /* XCRemoteSwiftPackageReference "AdversaryLabClientSwift" */;
+			productName = RawPacket;
+		};
+		AE17920824DCC55F00620B5E /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17920724DCC55F00620B5E /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		AE17920B24DCC5AB00620B5E /* Symphony */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */;
+			productName = Symphony;
+		};
+		AE17920D24DCC5AB00620B5E /* Song */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */;
+			productName = Song;
+		};
+		AE17921024DCC5CE00620B5E /* Auburn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */;
+			productName = Auburn;
+		};
+		AE17921324DCC5E900620B5E /* Datable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */;
+			productName = Datable;
+		};
+		AE17921624DCC61500620B5E /* Abacus */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */;
+			productName = Abacus;
+		};
+		AE17921924DCC67A00620B5E /* Charts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = Charts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4651A14520083BF700037D31 /* Project object */;
 }

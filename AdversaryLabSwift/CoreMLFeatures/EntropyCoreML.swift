@@ -152,7 +152,7 @@ class EntropyCoreML
         {
             let aEntropy = allowedEntropyList[entropyIndex]
             entropyList.append(aEntropy)
-            classificationLabels.append(ClassificationLabel.allowed.rawValue)
+            classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         /// Blocked traffic
@@ -161,7 +161,7 @@ class EntropyCoreML
         {
             let bEntropy = blockedEntropyList[entropyIndex]
             entropyList.append(bEntropy)
-            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }
         
         return (entropyList, classificationLabels)
@@ -179,10 +179,10 @@ class EntropyCoreML
         }
         
         // Allowed
-        testModel(entropyList: allowedEntropyList, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(entropyList: allowedEntropyList, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
         
         // Blocked
-        testModel(entropyList: blockedEntropyList, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(entropyList: blockedEntropyList, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
     }
     
     func testModel(entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
@@ -199,10 +199,10 @@ class EntropyCoreML
             entropyRegressorName = outEntropyRegressorName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedOutgoingEntropyAccuracyKey
                 entropyKey = allowedOutgoingEntropyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedOutgoingEntropyAccuracyKey
                 entropyKey = blockedOutgoingEntropyKey
             }
@@ -211,10 +211,10 @@ class EntropyCoreML
             entropyRegressorName = inEntropyRegressorName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedIncomingEntropyAccuracyKey
                 entropyKey = allowedIncomingEntropyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedIncomingEntropyAccuracyKey
                 entropyKey = blockedIncomingEntropyKey
             }

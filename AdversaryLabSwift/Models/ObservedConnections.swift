@@ -36,7 +36,7 @@ struct ObservedConnection
         self.connectionType = connectionType
         switch connectionType
         {
-            case .allowed:
+            case .transportA:
                 connectionsKey = allowedConnectionsKey
                 incomingKey = allowedIncomingKey
                 outgoingKey = allowedOutgoingKey
@@ -54,7 +54,7 @@ struct ObservedConnection
                 incomingEntropyKey = allowedIncomingEntropyKey
                 outgoingEntropyKey = allowedOutgoingEntropyKey
                 outgoingTlsCommonNameKey = allowedTlsCommonNameKey
-            case .blocked:
+            case .transportB:
                 connectionsKey = blockedConnectionsKey
                 incomingKey = blockedIncomingKey
                 outgoingKey = blockedOutgoingKey

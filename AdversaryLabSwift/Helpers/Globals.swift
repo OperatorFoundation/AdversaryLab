@@ -6,11 +6,18 @@
 //  Copyright © 2019 Operator Foundation. All rights reserved.
 //
 
-import Foundation
 import Cocoa
+import Foundation
+
+import Abacus
 
 var transportA = ""
 var transportB = ""
+
+var packetLengths = PacketLengths(transportAIncoming: SortedMultiset<Int>(sortingStyle: .highFirst),
+                                  transportAOutgoing:SortedMultiset<Int>(sortingStyle: .highFirst),
+                                  transportBIncoming:SortedMultiset<Int>(sortingStyle: .highFirst),
+                                  transportBOutgoing:SortedMultiset<Int>(sortingStyle: .highFirst))
 
 func getAdversarySupportDirectory() -> URL?
 {

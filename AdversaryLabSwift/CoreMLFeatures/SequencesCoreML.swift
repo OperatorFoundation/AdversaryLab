@@ -29,8 +29,8 @@ class SequencesCoreML
                 return
             }
             
-            testFloatModel(floatSequences: allowedFloatSequences, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
-            testFloatModel(floatSequences: blockedFloatSequences, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+            testFloatModel(floatSequences: allowedFloatSequences, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
+            testFloatModel(floatSequences: blockedFloatSequences, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
     
@@ -50,16 +50,16 @@ class SequencesCoreML
                 return
             }
             
-            testOffsetModel(offsetSequences: allowedOffsetSequences, connectionType: .allowed, connectionDirection: connectionDirection, configModel: configModel)
-            testOffsetModel(offsetSequences: blockedOffsetSequences, connectionType: .blocked, connectionDirection: connectionDirection, configModel: configModel)
+            testOffsetModel(offsetSequences: allowedOffsetSequences, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
+            testOffsetModel(offsetSequences: blockedOffsetSequences, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
     
     func createFloatTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
         var floatTable = MLDataTable()
-        let allowedTable = createFloatTable(forConnectionType: .allowed, andDirection: connectionDirection)
-        let blockedTable = createFloatTable(forConnectionType: .blocked, andDirection: connectionDirection)
+        let allowedTable = createFloatTable(forConnectionType: .transportA, andDirection: connectionDirection)
+        let blockedTable = createFloatTable(forConnectionType: .transportB, andDirection: connectionDirection)
         
         floatTable.append(contentsOf: allowedTable)
         floatTable.append(contentsOf: blockedTable)
@@ -70,8 +70,8 @@ class SequencesCoreML
     func createOffsetTable(connectionDirection: ConnectionDirection) -> MLDataTable
     {
         var offsetTable = MLDataTable()
-        let allowedTable = createOffsetTable(forConnectionType: .allowed, andDirection: connectionDirection)
-        let blockedTable = createOffsetTable(forConnectionType: .blocked, andDirection: connectionDirection)
+        let allowedTable = createOffsetTable(forConnectionType: .transportA, andDirection: connectionDirection)
+        let blockedTable = createOffsetTable(forConnectionType: .transportB, andDirection: connectionDirection)
         
         offsetTable.append(contentsOf: allowedTable)
         offsetTable.append(contentsOf: blockedTable)
@@ -96,7 +96,7 @@ class SequencesCoreML
         
         switch connectionType
         {
-        case .allowed:
+        case .transportA:
             connectionsList = RList(key: allowedConnectionsKey)
             switch connectionDirection
             {
@@ -105,7 +105,7 @@ class SequencesCoreML
             case .outgoing:
                 packetsMap = RMap(key: allowedOutgoingKey)
             }
-        case .blocked:
+        case .transportB:
             connectionsList = RList(key: blockedConnectionsKey)
             switch connectionDirection
             {
@@ -169,7 +169,7 @@ class SequencesCoreML
         
         switch connectionType
         {
-        case .allowed:
+        case .transportA:
             connectionsList = RList(key: allowedConnectionsKey)
             switch connectionDirection
             {
@@ -178,7 +178,7 @@ class SequencesCoreML
             case .outgoing:
                 packetsMap = RMap(key: allowedOutgoingKey)
             }
-        case .blocked:
+        case .transportB:
             connectionsList = RList(key: blockedConnectionsKey)
             switch connectionDirection
             {
@@ -234,18 +234,18 @@ class SequencesCoreML
             classifierName = inFloatClassifierName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedIncomingFloatAccuracyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedIncomingFloatAccuracyKey
             }
         case .outgoing:
             classifierName = outFloatClassifierName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedOutgoingFloatAccuracyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedOutgoingFloatAccuracyKey
             }
         }
@@ -324,18 +324,18 @@ class SequencesCoreML
             classifierName = inOffsetClassifierName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedIncomingOffsetAccuracyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedIncomingOffsetAccuracyKey
             }
         case .outgoing:
             classifierName = outOffsetClassifierName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedOutgoingOffsetAccuracyKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedOutgoingOffsetAccuracyKey
             }
         }

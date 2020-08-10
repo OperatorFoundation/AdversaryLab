@@ -80,6 +80,7 @@ func getHighestScoredLength(forConnectionDirection connectionDirection: Connecti
 
 class PacketLengthsCoreML
 {
+    // TODO: Use Song Data and save to our global PacketLengths instance
     func processPacketLengths(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
@@ -102,6 +103,16 @@ class PacketLengthsCoreML
         }
         
         // Increment the score of this particular outgoing packet length
+    
+        // FIXME: Testing Song via global var packetLengths
+        switch connection.connectionType
+        {
+        case .transportA:
+            packetLengths.outgoingA.add(element: outPacket.count)
+        case .transportB:
+            packetLengths.outgoingB.add(element: outPacket.count)
+        }
+        
         let _ = outgoingLengthSet.incrementScore(ofField: outPacket.count, byIncrement: 1)
         
         // Get the in packet that corresponds with this connection ID
@@ -119,6 +130,15 @@ class PacketLengthsCoreML
         }
         
         // Increment the score of this particular incoming packet length
+        // FIXME: Testing Song via global var packetLengths
+        switch connection.connectionType
+        {
+        case .transportA:
+            packetLengths.incomingA.add(element: inPacket.count)
+        case .transportB:
+            packetLengths.incomingB.add(element: inPacket.count)
+        }
+        
         let newInScore = incomingLengthSet.incrementScore(ofField: inPacket.count, byIncrement: 1)
         if newInScore == nil
         {
@@ -166,13 +186,13 @@ class PacketLengthsCoreML
             
             // Allowed
             testModel(lengths: allowedLengths,
-                      connectionType: .allowed,
+                      connectionType: .transportA,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
             
             // Blocked
             testModel(lengths: blockedLengths,
-                      connectionType: .blocked,
+                      connectionType: .transportB,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
         }
@@ -192,10 +212,10 @@ class PacketLengthsCoreML
             recommenderName = inLengthRecommenderName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedIncomingLengthAccuracyKey
                 lengthKey = allowedIncomingLengthKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedIncomingLengthAccuracyKey
                 lengthKey = blockedIncomingLengthKey
             }
@@ -204,10 +224,10 @@ class PacketLengthsCoreML
             recommenderName = outLengthRecommenderName
             switch connectionType
             {
-            case .allowed:
+            case .transportA:
                 accuracyKey = allowedOutgoingLengthAccuracyKey
                 lengthKey = allowedOutgoingLengthKey
-            case .blocked:
+            case .transportB:
                 accuracyKey = blockedOutgoingLengthAccuracyKey
                 lengthKey = blockedOutgoingLengthKey
             }
@@ -244,9 +264,9 @@ class PacketLengthsCoreML
                 
                 switch connectionType
                 {
-                case .allowed:
+                case .transportA:
                     lengthDictionary[lengthKey] = Double(result.allowedLength)
-                case .blocked:
+                case .transportB:
                     lengthDictionary[lengthKey] = Double(result.blockedLength)
                 }
             }
@@ -313,6 +333,7 @@ class PacketLengthsCoreML
     {
         var expandedLengths = [Int]()
         var expandedClassificationLabels = [String]()
+        
         let (lengths, scores, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
         
         for (index, length) in lengths.enumerated()
@@ -461,6 +482,7 @@ class PacketLengthsCoreML
         return (allowedLengthsArray, allowedScoresArray, blockedLengthsArray, blockedScoresArray)
     }
     
+    // TODO: Rewrite this so that it gets the data from our global PacketLengths instance
     func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Double], classifications: [String])
     {
         var lengths = [Int]()
@@ -492,14 +514,14 @@ class PacketLengthsCoreML
         scores.append(contentsOf: allowedLengthScores)
         for _ in allowedLengthsArray
         {
-            classificationLabels.append(ClassificationLabel.allowed.rawValue)
+            classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         lengths.append(contentsOf: blockedLengthsArray)
         scores.append(contentsOf: blockedLengthsScores)
         for _ in blockedLengthsArray
         {
-            classificationLabels.append(ClassificationLabel.blocked.rawValue)
+            classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }
         
         return(lengths, scores, classificationLabels)

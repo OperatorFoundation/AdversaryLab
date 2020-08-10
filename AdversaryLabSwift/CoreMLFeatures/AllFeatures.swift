@@ -32,10 +32,10 @@ class AllFeatures
         else
         {
             // Allowed
-            testModel(connectionType: .allowed, configModel: configModel)
+            testModel(connectionType: .transportA, configModel: configModel)
             
             // Blocked
-            testModel(connectionType: .blocked, configModel: configModel)
+            testModel(connectionType: .transportB, configModel: configModel)
         }
     }
     
@@ -71,10 +71,10 @@ class AllFeatures
         
         switch connectionType
         {
-        case .allowed:
+        case .transportA:
             for index in 0 ..< classificationLabels.count
             {
-                if classificationLabels[index] == ClassificationLabel.allowed.rawValue
+                if classificationLabels[index] == ClassificationLabel.transportA.rawValue
                 {
                     incomingLengths.append(inLengths[index])
                     outgoingLengths.append(outLengths[index])
@@ -88,10 +88,10 @@ class AllFeatures
                     }
                 }
             }
-        case .blocked:
+        case .transportB:
             for index in 0 ..< classificationLabels.count
             {
-                if classificationLabels[index] == ClassificationLabel.blocked.rawValue
+                if classificationLabels[index] == ClassificationLabel.transportB.rawValue
                 {
                     incomingLengths.append(inLengths[index])
                     outgoingLengths.append(outLengths[index])
@@ -139,10 +139,10 @@ class AllFeatures
                 
                 switch connectionType
                 {
-                case .allowed:
+                case .transportA:
                     accuracyKey = allowedAllFeaturesAccuracyKey
 
-                case .blocked:
+                case .transportB:
                     accuracyKey = blockedAllFeaturesAccuracyKey
                 }
                 

@@ -1081,385 +1081,378 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     
     func loadTrainingLabelData()
     {
-        // Get redis data in the utility queue and update the labels with the data in the main queue
+        // Offset Subsequences
+        let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
+        let requiredOutOffsetString = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+        let requiredOutOffsetCountString = outRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+        let requiredOutOffsetIndexString = outRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
+        let requiredOutOffsetAccString = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
         
-//        DispatchQueue.global(qos: .utility).async
-//        {
-            /// Scores
-            
-            // Offset Subsequences
-            let outRequiredOffsetHash: RMap<String, String> = RMap(key: outgoingRequiredOffsetKey)
-            let requiredOutOffsetString = outRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
-            let requiredOutOffsetCountString = outRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
-            let requiredOutOffsetIndexString = outRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
-            let requiredOutOffsetAccString = outRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
-            
-            let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
-            let forbiddenOutOffsetString = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            let forbiddenOutOffsetCountString = outForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
-            let forbiddenOutOffsetIndexString = outForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
-            let forbiddenOutOffsetAccString = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
-            
-            let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
-            let requiredInOffsetString = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
-            let requiredInOffsetCountString = inRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
-            let requiredInOffsetIndexString = inRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
-            let requiredInOffsetAccString = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
-            
-            let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
-            let forbiddenInOffsetString: String = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
-            let forbiddenInOffsetCountString = inForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
-            let forbiddenInOffsetIndexString = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
-            let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
-            
-            // Timing (microseconds)
-            let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
-            let rTiming = timingDictionary[requiredTimeDiffKey]
-            let fTiming = timingDictionary[forbiddenTimeDiffKey]
-            let timeDiffTAcc = timingDictionary[timeDiffTAccKey]
-            let timeDiffVAcc = timingDictionary[timeDiffVAccKey]
-            let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
-            
-            // TLS Common Names
-            let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
-            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
-            let rTLS = tlsResults[requiredTLSKey]
-            let fTLS = tlsResults[forbiddenTLSKey]
-            let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey]
-            let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey]
-            let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
+        let outForbiddenOffsetHash: RMap<String, String> = RMap(key: outgoingForbiddenOffsetKey)
+        let forbiddenOutOffsetString = outForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+        let forbiddenOutOffsetCountString = outForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+        let forbiddenOutOffsetIndexString = outForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
+        let forbiddenOutOffsetAccString = outForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
+        
+        let inRequiredOffsetHash: RMap<String, String> = RMap(key: incomingRequiredOffsetKey)
+        let requiredInOffsetString = inRequiredOffsetHash[requiredOffsetSequenceKey] ?? "--"
+        let requiredInOffsetCountString = inRequiredOffsetHash[requiredOffsetByteCountKey] ?? "--"
+        let requiredInOffsetIndexString = inRequiredOffsetHash[requiredOffsetIndexKey] ?? "--"
+        let requiredInOffsetAccString = inRequiredOffsetHash[requiredOffsetAccuracyKey] ?? "--"
+        
+        let inForbiddenOffsetHash: RMap<String, String> = RMap(key: incomingForbiddenOffsetKey)
+        let forbiddenInOffsetString: String = inForbiddenOffsetHash[forbiddenOffsetSequenceKey] ?? "--"
+        let forbiddenInOffsetCountString = inForbiddenOffsetHash[forbiddenOffsetByteCountKey] ?? "--"
+        let forbiddenInOffsetIndexString = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
+        let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
+        
+        // Timing (microseconds)
+        let timingDictionary: RMap<String, Double> = RMap(key: timeDifferenceTrainingResultsKey)
+        let rTiming = timingDictionary[requiredTimeDiffKey]
+        let fTiming = timingDictionary[forbiddenTimeDiffKey]
+        let timeDiffTAcc = timingDictionary[timeDiffTAccKey]
+        let timeDiffVAcc = timingDictionary[timeDiffVAccKey]
+        let timeDiffEAcc = timingDictionary[timeDiffEAccKey]
+        
+        // TLS Common Names
+        let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
+        let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
+        let rTLS = tlsResults[requiredTLSKey]
+        let fTLS = tlsResults[forbiddenTLSKey]
+        let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey]
+        let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey]
+        let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
 
-            // Lengths
-            let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsTrainingResultsKey)
-            let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey]
-            let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey]
-            let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey]
-            let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey]
-            let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
-            let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey]
-            let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey]
-            let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey]
-            let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey]
-            let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
+        // Lengths
+        let packetLengthsResults: RMap <String, Double> = RMap(key: packetLengthsTrainingResultsKey)
+        let outRequiredLength = packetLengthsResults[outgoingRequiredLengthKey]
+        let outForbiddenLength = packetLengthsResults[outgoingForbiddenLengthKey]
+        let outTrainingAcc = packetLengthsResults[outgoingLengthsTAccKey]
+        let outValidationAcc = packetLengthsResults[outgoingLengthsVAccKey]
+        let outEvaluationAcc = packetLengthsResults[outgoingLengthsEAccKey]
+        let inRequiredLength = packetLengthsResults[incomingRequiredLengthKey]
+        let inForbiddenLength = packetLengthsResults[incomingForbiddenLengthKey]
+        let inTrainingAcc = packetLengthsResults[incomingLengthsTAccKey]
+        let inValidationAcc = packetLengthsResults[incomingLengthsVAccKey]
+        let inEvaluationAcc = packetLengthsResults[incomingLengthsEAccKey]
+        
+        // Entropy
+        let entropyResults: RMap <String, Double> = RMap(key: entropyTrainingResultsKey)
+        let rOutEntropy = entropyResults[outgoingRequiredEntropyKey]
+        let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey]
+        let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey]
+        let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey]
+        let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
+        let rInEntropy = entropyResults[incomingRequiredEntropyKey]
+        let fInEntropy = entropyResults[incomingForbiddenEntropyKey]
+        let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey]
+        let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey]
+        let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
+        
+        // Float Subsequences
+        let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
+        let requiredOutFloatSequenceTuple: (Data, Float)? = requiredOutFloatSequenceSet.last
+        
+        let forbiddenOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenFloatSequencesKey)
+        let forbiddenOutFloatSequenceTuple: (Data, Float)? = forbiddenOutFloatSequenceSet.last
+        
+        let requiredInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
+        let requiredInFloatSequenceTuple: (Data, Float)? = requiredInFloatSequenceSet.last
+        
+        let forbiddenInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
+        let forbiddenInFloatSequenceTuple: (Data, Float)? = forbiddenInFloatSequenceSet.last
+        
+        // All Features
+        let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
+        let allTimingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTrainingResultsKey)
+        let allEntropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTrainingResultsKey)
+        let allLengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
+        let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
+        
+        let allFeaturesEvalAccuracy = allFeaturesDictionary[allFeaturesEAccKey]
+        
+        let allFeaturesTrainAllowedOutLength = allLengthDictionary[outgoingRequiredLengthKey]
+        let allFeaturesTrainBlockedOutLength = allLengthDictionary[outgoingForbiddenLengthKey]
+        let allFeaturesTrainAllowedOutEntropy = allEntropyDictionary[outgoingRequiredEntropyKey]
+        let allFeaturesTrainBlockedOutEntropy = allEntropyDictionary[outgoingForbiddenEntropyKey]
+        let allFeaturesTrainAllowedInLength = allLengthDictionary[incomingRequiredLengthKey]
+        let allFeaturesTrainBlockedInLength = allLengthDictionary[incomingForbiddenLengthKey]
+        let allFeaturesTrainAllowedInEntropy = allEntropyDictionary[incomingRequiredEntropyKey]
+        let allFeaturesTrainBlockedInEntropy = allEntropyDictionary[incomingForbiddenEntropyKey]
+        let allFeaturesTrainAllowedTiming = allTimingDictionary[requiredTimeDiffKey]
+        let allFeaturesTrainBlockedTiming = allTimingDictionary[forbiddenTimeDiffKey]
+        let allFeaturesTrainAllowedTLS = tlsDictionary[requiredTLSKey]
+        let allFeaturesTrainBlockedTLS = tlsDictionary[forbiddenTLSKey]
+        
+        DispatchQueue.main.async
+        {
+            self.activityIndicator.stopAnimation(nil)
             
-            // Entropy
-            let entropyResults: RMap <String, Double> = RMap(key: entropyTrainingResultsKey)
-            let rOutEntropy = entropyResults[outgoingRequiredEntropyKey]
-            let fOutEntropy = entropyResults[outgoingForbiddenEntropyKey]
-            let outEntropyTrainingAccuracy = entropyResults[outgoingEntropyTAccKey]
-            let outEntropyValidationAccuracy = entropyResults[outgoingEntropyVAccKey]
-            let outEntropyEvaluationAccuracy = entropyResults[outgoingEntropyEAccKey]
-            let rInEntropy = entropyResults[incomingRequiredEntropyKey]
-            let fInEntropy = entropyResults[incomingForbiddenEntropyKey]
-            let inEntropyTrainingAccuracy = entropyResults[incomingEntropyTAccKey]
-            let inEntropyValidationAccuracy = entropyResults[incomingEntropyVAccKey]
-            let inEntropyEvaluationAccuracy = entropyResults[incomingEntropyEAccKey]
-            
-            // Float Subsequences
-            let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
-            let requiredOutFloatSequenceTuple: (Data, Float)? = requiredOutFloatSequenceSet.last
-            
-            let forbiddenOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingForbiddenFloatSequencesKey)
-            let forbiddenOutFloatSequenceTuple: (Data, Float)? = forbiddenOutFloatSequenceSet.last
-            
-            let requiredInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingRequiredFloatSequencesKey)
-            let requiredInFloatSequenceTuple: (Data, Float)? = requiredInFloatSequenceSet.last
-            
-            let forbiddenInFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: incomingForbiddenFloatSequencesKey)
-            let forbiddenInFloatSequenceTuple: (Data, Float)? = forbiddenInFloatSequenceSet.last
+            self.allEvaluationAccuracy = "--"
+            self.allAllowedOutLength = "--"
+            self.allBlockedOutLength = "--"
+            self.allAllowedOutEntropy = "--"
+            self.allBlockedOutEntropy = "--"
+            self.allAllowedInLength = "--"
+            self.allBlockedInLength = "--"
+            self.allAllowedInEntropy = "--"
+            self.allBlockedInEntropy = "--"
+            self.allAllowedTiming = "--"
+            self.allBlockedTiming = "--"
             
             // All Features
-            let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
-            let allTimingDictionary: RMap<String, Double> = RMap(key: allFeaturesTimeTrainingResultsKey)
-            let allEntropyDictionary: RMap<String, Double> = RMap(key: allFeaturesEntropyTrainingResultsKey)
-            let allLengthDictionary: RMap<String, Double> = RMap(key: allFeaturesLengthTrainingResultsKey)
-            let tlsDictionary: RMap<String, String> = RMap(key: allFeaturesTLSTraininResultsKey)
+            if allFeaturesEvalAccuracy != nil
+            { self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvalAccuracy!) }
             
-            let allFeaturesEvalAccuracy = allFeaturesDictionary[allFeaturesEAccKey]
+            if allFeaturesTrainAllowedOutLength != nil
+            { self.allAllowedOutLength = String(format: "%.2f", allFeaturesTrainAllowedOutLength!) }
             
-            let allFeaturesTrainAllowedOutLength = allLengthDictionary[outgoingRequiredLengthKey]
-            let allFeaturesTrainBlockedOutLength = allLengthDictionary[outgoingForbiddenLengthKey]
-            let allFeaturesTrainAllowedOutEntropy = allEntropyDictionary[outgoingRequiredEntropyKey]
-            let allFeaturesTrainBlockedOutEntropy = allEntropyDictionary[outgoingForbiddenEntropyKey]
-            let allFeaturesTrainAllowedInLength = allLengthDictionary[incomingRequiredLengthKey]
-            let allFeaturesTrainBlockedInLength = allLengthDictionary[incomingForbiddenLengthKey]
-            let allFeaturesTrainAllowedInEntropy = allEntropyDictionary[incomingRequiredEntropyKey]
-            let allFeaturesTrainBlockedInEntropy = allEntropyDictionary[incomingForbiddenEntropyKey]
-            let allFeaturesTrainAllowedTiming = allTimingDictionary[requiredTimeDiffKey]
-            let allFeaturesTrainBlockedTiming = allTimingDictionary[forbiddenTimeDiffKey]
-            let allFeaturesTrainAllowedTLS = tlsDictionary[requiredTLSKey]
-            let allFeaturesTrainBlockedTLS = tlsDictionary[forbiddenTLSKey]
+            if allFeaturesTrainBlockedOutLength != nil
+            { self.allBlockedOutLength = String(format: "%.2f", allFeaturesTrainBlockedOutLength!) }
             
-            DispatchQueue.main.async
+            if allFeaturesTrainAllowedOutEntropy != nil
+            { self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesTrainAllowedOutEntropy!) }
+            
+            if allFeaturesTrainBlockedOutEntropy != nil
+            { self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesTrainBlockedOutEntropy!) }
+            
+            if allFeaturesTrainAllowedInLength != nil
+            { self.allAllowedInLength = String(format: "%.2f", allFeaturesTrainAllowedInLength!) }
+            
+            if allFeaturesTrainBlockedInLength != nil
+            { self.allBlockedInLength = String(format: "%.2f", allFeaturesTrainBlockedInLength!) }
+            
+            if allFeaturesTrainAllowedInEntropy != nil
+            { self.allAllowedInEntropy = String(format: "%.2f", allFeaturesTrainAllowedInEntropy!) }
+            
+            if allFeaturesTrainBlockedInEntropy != nil
+            { self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!) }
+            
+            if allFeaturesTrainAllowedTiming != nil
+            { self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!/1000) }
+            
+            if allFeaturesTrainBlockedTiming != nil
+            { self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!/1000) }
+
+            self.allAllowedTLS = allFeaturesTrainAllowedTLS ?? "--"
+            self.allBlockedTLS = allFeaturesTrainBlockedTLS ?? "--"
+
+            // Offset Subsequences
+            self.requiredOutOffset = requiredOutOffsetString
+            self.requiredOutOffsetCount = requiredOutOffsetCountString
+            self.requiredOutOffsetIndex = requiredOutOffsetIndexString
+            self.requiredOutOffsetAcc = requiredOutOffsetAccString
+            
+            self.forbiddenOutOffset = forbiddenOutOffsetString
+            self.forbiddenOutOffsetCount = forbiddenOutOffsetCountString
+            self.forbiddenOutOffsetIndex = forbiddenOutOffsetIndexString
+            self.forbiddenOutOffsetAcc = forbiddenOutOffsetAccString
+            
+            self.requiredInOffset = requiredInOffsetString
+            self.requiredInOffsetCount = requiredInOffsetCountString
+            self.requiredInOffsetIndex = requiredInOffsetIndexString
+            self.requiredInOffsetAcc = requiredInOffsetAccString
+            
+            self.forbiddenInOffset = forbiddenInOffsetString
+            self.forbiddenInOffsetCount = forbiddenInOffsetCountString
+            self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
+            self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
+            
+            // Timing (microseconds displayed in milliseconds)
+            self.requiredTiming = "--"
+            self.forbiddenTiming = "--"
+            self.timeTAcc = "--"
+            self.timeVAcc = "--"
+            self.timeEAcc = "--"
+            
+            if rTiming != nil
+            { self.requiredTiming = String(format: "%.2f", rTiming!/1000) + "ms" }
+            
+            if fTiming != nil
+            { self.forbiddenTiming = String(format: "%.2f", fTiming!/1000) + "ms" }
+            
+            if timeDiffTAcc != nil
+            { self.timeTAcc = String(format: "%.2f", timeDiffTAcc!) }
+            
+            if timeDiffVAcc != nil
+            { self.timeVAcc = String(format: "%.2f", timeDiffVAcc!) }
+            
+            if timeDiffEAcc != nil
+            { self.timeEAcc = String(format: "%.2f", timeDiffEAcc!) }
+
+            
+            // TLS Common Names
+            if rTLS != nil,
+                fTLS != nil,
+                tlsTrainingAccuracy != nil,
+                tlsValidationAccuracy != nil,
+                tlsEvaluationAccuracy != nil
             {
-                self.activityIndicator.stopAnimation(nil)
-                
-                self.allEvaluationAccuracy = "--"
-                self.allAllowedOutLength = "--"
-                self.allBlockedOutLength = "--"
-                self.allAllowedOutEntropy = "--"
-                self.allBlockedOutEntropy = "--"
-                self.allAllowedInLength = "--"
-                self.allBlockedInLength = "--"
-                self.allAllowedInEntropy = "--"
-                self.allBlockedInEntropy = "--"
-                self.allAllowedTiming = "--"
-                self.allBlockedTiming = "--"
-                
-                // All Features
-                if allFeaturesEvalAccuracy != nil
-                { self.allEvaluationAccuracy = String(format: "%.2f", allFeaturesEvalAccuracy!) }
-                
-                if allFeaturesTrainAllowedOutLength != nil
-                { self.allAllowedOutLength = String(format: "%.2f", allFeaturesTrainAllowedOutLength!) }
-                
-                if allFeaturesTrainBlockedOutLength != nil
-                { self.allBlockedOutLength = String(format: "%.2f", allFeaturesTrainBlockedOutLength!) }
-                
-                if allFeaturesTrainAllowedOutEntropy != nil
-                { self.allAllowedOutEntropy = String(format: "%.2f", allFeaturesTrainAllowedOutEntropy!) }
-                
-                if allFeaturesTrainBlockedOutEntropy != nil
-                { self.allBlockedOutEntropy = String(format: "%.2f", allFeaturesTrainBlockedOutEntropy!) }
-                
-                if allFeaturesTrainAllowedInLength != nil
-                { self.allAllowedInLength = String(format: "%.2f", allFeaturesTrainAllowedInLength!) }
-                
-                if allFeaturesTrainBlockedInLength != nil
-                { self.allBlockedInLength = String(format: "%.2f", allFeaturesTrainBlockedInLength!) }
-                
-                if allFeaturesTrainAllowedInEntropy != nil
-                { self.allAllowedInEntropy = String(format: "%.2f", allFeaturesTrainAllowedInEntropy!) }
-                
-                if allFeaturesTrainBlockedInEntropy != nil
-                { self.allBlockedInEntropy = String(format: "%.2f", allFeaturesTrainBlockedInEntropy!) }
-                
-                if allFeaturesTrainAllowedTiming != nil
-                { self.allAllowedTiming = String(format: "%.2f", allFeaturesTrainAllowedTiming!/1000) }
-                
-                if allFeaturesTrainBlockedTiming != nil
-                { self.allBlockedTiming = String(format: "%.2f", allFeaturesTrainBlockedTiming!/1000) }
+                self.requiredTLSName = rTLS!
+                self.forbiddenTLSName = fTLS!
+                self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy!)
+                self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy!)
+                self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!)
+            }
+            else
+            {
+                self.requiredTLSName = "--"
+                self.forbiddenTLSName = "--"
+                self.tlsTAcc = "--"
+                self.tlsVAcc = "--"
+                self.tlsEAcc = "--"
+            }
+            
+            // Lengths
+            self.requiredOutLength = "--"
+            self.forbiddenOutLength = "--"
+            self.outLengthTAcc = "--"
+            self.outLengthVAcc = "--"
+            self.outLengthEAcc = "--"
+            
+            self.requiredInLength = "--"
+            self.forbiddenInLength = "--"
+            self.inLengthTAcc = "--"
+            self.inLengthVAcc = "--"
+            self.inLengthEAcc = "--"
+            
+            if outRequiredLength != nil
+            { self.requiredOutLength = String(format: "%.2f", outRequiredLength!) }
+            
+            if outForbiddenLength != nil
+            { self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!) }
+            
+            if outTrainingAcc != nil
+            { self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!) }
 
-                self.allAllowedTLS = allFeaturesTrainAllowedTLS ?? "--"
-                self.allBlockedTLS = allFeaturesTrainBlockedTLS ?? "--"
-
-                // Offset Subsequences
-                self.requiredOutOffset = requiredOutOffsetString
-                self.requiredOutOffsetCount = requiredOutOffsetCountString
-                self.requiredOutOffsetIndex = requiredOutOffsetIndexString
-                self.requiredOutOffsetAcc = requiredOutOffsetAccString
+            if outValidationAcc != nil
+            { self.outLengthVAcc = String(format: "%.2f", outValidationAcc!) }
+            
+            if outEvaluationAcc != nil
+            { self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!) }
+            
+            if inRequiredLength != nil
+            { self.requiredInLength = String(format: "%.2f", inRequiredLength!) }
+            
+            if inForbiddenLength != nil
+            { self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!) }
+            
+            if inTrainingAcc != nil
+            { self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!) }
+            
+            if inValidationAcc != nil
+            { self.inLengthVAcc = String(format: "%.2f", inValidationAcc!) }
+            
+            if inEvaluationAcc != nil
+            { self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!) }
+            
+            // Entropy
+            if rOutEntropy != nil,
+                fOutEntropy != nil,
+                outEntropyTrainingAccuracy != nil,
+                outEntropyEvaluationAccuracy != nil
+            {
+                self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!)
+                self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!)
+                self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!)
+                self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!)
                 
-                self.forbiddenOutOffset = forbiddenOutOffsetString
-                self.forbiddenOutOffsetCount = forbiddenOutOffsetCountString
-                self.forbiddenOutOffsetIndex = forbiddenOutOffsetIndexString
-                self.forbiddenOutOffsetAcc = forbiddenOutOffsetAccString
-                
-                self.requiredInOffset = requiredInOffsetString
-                self.requiredInOffsetCount = requiredInOffsetCountString
-                self.requiredInOffsetIndex = requiredInOffsetIndexString
-                self.requiredInOffsetAcc = requiredInOffsetAccString
-                
-                self.forbiddenInOffset = forbiddenInOffsetString
-                self.forbiddenInOffsetCount = forbiddenInOffsetCountString
-                self.forbiddenInOffsetIndex = forbiddenInOffsetIndexString
-                self.forbiddenInOffsetAcc = forbiddenInOffsetAccString
-                
-                // Timing (microseconds displayed in milliseconds)
-                self.requiredTiming = "--"
-                self.forbiddenTiming = "--"
-                self.timeTAcc = "--"
-                self.timeVAcc = "--"
-                self.timeEAcc = "--"
-                
-                if rTiming != nil
-                { self.requiredTiming = String(format: "%.2f", rTiming!/1000) + "ms" }
-                
-                if fTiming != nil
-                { self.forbiddenTiming = String(format: "%.2f", fTiming!/1000) + "ms" }
-                
-                if timeDiffTAcc != nil
-                { self.timeTAcc = String(format: "%.2f", timeDiffTAcc!) }
-                
-                if timeDiffVAcc != nil
-                { self.timeVAcc = String(format: "%.2f", timeDiffVAcc!) }
-                
-                if timeDiffEAcc != nil
-                { self.timeEAcc = String(format: "%.2f", timeDiffEAcc!) }
-
-                
-                // TLS Common Names
-                if rTLS != nil,
-                    fTLS != nil,
-                    tlsTrainingAccuracy != nil,
-                    tlsValidationAccuracy != nil,
-                    tlsEvaluationAccuracy != nil
+                if outEntropyValidationAccuracy != nil
                 {
-                    self.requiredTLSName = rTLS!
-                    self.forbiddenTLSName = fTLS!
-                    self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy!)
-                    self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy!)
-                    self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!)
+                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
                 }
                 else
                 {
-                    self.requiredTLSName = "--"
-                    self.forbiddenTLSName = "--"
-                    self.tlsTAcc = "--"
-                    self.tlsVAcc = "--"
-                    self.tlsEAcc = "--"
-                }
-                
-                // Lengths
-                self.requiredOutLength = "--"
-                self.forbiddenOutLength = "--"
-                self.outLengthTAcc = "--"
-                self.outLengthVAcc = "--"
-                self.outLengthEAcc = "--"
-                
-                self.requiredInLength = "--"
-                self.forbiddenInLength = "--"
-                self.inLengthTAcc = "--"
-                self.inLengthVAcc = "--"
-                self.inLengthEAcc = "--"
-                
-                if outRequiredLength != nil
-                { self.requiredOutLength = String(format: "%.2f", outRequiredLength!) }
-                
-                if outForbiddenLength != nil
-                { self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!) }
-                
-                if outTrainingAcc != nil
-                { self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!) }
-
-                if outValidationAcc != nil
-                { self.outLengthVAcc = String(format: "%.2f", outValidationAcc!) }
-                
-                if outEvaluationAcc != nil
-                { self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!) }
-                
-                if inRequiredLength != nil
-                { self.requiredInLength = String(format: "%.2f", inRequiredLength!) }
-                
-                if inForbiddenLength != nil
-                { self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!) }
-                
-                if inTrainingAcc != nil
-                { self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!) }
-                
-                if inValidationAcc != nil
-                { self.inLengthVAcc = String(format: "%.2f", inValidationAcc!) }
-                
-                if inEvaluationAcc != nil
-                { self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!) }
-                
-                // Entropy
-                if rOutEntropy != nil,
-                    fOutEntropy != nil,
-                    outEntropyTrainingAccuracy != nil,
-                    outEntropyEvaluationAccuracy != nil
-                {
-                    self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!)
-                    self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!)
-                    self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!)
-                    self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!)
-                    
-                    if outEntropyValidationAccuracy != nil
-                    {
-                        self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
-                    }
-                    else
-                    {
-                        self.outEntropyVAcc = "--"
-                    }
-                }
-                else
-                {
-                    self.requiredOutEntropy = "--"
-                    self.forbiddenOutEntropy = "--"
-                    self.outEntropyTAcc = "--"
-                    self.outEntropyEAcc = "--"
-                }
-                                
-                if rInEntropy != nil,
-                    fInEntropy != nil,
-                    inEntropyTrainingAccuracy != nil,
-                    inEntropyEvaluationAccuracy != nil
-                {
-                    self.requiredInEntropy = String(format: "%.2f", rInEntropy!)
-                    self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!)
-                    self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!)
-                    self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!)
-                    if inEntropyValidationAccuracy != nil
-                    {
-                        self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
-                    }
-                    else
-                    {
-                        self.inEntropyVAcc = "--"
-                    }
-                }
-                else
-                {
-                    self.requiredInEntropy = "--"
-                    self.forbiddenInEntropy = "--"
-                    self.inEntropyTAcc = "--"
-                    self.inEntropyEAcc = "--"
-                }
-                
-                //Float Subsequences
-                if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
-                {
-                    self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
-                    self.requiredOutSequenceCount = "\(roFloatSeqMember)"
-                    self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
-                }
-                else
-                {
-                    self.requiredOutSequence = "--"
-                    self.requiredOutSequenceCount = "--"
-                    self.requiredOutSequenceAcc = "--"
-                }
-                
-                if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
-                {
-                    self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
-                    self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
-                    self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
-                }
-                else
-                {
-                    self.forbiddenOutSequence = "--"
-                    self.forbiddenOutSequenceCount = "--"
-                    self.forbiddenOutSequenceAcc = "--"
-                }
-                
-                if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
-                {
-                    self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
-                    self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
-                    self.requiredInSequenceAcc = "\(riFloatSeqScore)"
-                }
-                else
-                {
-                    self.requiredInSequence = "--"
-                    self.requiredInSequenceCount = "--"
-                    self.requiredInSequenceAcc = "--"
-                }
-                
-                if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
-                {
-                    self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
-                    self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
-                    self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
-                }
-                else
-                {
-                    self.forbiddenInSequence = "--"
-                    self.forbiddenInSequenceCount = "--"
-                    self.forbiddenInSequenceAcc = "--"
+                    self.outEntropyVAcc = "--"
                 }
             }
-//        }
+            else
+            {
+                self.requiredOutEntropy = "--"
+                self.forbiddenOutEntropy = "--"
+                self.outEntropyTAcc = "--"
+                self.outEntropyEAcc = "--"
+            }
+                            
+            if rInEntropy != nil,
+                fInEntropy != nil,
+                inEntropyTrainingAccuracy != nil,
+                inEntropyEvaluationAccuracy != nil
+            {
+                self.requiredInEntropy = String(format: "%.2f", rInEntropy!)
+                self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!)
+                self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!)
+                self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!)
+                if inEntropyValidationAccuracy != nil
+                {
+                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
+                }
+                else
+                {
+                    self.inEntropyVAcc = "--"
+                }
+            }
+            else
+            {
+                self.requiredInEntropy = "--"
+                self.forbiddenInEntropy = "--"
+                self.inEntropyTAcc = "--"
+                self.inEntropyEAcc = "--"
+            }
+            
+            //Float Subsequences
+            if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
+            {
+                self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
+                self.requiredOutSequenceCount = "\(roFloatSeqMember)"
+                self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
+            }
+            else
+            {
+                self.requiredOutSequence = "--"
+                self.requiredOutSequenceCount = "--"
+                self.requiredOutSequenceAcc = "--"
+            }
+            
+            if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
+            {
+                self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
+                self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
+                self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
+            }
+            else
+            {
+                self.forbiddenOutSequence = "--"
+                self.forbiddenOutSequenceCount = "--"
+                self.forbiddenOutSequenceAcc = "--"
+            }
+            
+            if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
+            {
+                self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
+                self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
+                self.requiredInSequenceAcc = "\(riFloatSeqScore)"
+            }
+            else
+            {
+                self.requiredInSequence = "--"
+                self.requiredInSequenceCount = "--"
+                self.requiredInSequenceAcc = "--"
+            }
+            
+            if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
+            {
+                self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
+                self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
+                self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
+            }
+            else
+            {
+                self.forbiddenInSequence = "--"
+                self.forbiddenInSequenceCount = "--"
+                self.forbiddenInSequenceAcc = "--"
+            }
+        }
     }
     
    

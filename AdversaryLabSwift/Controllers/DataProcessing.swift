@@ -202,24 +202,26 @@ class DataProcessing
         {
             let packetStatsMap = RMap<String, Int>(dictionary: connectionData.packetStats)
             packetStatsMap.key = packetStatsKey
+            
             let allowedIncomingMap = RMap<String, Data>(dictionary: connectionData.aConnectionData.incomingPackets)
             allowedIncomingMap.key = allowedIncomingKey
             let allowedOutgoingMap = RMap<String, Data>(dictionary: connectionData.aConnectionData.outgoingPackets)
             allowedOutgoingMap.key = allowedOutgoingKey
-            let blockedIncomingMap = RMap<String, Data>(dictionary: connectionData.aConnectionData.incomingPackets)
-            blockedIncomingMap.key = blockedIncomingKey
-            let blockedOutgoingMap = RMap<String, Data>(dictionary: connectionData.bConnectionData.outgoingPackets)
-            blockedOutgoingMap.key = blockedOutgoingKey
             let allowedIncomingDatesMap = RMap<String, Double>(dictionary: connectionData.aConnectionData.incomingDates)
             allowedIncomingDatesMap.key = allowedIncomingDatesKey
             let allowedOutgoingDatesMap = RMap<String, Double>(dictionary: connectionData.aConnectionData.outgoingDates)
             allowedOutgoingDatesMap.key = allowedOutgoingDatesKey
+            let allowedConnectionsList = RList<String>(array: connectionData.aConnectionData.connections)
+            allowedConnectionsList.key = allowedConnectionsKey
+            
+            let blockedIncomingMap = RMap<String, Data>(dictionary: connectionData.bConnectionData.incomingPackets)
+            blockedIncomingMap.key = blockedIncomingKey
+            let blockedOutgoingMap = RMap<String, Data>(dictionary: connectionData.bConnectionData.outgoingPackets)
+            blockedOutgoingMap.key = blockedOutgoingKey
             let blockedIncomingDatesMap = RMap<String, Double>(dictionary: connectionData.bConnectionData.incomingDates)
             blockedIncomingDatesMap.key = blockedIncomingDatesKey
             let blockedOutgoingDatesMap = RMap<String, Double>(dictionary: connectionData.bConnectionData.outgoingDates)
             blockedOutgoingDatesMap.key = blockedOutgoingDatesKey
-            let allowedConnectionsList = RList<String>(array: connectionData.aConnectionData.connections)
-            allowedConnectionsList.key = allowedConnectionsKey
             let blockedConnectionsList = RList<String>(array: connectionData.bConnectionData.connections)
             blockedConnectionsList.key = blockedConnectionsKey
             
