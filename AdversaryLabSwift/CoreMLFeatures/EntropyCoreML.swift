@@ -342,32 +342,51 @@ class EntropyCoreML
         // Train the classifier
         do
         {
+            // This is the dictionary we will save our results to
+            let entropyResults: RMap<String,Double> = RMap(key: entropyTrainingResultsKey)
             let classifier = try MLClassifier(trainingData: entropyTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
             
             // Classifier Training Accuracy as a Percentage
             let trainingError = classifier.trainingMetrics.classificationError
-            let trainingAccuracy = (1.0 - trainingError) * 100
+            var trainingAccuracy: Double? = nil
+            if trainingError >= 0
+            {
+                trainingAccuracy = (1.0 - trainingError) * 100
+                
+            }
+            if trainingAccuracy != nil
+            {
+                entropyResults[entropyTAccKey] = trainingAccuracy
+            }
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy: Double?
+            var validationAccuracy: Double? = nil
             
             // Sometimes we get a negative number, this is not valid for our purposes
-            if validationError < 0
-            {
-                validationAccuracy = nil
-            }
-            else
+            if validationError >= 0
             {
                 validationAccuracy = (1.0 - validationError) * 100
             }
-            
+
+            if validationAccuracy != nil
+            {
+                entropyResults[entropyVAccKey] = validationAccuracy!
+            }
             // Evaluate the classifier
             let classifierEvaluation = classifier.evaluation(on: entropyEvaluationTable)
             
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
-            let evaluationAccuracy = (1.0 - evaluationError) * 100
+            var evaluationAccuracy: Double? = nil
+            if evaluationError >= 0
+            {
+                evaluationAccuracy = (1.0 - evaluationError) * 100
+            }
+            if evaluationAccuracy != nil
+            {
+                entropyResults[entropyEAccKey] = evaluationAccuracy
+            }
             
             // Regressor
             do
@@ -380,10 +399,7 @@ class EntropyCoreML
                     print("\nUnable to create allowed and blocked tables from entropy table.")
                     return
                 }
-                
-                // This is the dictionary we will save our results to
-                let entropyResults: RMap<String,Double> = RMap(key: entropyTrainingResultsKey)
-                
+
                 // Allowed Entropy
                 do
                 {
@@ -401,19 +417,11 @@ class EntropyCoreML
                     
                     /// Save Results
                     entropyResults[requiredEntropyKey] = predictedAllowedEntropy
-                    entropyResults[entropyTAccKey] = trainingAccuracy
-                    entropyResults[entropyEAccKey] = evaluationAccuracy
-                    
-                    if validationAccuracy != nil
-                    {
-                        entropyResults[entropyVAccKey] = validationAccuracy!
-                    }
                 }
                 catch let allowedColumnError
                 {
                     print("\nError creating allowed entropy column:\(allowedColumnError)")
                 }
-
                 
                 // Blocked Entropy
                 do

@@ -183,29 +183,39 @@ class TimingCoreML
         timeDifferenceTable.addColumn(classificationColumn, named: ColumnLabel.classification.rawValue)
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
-        let (timeEvaluationTable, timeTrainingTable) = timeDifferenceTable.randomSplit(by: 0.20)
+        let (timeEvaluationTable, timeTrainingTable) = timeDifferenceTable.randomSplit(by: 0.30)
         
         // Train the classifier
         do
         {
+            // This is the dictionary where we will save our results
+            let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceTrainingResultsKey)
             let classifier = try MLClassifier(trainingData: timeTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
             
             // Classifier training accuracy as a percentage
             let trainingError = classifier.trainingMetrics.classificationError
-            let trainingAccuracy = (1.0 - trainingError) * 100
+            var trainingAccuracy: Double? = nil
+            if trainingError >= 0
+            {
+                trainingAccuracy = (1.0 - trainingError) * 100
+            }
+            if trainingAccuracy != nil
+            {
+                timingDictionary[timeDiffTAccKey] = trainingAccuracy
+            }
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy: Double?
+            var validationAccuracy: Double? = nil
 
             // Sometimes we get a negative number, this is not valid for our purposes
-            if validationError < 0
-            {
-                validationAccuracy = nil
-            }
-            else
+            if validationError >= 0
             {
                 validationAccuracy = (1.0 - validationError) * 100
+            }
+            if validationAccuracy != nil
+            {
+                timingDictionary[timeDiffVAccKey] = validationAccuracy!
             }
             
             // Evaluate the classifier
@@ -213,7 +223,15 @@ class TimingCoreML
             
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
-            let evaluationAccuracy = (1.0 - evaluationError) * 100
+            var evaluationAccuracy: Double? = nil
+            if evaluationError >= 0
+            {
+                evaluationAccuracy = (1.0 - evaluationError) * 100
+            }
+            if evaluationAccuracy != nil
+            {
+                timingDictionary[timeDiffEAccKey] = evaluationAccuracy
+            }
             
             // Regressor
             do
@@ -226,10 +244,7 @@ class TimingCoreML
                     print("\nUnable to create allowed and blocked tables from time difference table.")
                     return
                 }
-                
-                // This is the dictionary where we will save our results
-                let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceTrainingResultsKey)
-                
+ 
                 // Allowed Connection Time Differences
                 do
                 {
@@ -247,13 +262,6 @@ class TimingCoreML
                     
                     // Save scores
                     timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
-                    timingDictionary[timeDiffEAccKey] = evaluationAccuracy
-                    timingDictionary[timeDiffTAccKey] = trainingAccuracy
-                    
-                    if validationAccuracy != nil
-                    {
-                        timingDictionary[timeDiffVAccKey] = validationAccuracy!
-                    }
                 }
                 catch let allowedColumnError
                 {

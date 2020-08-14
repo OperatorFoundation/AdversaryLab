@@ -300,41 +300,52 @@ class AllFeatures
     
     func train(allFeaturesTable: MLDataTable, configModel: ProcessingConfigurationModel)
     {
-        // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
-        let (evaluationTable, trainingTable) = allFeaturesTable.randomSplit(by: 0.20)
+        // Set aside 30% of the model's data rows for evaluation, leaving the remaining 80% for training
+        let (evaluationTable, trainingTable) = allFeaturesTable.randomSplit(by: 0.30)
         
-        print("\n All Features training table has \(trainingTable.rows.count) rows.")
+        print("\nAll Features training table has \(trainingTable.rows.count) rows.")
         print("All Features eval table has \(evaluationTable.rows.count) rows.")
         
         // Train the classifier
         do
         {
+            let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
             let classifier = try MLClassifier(trainingData: trainingTable, targetColumn: ColumnLabel.classification.rawValue)
-            let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
-            let classifierEvaluation = classifier.evaluation(on: evaluationTable)
-            let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
-            let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy: Double?
-            
-            // Sometimes we get a negative number, this is not valid for our purposes
-            if validationError < 0
+            let trainingError = classifier.trainingMetrics.classificationError
+            var trainingAccuracy: Double? = nil
+            if trainingError >= 0
             {
-                validationAccuracy = nil
+                trainingAccuracy = (1.0 - trainingError) * 100
             }
-            else
+            if trainingAccuracy != nil
+            {
+                allFeaturesDictionary[allFeaturesTAccKey] = trainingAccuracy
+            }
+            
+            let classifierEvaluation = classifier.evaluation(on: evaluationTable)
+            let evaluationError = classifierEvaluation.classificationError
+            var evaluationAccuracy: Double? = nil
+            if evaluationError >= 0
+            {
+                evaluationAccuracy = (1.0 - evaluationError) * 100
+            }
+            if evaluationAccuracy != nil
+            {
+                allFeaturesDictionary[allFeaturesEAccKey] = evaluationAccuracy
+            }
+            
+            let validationError = classifier.validationMetrics.classificationError
+            var validationAccuracy: Double? = nil
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError >= 0
             {
                 validationAccuracy = (1.0 - validationError) * 100
             }
-
-            let allFeaturesDictionary: RMap<String, Double> = RMap(key: allFeaturesTrainingAccuracyKey)
-            allFeaturesDictionary[allFeaturesEAccKey] = evaluationAccuracy
-            allFeaturesDictionary[allFeaturesTAccKey] = trainingAccuracy
-            
             if validationAccuracy != nil
             {
                 allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy!
             }
-            
+
             let modelController = MLModelController()
 
             modelController.save(classifier: classifier, classifierMetadata: allFeaturesClassifierMetadata, fileName: allClassifierName, groupName: configModel.modelName)

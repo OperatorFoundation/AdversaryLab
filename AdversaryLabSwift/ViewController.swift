@@ -7,14 +7,17 @@
 //
 
 import Cocoa
+import CoreML
+
 import Auburn
+import Axis
 import RedShot
 import Datable
-import CoreML
 import Charts
 
 class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
 {
+    // @IBOutlet weak var TestLineChart: LineChart!
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
@@ -280,7 +283,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                     {
                         print("Time to analyze some things.")
                         configModel.modelName = name
-                        connectionInspector.analyzeConnections(configModel: configModel)
+                        connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: true, resetTestingData: false)
                         updateProgressIndicator()
                     }
                     else
@@ -706,7 +709,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         }
         
         configModel.modelName = modelDirectoryURL!.deletingPathExtension().lastPathComponent
-        connectionInspector.analyzeConnections(configModel: configModel)
+        connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: false, resetTestingData: true)
         updateProgressIndicator()
     }
 
@@ -1267,41 +1270,32 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             
             if rTiming != nil
             { self.requiredTiming = String(format: "%.2f", rTiming!/1000) + "ms" }
-            
             if fTiming != nil
             { self.forbiddenTiming = String(format: "%.2f", fTiming!/1000) + "ms" }
-            
             if timeDiffTAcc != nil
             { self.timeTAcc = String(format: "%.2f", timeDiffTAcc!) }
-            
             if timeDiffVAcc != nil
             { self.timeVAcc = String(format: "%.2f", timeDiffVAcc!) }
-            
             if timeDiffEAcc != nil
             { self.timeEAcc = String(format: "%.2f", timeDiffEAcc!) }
-
             
             // TLS Common Names
-            if rTLS != nil,
-                fTLS != nil,
-                tlsTrainingAccuracy != nil,
-                tlsValidationAccuracy != nil,
-                tlsEvaluationAccuracy != nil
-            {
-                self.requiredTLSName = rTLS!
-                self.forbiddenTLSName = fTLS!
-                self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy!)
-                self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy!)
-                self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!)
-            }
-            else
-            {
-                self.requiredTLSName = "--"
-                self.forbiddenTLSName = "--"
-                self.tlsTAcc = "--"
-                self.tlsVAcc = "--"
-                self.tlsEAcc = "--"
-            }
+            self.requiredTLSName = "--"
+            self.forbiddenTLSName = "--"
+            self.tlsTAcc = "--"
+            self.tlsVAcc = "--"
+            self.tlsEAcc = "--"
+            
+            if rTLS != nil
+            { self.requiredTLSName = rTLS! }
+            if fTLS != nil
+            { self.forbiddenTLSName = fTLS! }
+            if tlsTrainingAccuracy != nil
+            { self.tlsTAcc = String(format: "%.2f", tlsTrainingAccuracy!) }
+            if tlsValidationAccuracy != nil
+            { self.tlsVAcc = String(format: "%.2f", tlsValidationAccuracy!) }
+            if tlsEvaluationAccuracy != nil
+            { self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!) }
             
             // Lengths
             self.requiredOutLength = "--"
@@ -1318,140 +1312,103 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             
             if outRequiredLength != nil
             { self.requiredOutLength = String(format: "%.2f", outRequiredLength!) }
-            
             if outForbiddenLength != nil
             { self.forbiddenOutLength = String(format: "%.2f", outForbiddenLength!) }
-            
             if outTrainingAcc != nil
             { self.outLengthTAcc = String(format: "%.2f", outTrainingAcc!) }
-
             if outValidationAcc != nil
             { self.outLengthVAcc = String(format: "%.2f", outValidationAcc!) }
-            
             if outEvaluationAcc != nil
             { self.outLengthEAcc = String(format: "%.2f", outEvaluationAcc!) }
-            
             if inRequiredLength != nil
             { self.requiredInLength = String(format: "%.2f", inRequiredLength!) }
-            
             if inForbiddenLength != nil
             { self.forbiddenInLength = String(format: "%.2f", inForbiddenLength!) }
-            
             if inTrainingAcc != nil
             { self.inLengthTAcc = String(format: "%.2f", inTrainingAcc!) }
-            
             if inValidationAcc != nil
             { self.inLengthVAcc = String(format: "%.2f", inValidationAcc!) }
-            
             if inEvaluationAcc != nil
             { self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!) }
             
             // Entropy
-            if rOutEntropy != nil,
-                fOutEntropy != nil,
-                outEntropyTrainingAccuracy != nil,
-                outEntropyEvaluationAccuracy != nil
-            {
-                self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!)
-                self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!)
-                self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!)
-                self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!)
-                
-                if outEntropyValidationAccuracy != nil
-                {
-                    self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!)
-                }
-                else
-                {
-                    self.outEntropyVAcc = "--"
-                }
-            }
-            else
-            {
-                self.requiredOutEntropy = "--"
-                self.forbiddenOutEntropy = "--"
-                self.outEntropyTAcc = "--"
-                self.outEntropyEAcc = "--"
-            }
-                            
-            if rInEntropy != nil,
-                fInEntropy != nil,
-                inEntropyTrainingAccuracy != nil,
-                inEntropyEvaluationAccuracy != nil
-            {
-                self.requiredInEntropy = String(format: "%.2f", rInEntropy!)
-                self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!)
-                self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!)
-                self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!)
-                if inEntropyValidationAccuracy != nil
-                {
-                    self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!)
-                }
-                else
-                {
-                    self.inEntropyVAcc = "--"
-                }
-            }
-            else
-            {
-                self.requiredInEntropy = "--"
-                self.forbiddenInEntropy = "--"
-                self.inEntropyTAcc = "--"
-                self.inEntropyEAcc = "--"
-            }
+            self.requiredOutEntropy = "--"
+            self.forbiddenOutEntropy = "--"
+            self.outEntropyTAcc = "--"
+            self.outEntropyEAcc = "--"
+            self.outEntropyVAcc = "--"
+            if rOutEntropy != nil
+            { self.requiredOutEntropy = String(format: "%.2f", rOutEntropy!) }
+            if fOutEntropy != nil
+            { self.forbiddenOutEntropy = String(format: "%.2f", fOutEntropy!) }
+            if outEntropyTrainingAccuracy != nil
+            { self.outEntropyTAcc = String(format: "%.2f", outEntropyTrainingAccuracy!) }
+            if outEntropyEvaluationAccuracy != nil
+            { self.outEntropyEAcc = String(format: "%.2f", outEntropyEvaluationAccuracy!) }
+            if outEntropyValidationAccuracy != nil
+            { self.outEntropyVAcc = String(format: "%.2f", outEntropyValidationAccuracy!) }
+              
+            self.inEntropyVAcc = "--"
+            self.requiredInEntropy = "--"
+            self.forbiddenInEntropy = "--"
+            self.inEntropyTAcc = "--"
+            self.inEntropyEAcc = "--"
+            if rInEntropy != nil
+            { self.requiredInEntropy = String(format: "%.2f", rInEntropy!) }
+            if fInEntropy != nil
+            { self.forbiddenInEntropy = String(format: "%.2f", fInEntropy!) }
+            if inEntropyTrainingAccuracy != nil
+            { self.inEntropyTAcc = String(format: "%.2f", inEntropyTrainingAccuracy!) }
+            if inEntropyEvaluationAccuracy != nil
+            { self.inEntropyEAcc = String(format: "%.2f", inEntropyEvaluationAccuracy!) }
+            if inEntropyValidationAccuracy != nil
+            { self.inEntropyVAcc = String(format: "%.2f", inEntropyValidationAccuracy!) }
             
             //Float Subsequences
-            if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0, let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
+            self.requiredOutSequence = "--"
+            self.requiredOutSequenceCount = "--"
+            self.requiredOutSequenceAcc = "--"
+            if let roFloatSeqMember = requiredOutFloatSequenceTuple?.0
             {
                 self.requiredOutSequence = "\(roFloatSeqMember.hexEncodedString())"
                 self.requiredOutSequenceCount = "\(roFloatSeqMember)"
-                self.requiredOutSequenceAcc = "\(roFloatSeqScore)"
             }
-            else
-            {
-                self.requiredOutSequence = "--"
-                self.requiredOutSequenceCount = "--"
-                self.requiredOutSequenceAcc = "--"
-            }
+            if let roFloatSeqScore = requiredOutFloatSequenceTuple?.1
+            { self.requiredOutSequenceAcc = "\(roFloatSeqScore)" }
             
-            if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0, let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
+            self.forbiddenOutSequence = "--"
+            self.forbiddenOutSequenceCount = "--"
+            self.forbiddenOutSequenceAcc = "--"
+            if let foFloatSeqMember = forbiddenOutFloatSequenceTuple?.0
             {
                 self.forbiddenOutSequence = "\(foFloatSeqMember.hexEncodedString())"
                 self.forbiddenOutSequenceCount = "\(foFloatSeqMember)"
-                self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)"
             }
-            else
-            {
-                self.forbiddenOutSequence = "--"
-                self.forbiddenOutSequenceCount = "--"
-                self.forbiddenOutSequenceAcc = "--"
-            }
+            if let foFloatSeqScore = forbiddenOutFloatSequenceTuple?.1
+            { self.forbiddenOutSequenceAcc = "\(foFloatSeqScore)" }
             
-            if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0, let riFloatSeqScore = requiredInFloatSequenceTuple?.1
+            self.requiredInSequence = "--"
+            self.requiredInSequenceCount = "--"
+            self.requiredInSequenceAcc = "--"
+            if let riFloatSeqMemeber = requiredInFloatSequenceTuple?.0
             {
                 self.requiredInSequence = "\(riFloatSeqMemeber.hexEncodedString())"
                 self.requiredInSequenceCount = "\(riFloatSeqMemeber)"
-                self.requiredInSequenceAcc = "\(riFloatSeqScore)"
             }
-            else
-            {
-                self.requiredInSequence = "--"
-                self.requiredInSequenceCount = "--"
-                self.requiredInSequenceAcc = "--"
-            }
+            if let riFloatSeqScore = requiredInFloatSequenceTuple?.1
+            { self.requiredInSequenceAcc = "\(riFloatSeqScore)" }
             
-            if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0, let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
+            self.forbiddenInSequence = "--"
+            self.forbiddenInSequenceCount = "--"
+            self.forbiddenInSequenceAcc = "--"
+            if let fiFloatSeqMember = forbiddenInFloatSequenceTuple?.0
             {
                 self.forbiddenInSequence = "\(fiFloatSeqMember.hexEncodedString())"
                 self.forbiddenInSequenceCount = "\(fiFloatSeqMember)"
-                self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)"
+                
             }
-            else
-            {
-                self.forbiddenInSequence = "--"
-                self.forbiddenInSequenceCount = "--"
-                self.forbiddenInSequenceAcc = "--"
-            }
+            if let fiFloatSeqScore = forbiddenInFloatSequenceTuple?.1
+            { self.forbiddenInSequenceAcc = "\(fiFloatSeqScore)" }
         }
     }
     

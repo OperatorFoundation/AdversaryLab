@@ -249,8 +249,8 @@ class TLS12CoreML
         tlsTable.addColumn(tlsColumn, named: ColumnLabel.tlsNames.rawValue)
         tlsTable.addColumn(classyColumn, named: ColumnLabel.classification.rawValue)
         
-        // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
-        let (tlsEvaluationTable, tlsTrainingTable) = tlsTable.randomSplit(by: 0.20)
+        // Set aside 30% of the model's data rows for evaluation, leaving the remaining 80% for training
+        let (tlsEvaluationTable, tlsTrainingTable) = tlsTable.randomSplit(by: 0.30)
         guard tlsTrainingTable.rows.count > 2, tlsEvaluationTable.rows.count > 2
         else
         {
@@ -261,24 +261,34 @@ class TLS12CoreML
         // Train the classifier
         do
         {
+            // Save our results accuracy
+            let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
             let classifier = try MLClassifier(trainingData: tlsTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
             
             // Classifier training accuracy as a percentage
             let trainingError = classifier.trainingMetrics.classificationError
-            let trainingAccuracy = (1.0 - trainingError) * 100
+            var trainingAccuracy: Double? = nil
+            if trainingError >= 0
+            {
+                trainingAccuracy = (1.0 - trainingError) * 100
+            }
+            if trainingAccuracy != nil
+            {
+                tlsAccuracy[tlsTAccKey] = trainingAccuracy
+            }
             
             // Classifier validation accuracy as a percentage
             let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy: Double?
+            var validationAccuracy: Double? = nil
             
             // Sometimes we get a negative number, this is not valid for our purposes
-            if validationError < 0
-            {
-                validationAccuracy = nil
-            }
-            else
+            if validationError >= 0
             {
                 validationAccuracy = (1.0 - validationError) * 100
+            }
+            if validationAccuracy != nil
+            {
+                tlsAccuracy[tlsVAccKey] = validationAccuracy!
             }
             
             // Evaluate the classifier
@@ -286,23 +296,21 @@ class TLS12CoreML
             
             // Classifier evaluation accuracy as a percentage
             let evaluationError = classifierEvaluation.classificationError
-            let evaluationAccuracy = (1.0 - evaluationError) * 100
+            var evaluationAccuracy: Double? = nil
+            if evaluationError >= 0
+            {
+                evaluationAccuracy = (1.0 - evaluationError) * 100
+            }
+            if evaluationAccuracy != nil
+            {
+                tlsAccuracy[tlsEAccKey] = evaluationAccuracy
+            }
             
             // Regressor
             do
             {
                 let regressor = try MLRegressor(trainingData: tlsTrainingTable, targetColumn: ColumnLabel.tlsNames.rawValue)
-                
-                // Save our results accuracy
-                let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
-                tlsAccuracy[tlsTAccKey] = trainingAccuracy
-                tlsAccuracy[tlsEAccKey] = evaluationAccuracy
-                
-                if validationAccuracy != nil
-                {
-                    tlsAccuracy[tlsVAccKey] = validationAccuracy!
-                }
-                
+
                 guard let (allowedTLSTable, blockedTLSTable) = MLModelController().createAllowedBlockedTables(fromTable: tlsTable)
                 else
                 {

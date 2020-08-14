@@ -338,7 +338,8 @@ class PacketLengthsCoreML
         
         for (index, length) in lengths.enumerated()
         {
-            let score: Double = scores[index]
+            // FIXME: Does this still need to be a double after switch to Abacus data?
+            let score: Double = Double(scores[index])
             let classification = classificationLabels[index]
             let count = Int(score)
             
@@ -389,41 +390,52 @@ class PacketLengthsCoreML
             classifierName = outLengthClassifierName
         }
         
-        // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
-        let (classifierEvaluationTable, classifierTrainingTable) = lengthsClassifierTable.randomSplit(by: 0.20)
+        // Set aside 30% of the model's data rows for evaluation, leaving the remaining 70% for training
+        let (classifierEvaluationTable, classifierTrainingTable) = lengthsClassifierTable.randomSplit(by: 0.30)
         
         // Train the classifier
         do
         {
             let classifier = try MLClassifier(trainingData: classifierTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
-
-            let trainingAccuracy = (1.0 - classifier.trainingMetrics.classificationError) * 100
-            let classifierEvaluation = classifier.evaluation(on: classifierEvaluationTable)
-            let evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
-
-            let validationError = classifier.validationMetrics.classificationError
-            let validationAccuracy: Double?
-
-            // Sometimes we get a negative number, this is not valid for our purposes
-            if validationError < 0
-            {
-                print("We received a negative number for lengths validation error. this means we cannot calculate the validation accuracy.")
-                validationAccuracy = nil
-            }
-            else
-            {
-                validationAccuracy = (1.0 - validationError) * 100
-            }
-            
             // Save Length Recommendations
             let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
             lengthsDictionary[requiredLengthKey] = Double(lengthRecommender.allowedLength)
             lengthsDictionary[forbiddenLengthKey] = Double(lengthRecommender.blockedLength)
-
-            // Save Classifier Accuracies
+            
+            // Training Accuracy
+            let trainingError = classifier.trainingMetrics.classificationError
+            var trainingAccuracy: Double? = nil
+            if trainingError >= 0
+            {
+                trainingAccuracy = (1.0 - trainingError) * 100
+            }
+                
             lengthsDictionary[lengthsTAccKey] = trainingAccuracy
-            lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
+            
+            // Evaluation Accuracy
+            let classifierEvaluation = classifier.evaluation(on: classifierEvaluationTable)
+            let evaluationError = classifierEvaluation.classificationError
+            var evaluationAccuracy: Double? = nil
+            if evaluationError >= 0
+            {
+                evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
+            }
+            
+            if evaluationAccuracy != nil
+            {
+                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
+            }
 
+            // Validation Accuracy
+            let validationError = classifier.validationMetrics.classificationError
+            var validationAccuracy: Double? = nil
+            
+            // Sometimes we get a negative number, this is not valid for our purposes
+            if validationError >= 0
+            {
+                validationAccuracy = (1.0 - validationError) * 100
+            }
+            
             if validationAccuracy != nil
             {
                 lengthsDictionary[lengthsVAccKey] = validationAccuracy!
@@ -483,53 +495,87 @@ class PacketLengthsCoreML
     }
     
     // TODO: Rewrite this so that it gets the data from our global PacketLengths instance
-    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Double], classifications: [String])
+    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Int], classifications: [String])
     {
         var lengths = [Int]()
-        var scores = [Double]()
+        var scores = [Int]()
         var classificationLabels = [String]()
-        
-        let allowedLengthsKey: String
-        let blockedLengthsKey: String
-        
+
         switch connectionDirection
         {
         case .incoming:
-            allowedLengthsKey = allowedIncomingLengthKey
-            blockedLengthsKey = blockedIncomingLengthKey
+            // Add transport A lengths
+            lengths.append(contentsOf: packetLengths.incomingA.values)
+            scores.append(contentsOf: packetLengths.incomingA.counts)
+            for _ in packetLengths.incomingA.values
+            {
+                classificationLabels.append(ClassificationLabel.transportA.rawValue)
+            }
+            
+            // Add transport B lengths
+            lengths.append(contentsOf: packetLengths.incomingB.values)
+            scores.append(contentsOf: packetLengths.incomingB.counts)
+            for _ in packetLengths.incomingB.values
+            {
+                classificationLabels.append(ClassificationLabel.transportB.rawValue)
+            }
         case .outgoing:
-            allowedLengthsKey = allowedOutgoingLengthKey
-            blockedLengthsKey = blockedOutgoingLengthKey
+            // Add transport A lengths
+            lengths.append(contentsOf: packetLengths.outgoingA.values)
+            scores.append(contentsOf: packetLengths.outgoingA.counts)
+            for _ in packetLengths.outgoingA.values
+            {
+                classificationLabels.append(ClassificationLabel.transportA.rawValue)
+            }
+            
+            // Add transport B lengths
+            lengths.append(contentsOf: packetLengths.outgoingB.values)
+            scores.append(contentsOf: packetLengths.outgoingB.counts)
+            for _ in packetLengths.outgoingB.values
+            {
+                classificationLabels.append(ClassificationLabel.transportB.rawValue)
+            }
         }
         
-        /// A is the sorted set of lengths for the Allowed traffic
-        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let (allowedLengthsArray, allowedLengthScores) = arrays(from: [allowedLengthsRSet])
-        
-        /// B is the sorted set of lengths for the Blocked traffic
-        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let (blockedLengthsArray, blockedLengthsScores) = arrays(from: [blockedLengthsRSet])
-        
-        lengths.append(contentsOf: allowedLengthsArray)
-        scores.append(contentsOf: allowedLengthScores)
-        for _ in allowedLengthsArray
-        {
-            classificationLabels.append(ClassificationLabel.transportA.rawValue)
-        }
-        
-        lengths.append(contentsOf: blockedLengthsArray)
-        scores.append(contentsOf: blockedLengthsScores)
-        for _ in blockedLengthsArray
-        {
-            classificationLabels.append(ClassificationLabel.transportB.rawValue)
-        }
+//        let allowedLengthsKey: String
+//        let blockedLengthsKey: String
+//
+//        switch connectionDirection
+//        {
+//        case .incoming:
+//            allowedLengthsKey = allowedIncomingLengthKey
+//            blockedLengthsKey = blockedIncomingLengthKey
+//        case .outgoing:
+//            allowedLengthsKey = allowedOutgoingLengthKey
+//            blockedLengthsKey = blockedOutgoingLengthKey
+//        }
+//
+//        /// A is the sorted set of lengths for the Allowed traffic
+//        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
+//        let (allowedLengthsArray, allowedLengthScores) = arrays(from: [allowedLengthsRSet])
+//
+//        /// B is the sorted set of lengths for the Blocked traffic
+//        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
+//        let (blockedLengthsArray, blockedLengthsScores) = arrays(from: [blockedLengthsRSet])
+//
+//        lengths.append(contentsOf: allowedLengthsArray)
+//        scores.append(contentsOf: allowedLengthScores)
+//        for _ in allowedLengthsArray
+//        {
+//            classificationLabels.append(ClassificationLabel.transportA.rawValue)
+//        }
+//
+//        lengths.append(contentsOf: blockedLengthsArray)
+//        scores.append(contentsOf: blockedLengthsScores)
+//        for _ in blockedLengthsArray
+//        {
+//            classificationLabels.append(ClassificationLabel.transportB.rawValue)
+//        }
         
         return(lengths, scores, classificationLabels)
     }
     
 }
-
-// TODO: Add this to Auburn instead
 
 /// Returns one array containing each element in all of the sorted sets provided. This method takes an array of sorted sets of Ints and returns an array of Ints. Values are not repeated based on score. Each value will be added to the array only one time
 /// - Parameters:

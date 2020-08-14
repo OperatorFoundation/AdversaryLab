@@ -13,7 +13,7 @@ class ConnectionInspector
 {
     var pauseBuddy = PauseBot()
     
-    func analyzeConnections(configModel: ProcessingConfigurationModel)
+    func analyzeConnections(configModel: ProcessingConfigurationModel, resetTrainingData: Bool, resetTestingData: Bool)
     {
         ProgressBot.sharedInstance.analysisComplete = false
         
@@ -21,7 +21,7 @@ class ConnectionInspector
         {
             if self.pauseBuddy.processingComplete
             {
-                self.resetAnalysisData()
+                self.resetAnalysisData(resetTrainingData: resetTrainingData, resetTestingData: resetTestingData)
                 self.pauseBuddy.processingComplete = false
             }
             
@@ -350,7 +350,7 @@ class ConnectionInspector
         timeDifferenceTestResults.delete()
     }
     
-    func resetAnalysisData()
+    func resetAnalysisData(resetTrainingData: Bool, resetTestingData: Bool)
     {
         pauseBuddy = PauseBot()
         let packetsAnalyzedDictionary: RMap<String, Int> = RMap(key: packetStatsKey)
@@ -430,6 +430,9 @@ class ConnectionInspector
         allowedTlsCommonNames.delete()
         let blockedTlsCommonNames: RSortedSet<String> = RSortedSet(key: blockedTlsCommonNameKey)
         blockedTlsCommonNames.delete()
+        
+        if resetTestingData {resetTestResults()}
+        if resetTrainingData {resetTrainingResults()}
         
         NotificationCenter.default.post(name: .updateStats, object: nil)
     }
