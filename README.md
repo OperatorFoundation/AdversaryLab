@@ -40,27 +40,14 @@ git clone https://github.com/OperatorFoundation/AdversaryLab
 cd AdversaryLab
 ```
 
-Install the Swift Package used by the graphical interface
+Install the Swift Package used by the graphical interface. Swift packages are now handled in xcode. There is no longer a sub-project for updating packages via command line.
 
-```
-cd AdversaryLabSwiftPackage
-swift package update
-swift package generate-xcodeproj
-cd ..
-```
-
-Add the following executables to the AdversaryLab/Executables/ folder: redis-cli, redis-server, and [AdversaryLabClient](https://github.com/OperatorFoundation/AdversaryLabClientSwift)
-
-Open the graphical interface project in Xcode. Please note that at this time using SwiftPackageManager in this way will set the macOS deployment target to 10.10 in your project settings. The project will not compile unless you change it to 10.15 or higher.
-
-```
-open AdversaryLabSwift.xcodeproj
-```
+Add the following executables to the AdversaryLab/Executables/ folder: redis-cli, redis-server, and [AdversaryLabClient](https://github.com/OperatorFoundation/AdversaryLabClientSwift). Please note that this project requires the Swift version of the client, it is no longer compatible with the Go version.
 
 
 ## Deployment
 
-Open the Xcode project and click the Run button to run the Adversary Lab graphical interface. Make sure Redis is already running, as Adversary Lab will  not start Redis for you.
+Open the Xcode project. Once you have addressed signing as needed, and Xcode has downloaded the dependencies (packages), you can click the Run button to run the Adversary Lab graphical interface.
 
 To add network traffic to Adversary Lab for analysis, you need the AdversaryLabClient command line tool. For the [installation
 instructions](https://github.com/OperatorFoundation/AdversaryLabClientSwift) to install and use the command line tool.
