@@ -13,11 +13,10 @@ import Abacus
 
 var transportA = ""
 var transportB = ""
-
-var packetLengths = PacketLengths(transportAIncoming: SortedMultiset<Int>(sortingStyle: .highFirst),
-                                  transportAOutgoing:SortedMultiset<Int>(sortingStyle: .highFirst),
-                                  transportBIncoming:SortedMultiset<Int>(sortingStyle: .highFirst),
-                                  transportBOutgoing:SortedMultiset<Int>(sortingStyle: .highFirst))
+var connectionGroupData = ConnectionGroupData()
+var packetLengths = PacketLengths()
+var packetTimings = PacketTimings()
+var packetEntropies = PacketEntropies()
 
 func getAdversarySupportDirectory() -> URL?
 {

@@ -15,30 +15,37 @@ class EntropyCoreML
 {
     func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, inEntropy: Double?, outEntropy: Double?, error: Error?)
     {
-        let inPacketsEntropyList: RList<Double> = RList(key: connection.incomingEntropyKey)
-        let outPacketsEntropyList: RList<Double> = RList(key: connection.outgoingEntropyKey)
+        var outData: Data?
+        var inData: Data?
         
-        // Get the outgoing packet that corresponds with this connection ID
-        let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
-        guard let outPacket: Data = outPacketHash[connection.connectionID]
-            else
+        switch connection.connectionType
         {
-            return (false, nil, nil, PacketLengthError.noOutPacketForConnection(connection.connectionID))
+        case .transportA:
+            // Get the incoming packet that corresponds with this connection ID
+            inData = connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
+            // Get the incoming packet that corresponds with this connection ID
+            outData = connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
+        case .transportB:
+            inData = connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
+            outData = connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
         }
+        
+        guard let outPacket = outData else { return(false, nil, nil, nil) }
+        guard let inPacket = inData else { return(false, nil, nil, nil) }
         
         let outPacketEntropy = calculateEntropy(for: outPacket)
-        outPacketsEntropyList.append(outPacketEntropy)
-        
-        // Get the incoming packet that corresponds with this connection ID
-        let inPacketHash: RMap<String, Data> = RMap(key: connection.incomingKey)
-        guard let inPacket = inPacketHash[connection.connectionID]
-            else
-        {
-            return(false, nil, nil, PacketLengthError.noInPacketForConnection(connection.connectionID))
-        }
-        
         let inPacketEntropy = calculateEntropy(for: inPacket)
-        inPacketsEntropyList.append(inPacketEntropy)
+        
+        // Save Entropies to our global var
+        switch connection.connectionType
+        {
+        case .transportA:
+            packetEntropies.incomingA.append(inPacketEntropy)
+            packetEntropies.outgoingA.append(outPacketEntropy)
+        case .transportB:
+            packetEntropies.incomingB.append(inPacketEntropy)
+            packetEntropies.outgoingB.append(outPacketEntropy)
+        }
         
         return (true, inPacketEntropy, outPacketEntropy, nil)
     }
@@ -115,51 +122,35 @@ class EntropyCoreML
         return entropyTable
     }
     
-    func getAllowedBlockedEntropyLists(connectionDirection: ConnectionDirection) -> (allowedEntropy:[Double], blockedEntropy: [Double])
-    {
-        var allowedEntropyList = [Double]()
-        var blockedEntropyList = [Double]()
-        
-        let allowedEntropyKey: String
-        let blockedEntropyKey: String
-        
-        switch connectionDirection
-        {
-        case .outgoing:
-            allowedEntropyKey = allowedOutgoingEntropyKey
-            blockedEntropyKey = blockedOutgoingEntropyKey
-        case .incoming:
-            allowedEntropyKey = allowedIncomingEntropyKey
-            blockedEntropyKey = blockedIncomingEntropyKey
-        }
-        
-        // Allowed Traffic
-        allowedEntropyList = RList(key: allowedEntropyKey).list
-        blockedEntropyList = RList(key: blockedEntropyKey).list
-        
-        return (allowedEntropyList, blockedEntropyList)
-    }
-    
     func getEntropyAndClassificationLists(connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
     {
         var entropyList = [Double]()
         var classificationLabels = [String]()
-        let (allowedEntropyList, blockedEntropyList) = getAllowedBlockedEntropyLists(connectionDirection: connectionDirection)
+        var aEntropyList = [Double]()
+        var bEntropyList = [Double]()
+
+        switch connectionDirection
+        {
+        case .incoming:
+            aEntropyList = packetEntropies.incomingA
+            bEntropyList = packetEntropies.incomingB
+        case .outgoing:
+            aEntropyList = packetEntropies.outgoingA
+            bEntropyList = packetEntropies.outgoingB
+        }
         
         // Allowed Traffic
-        
-        for entropyIndex in 0 ..< allowedEntropyList.count
+        for entropyIndex in 0 ..< aEntropyList.count
         {
-            let aEntropy = allowedEntropyList[entropyIndex]
+            let aEntropy = aEntropyList[entropyIndex]
             entropyList.append(aEntropy)
             classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         /// Blocked traffic
-        
-        for entropyIndex in 0 ..< blockedEntropyList.count
+        for entropyIndex in 0 ..< bEntropyList.count
         {
-            let bEntropy = blockedEntropyList[entropyIndex]
+            let bEntropy = bEntropyList[entropyIndex]
             entropyList.append(bEntropy)
             classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }
@@ -169,9 +160,20 @@ class EntropyCoreML
     
     func testModel(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
-        let (allowedEntropyList, blockedEntropyList) = getAllowedBlockedEntropyLists(connectionDirection: connectionDirection)
+        var aEntropyList = [Double]()
+        var bEntropyList = [Double]()
+
+        switch connectionDirection
+        {
+        case .incoming:
+            aEntropyList = packetEntropies.incomingA
+            bEntropyList = packetEntropies.incomingB
+        case .outgoing:
+            aEntropyList = packetEntropies.outgoingA
+            bEntropyList = packetEntropies.outgoingB
+        }
         
-        guard blockedEntropyList.count > 0
+        guard bEntropyList.count > 0
         else
         {
             print("\nUnable to test entropy. The blocked entropy list is empty.")
@@ -179,10 +181,10 @@ class EntropyCoreML
         }
         
         // Allowed
-        testModel(entropyList: allowedEntropyList, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(entropyList: aEntropyList, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
         
         // Blocked
-        testModel(entropyList: blockedEntropyList, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(entropyList: bEntropyList, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
     }
     
     func testModel(entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)

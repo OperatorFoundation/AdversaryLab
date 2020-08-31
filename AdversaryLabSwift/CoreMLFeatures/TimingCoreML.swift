@@ -7,36 +7,45 @@
 //
 
 import Foundation
-import Auburn
 import CreateML
 import CoreML
 
+import Auburn
+
 class TimingCoreML
 {
+    // TODO: Currently not using error
+    // TODO: Replace observedConnection with ConnectionType
     func processTiming(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
-        let outPacketDateHash: RMap<String, Double> = RMap(key: connection.outgoingDateKey)
-        let inPacketDateHash: RMap<String, Double> = RMap(key: connection.incomingDateKey)
-        let timeDifferenceList: RList<Double> = RList(key: connection.timeDifferenceKey)
+        var outDate: Double?
+        var inDate: Double?
         
-        // Get the out packet time stamp
-        guard let outTimeInterval = outPacketDateHash[connection.connectionID]
-            else
+        switch connection.connectionType
         {
-            return (false, PacketTimingError.noOutPacketDateForConnection(connection.connectionID))
+        case .transportA:
+            outDate = connectionGroupData.aConnectionData.outgoingDates[connection.connectionID]
+            inDate = connectionGroupData.aConnectionData.incomingDates[connection.connectionID]
+            
+        case .transportB:
+            outDate = connectionGroupData.bConnectionData.outgoingDates[connection.connectionID]
+            inDate = connectionGroupData.bConnectionData.incomingDates[connection.connectionID]
         }
         
-        // Get the in packet time stamp
-        guard let inTimeInterval = inPacketDateHash[connection.connectionID]
-            else
-        {
-            return (false, PacketTimingError.noInPacketDateForConnection(connection.connectionID))
-        }
+        guard let timeOut = outDate else { return (false, nil) }
+        guard let timeIn = inDate else { return (false, nil) }
         
         // Add the time difference for this connection to the database
-        let timeDifference = (outTimeInterval - inTimeInterval)
-        timeDifferenceList.append(timeDifference)
+        let timeDifference = (timeOut - timeIn)
         
+        switch connection.connectionType
+        {
+        case .transportA:
+            packetTimings.transportA.append(timeDifference)
+        case .transportB:
+            packetTimings.transportB.append(timeDifference)
+        }
+                
         return (true, nil)
     }
     
@@ -59,23 +68,18 @@ class TimingCoreML
     
     func testModel(configModel: ProcessingConfigurationModel)
     {
-        let bTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
-        let blockedTimeDifferences = bTimeDifferenceList.list
-        let aTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
-        let allowedTimeDifferences = aTimeDifferenceList.list
-
-        guard blockedTimeDifferences.count > 0
+        guard packetTimings.transportB.count > 0
             else
         {
             print("\nError: No blocked time differences found in the database. Tests cannot be run without blocked connection data.")
             return
         }
         
-        testModel(connectionType: .transportB, timeDifferences: blockedTimeDifferences, configModel: configModel)
+        testModel(connectionType: .transportB, timeDifferences: packetTimings.transportB, configModel: configModel)
         
-        if allowedTimeDifferences.count > 0
+        if packetTimings.transportA.count > 0
         {
-            testModel(connectionType: .transportA, timeDifferences: allowedTimeDifferences, configModel: configModel)
+            testModel(connectionType: .transportA, timeDifferences: packetTimings.transportA, configModel: configModel)
         }
     }
     
@@ -258,7 +262,7 @@ class TimingCoreML
                     }
                     
                     let predictedAllowedTimeDifference = allowedTimeDifferences[0]
-                    print("\n Predicted allowed time difference = \(predictedAllowedTimeDifference)")
+                    print("\nPredicted allowed time difference = \(predictedAllowedTimeDifference)")
                     
                     // Save scores
                     timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
@@ -316,32 +320,16 @@ class TimingCoreML
         var timeDifferenceList = [Double]()
         var classificationLabels = [String]()
         
-        /// TimeDifferences for the Allowed traffic
-        let allowedTimeDifferenceList: RList<Double> = RList(key: allowedConnectionsTimeDiffKey)
-        
-        for timeDifferenceIndex in 0 ..< allowedTimeDifferenceList.count
+        /// TimeDifferences for the Transport A traffic
+        for aTimeDifference in packetTimings.transportA
         {
-            guard let aTimeDifference = allowedTimeDifferenceList[timeDifferenceIndex]
-                else
-            {
-                continue
-            }
-            
             timeDifferenceList.append(aTimeDifference)
             classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
-        /// TimeDifferences for the Blocked traffic
-        let blockedTimeDifferenceList: RList<Double> = RList(key: blockedConnectionsTimeDiffKey)
-        
-        for timeDifferenceIndex in 0 ..< blockedTimeDifferenceList.count
+        /// TimeDifferences for Transport B traffic
+        for bTimeDifference in packetTimings.transportB
         {
-            guard let bTimeDifference = blockedTimeDifferenceList[timeDifferenceIndex]
-                else
-            {
-                continue
-            }
-            
             timeDifferenceList.append(bTimeDifference)
             classificationLabels.append(ClassificationLabel.transportB.rawValue)
         }

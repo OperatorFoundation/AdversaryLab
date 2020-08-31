@@ -7,10 +7,11 @@
 //
 
 import Foundation
-import Auburn
 import CreateML
 import CoreML
-//import Song
+
+import Abacus
+import Auburn
 
 struct LengthRecommender: Codable {
     let allowedLength: Int
@@ -48,34 +49,28 @@ extension LengthRecommender {
 
 func getHighestScoredLength(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths: Int, allowedLengthScore: Double, blockedLength: Int, blockedLengthScore: Double)?
 {
-    let allowedLengthsKey: String
-    let blockedLengthsKey: String
+    let aLengths: SortedMultiset<Int>
+    let bLengths: SortedMultiset<Int>
     
     switch connectionDirection
     {
     case .incoming:
-        allowedLengthsKey = allowedIncomingLengthKey
-        blockedLengthsKey = blockedIncomingLengthKey
+        aLengths = packetLengths.incomingA
+        bLengths = packetLengths.incomingB
     case .outgoing:
-        allowedLengthsKey = allowedOutgoingLengthKey
-        blockedLengthsKey = blockedOutgoingLengthKey
+        aLengths = packetLengths.outgoingA
+        bLengths = packetLengths.outgoingB
     }
     
-    /// A is the sorted set of lengths for the Allowed traffic
-    let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-    guard let (allowedLength, allowedScore) = allowedLengthsRSet.first
-        else {
-            return nil
-    }
+    /// A is the sorted set of lengths for the Transport A traffic
+    guard let (aTopLength, aTopScore) = aLengths.array.first
+        else { return nil }
     
-    /// B is the sorted set of lengths for the Blocked traffic
-    let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-    guard let (blockedLength, blockedScore) = blockedLengthsRSet.first
-        else {
-            return nil
-    }
+    /// B is the sorted set of lengths for the Transport B traffic
+    guard let (bTopLength, bTopScore) = bLengths.array.first
+        else { return nil }
     
-    return (allowedLength, Double(allowedScore), blockedLength, Double(blockedScore))
+    return (aTopLength, Double(aTopScore), bTopLength, Double(bTopScore))
 }
 
 class PacketLengthsCoreML
@@ -83,66 +78,47 @@ class PacketLengthsCoreML
     // TODO: Use Song Data and save to our global PacketLengths instance
     func processPacketLengths(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
-        let outPacketHash: RMap<String, Data> = RMap(key: connection.outgoingKey)
-        let outgoingLengthSet: RSortedSet<Int> = RSortedSet(key: connection.outgoingLengthsKey)
-        let inPacketHash: RMap<String, Data> = RMap(key: connection.incomingKey)
-        let incomingLengthSet: RSortedSet<Int> = RSortedSet(key: connection.incomingLengthsKey)
-        
-        // Get the out packet that corresponds with this connection ID
-        guard let outPacket: Data = outPacketHash[connection.connectionID]
-            else
-        {
-            return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID))
-        }
-        
-        /// DEBUG
-        if outPacket.count < 10
-        {
-            print("\n### Outpacket count = \(String(outPacket.count))")
-            print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
-        }
-        
-        // Increment the score of this particular outgoing packet length
-    
-        // FIXME: Testing Song via global var packetLengths
         switch connection.connectionType
         {
         case .transportA:
+            // Get the out packet that corresponds with this connection ID
+            guard let outPacket = connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
+            else { return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID)) }
+            
+            // Get the in packet that corresponds with this connection ID
+            guard let inPacket = connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
+            else { return(false, PacketLengthError.noInPacketForConnection(connection.connectionID)) }
+            
+            /// Sanity Check
+            if outPacket.count < 10 || inPacket.count < 10
+            {
+                print("\n### packet count = \(String(outPacket.count))")
+                print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
+            }
+            
+            // Add these packet lengths to our packetLengths
+            // Adding an element increases the score if the element already exists
             packetLengths.outgoingA.add(element: outPacket.count)
-        case .transportB:
-            packetLengths.outgoingB.add(element: outPacket.count)
-        }
-        
-        let _ = outgoingLengthSet.incrementScore(ofField: outPacket.count, byIncrement: 1)
-        
-        // Get the in packet that corresponds with this connection ID
-        guard let inPacket = inPacketHash[connection.connectionID]
-            else
-        {
-            return(false, PacketLengthError.noInPacketForConnection(connection.connectionID))
-        }
-        
-        /// DEBUG
-        if inPacket.count < 10
-        {
-            print("\n### Inpacket count = \(String(inPacket.count))\n")
-            print("\n⁉️  We got a weird in packet size... \(String(describing: String(data: outPacket, encoding: .utf8))) <---\n")
-        }
-        
-        // Increment the score of this particular incoming packet length
-        // FIXME: Testing Song via global var packetLengths
-        switch connection.connectionType
-        {
-        case .transportA:
             packetLengths.incomingA.add(element: inPacket.count)
+
         case .transportB:
+            guard let outPacket = connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
+            else
+            { return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID)) }
+            
+            guard let inPacket = connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
+            else
+            { return (false, PacketLengthError.noInPacketForConnection(connection.connectionID)) }
+            
+            /// Sanity Check
+            if outPacket.count < 10 || inPacket.count < 10
+            {
+                print("\n### packet count = \(String(outPacket.count))")
+                print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
+            }
+            
+            packetLengths.outgoingB.add(element: outPacket.count)
             packetLengths.incomingB.add(element: inPacket.count)
-        }
-        
-        let newInScore = incomingLengthSet.incrementScore(ofField: inPacket.count, byIncrement: 1)
-        if newInScore == nil
-        {
-            return(false, PacketLengthError.unableToIncremementScore(packetSize: inPacket.count, connectionID: connection.connectionID))
         }
         
         return(true, nil)
@@ -164,6 +140,7 @@ class PacketLengthsCoreML
     
     func scorePacketLengths(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
+        
         if configModel.trainingMode
         {
             let classifierTable = createLengthClassifierTable(connectionDirection: connectionDirection)
@@ -175,23 +152,34 @@ class PacketLengthsCoreML
         }
         else
         {
-            let (allowedLengths, _, blockedLengths, _) = getLengthsAndScores(forConnectionDirection: connectionDirection)
+            let aLengths: [Int]
+            let bLengths: [Int]
             
-            guard blockedLengths.count > 0
+            switch connectionDirection
+            {
+            case .outgoing:
+                aLengths = packetLengths.outgoingA.values
+                bLengths = packetLengths.outgoingB.values
+            case .incoming:
+                aLengths = packetLengths.incomingA.values
+                bLengths = packetLengths.incomingB.values
+            }
+            
+            guard bLengths.count > 0
             else
             {
                 print("\nUnable to test lengths. The blocked lengths list is empty.")
                 return
             }
             
-            // Allowed
-            testModel(lengths: allowedLengths,
+            // TransportA
+            testModel(lengths: aLengths,
                       connectionType: .transportA,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
             
-            // Blocked
-            testModel(lengths: blockedLengths,
+            // TransportB
+            testModel(lengths: bLengths,
                       connectionType: .transportB,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
@@ -418,7 +406,7 @@ class PacketLengthsCoreML
             var evaluationAccuracy: Double? = nil
             if evaluationError >= 0
             {
-                evaluationAccuracy = (1.0 - classifierEvaluation.classificationError) * 100
+                evaluationAccuracy = (1.0 - evaluationError) * 100
             }
             
             if evaluationAccuracy != nil
@@ -468,33 +456,6 @@ class PacketLengthsCoreML
         return scaled
     }
     
-    func getLengthsAndScores(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths:[Int], allowedLengthScores:[Double], blockedLengths: [Int], blockedLengthScores: [Double])
-    {
-        let allowedLengthsKey: String
-        let blockedLengthsKey: String
-        
-        switch connectionDirection
-        {
-        case .incoming:
-            allowedLengthsKey = allowedIncomingLengthKey
-            blockedLengthsKey = blockedIncomingLengthKey
-        case .outgoing:
-            allowedLengthsKey = allowedOutgoingLengthKey
-            blockedLengthsKey = blockedOutgoingLengthKey
-        }
-        
-        /// A is the sorted set of lengths for the Allowed traffic
-        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-        let (allowedLengthsArray, allowedScoresArray) = arrays(from: [allowedLengthsRSet])
-        
-        /// B is the sorted set of lengths for the Blocked traffic
-        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-        let (blockedLengthsArray, blockedScoresArray) = arrays(from: [blockedLengthsRSet])
-        
-        return (allowedLengthsArray, allowedScoresArray, blockedLengthsArray, blockedScoresArray)
-    }
-    
-    // TODO: Rewrite this so that it gets the data from our global PacketLengths instance
     func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Int], classifications: [String])
     {
         var lengths = [Int]()
@@ -537,110 +498,7 @@ class PacketLengthsCoreML
             }
         }
         
-//        let allowedLengthsKey: String
-//        let blockedLengthsKey: String
-//
-//        switch connectionDirection
-//        {
-//        case .incoming:
-//            allowedLengthsKey = allowedIncomingLengthKey
-//            blockedLengthsKey = blockedIncomingLengthKey
-//        case .outgoing:
-//            allowedLengthsKey = allowedOutgoingLengthKey
-//            blockedLengthsKey = blockedOutgoingLengthKey
-//        }
-//
-//        /// A is the sorted set of lengths for the Allowed traffic
-//        let allowedLengthsRSet: RSortedSet<Int> = RSortedSet(key: allowedLengthsKey)
-//        let (allowedLengthsArray, allowedLengthScores) = arrays(from: [allowedLengthsRSet])
-//
-//        /// B is the sorted set of lengths for the Blocked traffic
-//        let blockedLengthsRSet: RSortedSet<Int> = RSortedSet(key: blockedLengthsKey)
-//        let (blockedLengthsArray, blockedLengthsScores) = arrays(from: [blockedLengthsRSet])
-//
-//        lengths.append(contentsOf: allowedLengthsArray)
-//        scores.append(contentsOf: allowedLengthScores)
-//        for _ in allowedLengthsArray
-//        {
-//            classificationLabels.append(ClassificationLabel.transportA.rawValue)
-//        }
-//
-//        lengths.append(contentsOf: blockedLengthsArray)
-//        scores.append(contentsOf: blockedLengthsScores)
-//        for _ in blockedLengthsArray
-//        {
-//            classificationLabels.append(ClassificationLabel.transportB.rawValue)
-//        }
-        
         return(lengths, scores, classificationLabels)
     }
     
 }
-
-/// Returns one array containing each element in all of the sorted sets provided. This method takes an array of sorted sets of Ints and returns an array of Ints. Values are not repeated based on score. Each value will be added to the array only one time
-/// - Parameters:
-///     - redisSets: [RSortedSet<Int>], an array of sorted sets to turn in to one array of Ints.
-/// - Returns: [Int], an array of Ints.
-func arrays(from redisSets:[RSortedSet<Int>]) -> (values: [Int], scores: [Double])
-{
-    var valueArray = [Int]()
-    var scoreArray = [Double]()
-    
-    for set in redisSets
-    {
-        if set.count == 1
-        {
-            if let newMember: Int = set[0], let score: Float = set.getScore(for: newMember)
-            {
-                valueArray.append(newMember)
-                scoreArray.append(Double(score))
-                
-                // Add the one value to the arrays twice because MLCreate requires more than one
-                scoreArray.append(Double(score))
-                valueArray.append(newMember)
-            }
-        }
-        
-        for i in 0 ..< set.count
-        {
-            if let newMember: Int = set[i], let score: Float = set.getScore(for: newMember)
-            {
-                valueArray.append(newMember)
-                scoreArray.append(Double(score))
-            }
-        }
-    }
-    
-    return (valueArray, scoreArray)
-}
-
-/// Returns an array of doubles created using the elements in the sorted set of Ints. The number of times a given element is added to the array is equal to the score of that element in the set.
-/// - Parameters:
-///     - intSortedSet: RSortedSet<Int>, the sorted set of Ints to use to create the array.
-/// - Returns: [Double], An array of Doubles.
-func newDoubleArrayUsingScores(from intSortedSet: RSortedSet<Int>) -> [Double]
-{
-    var newArray = [Double]()
-    
-    for i in 0 ..< intSortedSet.count
-    {
-        guard let value: Int = intSortedSet[i]
-            else { continue }
-        
-        guard let score = intSortedSet.getScore(for: value)
-            else { continue }
-        
-        // The score is the number of times we saw a given value
-        // Add the value to the array "score" times
-        for _ in 0..<Int(score)
-        {
-            newArray.append(Double(value))
-        }
-    }
-    
-    newArray.sort()
-    return newArray
-}
-
-
-

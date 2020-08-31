@@ -254,75 +254,7 @@ class RedisServerController: NSObject
             })
         }
     }
-    
-    func mergeIntoCurrentDatabase(mergeFile: URL, completion: @escaping (ConnectionGroupData?) -> Void)
-    {
-        let processor = DataProcessing()
-        let fileManager = FileManager.default
-        let currentDirectory = fileManager.currentDirectoryPath
-        let mergeGroup = DispatchGroup.init()
-        let mergeQueue = DispatchQueue(label: "MergeQueue")
-        
-        guard let currentDBName = Auburn.dbfilename
-            else
-        {
-            print("Unable to merge into current DB, database filename not found.")
-            completion(nil)
-            return
-        }
-        
-        let newDBName = currentDBName.replacingOccurrences(of: ".rdb", with: "_merged.rdb")
-        let destinationURL = URL(fileURLWithPath: currentDirectory).appendingPathComponent(newDBName)
-        if !fileManager.fileExists(atPath: destinationURL.path)
-        {
-            fileManager.createFile(atPath: destinationURL.path, contents: nil, attributes: nil)
-        }
-        
-        mergeQueue.async
-        {
-            
-            let connectionGroupData = ConnectionGroupData()
-            
-            print("\nEnter 1")
-            mergeGroup.enter()
-            self.switchDatabaseFile(withFile: mergeFile)
-            {
-                (_) in
-                
-                print("\nLeave 1")
-                mergeGroup.leave()
-            }
-            mergeGroup.wait()
-            
-            let newConnectionGroupData = ConnectionGroupData()
-            let mergedConnectionData = processor.merge(connectionGroupData: connectionGroupData, with: newConnectionGroupData)
-            
-            mergeGroup.enter()
-            print("\nEnter 2")
-            self.switchDatabaseFile(withFile: destinationURL)
-            {
-                (_) in
-                
-                print("\nLeave 2")
-                mergeGroup.leave()
-            }
-            mergeGroup.wait()
-            
-            
-            print("\nEnter 3")
-            mergeGroup.enter()
-            processor.saveToRedis(connectionData: mergedConnectionData)
-            {
-                _ in
-                
-                print("\nLeave 3")
-                mergeGroup.leave()
-                completion(mergedConnectionData)
-            }
-            mergeGroup.wait()
-        }
-    }
-    
+
     func runLaunchRedisScript(completion:@escaping (_ completion:Bool) -> Void)
     {
         let bundle = Bundle.main

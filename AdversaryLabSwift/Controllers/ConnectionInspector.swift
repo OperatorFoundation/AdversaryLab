@@ -263,7 +263,7 @@ class ConnectionInspector
         DispatchQueue.main.async{
             ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
         }
-        let (entropyProcessed,_, _, maybeEntropyError) = EntropyCoreML().processEntropy(forConnection: connection)
+        let (entropyProcessed, _, _, maybeEntropyError) = EntropyCoreML().processEntropy(forConnection: connection)
         if let entropyError = maybeEntropyError
         {
             print("Entropy error: \(entropyError)")

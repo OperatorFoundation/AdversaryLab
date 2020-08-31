@@ -12,8 +12,8 @@ import Cocoa
 func showNoDataAlert()
 {
     let alert = NSAlert()
-    alert.messageText = "No packets to process"
-    alert.informativeText = "There is no valid data in the selected database file."
+    alert.messageText = "Not enough packets to process"
+    alert.informativeText = "There is not enough valid data in the selected database file."
     alert.runModal()
 }
 

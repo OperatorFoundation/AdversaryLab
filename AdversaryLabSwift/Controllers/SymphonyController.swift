@@ -44,13 +44,7 @@ class SymphonyController
                 transportNames.append(tableURL.lastPathComponent)
             }
             
-            saveSymphonyDataToRedis
-            {
-                (success) in
-                
-                print("\nReturned from saving Symphony Data to Redis DB.\n")
-                completion(success)
-            }
+            saveSymphonyDataAsConnectionGroup()
         }
         catch let error
         {
@@ -60,7 +54,7 @@ class SymphonyController
         }
     }
     
-    func saveSymphonyDataToRedis(completion: @escaping (Bool) -> Void)
+    func saveSymphonyDataAsConnectionGroup()
     {
         let processor = DataProcessing()
         // Make sure that we have a connection to the database
@@ -68,55 +62,42 @@ class SymphonyController
             else
         {
             print("Unable to save Symphony data into Redis database. Failed to find Symphony instance.")
-            completion(false)
             return
         }
 
         guard transportNames.count > 1 else
         {
             print("Unable to add Symphony data to Redis, we need at least two transports.")
-            completion(false)
             return
         }
         
         print("Found transports in database: \(transportNames)")
         
         ///Ask the user which transport is allowed and which is blocked
-        DispatchQueue.main.async
-        {
-            guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: self.transportNames)
-                else
-            {
-                    completion(false)
-                    return
-            }
-                
-            guard let (transportB, _) = showChooseBConnectionsAlert(transportNames: remainingTransports)
-                else
-            {
-                completion(false)
-                return
-            }
-            
-            guard let (aPackets, bPackets) = self.packetArraysFromSymphony(for: transportA, transportB: transportB)
+        guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: self.transportNames)
             else
-            {
-               print("Failed to get both blocked and allowed packets from Symphony.")
-               completion(false)
-               return
-            }
-                
-            ///Write Swift data structures to Redis database
-            let redisConnectionData = processor.connectionData(forTransportA: transportA, aRawPackets: aPackets, transportB: transportB, bRawPackets: bPackets)
-            
-            processor.saveToRedis(connectionData: redisConnectionData)
-            {
-                (saved) in
-                
-                print("\nSaved our Symphony data to Redis!\n")
-                completion(saved)
-            }
+        {
+                return
         }
+            
+        guard let (transportB, _) = showChooseBConnectionsAlert(transportNames: remainingTransports)
+            else
+        {
+            return
+        }
+        
+        guard let (aPackets, bPackets) = self.packetArraysFromSymphony(for: transportA, transportB: transportB)
+        else
+        {
+           print("Failed to get both blocked and allowed packets from Symphony.")
+           return
+        }
+            
+        ///Write Swift data structures
+        processor.updateConnectionGroupData(forTransportA: transportA,
+                                            aRawPackets: aPackets,
+                                            transportB: transportB,
+                                            bRawPackets: bPackets)
     }
     
     /// File management

@@ -17,7 +17,7 @@ import Charts
 
 class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
 {
-    // @IBOutlet weak var TestLineChart: LineChart!
+//    @IBOutlet weak var TestLineChart: LineChart!
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
@@ -190,6 +190,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     @objc dynamic var bInEntropyAccuracyLabel = "In Entropy Accuracy: "
     @objc dynamic var inEntropyBlockAccuracy = "--"
 
+    let dataProcessing = DataProcessing()
     let circleRadius: CGFloat = 2.5
     var modelDirectoryURL: URL?
     
@@ -269,32 +270,26 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             case .TestMode:
                 runTest()
             case .TrainingMode: // In Training mode we need a name so we can save the model files
-                
-                let packetStatsDict = ConnectionGroupData().packetStats
-                guard let allowedPacketsSeenValue: Int = packetStatsDict[allowedPacketsSeenKey], let blockedPacketsSeenValue: Int = packetStatsDict[blockedPacketsSeenKey]
-                    else {
-                        showNoDataAlert()
-                        return
-                }
-                
-                if allowedPacketsSeenValue > 0, blockedPacketsSeenValue > 0
-                {
-                    if let name = showNameModelAlert()
-                    {
-                        print("Time to analyze some things.")
-                        configModel.modelName = name
-                        connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: true, resetTestingData: false)
-                        updateProgressIndicator()
-                    }
+                guard connectionGroupData.aPacketsSeen > 6, connectionGroupData.bPacketsSeen > 6
                     else
-                    {
-                        sender.state = .off
-                        refreshDBUI()
-                    }
-                }
-                else {
+                {
                     showNoDataAlert()
+                    return
                 }
+                
+                if let name = showNameModelAlert()
+                {
+                    print("Time to analyze some things.")
+                    configModel.modelName = name
+                    connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: true, resetTestingData: false)
+                    updateProgressIndicator()
+                }
+                else
+                {
+                    sender.state = .off
+                    refreshDBUI()
+                }
+                
                 
             case .DataMode:
                 print("Data mode selected. Nothing to do here.")
@@ -433,19 +428,15 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     
     func updateLengthChart()
     {
-        let allowedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedOutgoingLengthKey)
-        let allowedOutLengths = newDoubleArrayUsingScores(from: allowedOutLengthsSet)
-        let allowedInLengthsSet: RSortedSet<Int> = RSortedSet(key: allowedIncomingLengthKey)
-        let allowedInLengths = newDoubleArrayUsingScores(from: allowedInLengthsSet)
-        let blockedOutLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedOutgoingLengthKey)
-        let blockedOutLengths = newDoubleArrayUsingScores(from: blockedOutLengthsSet)
-        let blockedInLengthsSet: RSortedSet<Int> = RSortedSet(key: blockedIncomingLengthKey)
-        let blockedInLengths = newDoubleArrayUsingScores(from: blockedInLengthsSet)
+        let aOutLengths = packetLengths.outgoingA.expanded
+        let aInLengths = packetLengths.incomingA.expanded
+        let bOutLengths = packetLengths.outgoingB.expanded
+        let bInLengths = packetLengths.incomingB.expanded
         
-        let allowedInLengthsEntry = chartDataEntry(fromArray: allowedInLengths)
-        let allowedOutLengthsEntry = chartDataEntry(fromArray: allowedOutLengths)
-        let blockedInLengthsEntry = chartDataEntry(fromArray: blockedInLengths)
-        let blockedOutLengthsEntry = chartDataEntry(fromArray: blockedOutLengths)
+        let allowedInLengthsEntry = chartDataEntry(fromArray: aInLengths)
+        let allowedOutLengthsEntry = chartDataEntry(fromArray: aOutLengths)
+        let blockedInLengthsEntry = chartDataEntry(fromArray: bInLengths)
+        let blockedOutLengthsEntry = chartDataEntry(fromArray: bOutLengths)
         
         let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "Allowed Incoming Packet Lengths")
         allowedInLine.colors = [NSUIColor.blue]
@@ -621,7 +612,19 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         var lineChartData = [ChartDataEntry]()
         for i in 0..<dataArray.count
         {
-            let value = ChartDataEntry(x: Double(i), y: dataArray[i])
+            let value = ChartDataEntry(x: Double(i), y: Double(dataArray[i]))
+            lineChartData.append(value)
+        }
+        
+        return lineChartData
+    }
+    
+    func chartDataEntry(fromArray dataArray:[Int]) -> [ChartDataEntry]
+    {
+        var lineChartData = [ChartDataEntry]()
+        for i in 0..<dataArray.count
+        {
+            let value = ChartDataEntry(x: Double(i), y: Double(dataArray[i]))
             lineChartData.append(value)
         }
         
@@ -843,30 +846,26 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         }
     }
     
+    // MARK: Update Labels
+    
     @objc func loadLabelData()
     {
         // Updates Labels that are in the main window (always visible)
         // Get redis data in the utility queue and update the labels with the data in the main queue
         //print("Main thread?: \(Thread.isMainThread)")
-        let connectionData = ConnectionGroupData()
         let redisDatabaseFilename = Auburn.dbfilename ?? "--"
         
         DispatchQueue.main.async
         {
-            let packetStatsDict = connectionData.packetStats
-            let aPacketsSeenValue: Int? = packetStatsDict[allowedPacketsSeenKey]
-            let aPacketsAnalyzedValue: Int? = packetStatsDict[allowedPacketsAnalyzedKey]
-            let bPacketsSeenValue: Int? = packetStatsDict[blockedPacketsSeenKey]
-            let bPacketsAnalyzedValue: Int? = packetStatsDict[blockedPacketsAnalyzedKey]
             self.databaseNameLabel.stringValue = redisDatabaseFilename
             self.aConnectionsCountLabel = "\(transportA) connections: "
-            self.allowedPacketsSeen = "\(aPacketsSeenValue ?? 0)"
+            self.allowedPacketsSeen = "\(connectionGroupData.aPacketsSeen)"
             self.aConnectionsAnalyzedLabel = "\(transportA) connections analyzed: "
-            self.allowedPacketsAnalyzed = "\(aPacketsAnalyzedValue ?? 0)"
+            self.allowedPacketsAnalyzed = "\(connectionGroupData.aPacketsAnalyzed)"
             self.bConnectionsCountLabel = "\(transportB) connections: "
-            self.blockedPacketsSeen = "\(bPacketsSeenValue ?? 0)"
+            self.blockedPacketsSeen = "\(connectionGroupData.bPacketsSeen)"
             self.bConnectionsAnalyzedLabel = "\(transportB) connections analyzed: "
-            self.blockedPacketsAnalyzed = "\(bPacketsAnalyzedValue ?? 0)"
+            self.blockedPacketsAnalyzed = "\(connectionGroupData.bPacketsAnalyzed)"
             
             guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
                 let currentTab = TabIds(rawValue: identifier)

@@ -11,20 +11,9 @@ import Abacus
 
 class PacketLengths
 {
-    var incomingA: SortedMultiset<Int>
-    var outgoingA: SortedMultiset<Int>
+    var incomingA: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
+    var outgoingA: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
 
-    var incomingB: SortedMultiset<Int>
-    var outgoingB: SortedMultiset<Int>
-    
-    init(transportAIncoming: SortedMultiset<Int>,
-         transportAOutgoing: SortedMultiset<Int>,
-         transportBIncoming: SortedMultiset<Int>,
-         transportBOutgoing: SortedMultiset<Int>)
-    {
-        incomingA = transportAIncoming
-        outgoingA = transportAOutgoing
-        incomingB = transportBIncoming
-        outgoingB = transportBOutgoing
-    }
+    var incomingB: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
+    var outgoingB: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
 }
