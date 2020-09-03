@@ -17,7 +17,6 @@ import Charts
 
 class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
 {
-//    @IBOutlet weak var TestLineChart: LineChart!
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
@@ -383,6 +382,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         SymphonyController().launchSymphony(fromFile: fileURL)
         {
             (success) in
+            
             completion(success)
         }
     }

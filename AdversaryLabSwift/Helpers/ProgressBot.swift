@@ -16,7 +16,7 @@ class ProgressBot
     {
         didSet
         {
-            //NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
+            NotificationCenter.default.post(name: .updateProgressIndicator, object: nil)
         }
     }
     

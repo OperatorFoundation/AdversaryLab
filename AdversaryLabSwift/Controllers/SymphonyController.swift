@@ -45,6 +45,7 @@ class SymphonyController
             }
             
             saveSymphonyDataAsConnectionGroup()
+            completion(true)
         }
         catch let error
         {

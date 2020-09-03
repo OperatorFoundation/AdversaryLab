@@ -6,10 +6,11 @@
 //  Copyright © 2018 Operator Foundation. All rights reserved.
 //
 
-import Foundation
-import Auburn
 import CreateML
 import CoreML
+import Foundation
+
+import Auburn
 
 class EntropyCoreML
 {
@@ -106,7 +107,6 @@ class EntropyCoreML
             testModel(connectionDirection: .incoming, configModel: configModel)
             testModel(connectionDirection: .outgoing, configModel: configModel)
         }
-        
     }
     
     func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
@@ -340,7 +340,7 @@ class EntropyCoreML
         
         // Set aside 20% of the model's data rows for evaluation, leaving the remaining 80% for training
         let (entropyEvaluationTable, entropyTrainingTable) = entropyTable.randomSplit(by: 0.20)
-        
+
         // Train the classifier
         do
         {
