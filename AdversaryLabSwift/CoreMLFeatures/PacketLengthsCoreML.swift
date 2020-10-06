@@ -6,18 +6,17 @@
 //  Copyright © 2018 Operator Foundation. All rights reserved.
 //
 
-import Foundation
 import CreateML
 import CoreML
+import Foundation
 
 import Abacus
-import Auburn
 
 struct LengthRecommender: Codable {
-    let allowedLength: Int
-    let allowedScore: Double
-    let blockedLength: Int
-    let blockedScore: Double
+    let transportALength: Int
+    let transportAScore: Double
+    let transportBLength: Int
+    let transportBScore: Double
 }
 
 extension LengthRecommender {
@@ -30,10 +29,10 @@ extension LengthRecommender {
             return nil
         }
         
-        self.allowedLength = aLength
-        self.allowedScore = aScore
-        self.blockedLength = bLength
-        self.blockedScore = bScore
+        self.transportALength = aLength
+        self.transportAScore = aScore
+        self.transportBLength = bLength
+        self.transportBScore = bScore
     }
     
     func write(to fileURL: URL) throws
@@ -190,35 +189,15 @@ class PacketLengthsCoreML
     {
         let classifierName: String
         let recommenderName: String
-        let accuracyKey: String
-        let lengthKey: String
         
         switch connectionDirection
         {
         case .incoming:
             classifierName = inLengthClassifierName
             recommenderName = inLengthRecommenderName
-            switch connectionType
-            {
-            case .transportA:
-                accuracyKey = allowedIncomingLengthAccuracyKey
-                lengthKey = allowedIncomingLengthKey
-            case .transportB:
-                accuracyKey = blockedIncomingLengthAccuracyKey
-                lengthKey = blockedIncomingLengthKey
-            }
         case .outgoing:
             classifierName = outLengthClassifierName
             recommenderName = outLengthRecommenderName
-            switch connectionType
-            {
-            case .transportA:
-                accuracyKey = allowedOutgoingLengthAccuracyKey
-                lengthKey = allowedOutgoingLengthKey
-            case .transportB:
-                accuracyKey = blockedOutgoingLengthAccuracyKey
-                lengthKey = blockedOutgoingLengthKey
-            }
         }
         do
         {
@@ -235,27 +214,32 @@ class PacketLengthsCoreML
             let classifierFileURL = temporaryDirURL.appendingPathComponent(classifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
                        
             let recommenderFileURL = temporaryDirURL.appendingPathComponent(recommenderName, isDirectory: false).appendingPathExtension(songFileExtension)
-            
-            // This is the dictionary where we will save our results
-            let lengthDictionary: RMap<String,Double> = RMap(key: testResultsKey)
-            
-            // TODO: MLRecommender
+                        
             if FileManager.default.fileExists(atPath: recommenderFileURL.path)
             {
                 let decoder = JSONDecoder()
                 let recommenderData = try Data(contentsOf: recommenderFileURL)
                 let result = try decoder.decode(LengthRecommender.self, from: recommenderData)
-//                let decoder = SongDecoder()
-//                let recommenderData = try Data(contentsOf: recommenderFileURL)
-//                let result = try decoder.decode(LengthRecommender.self, from: recommenderData)
-                print("🔮 Length prediction for \(lengthKey): \(result).")
                 
-                switch connectionType
+                // Save the test results
+                switch connectionDirection
                 {
-                case .transportA:
-                    lengthDictionary[lengthKey] = Double(result.allowedLength)
-                case .transportB:
-                    lengthDictionary[lengthKey] = Double(result.blockedLength)
+                case .incoming:
+                    switch connectionType
+                    {
+                    case .transportA:
+                        packetLengths.incomingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                    case .transportB:
+                        packetLengths.incomingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                    }
+                case .outgoing:
+                    switch connectionType
+                    {
+                    case .transportA:
+                        packetLengths.outgoingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                    case .transportB:
+                        packetLengths.outgoingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                    }
                 }
             }
             else
@@ -301,9 +285,26 @@ class PacketLengthsCoreML
                     accuracy = (accuracy * 1000).rounded()/1000
                     // Show the accuracy as a percentage value
                     accuracy = accuracy * 100
-                    print("\n🔮 Length prediction: \(accuracy) \(connectionType.rawValue).")
                     
-                    lengthDictionary[accuracyKey] = accuracy
+                    switch connectionDirection
+                    {
+                    case .incoming:
+                        switch connectionType
+                        {
+                        case .transportA:
+                            packetLengths.incomingATestResults?.accuracy = accuracy
+                        case .transportB:
+                            packetLengths.incomingBTestResults?.accuracy = accuracy
+                        }
+                    case .outgoing:
+                        switch connectionType
+                        {
+                        case .transportA:
+                            packetLengths.outgoingATestResults?.accuracy = accuracy
+                        case .transportB:
+                            packetLengths.outgoingBTestResults?.accuracy = accuracy
+                        }
+                    }
                 }
             }
             else
@@ -350,30 +351,15 @@ class PacketLengthsCoreML
     
     func trainModels(lengthsClassifierTable: MLDataTable, lengthRecommender: LengthRecommender, connectionDirection: ConnectionDirection, modelName: String)
     {
-        let requiredLengthKey: String
-        let forbiddenLengthKey: String
-        let lengthsTAccKey: String
-        let lengthsVAccKey: String
-        let lengthsEAccKey: String
         let recommenderName: String
         let classifierName: String
         
         switch connectionDirection
         {
         case .incoming:
-            requiredLengthKey = incomingRequiredLengthKey
-            forbiddenLengthKey = incomingForbiddenLengthKey
-            lengthsTAccKey = incomingLengthsTAccKey
-            lengthsVAccKey = incomingLengthsVAccKey
-            lengthsEAccKey = incomingLengthsEAccKey
             recommenderName = inLengthRecommenderName
             classifierName = inLengthClassifierName
         case .outgoing:
-            requiredLengthKey = outgoingRequiredLengthKey
-            forbiddenLengthKey = outgoingForbiddenLengthKey
-            lengthsTAccKey = outgoingLengthsTAccKey
-            lengthsVAccKey = outgoingLengthsVAccKey
-            lengthsEAccKey = outgoingLengthsEAccKey
             recommenderName = outLengthRecommenderName
             classifierName = outLengthClassifierName
         }
@@ -385,11 +371,7 @@ class PacketLengthsCoreML
         do
         {
             let classifier = try MLClassifier(trainingData: classifierTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
-            // Save Length Recommendations
-            let lengthsDictionary: RMap<String, Double> = RMap(key: packetLengthsTrainingResultsKey)
-            lengthsDictionary[requiredLengthKey] = Double(lengthRecommender.allowedLength)
-            lengthsDictionary[forbiddenLengthKey] = Double(lengthRecommender.blockedLength)
-            
+                        
             // Training Accuracy
             let trainingError = classifier.trainingMetrics.classificationError
             var trainingAccuracy: Double? = nil
@@ -397,9 +379,7 @@ class PacketLengthsCoreML
             {
                 trainingAccuracy = (1.0 - trainingError) * 100
             }
-                
-            lengthsDictionary[lengthsTAccKey] = trainingAccuracy
-            
+                            
             // Evaluation Accuracy
             let classifierEvaluation = classifier.evaluation(on: classifierEvaluationTable)
             let evaluationError = classifierEvaluation.classificationError
@@ -407,11 +387,6 @@ class PacketLengthsCoreML
             if evaluationError >= 0
             {
                 evaluationAccuracy = (1.0 - evaluationError) * 100
-            }
-            
-            if evaluationAccuracy != nil
-            {
-                lengthsDictionary[lengthsEAccKey] = evaluationAccuracy
             }
 
             // Validation Accuracy
@@ -424,13 +399,27 @@ class PacketLengthsCoreML
                 validationAccuracy = (1.0 - validationError) * 100
             }
             
-            if validationAccuracy != nil
+            // Save Length Recommendations
+            switch connectionDirection
             {
-                lengthsDictionary[lengthsVAccKey] = validationAccuracy!
+            case .incoming:
+                trainingData.incomingLengthsTrainingResults = TrainingResults(
+                    predictionForA: Double(lengthRecommender.transportALength),
+                    predictionForB: Double(lengthRecommender.transportBLength),
+                    trainingAccuracy: trainingAccuracy,
+                    validationAccuracy: validationAccuracy,
+                    evaluationAccuracy: evaluationAccuracy)
+            case .outgoing:
+                trainingData.outgoingLengthsTrainingResults = TrainingResults(
+                    predictionForA: Double(lengthRecommender.transportALength),
+                    predictionForB: Double(lengthRecommender.transportBLength),
+                    trainingAccuracy: trainingAccuracy,
+                    validationAccuracy: validationAccuracy,
+                    evaluationAccuracy: evaluationAccuracy)
             }
 
             // Save the models to a file
-            MLModelController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, classifierFileName: classifierName, recommender: lengthRecommender, recommenderFileName: recommenderName, groupName: modelName)
+            FileController().saveModel(classifier: classifier, classifierMetadata: lengthsClassifierMetadata, classifierFileName: classifierName, recommender: lengthRecommender, recommenderFileName: recommenderName, groupName: modelName)
         }
         catch let error
         {

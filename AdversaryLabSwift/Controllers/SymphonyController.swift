@@ -26,13 +26,12 @@ class SymphonyController
         guard let songDirectory = unzipSong(sourceURL: fileURL)
             else
         {
-                completion(false)
-                return
+            completion(false)
+            return
         }
         
         symphony = Symphony(root: songDirectory)
         
-        // FIXME: We need to actually get the list of transport names from Symphony, this functionality does not exist yet
         // Get the list of transports in the Symphony DB
         
         do
@@ -78,7 +77,7 @@ class SymphonyController
         guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: self.transportNames)
             else
         {
-                return
+            return
         }
             
         guard let (transportB, _) = showChooseBConnectionsAlert(transportNames: remainingTransports)

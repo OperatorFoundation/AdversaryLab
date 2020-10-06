@@ -17,6 +17,7 @@ var connectionGroupData = ConnectionGroupData()
 var packetLengths = PacketLengths()
 var packetTimings = PacketTimings()
 var packetEntropies = PacketEntropies()
+var trainingData = TrainingData()
 
 func getAdversarySupportDirectory() -> URL?
 {

@@ -11,15 +11,13 @@ import Auburn
 
 class ConnectionGroupData
 {
-    var aPacketsSeen = 0
     var aPacketsAnalyzed = 0
     var aConnectionData = ConnectionData()
-    var bPacketsSeen = 0
     var bPacketsAnalyzed = 0
     var bConnectionData = ConnectionData()
 }
 
-struct ConnectionData
+struct ConnectionData: Codable
 {
     var incomingPackets: [String: Data] = [:]
     var incomingDates: [String: Double] = [:]

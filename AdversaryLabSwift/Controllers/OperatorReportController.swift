@@ -9,9 +9,7 @@
 import Foundation
 import Cocoa
 import Quartz
-import RedShot
 import Auburn
-
 
 /**
  This class is for Operator Foundation Reporting
@@ -128,28 +126,33 @@ class OperatorReportController
             let allFeatTLSDictionary: RMap<String,String> = RMap(key: allFeaturesTLSTestResultsKey)
             
             // Timing (milliseconds)
-            let timeBlocked: String
-            let timeBlockAccuracy: String
-            let timeAllowed: String
-            let timeAllowAccuracy: String
+            var transportATiming = "--"
+            var transportATimingAccuracy = "--"
+            var transportBTiming = "--"
+            var transportBTimingAccuracy = "--"
             
-            if testResults[blockedTimingKey] != nil, testResults[blockedTimingAccuracyKey] != nil, testResults[allowedTimingKey] != nil, testResults[allowedTimingAccuracyKey] != nil
+            if let transportATimingTestResults = packetTimings.transportATestResults
             {
-                timeBlocked = String(format: "%.2f", testResults[blockedTimingKey]!)
-                timeBlockAccuracy = String(format: "%.2f", testResults[blockedTimingAccuracyKey]!)
-                timeAllowed = String(format: "%.2f", testResults[allowedTimingKey]!)
-                timeAllowAccuracy = String(format: "%.2f", testResults[allowedTimingAccuracyKey]!)
-            }
-            else
-            {
-                timeBlocked = "--"
-                timeBlockAccuracy = "--"
-                timeAllowed = "--"
-                timeAllowAccuracy = "--"
+                transportATiming = String(format: "%.2f", transportATimingTestResults.prediction)
+                
+                if let accuracy = transportATimingTestResults.accuracy
+                {
+                    transportATimingAccuracy = String(format: "%.2f", accuracy)
+                }
             }
             
-            let timingAllowedRow = "| Allowed | \(timeAllowed) | \(timeAllowAccuracy) |\n"
-            let timingBlockedRow = "| Blocked | \(timeBlocked) | \(timeBlockAccuracy) |\n"
+            if let transportBTimingTestResults = packetTimings.transportBTestResults
+            {
+                transportBTiming = String(format: "%.2f", transportBTimingTestResults.prediction)
+                
+                if let accuracy = transportBTimingTestResults.accuracy
+                {
+                    transportBTimingAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            let timingAllowedRow = "| Allowed | \(transportATiming) | \(transportATimingAccuracy) |\n"
+            let timingBlockedRow = "| Blocked | \(transportBTiming) | \(transportBTimingAccuracy) |\n"
             
             // TLS Common Names
             let tlsBlocked = tlsTestValuesDictionary[blockedTLSKey] ?? "--"
@@ -172,79 +175,111 @@ class OperatorReportController
             let tlsBlockedRow = "| Blocked| \(tlsBlocked) | \(tlsBlockAccuracy) |\n"
             
             // Lengths
-            let lengthInAllowed: String
-            let lengthInAllowAccuracy: String
-            let lengthOutAllowed: String
-            let lengthOutAllowAccuracy: String
+            var lengthInA = "--"
+            var lengthInAAccuracy = "--"
+            var lengthOutA = "--"
+            var lengthOutAAccuracy = "--"
             
-            let lengthInBlocked: String
-            let lengthInBlockAccuracy: String
-            let lengthOutBlocked: String
-            let lengthOutBlockAccuracy: String
+            var lengthInB = "--"
+            var lengthInBAccuracy = "--"
+            var lengthOutB = "--"
+            var lengthOutBAccuracy = "--"
             
-            if testResults[allowedIncomingLengthKey] != nil, testResults[allowedIncomingLengthAccuracyKey] != nil, testResults[allowedOutgoingLengthKey] != nil, testResults[allowedOutgoingLengthAccuracyKey] != nil, testResults[blockedIncomingLengthKey] != nil, testResults[blockedIncomingLengthAccuracyKey] != nil, testResults[blockedOutgoingLengthKey] != nil,  testResults[blockedOutgoingLengthAccuracyKey] != nil
+            if let aIncomingLengthTestResults = packetLengths.incomingATestResults
             {
-                lengthInAllowed = String(format: "%.2f", testResults[allowedIncomingLengthKey]!)
-                lengthInAllowAccuracy = String(format: "%.2f", testResults[allowedIncomingLengthAccuracyKey]!)
-                lengthOutAllowed = String(format: "%.2f", testResults[allowedOutgoingLengthKey]!)
-                lengthOutAllowAccuracy = String(format: "%.2f", testResults[allowedOutgoingLengthAccuracyKey]!)
+                lengthInA = String(format: "%.2f", aIncomingLengthTestResults.prediction)
                 
-                lengthInBlocked = String(format: "%.2f", testResults[blockedIncomingLengthKey]!)
-                lengthInBlockAccuracy = String(format: "%.2f", testResults[blockedIncomingLengthAccuracyKey]!)
-                lengthOutBlocked = String(format: "%.2f", testResults[blockedOutgoingLengthKey]!)
-                lengthOutBlockAccuracy = String(format: "%.2f", testResults[blockedOutgoingLengthAccuracyKey]!)
-            }
-            else
-            {
-                lengthInAllowed = "--"
-                lengthInAllowAccuracy = "--"
-                lengthOutAllowed = "--"
-                lengthOutAllowAccuracy = "--"
-                
-                lengthInBlocked = "--"
-                lengthInBlockAccuracy = "--"
-                lengthOutBlocked = "--"
-                lengthOutBlockAccuracy = "--"
+                if let accuracy = aIncomingLengthTestResults.accuracy
+                {
+                    lengthInAAccuracy = String(format: "%.2f", accuracy)
+                }
             }
             
-            let lengthAllowedRow = "| Allowed | \(lengthInAllowed) | \(lengthInAllowAccuracy) | \(lengthOutAllowed) | \(lengthOutAllowAccuracy) |\n"
-            let lengthBlockedRow = "| Blocked | \(lengthInBlocked) | \(lengthInBlockAccuracy) | \(lengthOutBlocked) | \(lengthOutBlockAccuracy) |\n"
+            if let aOutgoingLengthTestResults = packetLengths.outgoingATestResults
+            {
+                lengthOutA = String(format: "%.2f", aOutgoingLengthTestResults.prediction)
+                if let accuracy = aOutgoingLengthTestResults.accuracy
+                {
+                    lengthOutAAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            if let bIncomingLengthTestResults = packetLengths.incomingBTestResults
+            {
+                lengthInB = String(format: "%.2f", bIncomingLengthTestResults.prediction)
+                
+                if let accuracy = bIncomingLengthTestResults.accuracy
+                {
+                    lengthInBAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            if let bOutgoingLengthTestResults = packetLengths.outgoingBTestResults
+            {
+                lengthOutB = String(format: "%.2f", bOutgoingLengthTestResults.prediction)
+                
+                if let accuracy = bOutgoingLengthTestResults.accuracy
+                {
+                    lengthOutBAccuracy = String(format: "%.2f", accuracy)
+                } else { lengthOutBAccuracy = "--" }
+                
+            } else { lengthOutB = "--" }
+            
+            let lengthAllowedRow = "| Allowed | \(lengthInA) | \(lengthInAAccuracy) | \(lengthOutA) | \(lengthOutAAccuracy) |\n"
+            let lengthBlockedRow = "| Blocked | \(lengthInB) | \(lengthInBAccuracy) | \(lengthOutB) | \(lengthOutBAccuracy) |\n"
             
             // Entropy
-            let entInAllowed: String
-            let entInAllowAccuracy: String
-            let entOutAllowed: String
-            let entoutAllowAccuracy: String
-            let entInBlocked: String
-            let entInBlockAccuracy: String
-            let entOutBlocked: String
-            let entOutBlockAccuracy: String
+            var entInA = "--"
+            var entInAAccuracy = "--"
+            var entOutA = "--"
+            var entoutAAccuracy = "--"
+            var entInB = "--"
+            var entInBAccuracy = "--"
+            var entOutB = "--"
+            var entOutBAccuracy = "--"
             
-            if testResults[allowedIncomingEntropyKey] != nil, testResults[allowedIncomingEntropyAccuracyKey] != nil, testResults[allowedOutgoingEntropyKey] != nil, testResults[allowedOutgoingEntropyAccuracyKey] != nil, testResults[blockedIncomingEntropyKey] != nil, testResults[blockedIncomingEntropyAccuracyKey] != nil, testResults[blockedOutgoingEntropyKey] != nil, testResults[blockedOutgoingEntropyAccuracyKey] != nil
+            if let entInATestResults = packetEntropies.incomingATestResults
             {
-                entInAllowed = String(format: "%.2f", testResults[allowedIncomingEntropyKey]!)
-                entInAllowAccuracy = String(format: "%.2f", testResults[allowedIncomingEntropyAccuracyKey]!)
-                entOutAllowed = String(format: "%.2f", testResults[allowedOutgoingEntropyKey]!)
-                entoutAllowAccuracy = String(format: "%.2f", testResults[allowedOutgoingEntropyAccuracyKey]!)
-                entInBlocked = String(format: "%.2f", testResults[blockedIncomingEntropyKey]!)
-                entInBlockAccuracy = String(format: "%.2f", testResults[blockedIncomingEntropyAccuracyKey]!)
-                entOutBlocked = String(format: "%.2f", testResults[blockedOutgoingEntropyKey]!)
-                entOutBlockAccuracy = String(format: "%.2f", testResults[blockedOutgoingEntropyAccuracyKey]!)
-            }
-            else
-            {
-                entInAllowed = "--"
-                entInAllowAccuracy = "--"
-                entOutAllowed = "--"
-                entoutAllowAccuracy = "--"
-                entInBlocked = "--"
-                entInBlockAccuracy = "--"
-                entOutBlocked = "--"
-                entOutBlockAccuracy = "--"
+                entInA = String(format: "%.2f", entInATestResults.prediction)
+                
+                if let accuracy = entInATestResults.accuracy
+                {
+                    entInAAccuracy = String(format: "%.2f", accuracy)
+                }
             }
             
-            let entropyAllowedRow = "| Allowed | \(entInAllowed) | \(entInAllowAccuracy) | \(entOutAllowed) | \(entoutAllowAccuracy) |\n"
-            let entropyBlockedRow = "| Blocked | \(entInBlocked) | \(entInBlockAccuracy) | \(entOutBlocked) | \(entOutBlockAccuracy) |\n"
+            if let entOutATestResults = packetEntropies.outgoingATestResults
+            {
+                entOutA = String(format: "%.2f", entOutATestResults.prediction)
+                
+                if let accuracy = entOutATestResults.accuracy
+                {
+                    entoutAAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            if let entInBTestResults = packetEntropies.incomingBTestResults
+            {
+                entInB = String(format: "%.2f", entInBTestResults.prediction)
+                
+                if let accuracy = entInBTestResults.accuracy
+                {
+                    entInBAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            if let entOutBTestResults = packetEntropies.outgoingBTestResults
+            {
+                entOutB = String(format: "%.2f", entOutBTestResults.prediction)
+                
+                if let accuracy = entOutBTestResults.accuracy
+                {
+                    entOutBAccuracy = String(format: "%.2f", accuracy)
+                }
+            }
+            
+            let entropyAllowedRow = "| Allowed | \(entInA) | \(entInAAccuracy) | \(entOutA) | \(entoutAAccuracy) |\n"
+            let entropyBlockedRow = "| Blocked | \(entInB) | \(entInBAccuracy) | \(entOutB) | \(entOutBAccuracy) |\n"
 
             // Float Sequences
             let floatInAllowAccuracy: String

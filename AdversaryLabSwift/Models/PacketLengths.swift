@@ -10,11 +10,15 @@ import Foundation
 
 import Abacus
 
-class PacketLengths
+struct PacketLengths
 {
     var incomingA: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
-    var outgoingA: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
-
+    var incomingATestResults: TestResults?
     var incomingB: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
+    var incomingBTestResults: TestResults?
+    
+    var outgoingA: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
+    var outgoingATestResults: TestResults?
     var outgoingB: SortedMultiset<Int> = SortedMultiset(sortingStyle: .highFirst)
+    var outgoingBTestResults: TestResults?
 }

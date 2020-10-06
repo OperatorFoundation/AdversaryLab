@@ -85,19 +85,6 @@ class TimingCoreML
     
     func testModel(connectionType: ClassificationLabel, timeDifferences: [Double], configModel: ProcessingConfigurationModel)
     {
-        let accuracyKey: String
-        let timingKey: String
-        
-        switch connectionType
-        {
-        case .transportA:
-            accuracyKey = allowedTimingAccuracyKey
-            timingKey = allowedTimingKey
-        case .transportB:
-            accuracyKey = blockedTimingAccuracyKey
-            timingKey = blockedTimingKey
-        }
-        
         do
         {
             let classifierFeatureProvider = try MLArrayBatchProvider(dictionary: [ColumnLabel.timeDifference.rawValue: timeDifferences])
@@ -113,10 +100,7 @@ class TimingCoreML
             let temporaryDirURL = tempDirURL.appendingPathComponent("\(configModel.modelName)", isDirectory: true)
             let classifierFileURL = temporaryDirURL.appendingPathComponent(timingClassifierName, isDirectory: false).appendingPathExtension(modelFileExtension)
             let regressorFileURL = temporaryDirURL.appendingPathComponent(timingRegressorName, isDirectory: false).appendingPathExtension(modelFileExtension)
-            
-            // This is the dictionary where we will save our results
-            let timingDictionary: RMap<String,Double> = RMap(key: testResultsKey)
-            
+                        
             if FileManager.default.fileExists(atPath: regressorFileURL.path)
             {
                 guard let regressorPrediction = MLModelController().prediction(fileURL: regressorFileURL, batchFeatureProvider: regressorFeatureProvider)
@@ -133,8 +117,13 @@ class TimingCoreML
                 guard let thisFeatureValue = regressorPrediction.features(at: 0).featureValue(for: firstFeatureName)
                     else { return }
                 
-                print("🔮 Timing prediction for \(timingKey): \(thisFeatureValue).")
-                timingDictionary[timingKey] = thisFeatureValue.doubleValue
+                switch connectionType
+                {
+                case .transportA:
+                    packetTimings.transportATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                case .transportB:
+                    packetTimings.transportBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                }
             }
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
@@ -164,9 +153,15 @@ class TimingCoreML
                 accuracy = (accuracy * 1000).rounded()/1000
                 // Show the accuracy as a percentage value
                 accuracy = accuracy * 100
-                print("\n🔮 Timing prediction: \(accuracy) \(connectionType.rawValue).")
                 
-                timingDictionary[accuracyKey] = accuracy
+                // Save the accuracy
+                switch connectionType
+                {
+                case .transportA:
+                    packetTimings.transportATestResults?.accuracy = accuracy
+                case .transportB:
+                    packetTimings.transportBTestResults?.accuracy = accuracy
+                }
             }
         }
         catch
@@ -192,8 +187,6 @@ class TimingCoreML
         // Train the classifier
         do
         {
-            // This is the dictionary where we will save our results
-            let timingDictionary: RMap<String,Double> = RMap(key: timeDifferenceTrainingResultsKey)
             let classifier = try MLClassifier(trainingData: timeTrainingTable, targetColumn: ColumnLabel.classification.rawValue)
             
             // Classifier training accuracy as a percentage
@@ -202,10 +195,6 @@ class TimingCoreML
             if trainingError >= 0
             {
                 trainingAccuracy = (1.0 - trainingError) * 100
-            }
-            if trainingAccuracy != nil
-            {
-                timingDictionary[timeDiffTAccKey] = trainingAccuracy
             }
             
             // Classifier validation accuracy as a percentage
@@ -216,10 +205,6 @@ class TimingCoreML
             if validationError >= 0
             {
                 validationAccuracy = (1.0 - validationError) * 100
-            }
-            if validationAccuracy != nil
-            {
-                timingDictionary[timeDiffVAccKey] = validationAccuracy!
             }
             
             // Evaluate the classifier
@@ -232,65 +217,56 @@ class TimingCoreML
             {
                 evaluationAccuracy = (1.0 - evaluationError) * 100
             }
-            if evaluationAccuracy != nil
-            {
-                timingDictionary[timeDiffEAccKey] = evaluationAccuracy
-            }
             
             // Regressor
             do
             {
                 let regressor = try MLRegressor(trainingData: timeTrainingTable, targetColumn: ColumnLabel.timeDifference.rawValue)
                 
-                guard let (allowedTimingTable, blockedTimingTable) = MLModelController().createAllowedBlockedTables(fromTable: timeDifferenceTable)
+                guard let (transportATimingTable, transportBTimingTable) = MLModelController().createAandBTables(fromTable: timeDifferenceTable)
                 else
                 {
                     print("\nUnable to create allowed and blocked tables from time difference table.")
                     return
                 }
  
-                // Allowed Connection Time Differences
+                // TransportA Connection Time Differences
                 do
                 {
-                    let allowedTimeColumn = try regressor.predictions(from: allowedTimingTable)
+                    let transportATimeColumn = try regressor.predictions(from: transportATimingTable)
                     
-                    guard let allowedTimeDifferences = allowedTimeColumn.doubles
+                    guard let transportATimeDifferences = transportATimeColumn.doubles
                     else
                     {
                         print("\nFailed to identify allowed time differences.")
                         return
                     }
                     
-                    let predictedAllowedTimeDifference = allowedTimeDifferences[0]
-                    print("\nPredicted allowed time difference = \(predictedAllowedTimeDifference)")
+                    let transportAPredictedTimeDifference = transportATimeDifferences[0]
+                    print("\nPredicted transportA time difference = \(transportAPredictedTimeDifference)")
                     
-                    // Save scores
-                    timingDictionary[requiredTimeDiffKey] = predictedAllowedTimeDifference
-                }
-                catch let allowedColumnError
-                {
-                    print("\nError creating allowed time difference column: \(allowedColumnError)")
-                }
-                
-                // Blocked Connection Time Differences
-                do
-                {
-                    let blockedColumn = try regressor.predictions(from: blockedTimingTable)
-                    guard let blockedTimeDifferences = blockedColumn.doubles
+                    // transportB Connection Time Differences
+                    let transportBColumn = try regressor.predictions(from: transportBTimingTable)
+                    guard let transportBTimeDifferences = transportBColumn.doubles
                     else
                     {
                         print("\nFailed to identify blocked time differences.")
                         return
                     }
                     
-                    let predictedBlockedTimeDifference = blockedTimeDifferences[0]
-                    print("\nPredicted blocked time difference = \(predictedBlockedTimeDifference)")
+                    let transportBPredictedTimeDifference = transportBTimeDifferences[0]
+                    print("\nPredicted transportB time difference = \(transportBPredictedTimeDifference)")
                     
                     /// Save Predicted Time Difference
-                    timingDictionary[forbiddenTimeDiffKey] = predictedBlockedTimeDifference
+                    trainingData.timingTrainingResults = TrainingResults(
+                        predictionForA: transportAPredictedTimeDifference,
+                        predictionForB: transportBPredictedTimeDifference,
+                        trainingAccuracy: trainingAccuracy,
+                        validationAccuracy: validationAccuracy,
+                        evaluationAccuracy: evaluationAccuracy)
                     
                     // Save the models
-                    MLModelController().saveModel(classifier: classifier,
+                    FileController().saveModel(classifier: classifier,
                                                   classifierMetadata: timingClassifierMetadata,
                                                   classifierFileName: timingClassifierName,
                                                   regressor: regressor,
@@ -298,9 +274,9 @@ class TimingCoreML
                                                   regressorFileName: timingRegressorName,
                                                   groupName: configModel.modelName)
                 }
-                catch let blockedColumnError
+                catch let allowedColumnError
                 {
-                    print("\nError creating blocked time difference column: \(blockedColumnError)")
+                    print("\nError creating time difference column: \(allowedColumnError)")
                 }
             }
             catch let regressorError

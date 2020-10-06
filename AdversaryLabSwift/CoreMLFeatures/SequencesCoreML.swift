@@ -511,7 +511,7 @@ class SequencesCoreML
             }
             
             // Save the models to a file
-            MLModelController().save(classifier: classifier, classifierMetadata: floatClassifierMetadata, fileName: classifierName, groupName: modelName)
+            FileController().save(classifier: classifier, classifierMetadata: floatClassifierMetadata, fileName: classifierName, groupName: modelName)
         }
         catch
         {
@@ -576,7 +576,7 @@ class SequencesCoreML
             }
             
             // Save the models to a file
-            MLModelController().save(classifier: classifier, classifierMetadata: offsetClassifierMetadata, fileName: classifierName, groupName: modelName)
+            FileController().save(classifier: classifier, classifierMetadata: offsetClassifierMetadata, fileName: classifierName, groupName: modelName)
         }
         catch let error
         {

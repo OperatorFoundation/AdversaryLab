@@ -346,9 +346,7 @@ class AllFeatures
                 allFeaturesDictionary[allFeaturesVAccKey] = validationAccuracy!
             }
 
-            let modelController = MLModelController()
-
-            modelController.save(classifier: classifier, classifierMetadata: allFeaturesClassifierMetadata, fileName: allClassifierName, groupName: configModel.modelName)
+            FileController().save(classifier: classifier, classifierMetadata: allFeaturesClassifierMetadata, fileName: allClassifierName, groupName: configModel.modelName)
         }
         catch let classifierTrainingError
         {

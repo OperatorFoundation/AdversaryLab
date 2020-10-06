@@ -311,7 +311,7 @@ class TLS12CoreML
             {
                 let regressor = try MLRegressor(trainingData: tlsTrainingTable, targetColumn: ColumnLabel.tlsNames.rawValue)
 
-                guard let (allowedTLSTable, blockedTLSTable) = MLModelController().createAllowedBlockedTables(fromTable: tlsTable)
+                guard let (allowedTLSTable, blockedTLSTable) = MLModelController().createAandBTables(fromTable: tlsTable)
                 else
                 {
                     print("\nUnable to create allowed and blocked tables from tls table.")
@@ -364,7 +364,7 @@ class TLS12CoreML
                     tlsResults[forbiddenTLSKey] = predictedBlockedTLSName
                     
                     // Save the model
-                    MLModelController().saveModel(classifier: classifier,
+                    FileController().saveModel(classifier: classifier,
                                                   classifierMetadata: tlsClassifierMetadata,
                                                   classifierFileName: tlsClassifierName,
                                                   regressor: regressor,

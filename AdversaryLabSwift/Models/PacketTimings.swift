@@ -10,8 +10,11 @@ import Foundation
 
 import Abacus
 
-class PacketTimings
+struct PacketTimings: Codable
 {
     var transportA: [Double] = []
+    var transportATestResults: TestResults?
     var transportB: [Double] = []
+    var transportBTestResults: TestResults?
+    
 }

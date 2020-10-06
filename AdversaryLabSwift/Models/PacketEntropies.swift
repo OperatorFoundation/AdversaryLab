@@ -10,11 +10,16 @@ import Foundation
 
 import Abacus
 
-class PacketEntropies
+struct PacketEntropies: Codable
 {
     var incomingA: [Double] = []
-    var outgoingA: [Double] = []
-
+    var incomingATestResults: TestResults?
     var incomingB: [Double] = []
+    var incomingBTestResults: TestResults?
+    
+    var outgoingA: [Double] = []
+    var outgoingATestResults: TestResults?
     var outgoingB: [Double] = []
+    var outgoingBTestResults: TestResults?
+    
 }

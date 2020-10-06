@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ProcessingConfigurationModel: NSObject
+class ProcessingConfigurationModel
 {
     var enableSequenceAnalysis = false
     var enableTLSAnalysis = false

@@ -34,7 +34,7 @@ class DataProcessing
             switch connectionType
             {
             case .transportA:
-                connectionGroupData.aPacketsSeen += 1
+                
                 // inOut == true means an incoming connection
                 if packet.in_out
                 {
@@ -53,7 +53,7 @@ class DataProcessing
                     connectionGroupData.aConnectionData.connections.append(packet.connection)
                 }
             case .transportB:
-                connectionGroupData.bPacketsSeen += 1
+                
                 // inOut == true means an incoming connection
                 if packet.in_out
                 {
@@ -61,7 +61,7 @@ class DataProcessing
                     connectionGroupData.bConnectionData.incomingDates[packet.connection] = Double(packet.timestamp)
                 }
                 else
-                {
+                {                    
                     connectionGroupData.bConnectionData.outgoingPackets[packet.connection] = packet.payload
                     connectionGroupData.bConnectionData.outgoingDates[packet.connection] = Double(packet.timestamp)
                 }
