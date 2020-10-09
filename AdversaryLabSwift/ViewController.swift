@@ -261,42 +261,30 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             // Identify which tab we need to update
             guard let identifier = tabView.selectedTabViewItem?.identifier as? String,
                 let currentTab = TabIds(rawValue: identifier)
-                else { return }
+                else
+            {
+                stopActivityIndicator()
+                return
+                
+            }
             
             switch currentTab
             {
             case .TestMode:
                 runTest()
-            case .TrainingMode: // In Training mode we need a name so we can save the model files
-                guard connectionGroupData.aConnectionData.connections.count > 6, connectionGroupData.bConnectionData.connections.count > 6
-                    else
-                {
-                    showNoDataAlert()
-                    return
-                }
-                
-                if let name = showNameModelAlert()
-                {
-                    print("Time to analyze some things.")
-                    configModel.modelName = name
-                    connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: true, resetTestingData: false)
-                    updateProgressIndicator()
-                }
-                else
-                {
-                    sender.state = .off
-                    refreshDBUI()
-                }
-                
-                
+            case .TrainingMode:
+                runTraining()
             case .DataMode:
                 print("Data mode selected. Nothing to do here.")
+                stopActivityIndicator()
+                return
             }
         }
         else
         {
             print("Pause bot engage!! 🤖")
             updateProgressIndicator()
+            stopActivityIndicator()
         }
     }
     
@@ -348,10 +336,19 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 configModel.modelName = modelName
                 
                 // Unpack to a temporary directory
-                modelDirectoryURL = FileController().unpack(adversaryURL: selectedURL)
-                runTest()
+                if let maybeModelDirectory = FileController().unpack(adversaryURL: selectedURL)
+                {
+                    modelDirectoryURL = maybeModelDirectory
+                    runTest()
+                }
+                else
+                {
+                    print("🚨  Failed to unpack the selected adversary file.  🚨")
+                }
             }
+            
             loadDataButton.isEnabled = true
+            stopActivityIndicator()
   
         case .TrainingMode:
             DispatchQueue.main.async {
@@ -386,6 +383,14 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             self.databaseNameLabel.stringValue = databaseName
             self.loadDataButton.isEnabled = true
             self.loadLabelData()
+            self.activityIndicator.stopAnimation(nil)
+        }
+    }
+    
+    func stopActivityIndicator()
+    {
+        DispatchQueue.main.async
+        {
             self.activityIndicator.stopAnimation(nil)
         }
     }
@@ -657,44 +662,95 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     {
         configModel.processingEnabled = true
         
-        guard connectionGroupData.bConnectionData.connections.count > 1
-            else
+        if connectionGroupData.bConnectionData.connections.count < 1
         {
-            showNoBlockedConnectionsAlert()
-            return
-        }
-        
-        // Make sure that we have gotten an Adversary file and unpacked it to a temporary directory
-        // TODO: Delete this directory on program exit
-        if modelDirectoryURL == nil
-        {
-            // Get the user to select the correct .adversary file
-            if let selectedURL = showSelectAdversaryFileAlert()
-            {
-                // Model Group Name should be the same as the directory
-                modelName = selectedURL.deletingPathExtension().lastPathComponent
+            // Prompt the user to select a data file to load
+            showNoDataAlert
+            { (dataLoaded) in
                 
-                // Unpack to a temporary directory
-                modelDirectoryURL = FileController().unpack(adversaryURL: selectedURL)
-                runTest()
+                if dataLoaded
+                {
+                    self.runTest()
+                }
+                else
+                {
+                    self.stopActivityIndicator()
+                    return
+                }
             }
-            else
+        }
+        else
+        {
+            // Make sure that we have gotten an Adversary file and unpacked it to a temporary directory
+            // TODO: Delete this directory on program exit
+            if modelDirectoryURL == nil
             {
-                processPacketsButton.state = .off
+                // Get the user to select the correct .adversary file
+                if let selectedURL = showSelectAdversaryFileAlert()
+                {
+                    // Model Group Name should be the same as the directory
+                    modelName = selectedURL.deletingPathExtension().lastPathComponent
+                    
+                    // Unpack to a temporary directory
+                    modelDirectoryURL = FileController().unpack(adversaryURL: selectedURL)
+                    runTest()
+                }
+                else
+                {
+                    processPacketsButton.state = .off
+                    stopActivityIndicator()
+                    return
+                }
             }
             
+            if !modelDirectoryURL!.hasDirectoryPath
+            {
+                // Unpack to a temporary directory
+                modelDirectoryURL = FileController().unpack(adversaryURL: modelDirectoryURL!)
+            }
+            
+            configModel.modelName = modelDirectoryURL!.deletingPathExtension().lastPathComponent
+            connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: false, resetTestingData: true)
+            updateProgressIndicator()
+            stopActivityIndicator()
+        }
+    }
+    
+    func runTraining()
+    {
+        // In Training mode we need a name so we can save the model files
+        if connectionGroupData.aConnectionData.connections.count < 6, connectionGroupData.bConnectionData.connections.count < 6
+        {
+            showNoDataAlert
+            {
+                (dataLoaded) in
+                
+                if dataLoaded
+                {
+                    self.runTraining()
+                }
+                else
+                {
+                    self.stopActivityIndicator()
+                    return
+                }
+            }
+        }
+        
+        if let name = showNameModelAlert()
+        {
+            print("Time to analyze some things.")
+            configModel.modelName = name
+            connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: true, resetTestingData: false)
+            updateProgressIndicator()
+            stopActivityIndicator()
             return
         }
-        
-        if !modelDirectoryURL!.hasDirectoryPath
+        else
         {
-            // Unpack to a temporary directory
-            modelDirectoryURL = FileController().unpack(adversaryURL: modelDirectoryURL!)
+            stopActivityIndicator()
+            return
         }
-        
-        configModel.modelName = modelDirectoryURL!.deletingPathExtension().lastPathComponent
-        connectionInspector.analyzeConnections(configModel: configModel, resetTrainingData: false, resetTestingData: true)
-        updateProgressIndicator()
     }
 
     // MARK: - Alerts

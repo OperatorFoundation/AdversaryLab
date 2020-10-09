@@ -8,13 +8,27 @@
 
 import Cocoa
 
-    // TODO: Call this when there is no appropriate data to be processed in the rdb file
-func showNoDataAlert()
+/// Call this when there is no appropriate data to be processed
+func showNoDataAlert(completion:@escaping (_ completion:Bool) -> Void)
 {
     let alert = NSAlert()
     alert.messageText = "Not enough packets to process"
     alert.informativeText = "There is not enough valid data in the selected database file."
-    alert.runModal()
+    let result = alert.runModal()
+        
+    if result.rawValue == 0
+    {
+        if let selectedFileURL = showRethinkFileAlert()
+        {
+            FileController().loadSongFile(fileURL: selectedFileURL, completion: completion)
+        }
+    }
+    else
+    {
+        print("Alert result: \(result)")
+        completion(false)
+        return
+    }
 }
 
 func showNoBlockedConnectionsAlert()

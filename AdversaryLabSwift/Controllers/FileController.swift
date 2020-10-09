@@ -14,7 +14,7 @@ import ZIPFoundation
 
 class FileController
 {
-    let trainingDataFilename = "TrainingResults"
+    let trainingDataFilename = "TrainingResults.json"
     
     func saveModel(classifier: MLClassifier,
     classifierMetadata: MLModelMetadata,
@@ -220,53 +220,57 @@ class FileController
     
     func unpack(adversaryURL: URL) -> URL?
     {
-        let modelGroupName = "temp"
-        
-        if let appDirectory = prepareDirectory(groupName: modelGroupName)
+        guard let appDirectory = getAdversarySupportDirectory()
+            else
         {
-            let temporaryDirURL = appDirectory.appendingPathComponent(modelGroupName, isDirectory: true)
+            print("Failed to save the file, could not find the application document directory.")
+            return nil
+        }
+        
+        let modelGroupName = "temp"
+        let temporaryDirURL = appDirectory.appendingPathComponent(modelGroupName, isDirectory: true)
+        
+        if FileManager.default.fileExists(atPath: temporaryDirURL.path)
+        {
+            try? FileManager.default.removeItem(at: temporaryDirURL)
+        }
+        
+        do
+        {
+            try FileManager.default.unzipItem(at: adversaryURL, to: temporaryDirURL, progress: nil, preferredEncoding: nil)
             
-            do
+            let fileURLS = try FileManager.default.contentsOfDirectory(at: temporaryDirURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
+            print("\nUnzipped item at: \(adversaryURL.path)\nto: \(temporaryDirURL.path)")
+            
+            if fileURLS.count == 1, fileURLS[0].hasDirectoryPath
             {
-                try FileManager.default.unzipItem(at: adversaryURL, to: temporaryDirURL, progress: nil, preferredEncoding: nil)
+                print("Unpacked model files to: \(fileURLS[0])")
+                loadTrainingData(from: fileURLS[0])
                 
-                let fileURLS = try FileManager.default.contentsOfDirectory(at: temporaryDirURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-                
-                print("\nUnzipped item at: \(adversaryURL.path)\nto: \(temporaryDirURL.path)")
-                
-                if fileURLS.count == 1, fileURLS[0].hasDirectoryPath
-                {
-                    print("Unpacked model files to: \(fileURLS[0])")
-                    loadTrainingData(from: fileURLS[0])
-                    
-                    return fileURLS[0]
-                }
-                else
-                {
-                    for fileURL in fileURLS
-                    {
-                        print("\nFound file: \(fileURL.path)")
-                        if fileURL.pathExtension == "mlmodel"
-                        {
-                            print("\nFound an mlm file in the chosen directory: \(fileURL)")
-                        }
-                    }
-                    
-                    print("Unpacked model files to: \(temporaryDirURL)")
-                    loadTrainingData(from: temporaryDirURL)
-                    
-                    return temporaryDirURL
-                }
+                return fileURLS[0]
             }
-            catch let unzipError
+            else
             {
-                print("\nError unzipping item at \(adversaryURL) to \(temporaryDirURL): \n\(unzipError)")
+                for fileURL in fileURLS
+                {
+                    print("\nFound file: \(fileURL.path)")
+                    if fileURL.pathExtension == "mlmodel"
+                    {
+                        print("\nFound an mlm file in the chosen directory: \(fileURL)")
+                    }
+                }
                 
-                return nil
+                print("Unpacked model files to: \(temporaryDirURL)")
+                loadTrainingData(from: temporaryDirURL)
+                
+                return temporaryDirURL
             }
         }
-        else
+        catch let unzipError
         {
+            print("\nError unzipping item at \(adversaryURL) to \(temporaryDirURL): \n\(unzipError)")
+            
             return nil
         }
         
@@ -284,17 +288,21 @@ class FileController
         
         let groupURL = appDirectory.appendingPathComponent(groupName)
         
-        if !fileManager.fileExists(atPath: groupURL.path)
+        guard fileManager.fileExists(atPath: groupURL.path)
+        else
         {
-            do
-            {
-                _ = try fileManager.createDirectory(at: groupURL, withIntermediateDirectories: true, attributes: nil)
-            }
-            catch let directoryError
-            {
-                print("\nError creating group directory: \(directoryError)")
-                return nil
-            }
+            print("Group directory does not exist.")
+            return nil
+        }
+        
+        do
+        {
+            _ = try fileManager.createDirectory(at: groupURL, withIntermediateDirectories: true, attributes: nil)
+        }
+        catch let directoryError
+        {
+            print("\nError creating group directory: \(directoryError)")
+            return nil
         }
         
         return appDirectory
@@ -315,6 +323,7 @@ class FileController
                     {
                         let trainingBytes = try Data(contentsOf: fileUrl)
                         trainingData = try decoder.decode(TrainingData.self, from: trainingBytes)
+                        return
                     }
                     catch let decodeError
                     {
