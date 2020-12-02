@@ -258,6 +258,7 @@ class RedisServerController: NSObject
     func runLaunchRedisScript(completion:@escaping (_ completion:Bool) -> Void)
     {
         let bundle = Bundle.main
+        let workingDir = FileManager.default.currentDirectoryPath
         
         guard let path = bundle.path(forResource: "LaunchRedisServerScript", ofType: "sh")
             else
@@ -270,7 +271,7 @@ class RedisServerController: NSObject
         guard let redisConfigPath = bundle.path(forResource: "redis", ofType: "conf")
             else
         {
-            print("Unable to launch Redis server: could not find terraform executable.")
+            print("Unable to launch Redis server: could not find redis executable.")
             completion(false)
             return
         }
@@ -278,7 +279,15 @@ class RedisServerController: NSObject
         guard let redisPath = bundle.path(forResource: "redis-server", ofType: nil)
             else
         {
-            print("Unable to launch Redis server: could not find terraform executable.")
+            print("Unable to launch Redis server: could not find redis-server.")
+            completion(false)
+            return
+        }
+        
+        guard let redisCliPath = bundle.path(forResource: "redis-cli", ofType: nil)
+            else
+        {
+            print("Unable to launch Redis server: could not find redis-cli.")
             completion(false)
             return
         }
@@ -296,9 +305,10 @@ class RedisServerController: NSObject
         {
             print("🚀🚀🚀🚀🚀🚀🚀")
             print("Redis config path: \(redisConfigPath)")
+            print("Working directory: \(workingDir)")
             self.redisProcess = Process()
             self.redisProcess.launchPath = path
-            self.redisProcess.arguments = [redisPath, redisConfigPath, redisModulePath]
+            self.redisProcess.arguments = [redisPath, redisConfigPath, redisModulePath, redisCliPath, workingDir]
             self.redisProcess.launch()
             
             sleep(1)

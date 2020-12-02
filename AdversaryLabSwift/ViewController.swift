@@ -18,6 +18,8 @@ import Charts
 
 class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
 {
+    @IBOutlet weak var enableTLSCheckButton: NSButton!
+    @IBOutlet weak var enableSequencesCheckButton: NSButton!
     @IBOutlet weak var timingChartView: LineChartView!
     @IBOutlet weak var entropyChartView: LineChartView!
     @IBOutlet weak var lengthChartView: LineChartView!
@@ -193,6 +195,9 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     @objc dynamic var bInEntropyAccuracyLabel = "In Entropy Accuracy: "
     @objc dynamic var inEntropyBlockAccuracy = "--"
 
+    @objc dynamic var vcTransportAName = "Transport A"
+    @objc dynamic var vcTransportBName = "Transport B"
+    
     let dataProcessing = DataProcessing()
     let circleRadius: CGFloat = 2.5
     var modelDirectoryURL: URL?
@@ -434,7 +439,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         let blockedInLengthsEntry = chartDataEntry(fromArray: bInLengths)
         let blockedOutLengthsEntry = chartDataEntry(fromArray: bOutLengths)
         
-        let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "Allowed Incoming Packet Lengths")
+        let allowedInLine = LineChartDataSet(entries: allowedInLengthsEntry, label: "\(transportA) Incoming Packet Lengths")
         allowedInLine.colors = [NSUIColor.blue]
         allowedInLine.circleColors = [NSUIColor.blue]
         allowedInLine.circleRadius = 3
@@ -442,7 +447,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         allowedInLine.circleHoleRadius = 1
         allowedInLine.circleHoleColor = NSUIColor.clear
         allowedInLine.drawValuesEnabled = false
-        let allowedOutLine = LineChartDataSet(entries: allowedOutLengthsEntry, label: "Allowed Outgoing Packet Lengths")
+        let allowedOutLine = LineChartDataSet(entries: allowedOutLengthsEntry, label: "\(transportA) Outgoing Packet Lengths")
         allowedOutLine.colors = [NSUIColor.magenta]
         allowedOutLine.circleColors = [NSUIColor.magenta]
         allowedOutLine.circleRadius = 4.5
@@ -450,7 +455,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         allowedOutLine.circleHoleRadius = 2.5
         allowedOutLine.circleHoleColor = NSUIColor.clear
         allowedOutLine.drawValuesEnabled = false
-        let blockedInLine = LineChartDataSet(entries: blockedInLengthsEntry, label: "Blocked Incoming Packet Lengths")
+        let blockedInLine = LineChartDataSet(entries: blockedInLengthsEntry, label: "\(transportB) Incoming Packet Lengths")
         blockedInLine.colors = [NSUIColor.red]
         blockedInLine.circleColors = [NSUIColor.red]
         blockedInLine.circleRadius = 6
@@ -458,7 +463,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         blockedInLine.circleHoleRadius = 4.5
         blockedInLine.circleHoleColor = NSUIColor.clear
         blockedInLine.drawValuesEnabled = false
-        let blockedOutLine = LineChartDataSet(entries: blockedOutLengthsEntry, label: "Blocked Outgoing Packet Lengths")
+        let blockedOutLine = LineChartDataSet(entries: blockedOutLengthsEntry, label: "\(transportB) Outgoing Packet Lengths")
         blockedOutLine.colors = [NSUIColor.systemGreen ]
         blockedOutLine.circleColors = [NSUIColor.systemGreen]
         blockedOutLine.circleRadius = 7.5
@@ -510,7 +515,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         let bInEntropyEntry = chartDataEntry(fromArray: bInEntropy)
         let bOutEntropyEntry = chartDataEntry(fromArray: bOutEntropy)
         
-        let aInLine = LineChartDataSet(entries: aInEntropyEntry, label: "Allowed Incoming Entropy")
+        let aInLine = LineChartDataSet(entries: aInEntropyEntry, label: "\(transportA) Incoming Entropy")
         aInLine.colors = [NSUIColor.blue]
         aInLine.circleColors = [NSUIColor.blue]
         aInLine.circleRadius = 2
@@ -518,7 +523,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         aInLine.circleHoleRadius = 1
         aInLine.circleHoleColor = NSUIColor.clear
         aInLine.drawValuesEnabled = false
-        let aOutLine = LineChartDataSet(entries: aOutEntropyEntry, label: "Allowed Outgoing Entropy")
+        let aOutLine = LineChartDataSet(entries: aOutEntropyEntry, label: "\(transportA) Outgoing Entropy")
         aOutLine.colors = [NSUIColor.magenta]
         aOutLine.circleColors = [NSUIColor.magenta]
         aOutLine.circleRadius = 3.5
@@ -526,7 +531,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         aOutLine.circleHoleRadius = 2.5
         aOutLine.circleHoleColor = NSUIColor.clear
         aOutLine.drawValuesEnabled = false
-        let bInLine = LineChartDataSet(entries: bInEntropyEntry, label: "Blocked Incoming Entropy")
+        let bInLine = LineChartDataSet(entries: bInEntropyEntry, label: "\(transportB) Incoming Entropy")
         bInLine.colors = [NSUIColor.red]
         bInLine.circleColors = [NSUIColor.red]
         bInLine.circleRadius = 5
@@ -534,7 +539,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         bInLine.circleHoleRadius = 4.5
         bInLine.circleHoleColor = NSUIColor.clear
         bInLine.drawValuesEnabled = false
-        let bOutLine = LineChartDataSet(entries: bOutEntropyEntry, label: "Blocked Outgoing Entropy")
+        let bOutLine = LineChartDataSet(entries: bOutEntropyEntry, label: "\(transportB) Outgoing Entropy")
         bOutLine.colors = [NSUIColor.systemGreen ]
         bOutLine.circleColors = [NSUIColor.systemGreen]
         bOutLine.circleRadius = 6.5
@@ -573,14 +578,14 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         let aLineChartEntry = chartDataEntry(fromArray: aTimeDifferences)
         let bLineChartEntry = chartDataEntry(fromArray: bTimeDifferences)
         
-        let line1 = LineChartDataSet(entries: aLineChartEntry, label: "Allowed")
+        let line1 = LineChartDataSet(entries: aLineChartEntry, label: "\(transportA)")
         line1.colors = [NSUIColor.blue]
         line1.circleColors = [NSUIColor.blue]
         line1.circleRadius = circleRadius
         line1.drawCirclesEnabled = true
         line1.circleHoleColor = NSUIColor.clear
         
-        let line2 = LineChartDataSet(entries: bLineChartEntry, label: "Blocked")
+        let line2 = LineChartDataSet(entries: bLineChartEntry, label: "\(transportB)")
         line2.colors = [NSUIColor.red]
         line2.circleColors = [NSUIColor.red]
         line2.circleRadius = circleRadius + 0.5
@@ -635,6 +640,15 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     
     func updateButtons(currentTab: TabIds)
     {
+        // Checkbox button title color cannot be set in storyboard
+        enableTLSCheck.attributedTitle = NSAttributedString(
+            string: enableTLSCheck.title,
+            attributes: [ NSAttributedString.Key.foregroundColor: NSColor.lightGray])
+        
+        enableSequencesCheck.attributedTitle = NSAttributedString(
+            string: enableSequencesCheck.title,
+            attributes: [ NSAttributedString.Key.foregroundColor: NSColor.lightGray])
+        
         switch currentTab
         {
         case .TrainingMode:
@@ -894,6 +908,9 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         
         DispatchQueue.main.async
         {
+            self.vcTransportAName = transportA
+            self.vcTransportBName = transportB
+            
             self.databaseNameLabel.stringValue = redisDatabaseFilename
             self.aConnectionsCountLabel = "\(transportA) connections: "
             self.allowedPacketsSeen = "\(connectionGroupData.aConnectionData.connections.count)"
@@ -925,39 +942,12 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         // Get redis data in the utility queue and update the labels with the data in the main queue
         let testResults: RMap<String,Double> = RMap(key: testResultsKey)
         
-        // Timing (microseconds)
-        let transportBTiming = packetTimings.transportBTestResults?.prediction
-        let transportBTimingAccuracy = packetTimings.transportBTestResults?.accuracy
-        let transportATiming = packetTimings.transportATestResults?.prediction
-        let transportATimingAccuracy = packetTimings.transportATestResults?.accuracy
-        
         // TLS Common Names
         let tlsBlockAccuracy = testResults[blockedTLSAccuracyKey]
         let tlsAllowAccuracy = testResults[allowedTLSAccuracyKey]
         let tlsResultsDictionary: RMap<String,String> = RMap(key: tlsTestResultsKey)
         let tlsAllowed = tlsResultsDictionary[allowedTLSKey]
         let tlsBlocked = tlsResultsDictionary[blockedTLSKey]
-        
-        // Lengths
-        let transportAInLengthPrediction = packetLengths.incomingATestResults?.prediction
-        let transportAInLengthAccuracy = packetLengths.incomingATestResults?.accuracy
-        let transportBInLengthPrediction = packetLengths.incomingBTestResults?.prediction
-        let transportBInLengthAccuracy = packetLengths.incomingBTestResults?.accuracy
-        let transportAOutLengthPrediction = packetLengths.outgoingATestResults?.prediction
-        let transportAOutLengthAccuracy = packetLengths.outgoingATestResults?.accuracy
-        let transportBOutLengthPrediction = packetLengths.outgoingBTestResults?.prediction
-        let transportBOutLengthAccuracy = packetLengths.outgoingBTestResults?.accuracy
-        
-        // Entropy
-        let transportAInEntropyPrediction = packetEntropies.incomingATestResults?.prediction
-        let transportAInEntropyAccuracy = packetEntropies.incomingATestResults?.accuracy
-        let transportBInEntropyPrediction = packetEntropies.incomingBTestResults?.prediction
-        let transportBInEntropyAccuracy = packetEntropies.incomingBTestResults?.accuracy
-
-        let transportAOutEntropyPrediction = packetEntropies.outgoingATestResults?.prediction
-        let transportAOutEntropyAccuracy = packetEntropies.outgoingATestResults?.accuracy
-        let transportBOutEntropyPrediction = packetEntropies.outgoingBTestResults?.prediction
-        let transportBOutEntropyAccuracy = packetEntropies.outgoingBTestResults?.accuracy
 
         // All Features
         let allAllowAccuracy = testResults[allowedAllFeaturesAccuracyKey]
@@ -966,6 +956,12 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         DispatchQueue.main.async
         {
             self.activityIndicator.stopAnimation(nil)
+            
+            // Timing (microseconds)
+            let transportBTiming = packetTimings.transportBTestResults?.prediction
+            let transportBTimingAccuracy = packetTimings.transportBTestResults?.accuracy
+            let transportATiming = packetTimings.transportATestResults?.prediction
+            let transportATimingAccuracy = packetTimings.transportATestResults?.accuracy
             
             self.aTimingLabel = "\(transportA) Timing: "
             self.aTimingAccuracyLabel = "\(transportA) Timing Accuracy: "
@@ -1005,6 +1001,17 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 self.tls12BlockAccuracy = "--"
             }
             
+            // Entropy
+            let transportAInEntropyPrediction = packetEntropies.incomingATestResults?.prediction
+            let transportAInEntropyAccuracy = packetEntropies.incomingATestResults?.accuracy
+            let transportBInEntropyPrediction = packetEntropies.incomingBTestResults?.prediction
+            let transportBInEntropyAccuracy = packetEntropies.incomingBTestResults?.accuracy
+
+            let transportAOutEntropyPrediction = packetEntropies.outgoingATestResults?.prediction
+            let transportAOutEntropyAccuracy = packetEntropies.outgoingATestResults?.accuracy
+            let transportBOutEntropyPrediction = packetEntropies.outgoingBTestResults?.prediction
+            let transportBOutEntropyAccuracy = packetEntropies.outgoingBTestResults?.accuracy
+            
             self.aInEntropyLabel = "\(transportA) In Entropy: "
             self.aInEntropyAccuracyLabel = "\(transportA) In Entropy Accurcy: "
             self.aOutEntropyLabel = "\(transportA) Out Entropy: "
@@ -1013,6 +1020,7 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             self.bInEntropyAccuracyLabel = "\(transportB) In Entropy Accuracy: "
             self.bOutEntropyLabel = "\(transportB) Out Entropy: "
             self.bOutEntropyAccuracyLabel = "\(transportB) Out Entropy Accuracy: "
+            
             if
                 transportAInEntropyPrediction != nil,
                 transportBInEntropyPrediction != nil,
@@ -1050,6 +1058,16 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
                 self.outEntropyAllowAccuracy = "--"
                 self.outEntropyBlockAccuracy = "--"
             }
+            
+            // Lengths
+            let transportAInLengthPrediction = packetLengths.incomingATestResults?.prediction
+            let transportAInLengthAccuracy = packetLengths.incomingATestResults?.accuracy
+            let transportBInLengthPrediction = packetLengths.incomingBTestResults?.prediction
+            let transportBInLengthAccuracy = packetLengths.incomingBTestResults?.accuracy
+            let transportAOutLengthPrediction = packetLengths.outgoingATestResults?.prediction
+            let transportAOutLengthAccuracy = packetLengths.outgoingATestResults?.accuracy
+            let transportBOutLengthPrediction = packetLengths.outgoingBTestResults?.prediction
+            let transportBOutLengthAccuracy = packetLengths.outgoingBTestResults?.accuracy
             
             self.aInLengthLabel = "\(transportA) In Length: "
             self.aInLengthAccuracyLabel = "\(transportA) In Length Accuracy: "
@@ -1145,13 +1163,6 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         let forbiddenInOffsetIndexString = inForbiddenOffsetHash[forbiddenOffsetIndexKey] ?? "--"
         let forbiddenInOffsetAccString = inForbiddenOffsetHash[forbiddenOffsetAccuracyKey] ?? "--"
         
-        // Timing (microseconds)
-        let transportATiming = trainingData.timingTrainingResults?.transportAPrediction
-        let transportBTiming = trainingData.timingTrainingResults?.transportBPrediction
-        let timeDiffTAcc = trainingData.timingTrainingResults?.trainingAccuracy
-        let timeDiffVAcc = trainingData.timingTrainingResults?.validationAccuracy
-        let timeDiffEAcc = trainingData.timingTrainingResults?.evaluationAccuracy
-        
         // TLS Common Names
         let tlsResults: RMap <String, String> = RMap(key: tlsTrainingResultsKey)
         let tlsAccuracy: RMap <String, Double> = RMap(key: tlsTrainingAccuracyKey)
@@ -1160,33 +1171,6 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         let tlsTrainingAccuracy = tlsAccuracy[tlsTAccKey]
         let tlsValidationAccuracy = tlsAccuracy[tlsVAccKey]
         let tlsEvaluationAccuracy = tlsAccuracy[tlsEAccKey]
-
-        // Lengths
-        let transportAPredictedOutLength = trainingData.outgoingLengthsTrainingResults?.transportAPrediction
-        let transportBPredictedOutLength = trainingData.outgoingLengthsTrainingResults?.transportBPrediction
-        let outTrainingAcc = trainingData.outgoingLengthsTrainingResults?.trainingAccuracy
-        let outValidationAcc = trainingData.outgoingLengthsTrainingResults?.validationAccuracy
-        let outEvaluationAcc = trainingData.outgoingLengthsTrainingResults?.evaluationAccuracy
-        
-        let transportAPredictedInLength = trainingData.incomingLengthsTrainingResults?.transportAPrediction
-        let transportBPredictedInLength = trainingData.incomingLengthsTrainingResults?.transportBPrediction
-        let inTrainingAcc = trainingData.incomingLengthsTrainingResults?.trainingAccuracy
-        let inValidationAcc = trainingData.incomingLengthsTrainingResults?.validationAccuracy
-        let inEvaluationAcc = trainingData.incomingLengthsTrainingResults?.evaluationAccuracy
-        
-        // Entropy
-        let transportAPredictedOutEntropy =
-            trainingData.outgoingEntropyTrainingResults?.transportAPrediction
-        let transportBPredictedOutEntropy = trainingData.outgoingEntropyTrainingResults?.transportBPrediction
-            
-        let outEntropyTrainingAccuracy = trainingData.outgoingEntropyTrainingResults?.trainingAccuracy
-        let outEntropyValidationAccuracy = trainingData.outgoingEntropyTrainingResults?.validationAccuracy
-        let outEntropyEvaluationAccuracy = trainingData.outgoingEntropyTrainingResults?.evaluationAccuracy
-        let transportAPredictedInEntropy = trainingData.incomingEntropyTrainingResults?.transportAPrediction
-        let transportBPredictedInEntropy = trainingData.incomingEntropyTrainingResults?.transportBPrediction
-        let inEntropyTrainingAccuracy = trainingData.incomingEntropyTrainingResults?.trainingAccuracy
-        let inEntropyValidationAccuracy = trainingData.incomingEntropyTrainingResults?.validationAccuracy
-        let inEntropyEvaluationAccuracy = trainingData.incomingEntropyTrainingResults?.evaluationAccuracy
         
         // Float Subsequences
         let requiredOutFloatSequenceSet: RSortedSet<Data> = RSortedSet(key: outgoingRequiredFloatSequencesKey)
@@ -1304,6 +1288,13 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             self.timeVAcc = "--"
             self.timeEAcc = "--"
             
+            // Timing (microseconds)
+            let transportATiming = trainingData.timingTrainingResults?.transportAPrediction
+            let transportBTiming = trainingData.timingTrainingResults?.transportBPrediction
+            let timeDiffTAcc = trainingData.timingTrainingResults?.trainingAccuracy
+            let timeDiffVAcc = trainingData.timingTrainingResults?.validationAccuracy
+            let timeDiffEAcc = trainingData.timingTrainingResults?.evaluationAccuracy
+            
             if transportATiming != nil
             { self.requiredTiming = String(format: "%.2f", transportATiming!/1000) + "ms" }
             if transportBTiming != nil
@@ -1334,6 +1325,18 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             { self.tlsEAcc = String(format: "%.2f", tlsEvaluationAccuracy!) }
             
             // Lengths
+            let transportAPredictedOutLength = trainingData.outgoingLengthsTrainingResults?.transportAPrediction
+            let transportBPredictedOutLength = trainingData.outgoingLengthsTrainingResults?.transportBPrediction
+            let outTrainingAcc = trainingData.outgoingLengthsTrainingResults?.trainingAccuracy
+            let outValidationAcc = trainingData.outgoingLengthsTrainingResults?.validationAccuracy
+            let outEvaluationAcc = trainingData.outgoingLengthsTrainingResults?.evaluationAccuracy
+            
+            let transportAPredictedInLength = trainingData.incomingLengthsTrainingResults?.transportAPrediction
+            let transportBPredictedInLength = trainingData.incomingLengthsTrainingResults?.transportBPrediction
+            let inTrainingAcc = trainingData.incomingLengthsTrainingResults?.trainingAccuracy
+            let inValidationAcc = trainingData.incomingLengthsTrainingResults?.validationAccuracy
+            let inEvaluationAcc = trainingData.incomingLengthsTrainingResults?.evaluationAccuracy
+            
             self.requiredOutLength = "--"
             self.forbiddenOutLength = "--"
             self.outLengthTAcc = "--"
@@ -1368,6 +1371,19 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
             { self.inLengthEAcc = String(format: "%.2f", inEvaluationAcc!) }
             
             // Entropy
+            let transportAPredictedOutEntropy =
+                trainingData.outgoingEntropyTrainingResults?.transportAPrediction
+            let transportBPredictedOutEntropy = trainingData.outgoingEntropyTrainingResults?.transportBPrediction
+                
+            let outEntropyTrainingAccuracy = trainingData.outgoingEntropyTrainingResults?.trainingAccuracy
+            let outEntropyValidationAccuracy = trainingData.outgoingEntropyTrainingResults?.validationAccuracy
+            let outEntropyEvaluationAccuracy = trainingData.outgoingEntropyTrainingResults?.evaluationAccuracy
+            let transportAPredictedInEntropy = trainingData.incomingEntropyTrainingResults?.transportAPrediction
+            let transportBPredictedInEntropy = trainingData.incomingEntropyTrainingResults?.transportBPrediction
+            let inEntropyTrainingAccuracy = trainingData.incomingEntropyTrainingResults?.trainingAccuracy
+            let inEntropyValidationAccuracy = trainingData.incomingEntropyTrainingResults?.validationAccuracy
+            let inEntropyEvaluationAccuracy = trainingData.incomingEntropyTrainingResults?.evaluationAccuracy
+            
             self.requiredOutEntropy = "--"
             self.forbiddenOutEntropy = "--"
             self.outEntropyTAcc = "--"

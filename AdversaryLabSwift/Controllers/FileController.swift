@@ -38,7 +38,7 @@ class FileController
         guard let appDirectory = prepareDirectory(groupName: groupName)
             else
         {
-            print("Failed to save the classifier, could not find the application document directory.")
+            print("Failed to save the model, could not prepare the \(groupName) directory.")
             return
         }
         
@@ -97,7 +97,7 @@ class FileController
         guard let appDirectory = prepareDirectory(groupName: groupName)
         else
         {
-            print("Failed to save the classifier, could not find the application document directory.")
+            print("Failed to save the classifier, could not prepare the \(groupName) directory.")
             return
         }
         
@@ -206,6 +206,17 @@ class FileController
         
         let directoryURL = appDirectory.appendingPathComponent(groupName)
         let bundleURL = directoryURL.appendingPathExtension("adversary")
+        
+        if fileManager.fileExists(atPath: bundleURL.path)
+        {
+            do{
+                try fileManager.removeItem(at: bundleURL)
+            }
+            catch let removeFileError
+            {
+                print("Error trying to remove file at \(bundleURL.path): \(removeFileError)")
+            }
+        }
 
         do
         {
@@ -282,17 +293,21 @@ class FileController
         guard let appDirectory = getAdversarySupportDirectory()
             else
         {
-            print("Failed to save the file, could not find the application document directory.")
+            print("Failed to save the file, could not find the application support directory.")
             return nil
         }
         
         let groupURL = appDirectory.appendingPathComponent(groupName)
         
-        guard fileManager.fileExists(atPath: groupURL.path)
-        else
+        if !fileManager.fileExists(atPath: groupURL.path)
         {
-            print("Group directory does not exist.")
-            return nil
+            do {
+                try fileManager.createDirectory(at: groupURL, withIntermediateDirectories: true, attributes: nil)
+            } catch let createDirError {
+                print("Failed to prepare the \(groupName) directory.")
+                print("Received a directory creation error: \(createDirError)")
+                return nil
+            }
         }
         
         do

@@ -33,7 +33,6 @@ class SymphonyController
         symphony = Symphony(root: songDirectory)
         
         // Get the list of transports in the Symphony DB
-        
         do
         {
             let tables = try FileManager().contentsOfDirectory(at: songDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
@@ -103,18 +102,23 @@ class SymphonyController
     /// File management
     func unzipSong(sourceURL: URL) -> URL?
     {
-        let fileManager = FileManager()
-        let currentWorkingURL = URL(fileURLWithPath: fileManager.currentDirectoryPath)
-        let destinationURL = currentWorkingURL.appendingPathComponent("adversary_data")
+        guard let applicationSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+        else {
+            print("Unable to unzip the Song data because we could not find the application support directory.")
+            return nil
+        }
+        
+        let destinationURL = applicationSupportDir.appendingPathComponent("adversary_data")
         do
         {
             // Overwrite any old data at this directory
-            if fileManager.fileExists(atPath: destinationURL.path)
+            if FileManager.default.fileExists(atPath: destinationURL.path)
             {
-                try fileManager.removeItem(at: destinationURL)
+                try FileManager.default.removeItem(at: destinationURL)
             }
             
-            try fileManager.unzipItem(at: sourceURL, to: currentWorkingURL)
+            try FileManager.default.unzipItem(at: sourceURL, to: applicationSupportDir)
+            
             return destinationURL
         }
         catch
