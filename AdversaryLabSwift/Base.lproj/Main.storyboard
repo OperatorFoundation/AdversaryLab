@@ -708,57 +708,79 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="AdversaryLabSwift" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" identifier="mainView" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="1200" height="800"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1199" height="800"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box identifier="settingsBox" boxType="custom" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="7kG-4K-h0L">
-                                <rect key="frame" x="0.0" y="696" width="1200" height="104"/>
+                                <rect key="frame" x="0.0" y="696" width="1199" height="104"/>
                                 <view key="contentView" id="4OY-m4-WrU">
-                                    <rect key="frame" x="1" y="1" width="1198" height="102"/>
+                                    <rect key="frame" x="1" y="1" width="1197" height="102"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
-                                            <rect key="frame" x="411" y="74" width="117" height="16"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Optional Settings" id="inq-Xy-mpx">
-                                                <font key="font" metaFont="systemBold"/>
-                                                <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ygH-l3-SnY">
-                                            <rect key="frame" x="425" y="53" width="181" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable Sequence Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="njV-0D-nD0">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <color key="contentTintColor" cyan="0.0" magenta="0.0" yellow="0.0" black="0.0" alpha="1" colorSpace="custom" customColorSpace="genericCMYKColorSpace"/>
-                                            <connections>
-                                                <action selector="enableSequenceAnalysisClicked:" target="XfG-lQ-9wD" id="zIU-Lr-Oor"/>
-                                            </connections>
-                                        </button>
-                                        <button hidden="YES" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
-                                            <rect key="frame" x="425" y="5" width="209" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="oLi-vs-yls">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="removePacketsClicked:" target="XfG-lQ-9wD" id="0HC-mX-IVK"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
-                                            <rect key="frame" x="425" y="29" width="144" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m3M-iX-HUs">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <color key="contentTintColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <connections>
-                                                <action selector="enableTLSAnslysisClicked:" target="XfG-lQ-9wD" id="lvP-wz-OBV"/>
-                                            </connections>
-                                        </button>
-                                        <gridView fixedFrame="YES" xPlacement="leading" yPlacement="fill" rowAlignment="none" rowSpacing="2" columnSpacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="Mo3-ec-rYc">
-                                            <rect key="frame" x="17" y="10" width="337" height="88"/>
+                                        <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dJ3-TL-k0L">
+                                            <rect key="frame" x="998" y="20" width="183" height="64"/>
+                                            <subviews>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
+                                                    <rect key="frame" x="-2" y="48" width="117" height="16"/>
+                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Optional Settings" id="inq-Xy-mpx">
+                                                        <font key="font" metaFont="systemBold"/>
+                                                        <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ygH-l3-SnY">
+                                                    <rect key="frame" x="-2" y="23" width="185" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Enable Sequence Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="njV-0D-nD0">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                    </buttonCell>
+                                                    <color key="contentTintColor" cyan="0.0" magenta="0.0" yellow="0.0" black="0.0" alpha="1" colorSpace="custom" customColorSpace="genericCMYKColorSpace"/>
+                                                    <connections>
+                                                        <action selector="enableSequenceAnalysisClicked:" target="XfG-lQ-9wD" id="zIU-Lr-Oor"/>
+                                                    </connections>
+                                                </button>
+                                                <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l29-wR-vQY">
+                                                    <rect key="frame" x="-2" y="47" width="213" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Remove Packets After Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="oLi-vs-yls">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                    </buttonCell>
+                                                    <connections>
+                                                        <action selector="removePacketsClicked:" target="XfG-lQ-9wD" id="0HC-mX-IVK"/>
+                                                    </connections>
+                                                </button>
+                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qWY-FO-Xfj">
+                                                    <rect key="frame" x="-2" y="-1" width="148" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Enable TLS Analysis" bezelStyle="regularSquare" imagePosition="left" inset="2" id="m3M-iX-HUs">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                    </buttonCell>
+                                                    <color key="contentTintColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    <connections>
+                                                        <action selector="enableTLSAnslysisClicked:" target="XfG-lQ-9wD" id="lvP-wz-OBV"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="4jO-uV-X2x">
+                                            <rect key="frame" x="555" y="12" width="87" height="77"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="al-256" id="xod-T9-emB"/>
+                                        </imageView>
+                                        <gridView xPlacement="leading" yPlacement="fill" rowAlignment="none" rowSpacing="2" columnSpacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="Mo3-ec-rYc">
+                                            <rect key="frame" x="16" y="8" width="337" height="88"/>
                                             <rows>
                                                 <gridRow id="52e-eo-uFK"/>
                                                 <gridRow id="l56-B0-7Md"/>
@@ -898,17 +920,14 @@
                                         </gridView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="ygH-l3-SnY" firstAttribute="top" secondItem="jR8-1j-flg" secondAttribute="bottom" constant="4" id="3Wd-Wp-qUp"/>
-                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="ygH-l3-SnY" secondAttribute="trailing" constant="16" symbolic="YES" id="5zN-b6-Pyj"/>
-                                        <constraint firstItem="ygH-l3-SnY" firstAttribute="leading" secondItem="jR8-1j-flg" secondAttribute="leading" constant="14" id="CY2-jo-F9P"/>
-                                        <constraint firstItem="qWY-FO-Xfj" firstAttribute="leading" secondItem="ygH-l3-SnY" secondAttribute="leading" id="CaW-YT-hY0"/>
-                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jR8-1j-flg" secondAttribute="trailing" constant="16" symbolic="YES" id="RQ0-aX-Pkx"/>
-                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="qWY-FO-Xfj" secondAttribute="trailing" constant="16" symbolic="YES" id="YVd-Al-Wc4"/>
-                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="l29-wR-vQY" secondAttribute="trailing" constant="16" symbolic="YES" id="mTH-Js-mNd"/>
-                                        <constraint firstItem="l29-wR-vQY" firstAttribute="top" secondItem="qWY-FO-Xfj" secondAttribute="bottom" constant="8" id="oel-Zp-ITJ"/>
-                                        <constraint firstItem="jR8-1j-flg" firstAttribute="top" secondItem="4OY-m4-WrU" secondAttribute="top" constant="12" id="ozV-GC-ryc"/>
-                                        <constraint firstItem="l29-wR-vQY" firstAttribute="leading" secondItem="qWY-FO-Xfj" secondAttribute="leading" id="pyT-O6-iYA"/>
-                                        <constraint firstItem="qWY-FO-Xfj" firstAttribute="top" secondItem="ygH-l3-SnY" secondAttribute="bottom" constant="8" id="ttd-sr-7Yi"/>
+                                        <constraint firstAttribute="trailing" secondItem="dJ3-TL-k0L" secondAttribute="trailing" constant="16" symbolic="YES" id="1m2-hP-L8Z"/>
+                                        <constraint firstItem="Mo3-ec-rYc" firstAttribute="leading" secondItem="4OY-m4-WrU" secondAttribute="leading" constant="16" symbolic="YES" id="42u-Oi-oBz"/>
+                                        <constraint firstItem="dJ3-TL-k0L" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="HFN-Yh-Tjo"/>
+                                        <constraint firstItem="dJ3-TL-k0L" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4jO-uV-X2x" secondAttribute="trailing" constant="18" id="HqN-At-nvp"/>
+                                        <constraint firstItem="4jO-uV-X2x" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="VGX-wy-poI"/>
+                                        <constraint firstItem="Mo3-ec-rYc" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="rd6-NN-3dg"/>
+                                        <constraint firstItem="4jO-uV-X2x" firstAttribute="centerX" secondItem="4OY-m4-WrU" secondAttribute="centerX" id="x34-aA-vbf"/>
+                                        <constraint firstItem="4jO-uV-X2x" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Mo3-ec-rYc" secondAttribute="trailing" constant="18" id="zMv-Ug-LDs"/>
                                     </constraints>
                                 </view>
                                 <constraints>
@@ -917,31 +936,31 @@
                                 <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
                             <box identifier="resultsBox" boxType="custom" borderType="line" cornerRadius="4" title="Results" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="bLg-zh-5Y8">
-                                <rect key="frame" x="0.0" y="0.0" width="1200" height="698"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1199" height="698"/>
                                 <view key="contentView" id="rEU-zU-uAX">
-                                    <rect key="frame" x="1" y="1" width="1198" height="696"/>
+                                    <rect key="frame" x="1" y="1" width="1197" height="696"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="XH8-rE-kw3">
                                             <rect key="frame" x="583" y="332" width="32" height="32"/>
                                         </progressIndicator>
                                         <tabView type="bottomTabsBezelBorder" translatesAutoresizingMaskIntoConstraints="NO" id="U3K-mm-fOh">
-                                            <rect key="frame" x="-7" y="54" width="1212" height="638"/>
+                                            <rect key="frame" x="-7" y="54" width="1211" height="638"/>
                                             <font key="font" metaFont="system"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Data" identifier="DataMode" id="lzk-GG-MO3">
                                                     <view key="view" id="ksq-IL-4hz">
-                                                        <rect key="frame" x="10" y="7" width="1192" height="600"/>
+                                                        <rect key="frame" x="10" y="7" width="1191" height="600"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MmQ-Yo-R8n" customClass="LineChartView" customModule="Charts">
                                                                 <rect key="frame" x="17" y="301" width="529" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="dYG-fi-xdx" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="597" y="301" width="578" height="282"/>
+                                                                <rect key="frame" x="597" y="301" width="577" height="282"/>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Cwd-sz-D6E" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="307" y="1" width="578" height="292"/>
+                                                                <rect key="frame" x="307" y="1" width="577" height="292"/>
                                                             </customView>
                                                         </subviews>
                                                         <constraints>
@@ -5524,7 +5543,7 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xh2-hi-Cpw">
-                                            <rect key="frame" x="963" y="18" width="96" height="32"/>
+                                            <rect key="frame" x="962" y="18" width="96" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Xs-aF-0F3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5534,7 +5553,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PUo-Tn-R9n">
-                                            <rect key="frame" x="1057" y="18" width="128" height="32"/>
+                                            <rect key="frame" x="1056" y="18" width="128" height="32"/>
                                             <buttonCell key="cell" type="push" title="Train With Data" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="guU-24-ESe">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5544,10 +5563,10 @@
                                             </connections>
                                         </button>
                                         <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="SuX-tc-4bk">
-                                            <rect key="frame" x="19" y="5" width="1159" height="20"/>
+                                            <rect key="frame" x="19" y="5" width="1158" height="20"/>
                                         </progressIndicator>
                                         <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AP7-De-osk">
-                                            <rect key="frame" x="890" y="18" width="75" height="32"/>
+                                            <rect key="frame" x="889" y="18" width="75" height="32"/>
                                             <buttonCell key="cell" type="push" title="Charts" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mS-TN-z6y">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -5573,6 +5592,7 @@
                                         <constraint firstAttribute="trailing" secondItem="U3K-mm-fOh" secondAttribute="trailing" id="XDR-KE-IGe"/>
                                         <constraint firstItem="OYu-D3-1sv" firstAttribute="bottom" secondItem="xh2-hi-Cpw" secondAttribute="bottom" id="Xay-hg-Nop"/>
                                         <constraint firstItem="PUo-Tn-R9n" firstAttribute="leading" secondItem="xh2-hi-Cpw" secondAttribute="trailing" constant="12" id="eSG-O5-Na6"/>
+                                        <constraint firstItem="AP7-De-osk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="OYu-D3-1sv" secondAttribute="trailing" constant="12" id="eyt-CV-J8P"/>
                                         <constraint firstAttribute="bottom" secondItem="U3K-mm-fOh" secondAttribute="bottom" constant="60" id="gFt-fG-Hw7"/>
                                         <constraint firstItem="xh2-hi-Cpw" firstAttribute="leading" secondItem="AP7-De-osk" secondAttribute="trailing" constant="12" id="iQG-WL-sFe"/>
                                         <constraint firstItem="OYu-D3-1sv" firstAttribute="bottom" secondItem="AP7-De-osk" secondAttribute="bottom" id="zOp-k0-VLG"/>
@@ -5616,7 +5636,7 @@
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="bzY-MI-M55"/>
             </objects>
-            <point key="canvasLocation" x="1413" y="222"/>
+            <point key="canvasLocation" x="1390" y="221"/>
         </scene>
         <!--Hosting Controller-->
         <scene sceneID="Ls6-HL-uy3">
@@ -5627,4 +5647,7 @@
             <point key="canvasLocation" x="2322" y="512"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="al-256" width="256" height="256"/>
+    </resources>
 </document>
