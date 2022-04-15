@@ -37,6 +37,15 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
     @objc dynamic var bConnectionsAnalyzedLabel = "Connections Analyzed"
     @objc dynamic var blockedPacketsAnalyzed = "Loading..."
     
+    @objc dynamic var aConnectionsOutgoingTitleLabel = "Transport A Outgoing Packets"
+    @objc dynamic var aConnectionsOutgoingValueLabel = "Loading..."
+    @objc dynamic var aConnectionsIncomingTitleLabel = "Transport A Incoming Packets"
+    @objc dynamic var aConnectionsIncomingValueLabel = "Loading..."
+    @objc dynamic var bConnectionsOutgoingTitleLabel = "Transport B Outgoing Packets"
+    @objc dynamic var bConnectionsOutgoingValueLabel = "Loading..."
+    @objc dynamic var bConnectionsIncomingTitleLabel = "Transport B Incoming Packets"
+    @objc dynamic var bConnectionsIncomingValueLabel = "Loading..."
+    
     @objc dynamic var requiredTiming = "--"
     @objc dynamic var forbiddenTiming = "--"
     @objc dynamic var timeTAcc = "--"
@@ -908,23 +917,37 @@ class ViewController: NSViewController, NSTabViewDelegate, ChartViewDelegate
         
         DispatchQueue.main.async
         {
+            // Header Labels
             self.vcTransportAName = transportA
             self.vcTransportBName = transportB
             
             self.databaseNameLabel.stringValue = redisDatabaseFilename
+            
+            let aConnectionData = connectionGroupData.aConnectionData
             self.aConnectionsCountLabel = "\(transportA) connections: "
-            self.allowedPacketsSeen = "\(connectionGroupData.aConnectionData.connections.count)"
+            self.allowedPacketsSeen = "\(aConnectionData.connections.count)"
+            self.aConnectionsOutgoingTitleLabel = "\(transportA) total outgoing packets: "
+            self.aConnectionsOutgoingValueLabel = "\(aConnectionData.outgoingPackets.count)"
+            self.aConnectionsIncomingTitleLabel = "\(transportA) total incoming packets: "
+            self.aConnectionsIncomingValueLabel = "\(aConnectionData.incomingPackets.count)"
             self.aConnectionsAnalyzedLabel = "\(transportA) connections analyzed: "
             self.allowedPacketsAnalyzed = "\(connectionGroupData.aPacketsAnalyzed)"
+            
+            let bConnectionData = connectionGroupData.bConnectionData
             self.bConnectionsCountLabel = "\(transportB) connections: "
-            self.blockedPacketsSeen = "\(connectionGroupData.bConnectionData.connections.count)"
+            self.blockedPacketsSeen = "\(bConnectionData.connections.count)"
             self.bConnectionsAnalyzedLabel = "\(transportB) connections analyzed: "
             self.blockedPacketsAnalyzed = "\(connectionGroupData.bPacketsAnalyzed)"
+            self.bConnectionsIncomingTitleLabel = "\(transportB) total incoming packets: "
+            self.bConnectionsIncomingValueLabel = "\(bConnectionData.incomingPackets.count)"
+            self.bConnectionsOutgoingTitleLabel = "\(transportB) total outgoing packets: "
+            self.bConnectionsOutgoingValueLabel = "\(bConnectionData.outgoingPackets.count)"
             
             guard let identifier = self.tabView.selectedTabViewItem?.identifier as? String,
                 let currentTab = TabIds(rawValue: identifier)
                 else { return }
             
+            // Main body labels
             switch currentTab
             {
             case .TrainingMode:

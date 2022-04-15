@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -718,7 +718,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dJ3-TL-k0L">
-                                            <rect key="frame" x="998" y="20" width="183" height="64"/>
+                                            <rect key="frame" x="994" y="20" width="183" height="64"/>
                                             <subviews>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jR8-1j-flg">
                                                     <rect key="frame" x="-2" y="48" width="117" height="16"/>
@@ -780,7 +780,7 @@
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="al-256" id="xod-T9-emB"/>
                                         </imageView>
                                         <gridView xPlacement="leading" yPlacement="fill" rowAlignment="none" rowSpacing="2" columnSpacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="Mo3-ec-rYc">
-                                            <rect key="frame" x="16" y="8" width="337" height="88"/>
+                                            <rect key="frame" x="20" y="8" width="313" height="88"/>
                                             <rows>
                                                 <gridRow id="52e-eo-uFK"/>
                                                 <gridRow id="l56-B0-7Md"/>
@@ -803,8 +803,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="52e-eo-uFK" column="iB3-u3-QZ1" id="t8G-G8-Wq5">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8y-G1-l9V">
-                                                        <rect key="frame" x="201" y="72" width="138" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j8y-G1-l9V">
+                                                        <rect key="frame" x="200" y="72" width="115" height="16"/>
                                                         <textFieldCell key="cell" title="--                                  " id="9rQ-Gk-UJ8">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -826,8 +826,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="l56-B0-7Md" column="iB3-u3-QZ1" id="Oac-4E-yZV">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SkB-0N-VDD" userLabel="apsValueLabel">
-                                                        <rect key="frame" x="201" y="54" width="17" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SkB-0N-VDD" userLabel="apsValueLabel">
+                                                        <rect key="frame" x="200" y="54" width="17" height="16"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="JPT-oh-fHT">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -852,8 +852,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="nbI-Lo-SPU" column="iB3-u3-QZ1" id="Anr-bO-f5E">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ROT-VW-FE8" userLabel="apaValueLabel">
-                                                        <rect key="frame" x="201" y="36" width="17" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ROT-VW-FE8" userLabel="apaValueLabel">
+                                                        <rect key="frame" x="200" y="36" width="17" height="16"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="pan-iU-mL1">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -878,8 +878,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="2W4-Co-jkt" column="iB3-u3-QZ1" id="DII-Hm-lVi">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x5M-14-860" userLabel="bpsValueLabel">
-                                                        <rect key="frame" x="201" y="18" width="17" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x5M-14-860" userLabel="bpsValueLabel">
+                                                        <rect key="frame" x="200" y="18" width="17" height="16"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="WuV-Vn-yMb">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -891,8 +891,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="gkh-Xo-not" column="cv6-Ne-t4B" id="qGs-c4-XxW">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Cqs-Co-gso">
-                                                        <rect key="frame" x="-2" y="0.0" width="204" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cqs-Co-gso">
+                                                        <rect key="frame" x="-2" y="0.0" width="203" height="16"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Blocked Connections Analyzed:" id="MwL-9t-5dD">
                                                             <font key="font" metaFont="systemSemibold" size="13"/>
                                                             <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -904,8 +904,8 @@
                                                     </textField>
                                                 </gridCell>
                                                 <gridCell row="gkh-Xo-not" column="iB3-u3-QZ1" id="3MC-OM-mQ2">
-                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6fu-LL-ZLE" userLabel="bpaValueLabel">
-                                                        <rect key="frame" x="201" y="0.0" width="17" height="16"/>
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6fu-LL-ZLE" userLabel="bpaValueLabel">
+                                                        <rect key="frame" x="200" y="0.0" width="17" height="16"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="--" id="MGK-Wf-ChT">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -918,16 +918,137 @@
                                                 </gridCell>
                                             </gridCells>
                                         </gridView>
+                                        <gridView xPlacement="leading" yPlacement="fill" rowAlignment="none" rowSpacing="2" columnSpacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="ooy-di-2Cd">
+                                            <rect key="frame" x="341" y="17" width="206" height="70"/>
+                                            <rows>
+                                                <gridRow id="Njp-0n-oa3"/>
+                                                <gridRow id="Kqr-Z0-s70"/>
+                                                <gridRow id="9rW-TG-zCv"/>
+                                                <gridRow id="k4L-C6-2uU"/>
+                                            </rows>
+                                            <columns>
+                                                <gridColumn id="4Ay-0v-YfW"/>
+                                                <gridColumn id="Utv-R2-Llj"/>
+                                            </columns>
+                                            <gridCells>
+                                                <gridCell row="Njp-0n-oa3" column="4Ay-0v-YfW" id="TOS-6c-w1J">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MSu-Jn-YbY">
+                                                        <rect key="frame" x="-2" y="54" width="194" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Transport A Outgoing Packets" id="VFs-OI-saM">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsOutgoingTitleLabel" id="ARK-Ee-NLN"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="Njp-0n-oa3" column="Utv-R2-Llj" id="KLD-SD-VzT">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gx2-ra-FwW">
+                                                        <rect key="frame" x="191" y="54" width="17" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="--" id="Y3Y-i4-hcN">
+                                                            <font key="font" usesAppearanceFont="YES"/>
+                                                            <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsOutgoingValueLabel" id="f2q-AW-OV5"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="Kqr-Z0-s70" column="4Ay-0v-YfW" id="V77-aa-2CU">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FBX-UV-aZx">
+                                                        <rect key="frame" x="-2" y="36" width="194" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Transport A Incoming Packets" id="fMh-6b-vcQ">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsIncomingTitleLabel" id="YqR-KC-mqB"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="Kqr-Z0-s70" column="Utv-R2-Llj" id="qAR-No-ttH">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1r0-Ic-zCV">
+                                                        <rect key="frame" x="191" y="36" width="17" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="--" id="lOu-Ww-40c">
+                                                            <font key="font" usesAppearanceFont="YES"/>
+                                                            <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.aConnectionsIncomingValueLabel" id="PSv-8p-nuk"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="9rW-TG-zCv" column="4Ay-0v-YfW" id="V5O-ld-4UI">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yRM-pZ-Y4G">
+                                                        <rect key="frame" x="-2" y="18" width="193" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Transport B Outgoing Packets" id="Whw-2J-EcE">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsOutgoingTitleLabel" id="w4Y-Tt-MvE"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="9rW-TG-zCv" column="Utv-R2-Llj" id="O7P-V8-Tos">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3g9-0j-Sgv">
+                                                        <rect key="frame" x="191" y="18" width="17" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="--" id="acx-Ym-bYa">
+                                                            <font key="font" usesAppearanceFont="YES"/>
+                                                            <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsOutgoingValueLabel" id="91Y-f4-y8E"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="k4L-C6-2uU" column="4Ay-0v-YfW" id="EJS-iD-NzH">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FR8-ap-DR5">
+                                                        <rect key="frame" x="-2" y="0.0" width="193" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Transport B Outgoing Packets" id="jAO-Ew-0Gp">
+                                                            <font key="font" metaFont="systemSemibold" size="13"/>
+                                                            <color key="textColor" white="0.70499061210000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsIncomingTitleLabel" id="u21-Fg-5BR"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                                <gridCell row="k4L-C6-2uU" column="Utv-R2-Llj" id="2JJ-QL-VOm">
+                                                    <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8G5-VV-VfP">
+                                                        <rect key="frame" x="191" y="0.0" width="17" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="--" id="jP1-iH-zWd">
+                                                            <font key="font" usesAppearanceFont="YES"/>
+                                                            <color key="textColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="XfG-lQ-9wD" name="value" keyPath="self.bConnectionsIncomingValueLabel" id="PBQ-IF-n9H"/>
+                                                        </connections>
+                                                    </textField>
+                                                </gridCell>
+                                            </gridCells>
+                                        </gridView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="dJ3-TL-k0L" secondAttribute="trailing" constant="16" symbolic="YES" id="1m2-hP-L8Z"/>
-                                        <constraint firstItem="Mo3-ec-rYc" firstAttribute="leading" secondItem="4OY-m4-WrU" secondAttribute="leading" constant="16" symbolic="YES" id="42u-Oi-oBz"/>
+                                        <constraint firstItem="Mo3-ec-rYc" firstAttribute="leading" secondItem="4OY-m4-WrU" secondAttribute="leading" constant="20" symbolic="YES" id="42u-Oi-oBz"/>
                                         <constraint firstItem="dJ3-TL-k0L" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="HFN-Yh-Tjo"/>
                                         <constraint firstItem="dJ3-TL-k0L" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4jO-uV-X2x" secondAttribute="trailing" constant="18" id="HqN-At-nvp"/>
+                                        <constraint firstItem="ooy-di-2Cd" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="JTJ-Bf-iMY"/>
                                         <constraint firstItem="4jO-uV-X2x" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="VGX-wy-poI"/>
                                         <constraint firstItem="Mo3-ec-rYc" firstAttribute="centerY" secondItem="4OY-m4-WrU" secondAttribute="centerY" id="rd6-NN-3dg"/>
+                                        <constraint firstItem="ooy-di-2Cd" firstAttribute="leading" secondItem="Mo3-ec-rYc" secondAttribute="trailing" constant="8" id="u2F-rp-7SW"/>
+                                        <constraint firstItem="4jO-uV-X2x" firstAttribute="leading" secondItem="ooy-di-2Cd" secondAttribute="trailing" constant="8" id="wIQ-xc-Frl"/>
                                         <constraint firstItem="4jO-uV-X2x" firstAttribute="centerX" secondItem="4OY-m4-WrU" secondAttribute="centerX" id="x34-aA-vbf"/>
-                                        <constraint firstItem="4jO-uV-X2x" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Mo3-ec-rYc" secondAttribute="trailing" constant="18" id="zMv-Ug-LDs"/>
                                     </constraints>
                                 </view>
                                 <constraints>
@@ -5636,7 +5757,7 @@
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="bzY-MI-M55"/>
             </objects>
-            <point key="canvasLocation" x="1390" y="221"/>
+            <point key="canvasLocation" x="1389.5" y="221"/>
         </scene>
         <!--Hosting Controller-->
         <scene sceneID="Ls6-HL-uy3">
