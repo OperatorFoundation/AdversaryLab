@@ -1069,44 +1069,13 @@
                                             <rect key="frame" x="-7" y="54" width="1211" height="638"/>
                                             <font key="font" metaFont="system"/>
                                             <tabViewItems>
-                                                <tabViewItem label="Data" identifier="DataMode" id="lzk-GG-MO3">
-                                                    <view key="view" id="ksq-IL-4hz">
+                                                <tabViewItem label="Training" identifier="TrainingMode" id="Rlt-zU-eIh">
+                                                    <view key="view" id="nkb-dB-4xB">
                                                         <rect key="frame" x="10" y="7" width="1191" height="600"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="MmQ-Yo-R8n" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="17" y="301" width="529" height="282"/>
-                                                            </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="dYG-fi-xdx" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="597" y="301" width="577" height="282"/>
-                                                            </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Cwd-sz-D6E" customClass="LineChartView" customModule="Charts">
-                                                                <rect key="frame" x="307" y="1" width="577" height="292"/>
-                                                            </customView>
-                                                        </subviews>
-                                                        <constraints>
-                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="MmQ-Yo-R8n" secondAttribute="bottom" constant="8" symbolic="YES" id="4gs-MR-fpz"/>
-                                                            <constraint firstItem="dYG-fi-xdx" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="597" id="5RV-md-yqw"/>
-                                                            <constraint firstAttribute="bottom" secondItem="Cwd-sz-D6E" secondAttribute="bottom" constant="1" id="DIe-p4-NBi"/>
-                                                            <constraint firstItem="dYG-fi-xdx" firstAttribute="leading" secondItem="MmQ-Yo-R8n" secondAttribute="trailing" constant="51" id="Ghs-at-oYh"/>
-                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="top" secondItem="dYG-fi-xdx" secondAttribute="top" id="NUr-sf-1C4"/>
-                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="dYG-fi-xdx" secondAttribute="bottom" constant="8" symbolic="YES" id="Nur-jB-PZS"/>
-                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="307" id="SGJ-hG-aRD"/>
-                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="top" secondItem="ksq-IL-4hz" secondAttribute="top" constant="17" id="fv2-XE-Zuu"/>
-                                                            <constraint firstAttribute="trailing" secondItem="dYG-fi-xdx" secondAttribute="trailing" constant="17" id="mrc-YW-qJD"/>
-                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="17" id="q7E-5R-zFl"/>
-                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="ksq-IL-4hz" secondAttribute="top" constant="307" id="r3E-F7-rBY"/>
-                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="centerX" secondItem="ksq-IL-4hz" secondAttribute="centerX" id="uGg-t0-51k"/>
-                                                        </constraints>
-                                                    </view>
-                                                </tabViewItem>
-                                                <tabViewItem label="Training" identifier="TrainingMode" id="Rlt-zU-eIh">
-                                                    <view key="view" id="nkb-dB-4xB">
-                                                        <rect key="frame" x="10" y="7" width="1192" height="600"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                        <subviews>
                                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjj-d9-0zI" userLabel="Float Stack View">
-                                                                <rect key="frame" x="19" y="65" width="413" height="185"/>
+                                                                <rect key="frame" x="19" y="65" width="412" height="185"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gua-Ec-IdB">
                                                                         <rect key="frame" x="-2" y="166" width="148" height="19"/>
@@ -2460,7 +2429,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pDg-QR-5Xz" userLabel="Offset Stack View">
-                                                                <rect key="frame" x="456" y="25" width="369" height="225"/>
+                                                                <rect key="frame" x="455" y="25" width="369" height="225"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tei-Ib-ZQM">
                                                                         <rect key="frame" x="-2" y="206" width="135" height="19"/>
@@ -3631,7 +3600,7 @@
                                                 </tabViewItem>
                                                 <tabViewItem label="Testing" identifier="TestMode" id="PfJ-vd-mAh">
                                                     <view key="view" id="8hf-BJ-0zt">
-                                                        <rect key="frame" x="10" y="7" width="1192" height="600"/>
+                                                        <rect key="frame" x="10" y="7" width="1191" height="600"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AJV-pc-gSa">
@@ -5641,6 +5610,37 @@
                                                             <constraint firstItem="a8G-wx-Oq5" firstAttribute="top" secondItem="2g4-33-VNd" secondAttribute="top" id="wfI-8p-7bb"/>
                                                             <constraint firstItem="n0P-De-6R9" firstAttribute="top" relation="greaterThanOrEqual" secondItem="j1z-hm-1tr" secondAttribute="bottom" constant="15" id="xSy-UQ-fan"/>
                                                             <constraint firstItem="XZ4-cs-jBl" firstAttribute="trailing" secondItem="79E-XJ-29u" secondAttribute="trailing" id="yut-An-rEJ"/>
+                                                        </constraints>
+                                                    </view>
+                                                </tabViewItem>
+                                                <tabViewItem label="Data" identifier="DataMode" id="lzk-GG-MO3">
+                                                    <view key="view" id="ksq-IL-4hz">
+                                                        <rect key="frame" x="10" y="7" width="1191" height="600"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <subviews>
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="MmQ-Yo-R8n" customClass="LineChartView" customModule="Charts">
+                                                                <rect key="frame" x="17" y="301" width="529" height="282"/>
+                                                            </customView>
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="dYG-fi-xdx" customClass="LineChartView" customModule="Charts">
+                                                                <rect key="frame" x="597" y="301" width="577" height="282"/>
+                                                            </customView>
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Cwd-sz-D6E" customClass="LineChartView" customModule="Charts">
+                                                                <rect key="frame" x="307" y="1" width="577" height="292"/>
+                                                            </customView>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="MmQ-Yo-R8n" secondAttribute="bottom" constant="8" symbolic="YES" id="4gs-MR-fpz"/>
+                                                            <constraint firstItem="dYG-fi-xdx" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="597" id="5RV-md-yqw"/>
+                                                            <constraint firstAttribute="bottom" secondItem="Cwd-sz-D6E" secondAttribute="bottom" constant="1" id="DIe-p4-NBi"/>
+                                                            <constraint firstItem="dYG-fi-xdx" firstAttribute="leading" secondItem="MmQ-Yo-R8n" secondAttribute="trailing" constant="51" id="Ghs-at-oYh"/>
+                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="top" secondItem="dYG-fi-xdx" secondAttribute="top" id="NUr-sf-1C4"/>
+                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="dYG-fi-xdx" secondAttribute="bottom" constant="8" symbolic="YES" id="Nur-jB-PZS"/>
+                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="307" id="SGJ-hG-aRD"/>
+                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="top" secondItem="ksq-IL-4hz" secondAttribute="top" constant="17" id="fv2-XE-Zuu"/>
+                                                            <constraint firstAttribute="trailing" secondItem="dYG-fi-xdx" secondAttribute="trailing" constant="17" id="mrc-YW-qJD"/>
+                                                            <constraint firstItem="MmQ-Yo-R8n" firstAttribute="leading" secondItem="ksq-IL-4hz" secondAttribute="leading" constant="17" id="q7E-5R-zFl"/>
+                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="top" secondItem="ksq-IL-4hz" secondAttribute="top" constant="307" id="r3E-F7-rBY"/>
+                                                            <constraint firstItem="Cwd-sz-D6E" firstAttribute="centerX" secondItem="ksq-IL-4hz" secondAttribute="centerX" id="uGg-t0-51k"/>
                                                         </constraints>
                                                     </view>
                                                 </tabViewItem>
