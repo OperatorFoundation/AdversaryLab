@@ -22,7 +22,7 @@ Swift 5.0, included in Xcode 11
 
 Install and run Redis.
 
-You can install it with Homebrew
+Using Homebrew:
 
 ```
 brew install redis
