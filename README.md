@@ -33,24 +33,16 @@ Or refer to the [Redis documentation](https://redis.io/download) to install it m
 
 ### Installing
 
-Check out the project from Github
-
-```
-git clone https://github.com/OperatorFoundation/AdversaryLab
-cd AdversaryLab
-```
-
-Install the Swift Package used by the graphical interface. Swift packages are now handled in xcode. There is no longer a sub-project for updating packages via command line.
-
-Add the following executables to the AdversaryLab/Executables/ folder: redis-cli, redis-server, and [AdversaryLabClient](https://github.com/OperatorFoundation/AdversaryLabClientSwift). Please note that this project requires the Swift version of the client, it is no longer compatible with the Go version.
+Check out the project from Github and add the following executables to the AdversaryLab/Executables/ folder: 
+- redis-cli  
+- redis-server
 
 
 ## Deployment
 
-Open the Xcode project. Once you have addressed signing as needed, and Xcode has downloaded the dependencies (packages), you can click the Run button to run the Adversary Lab graphical interface.
+Open the Xcode project. Once you have addressed signing as needed, you can run the project using Xcode. Note that you have to have started redis using `brew services start redis` for AdversaryLab to run correctly.
 
-To add network traffic to Adversary Lab for analysis, you need the AdversaryLabClient command line tool. For the [installation
-instructions](https://github.com/OperatorFoundation/AdversaryLabClientSwift) to install and use the command line tool.
+To add network traffic to Adversary Lab for analysis you can use [CanaryDesktop](https://github.com/OperatorFoundation/CanaryDesktop.git) for macOS, or [CanaryLinux](https://github.com/OperatorFoundation/CanaryLinux.git) for Linux. When selecting data to load, you should browse to the location of one of the zip files created by Canary. These zip files are named "adversary_data" followed by a timestamp.
 
 ## Built With
 
