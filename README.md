@@ -30,6 +30,7 @@ To add network traffic to Adversary Lab for analysis you can use [CanaryDesktop]
 
 * [Auburn](https://github.com/OperatorFoundation/Auburn) - An idiomatic Swift library for using Redis
 * [Datable](https://github.com/OperatorFoundation/Datable) - Swift convenience functions to convert between various different types and Data
+* [Song](https://github.com/OperatorFoundation/Song.git) - Data structure serialization with static typing.
 
 ## Contributing
 
