@@ -8,27 +8,78 @@
 
 import Cocoa
 
+//func showCorruptRedisAlert(processPID: String)
+//{
+//    let alert = NSAlert()
+//    alert.messageText = "A redis server is already running"
+//    alert.informativeText = "This server will need to be shut down in order to proceed. Manually shut down this server?"
+//
+//    alert.addButton(withTitle: "Yes")
+//    alert.addButton(withTitle: "Quit")
+//
+//    let response = alert.runModal()
+//
+//    switch response
+//    {
+//    case .alertFirstButtonReturn:
+//        print("User chose to quit Adversary Lab rather than kill server.")
+//        quitAdversaryLab()
+//    case .alertSecondButtonReturn:
+//        // TODO: Kill Redis Server
+//        print("User chose to manually kill Redis server with PID: \(processPID)")
+//        RedisServerController.sharedInstance.killProcess(pid: processPID, completion:
+//        {
+//            (_) in
+//
+//            // Launch Redis Server
+//            RedisServerController.sharedInstance.launchRedisServer
+//            {
+//                (result) in
+//
+//                switch result
+//                {
+//                case .okay(_):
+//                    // Update Labels and Progress Indicator
+//                        print("Redis Launched")
+//                case .otherProcessOnPort(let processName):
+//                    showOtherProcessAlert(processName: processName)
+//                case .corruptRedisOnPort(let pidString):
+//                    showCorruptRedisAlert(processPID: pidString)
+//                case .failure(let failureString):
+//                    print("Received failure on launch server: \(failureString ?? "")")
+//                    quitAdversaryLab()
+//                }
+//            }
+//        })
+//    default:
+//        print("Unknown error user chose unknown option for redis server alert.")
+//    }
+//}
+
 /// Call this when there is no appropriate data to be processed
-func showNoDataAlert(completion:@escaping (_ completion:Bool) -> Void)
+func showNoDataAlert(labData: LabData)
 {
     let alert = NSAlert()
     alert.messageText = "Not enough packets to process"
     alert.informativeText = "There is not enough valid data in the selected database file."
-    let result = alert.runModal()
-        
-    if result.rawValue == 0
-    {
-        if let selectedFileURL = showRethinkFileAlert()
-        {
-            FileController().loadSongFile(fileURL: selectedFileURL, completion: completion)
-        }
-    }
-    else
-    {
-        print("Alert result: \(result)")
-        completion(false)
-        return
-    }
+    _ = alert.runModal()
+//        
+//    if result.rawValue == 0
+//    {
+//        if let selectedFileURL = showRethinkFileAlert()
+//        {
+//            Task
+//            {
+//                await FileController().loadSongFile(fileURL: selectedFileURL, labData: labData)
+//            }
+//        }
+//    }
+//    else
+//    {
+//        print("Alert result: \(result)")
+//        completion(false)
+//        return
+//    }
 }
 
 func showNoBlockedConnectionsAlert()
@@ -95,14 +146,21 @@ func showRethinkFileAlert() -> URL?
     return panel.urls[0]
 }
 
-func showChooseBConnectionsAlert(transportNames: [String]) -> (transportB: String, remainingTransports: [String])?
+func showChooseBConnectionsAlert(labData: LabData, transportNames: [String])
 {
+    // Do not show Transport A as an option if it has already been selected
+    var remainingTransports = transportNames
+    if let index = remainingTransports.firstIndex(of: labData.transportA)
+    {
+        remainingTransports.remove(at: index)
+    }
+    
     let alert = NSAlert()
     alert.messageText = "Select the other transport you want to use for your analysis."
     
-    let blockedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
-    blockedPopup.addItems(withTitles: transportNames)
-    alert.accessoryView = blockedPopup
+    let transportBPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
+    transportBPopup.addItems(withTitles: remainingTransports)
+    alert.accessoryView = transportBPopup
     
     alert.addButton(withTitle: "OK")
     alert.addButton(withTitle: "Cancel")
@@ -110,51 +168,45 @@ func showChooseBConnectionsAlert(transportNames: [String]) -> (transportB: Strin
     let result = alert.runModal()
     if result == .alertFirstButtonReturn
     {
-        let index = blockedPopup.indexOfSelectedItem
-        if index >= 0, index < transportNames.count, let selectedTransport = blockedPopup.titleOfSelectedItem
+        let index = transportBPopup.indexOfSelectedItem
+        if index >= 0, index < remainingTransports.count, let selectedTransport = transportBPopup.titleOfSelectedItem
         {
-            
-            var remainingTransports = transportNames
-            _ = remainingTransports.remove(at: index)
-            transportB = selectedTransport
-            return (selectedTransport, remainingTransports)
+            labData.transportB = selectedTransport
         }
     }
-    
-    return nil
 }
 
-func showChooseAConnectionsAlert(transportNames: [String]) -> (transportA: String, remainingTransports: [String])?
+func showChooseAConnectionsAlert(labData: LabData, transportNames: [String])
 {
+    // Do not show Transport A as an option if it has already been selected
+    var remainingTransports = transportNames
+    if let index = remainingTransports.firstIndex(of: labData.transportB)
+    {
+        remainingTransports.remove(at: index)
+    }
+    
     let alert = NSAlert()
     alert.messageText = "Select one of the transports you want to analyze."
     
-    let allowedPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
-    allowedPopup.addItems(withTitles: transportNames)
-    alert.accessoryView = allowedPopup
+    let transportAPopup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200 , height: 20))
+    transportAPopup.addItems(withTitles: remainingTransports)
+    alert.accessoryView = transportAPopup
     alert.addButton(withTitle: "OK")
     alert.addButton(withTitle: "Cancel")
     
     let result = alert.runModal()
     if result == .alertFirstButtonReturn
     {
-        let index = allowedPopup.indexOfSelectedItem
-        if index >= 0, index < transportNames.count, let selectedTransport = allowedPopup.titleOfSelectedItem
+        let index = transportAPopup.indexOfSelectedItem
+        if index >= 0, index < remainingTransports.count, let selectedTransport = transportAPopup.titleOfSelectedItem
         {
-            
-            var remainingTransports = transportNames
-            _ = remainingTransports.remove(at: index)
-            transportA = selectedTransport
-            return (selectedTransport, remainingTransports)
+            labData.transportA = selectedTransport
         }
     }
-    
-    return nil
 }
 
 func quitAdversaryLab()
 {
     // TODO: Quit
-    RedisServerController.sharedInstance.shutdownRedisServer()
     NSApplication.shared.terminate(nil)
 }

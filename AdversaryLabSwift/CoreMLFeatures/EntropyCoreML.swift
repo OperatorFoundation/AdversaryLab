@@ -12,7 +12,7 @@ import Foundation
 
 class EntropyCoreML
 {
-    func processEntropy(forConnection connection: ObservedConnection) -> (processsed: Bool, inEntropy: Double?, outEntropy: Double?, error: Error?)
+    func processEntropy(labData: LabData, forConnection connection: ObservedConnection) -> (processsed: Bool, inEntropy: Double?, outEntropy: Double?, error: Error?)
     {
         var outData: Data?
         var inData: Data?
@@ -21,12 +21,12 @@ class EntropyCoreML
         {
         case .transportA:
             // Get the incoming packet that corresponds with this connection ID
-            inData = connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
-            // Get the incoming packet that corresponds with this connection ID
-            outData = connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
+                inData = labData.connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
+            // Get the outgoing packet that corresponds with this connection ID
+                outData = labData.connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
         case .transportB:
-            inData = connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
-            outData = connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
+                inData = labData.connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
+                outData = labData.connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
         }
         
         guard let outPacket = outData else { return(false, nil, nil, nil) }
@@ -39,11 +39,11 @@ class EntropyCoreML
         switch connection.connectionType
         {
         case .transportA:
-            packetEntropies.incomingA.append(inPacketEntropy)
-            packetEntropies.outgoingA.append(outPacketEntropy)
+                labData.packetEntropies.incomingA.append(inPacketEntropy)
+                labData.packetEntropies.outgoingA.append(outPacketEntropy)
         case .transportB:
-            packetEntropies.incomingB.append(inPacketEntropy)
-            packetEntropies.outgoingB.append(outPacketEntropy)
+                labData.packetEntropies.incomingB.append(inPacketEntropy)
+                labData.packetEntropies.outgoingB.append(outPacketEntropy)
         }
         
         return (true, inPacketEntropy, outPacketEntropy, nil)
@@ -88,28 +88,28 @@ class EntropyCoreML
         return countArray
     }
     
-    func scoreAllEntropyInDatabase(configModel: ProcessingConfigurationModel)
+    func scoreAllEntropyInDatabase(labData: LabData, configModel: ProcessingConfigurationModel)
     {
         if configModel.trainingMode
         {
             // Outgoing
-            let outEntropyTable = createEntropyTable(connectionDirection: .outgoing)
-            trainEntropy(table: outEntropyTable, connectionDirection: .outgoing, modelName: configModel.modelName)
+            let outEntropyTable = createEntropyTable(labData: labData, connectionDirection: .outgoing)
+            trainEntropy(labData: labData, table: outEntropyTable, connectionDirection: .outgoing, modelName: configModel.modelName)
             
             // Incoming
-            let inEntropyTable = createEntropyTable(connectionDirection: .incoming)
-            trainEntropy(table: inEntropyTable, connectionDirection: .incoming, modelName: configModel.modelName)
+            let inEntropyTable = createEntropyTable(labData: labData, connectionDirection: .incoming)
+            trainEntropy(labData: labData, table: inEntropyTable, connectionDirection: .incoming, modelName: configModel.modelName)
         }
         else
         {
-            testModel(connectionDirection: .incoming, configModel: configModel)
-            testModel(connectionDirection: .outgoing, configModel: configModel)
+            testModel(labData: labData, connectionDirection: .incoming, configModel: configModel)
+            testModel(labData: labData, connectionDirection: .outgoing, configModel: configModel)
         }
     }
     
-    func createEntropyTable(connectionDirection: ConnectionDirection) -> MLDataTable
+    func createEntropyTable(labData: LabData, connectionDirection: ConnectionDirection) -> MLDataTable
     {
-        let (entropyList, classificationLabels) = getEntropyAndClassificationLists(connectionDirection: connectionDirection)
+        let (entropyList, classificationLabels) = getEntropyAndClassificationLists(labData: labData, connectionDirection: connectionDirection)
         
         var entropyTable = MLDataTable()
         let entropyColumn = MLDataColumn(entropyList)
@@ -120,7 +120,7 @@ class EntropyCoreML
         return entropyTable
     }
     
-    func getEntropyAndClassificationLists(connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
+    func getEntropyAndClassificationLists(labData: LabData, connectionDirection: ConnectionDirection) -> (entropyList: [Double], classificationLabels: [String])
     {
         var entropyList = [Double]()
         var classificationLabels = [String]()
@@ -130,11 +130,11 @@ class EntropyCoreML
         switch connectionDirection
         {
         case .incoming:
-            aEntropyList = packetEntropies.incomingA
-            bEntropyList = packetEntropies.incomingB
+                aEntropyList = labData.packetEntropies.incomingA
+                bEntropyList = labData.packetEntropies.incomingB
         case .outgoing:
-            aEntropyList = packetEntropies.outgoingA
-            bEntropyList = packetEntropies.outgoingB
+                aEntropyList = labData.packetEntropies.outgoingA
+                bEntropyList = labData.packetEntropies.outgoingB
         }
         
         // Allowed Traffic
@@ -156,7 +156,7 @@ class EntropyCoreML
         return (entropyList, classificationLabels)
     }
     
-    func testModel(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(labData: LabData, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         var aEntropyList = [Double]()
         var bEntropyList = [Double]()
@@ -164,11 +164,11 @@ class EntropyCoreML
         switch connectionDirection
         {
         case .incoming:
-            aEntropyList = packetEntropies.incomingA
-            bEntropyList = packetEntropies.incomingB
+                aEntropyList = labData.packetEntropies.incomingA
+                bEntropyList = labData.packetEntropies.incomingB
         case .outgoing:
-            aEntropyList = packetEntropies.outgoingA
-            bEntropyList = packetEntropies.outgoingB
+                aEntropyList = labData.packetEntropies.outgoingA
+                bEntropyList = labData.packetEntropies.outgoingB
         }
         
         guard bEntropyList.count > 0
@@ -179,13 +179,13 @@ class EntropyCoreML
         }
         
         // Allowed
-        testModel(entropyList: aEntropyList, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(labData: labData, entropyList: aEntropyList, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
         
         // Blocked
-        testModel(entropyList: bEntropyList, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
+        testModel(labData: labData, entropyList: bEntropyList, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
     }
     
-    func testModel(entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(labData: LabData, entropyList: [Double], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let entropyClassifierName: String
         let entropyRegressorName: String
@@ -247,19 +247,20 @@ class EntropyCoreML
                     switch connectionType
                     {
                     case .transportA:
-                        packetEntropies.incomingATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                            labData.packetEntropies.incomingATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
                     case .transportB:
-                        packetEntropies.incomingBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                            labData.packetEntropies.incomingBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
                     }
                 case .outgoing:
                     switch connectionType
                     {
                     case .transportA:
-                        packetEntropies.outgoingATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                            labData.packetEntropies.outgoingATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
                     case .transportB:
-                        packetEntropies.outgoingBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                            labData.packetEntropies.outgoingBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
                     }
                 }
+                
             }
             
             // Classifier
@@ -292,24 +293,27 @@ class EntropyCoreML
                 accuracy = accuracy * 100
                 print("🔮 Entropy classification prediction accuracy: \(accuracy) \(connectionType.rawValue).")
                 
-                // Save the test accuracy
-                switch connectionDirection
+                if accuracy > 0
                 {
-                case .incoming:
-                    switch connectionType
+                    // Save the test accuracy
+                    switch connectionDirection
                     {
-                    case .transportA:
-                        packetEntropies.incomingATestResults?.accuracy = accuracy
-                    case .transportB:
-                        packetEntropies.incomingBTestResults?.accuracy = accuracy
-                    }
-                case .outgoing:
-                    switch connectionType
-                    {
-                    case .transportA:
-                        packetEntropies.outgoingATestResults?.accuracy = accuracy
-                    case .transportB:
-                        packetEntropies.outgoingBTestResults?.accuracy = accuracy
+                    case .incoming:
+                        switch connectionType
+                        {
+                        case .transportA:
+                                labData.packetEntropies.incomingATestResults?.accuracy = accuracy
+                        case .transportB:
+                                labData.packetEntropies.incomingBTestResults?.accuracy = accuracy
+                        }
+                    case .outgoing:
+                        switch connectionType
+                        {
+                        case .transportA:
+                                labData.packetEntropies.outgoingATestResults?.accuracy = accuracy
+                        case .transportB:
+                                labData.packetEntropies.outgoingBTestResults?.accuracy = accuracy
+                        }
                     }
                 }
             }
@@ -320,7 +324,7 @@ class EntropyCoreML
         }
     }
     
-    func trainEntropy(table entropyTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
+    func trainEntropy(labData: LabData, table entropyTable: MLDataTable, connectionDirection: ConnectionDirection, modelName: String)
     {
         let entropyClassifierName: String
         let entropyRegressorName: String
@@ -417,14 +421,14 @@ class EntropyCoreML
                     switch connectionDirection
                     {
                     case .incoming:
-                        trainingData.incomingEntropyTrainingResults = TrainingResults(
+                            labData.trainingData.incomingEntropyTrainingResults = TrainingResults(
                             predictionForA: predictedTransportAEntropy,
                             predictionForB: predictedTransportBEntropy,
                             trainingAccuracy: trainingAccuracy,
                             validationAccuracy: validationAccuracy,
                             evaluationAccuracy: evaluationAccuracy)
                     case .outgoing:
-                        trainingData.outgoingEntropyTrainingResults = TrainingResults(
+                            labData.trainingData.outgoingEntropyTrainingResults = TrainingResults(
                             predictionForA: predictedTransportAEntropy,
                             predictionForB: predictedTransportBEntropy,
                             trainingAccuracy: trainingAccuracy,

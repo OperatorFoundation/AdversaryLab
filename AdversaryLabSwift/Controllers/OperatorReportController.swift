@@ -16,10 +16,9 @@ import Auburn
  */
 class OperatorReportController
 {
-    static let sharedInstance = OperatorReportController()
     let formatter = ISO8601DateFormatter()
     
-    func createReportTextFile(forModel modelName: String)
+    func createReportTextFile(labData: LabData, forModel modelName: String)
     {
         let fileManager = FileManager.default
         guard let appDirectory = getAdversarySupportDirectory()
@@ -32,7 +31,7 @@ class OperatorReportController
         let folderURL = appDirectory.appendingPathComponent("OperatorReports")
         let fileURL = folderURL.appendingPathComponent(getReportTextFileName()).appendingPathExtension(".md")
         
-        generateReportContent(forModel: modelName, completion:
+        generateReportContent(labData: labData, forModel: modelName, completion:
         {
             (report) in
             //print(report)
@@ -73,7 +72,7 @@ class OperatorReportController
         return "AdversaryLab\(now)"
     }
     
-    func generateReportContent(forModel modelName: String, completion: @escaping (_ completion: String) -> Void)
+    func generateReportContent(labData: LabData, forModel modelName: String, completion: @escaping (_ completion: String) -> Void)
     {
         //Today's date as string
         formatter.timeZone = TimeZone.current
@@ -90,7 +89,7 @@ class OperatorReportController
         //Format with markdown because pretty.
         let reportHeader = "## Adversary Lab Report\n"
         let reportDate = "\(now)\n\n"
-        generateResultsTable(forModel: modelName, completion:
+        generateResultsTable(labData: labData, forModel: modelName, completion:
         {
             (reportData) in
             
@@ -100,7 +99,7 @@ class OperatorReportController
     
     ///This method generates a markdown table for a given country.
     ///If the country has no test results this method returns nil instead.
-    func generateResultsTable(forModel modelName: String, completion: @escaping (_ completion: String) -> Void)
+    func generateResultsTable(labData: LabData, forModel modelName: String, completion: @escaping (_ completion: String) -> Void)
     {
         let tableHeader = "\n## \(modelName)\n"
         
@@ -131,7 +130,7 @@ class OperatorReportController
             var transportBTiming = "--"
             var transportBTimingAccuracy = "--"
             
-            if let transportATimingTestResults = packetTimings.transportATestResults
+            if let transportATimingTestResults = labData.packetTimings.transportATestResults
             {
                 transportATiming = String(format: "%.2f", transportATimingTestResults.prediction)
                 
@@ -141,7 +140,7 @@ class OperatorReportController
                 }
             }
             
-            if let transportBTimingTestResults = packetTimings.transportBTestResults
+            if let transportBTimingTestResults = labData.packetTimings.transportBTestResults
             {
                 transportBTiming = String(format: "%.2f", transportBTimingTestResults.prediction)
                 
@@ -153,7 +152,6 @@ class OperatorReportController
             
             let timingAllowedRow = "| Allowed | \(transportATiming) | \(transportATimingAccuracy) |\n"
             let timingBlockedRow = "| Blocked | \(transportBTiming) | \(transportBTimingAccuracy) |\n"
-            
             // TLS Common Names
             let tlsBlocked = tlsTestValuesDictionary[blockedTLSKey] ?? "--"
             let tlsAllowed = tlsTestValuesDictionary[allowedTLSKey] ?? "--"
@@ -185,7 +183,7 @@ class OperatorReportController
             var lengthOutB = "--"
             var lengthOutBAccuracy = "--"
             
-            if let aIncomingLengthTestResults = packetLengths.incomingATestResults
+            if let aIncomingLengthTestResults = labData.packetLengths.incomingATestResults
             {
                 lengthInA = String(format: "%.2f", aIncomingLengthTestResults.prediction)
                 
@@ -195,7 +193,7 @@ class OperatorReportController
                 }
             }
             
-            if let aOutgoingLengthTestResults = packetLengths.outgoingATestResults
+            if let aOutgoingLengthTestResults = labData.packetLengths.outgoingATestResults
             {
                 lengthOutA = String(format: "%.2f", aOutgoingLengthTestResults.prediction)
                 if let accuracy = aOutgoingLengthTestResults.accuracy
@@ -204,7 +202,7 @@ class OperatorReportController
                 }
             }
             
-            if let bIncomingLengthTestResults = packetLengths.incomingBTestResults
+            if let bIncomingLengthTestResults = labData.packetLengths.incomingBTestResults
             {
                 lengthInB = String(format: "%.2f", bIncomingLengthTestResults.prediction)
                 
@@ -214,7 +212,7 @@ class OperatorReportController
                 }
             }
             
-            if let bOutgoingLengthTestResults = packetLengths.outgoingBTestResults
+            if let bOutgoingLengthTestResults = labData.packetLengths.outgoingBTestResults
             {
                 lengthOutB = String(format: "%.2f", bOutgoingLengthTestResults.prediction)
                 
@@ -238,7 +236,7 @@ class OperatorReportController
             var entOutB = "--"
             var entOutBAccuracy = "--"
             
-            if let entInATestResults = packetEntropies.incomingATestResults
+            if let entInATestResults = labData.packetEntropies.incomingATestResults
             {
                 entInA = String(format: "%.2f", entInATestResults.prediction)
                 
@@ -248,7 +246,7 @@ class OperatorReportController
                 }
             }
             
-            if let entOutATestResults = packetEntropies.outgoingATestResults
+            if let entOutATestResults = labData.packetEntropies.outgoingATestResults
             {
                 entOutA = String(format: "%.2f", entOutATestResults.prediction)
                 
@@ -258,7 +256,7 @@ class OperatorReportController
                 }
             }
             
-            if let entInBTestResults = packetEntropies.incomingBTestResults
+            if let entInBTestResults = labData.packetEntropies.incomingBTestResults
             {
                 entInB = String(format: "%.2f", entInBTestResults.prediction)
                 
@@ -268,7 +266,7 @@ class OperatorReportController
                 }
             }
             
-            if let entOutBTestResults = packetEntropies.outgoingBTestResults
+            if let entOutBTestResults = labData.packetEntropies.outgoingBTestResults
             {
                 entOutB = String(format: "%.2f", entOutBTestResults.prediction)
                 
@@ -361,30 +359,26 @@ class OperatorReportController
             let allFeatAllowedRow = "| Allowed | \(allFeatAllowInLength) | \(allFeatAllowOutLength) | \(allFeatAllowInEntropy) | \(allFeatAllowOutEntropy) | \(allFeatAllowTiming) | \(allFeatAllowTLS) | \(allAllowAccuracy) |\n"
             let allFeatBlockedRow = "| Blocked | \(allFeatBlockInLength) | \(allFeatBlockOutLength) | \(allFeatBlockInEntropy) | \(allFeatBlockOutEntropy) | \(allFeatBlockTiming) | \(allFeatBlockedTLS) | \(allBlockAccuracy) |"
 
-            DispatchQueue.main.async
-            {
-                let timingTableValues = timingAllowedRow + timingBlockedRow
-                let timingTable = timingTableHeader + timingTableFields + timingTableValues
-                
-                let tlsTableValues = tlsAllowedRow + tlsBlockedRow
-                let tlsTable = tlsTableHeader + tlsTableHeaderFields + tlsTableValues
-                
-                let lengthTableValues = lengthAllowedRow + lengthBlockedRow
-                let lengthTable = lengthTableHeader + lengthTableFields + lengthTableValues
-                
-                let entropyTableValues = entropyAllowedRow + entropyBlockedRow
-                let entropyTable = entropyTableHeader + entropyTableHeaderFields + entropyTableValues
-                
-                let floatTableValues = floatAllowedRow + floatBlockedRow
-                let floatTable = floatTableHeader + floatTableFields + floatTableValues
-                
-                let allFeaturesTableValues = allFeatAllowedRow + allFeatBlockedRow
-                let allFeaturesTable = allFeaturesTableHeader + allFeaturesTableFields + allFeaturesTableValues
-                
-                //Put it all together and what do you get? m;)
-                completion(tableHeader + lengthTable + entropyTable + timingTable + tlsTable + floatTable + allFeaturesTable)
-            }
-
+            let timingTableValues = timingAllowedRow + timingBlockedRow
+            let timingTable = timingTableHeader + timingTableFields + timingTableValues
+            
+            let tlsTableValues = tlsAllowedRow + tlsBlockedRow
+            let tlsTable = tlsTableHeader + tlsTableHeaderFields + tlsTableValues
+            
+            let lengthTableValues = lengthAllowedRow + lengthBlockedRow
+            let lengthTable = lengthTableHeader + lengthTableFields + lengthTableValues
+            
+            let entropyTableValues = entropyAllowedRow + entropyBlockedRow
+            let entropyTable = entropyTableHeader + entropyTableHeaderFields + entropyTableValues
+            
+            let floatTableValues = floatAllowedRow + floatBlockedRow
+            let floatTable = floatTableHeader + floatTableFields + floatTableValues
+            
+            let allFeaturesTableValues = allFeatAllowedRow + allFeatBlockedRow
+            let allFeaturesTable = allFeaturesTableHeader + allFeaturesTableFields + allFeaturesTableValues
+            
+            //Put it all together and what do you get? m;)
+            completion(tableHeader + lengthTable + entropyTable + timingTable + tlsTable + floatTable + allFeaturesTable)
         }
     }
     

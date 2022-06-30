@@ -393,7 +393,10 @@ class SequencesCoreML
                     let accuracy = allowedBlockedCount/Double(featureCount)
                     print("\n🔮 Float Sequence prediction: \(accuracy * 100) \(connectionType.rawValue).")
                     
-                    offsetDictionary[accuracyKey] = accuracy
+                    if accuracy > 0
+                    {
+                        offsetDictionary[accuracyKey] = accuracy
+                    }
                 }
             }
         }

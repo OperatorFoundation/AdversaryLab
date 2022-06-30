@@ -9,12 +9,22 @@
 import Foundation
 import Auburn
 
-class ConnectionGroupData
+struct ConnectionGroupData
 {
-    var aPacketsAnalyzed = 0
     var aConnectionData = ConnectionData()
-    var bPacketsAnalyzed = 0
     var bConnectionData = ConnectionData()
+}
+
+struct ConnectionViewGroupData
+{
+    var aConnectionData = ConnectionViewData()
+    var bConnectionData = ConnectionViewData()
+    
+    func copyLabConnectionData(connectionGroupData: ConnectionGroupData)
+    {
+        aConnectionData.copyLabConnectionData(connectionData: connectionGroupData.aConnectionData)
+        bConnectionData.copyLabConnectionData(connectionData: connectionGroupData.bConnectionData)
+    }
 }
 
 struct ConnectionData: Codable
@@ -24,4 +34,24 @@ struct ConnectionData: Codable
     var outgoingPackets: [String: Data] = [:]
     var outgoingDates: [String: Double] = [:]
     var connections: [String] = []
+    var totalPayloadBytes: Int = 0
+    var packetsAnalyzed = 0
+}
+
+class ConnectionViewData: Codable
+{
+    var incomingPacketsCount = 0
+    var outgoingPacketsCount = 0
+    var connectionsCount = 0
+    var totalPayloadBytes = 0
+    var packetsAnalyzed = 0
+    
+    func copyLabConnectionData(connectionData: ConnectionData)
+    {
+        incomingPacketsCount = connectionData.incomingPackets.count
+        outgoingPacketsCount = connectionData.outgoingPackets.count
+        connectionsCount = connectionData.connections.count
+        totalPayloadBytes = connectionData.totalPayloadBytes
+        packetsAnalyzed = connectionData.packetsAnalyzed
+    }
 }

@@ -16,5 +16,4 @@ struct PacketTimings: Codable
     var transportATestResults: TestResults?
     var transportB: [Double] = []
     var transportBTestResults: TestResults?
-    
 }

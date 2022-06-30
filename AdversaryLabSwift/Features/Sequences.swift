@@ -198,14 +198,6 @@ func scoreOffsetSequences(connectionDirection: ConnectionDirection, configModel:
 
         offsetIndex += 1
         
-        // Progress Indicator Info
-        DispatchQueue.main.async
-        {
-            ProgressBot.sharedInstance.currentProgress = offsetIndex
-            ProgressBot.sharedInstance.totalToAnalyze = tempOffsetScores.count
-            ProgressBot.sharedInstance.progressMessage = "\(scoringOffsetsString) \(offsetIndex)"
-        }
-        
         // Let's gather some training data
         let topOffset = OffsetSequenceRecord(offset: offsetIndex, sequence: longestTopSequence, score: thisTopOffsetScore)
         topSequences.append(topOffset)
@@ -331,9 +323,6 @@ func scoreFloatSequences(connectionDirection: ConnectionDirection, configModel: 
         floatScoresKey = incomingFloatSequenceScoresKey
         trainingSequencesKey = incomingFloatTrainingSequencesKey
     }
-    ProgressBot.sharedInstance.currentProgress = 0
-    ProgressBot.sharedInstance.totalToAnalyze = 3
-    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(0) of \(3)"
     
     let packetStatsDict: RMap<String, Int> = RMap(key: packetStatsKey)
     
@@ -376,9 +365,6 @@ func scoreFloatSequences(connectionDirection: ConnectionDirection, configModel: 
         return
     }
     
-    ProgressBot.sharedInstance.currentProgress = 1
-    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(1) of \(3)"
-    
     /// Divide the score by Ta * Tb to get the accuracy
     let requiredSequenceRuleAccuracy = abs(requiredSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let requiredSequenceSet: RSortedSet<Data> = RSortedSet(key: requiredFloatKey)
@@ -400,17 +386,11 @@ func scoreFloatSequences(connectionDirection: ConnectionDirection, configModel: 
         return
     }
     
-    ProgressBot.sharedInstance.currentProgress = 2
-    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(2) of \(3)"
-    
     /// Divide the score by Ta * Tb to get the accuracy
     let forbiddenSequenceRuleAccuracy = abs(forbiddenSequenceScore)/Float(allowedConnectionsAnalyzed * blockedConnectionsAnalyzed)
     let forbiddenSequenceSet: RSortedSet<Data> = RSortedSet(key: forbiddenFloatKey)
     forbiddenSequenceSet.delete()
     _ = forbiddenSequenceSet.insert((longestBottomSequence, forbiddenSequenceRuleAccuracy))
-    
-    ProgressBot.sharedInstance.currentProgress = 3
-    ProgressBot.sharedInstance.progressMessage = "\(scoringFloatSequencesString) \(3) of \(3)"
     
     // Save top 10 and bottom 10 to the DB to use later for model training
     let trainingSequences: RList<Data> = RList(key: trainingSequencesKey)

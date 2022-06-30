@@ -15,6 +15,7 @@ import ZIPFoundation
 class FileController
 {
     let trainingDataFilename = "TrainingResults.json"
+
     
     func saveModel(classifier: MLClassifier,
     classifierMetadata: MLModelMetadata,
@@ -157,7 +158,7 @@ class FileController
         }
     }
     
-    func saveTrainingData(groupName: String)
+    func saveTrainingData(trainingData: TrainingData, groupName: String)
     {
         guard let appDirectory = prepareDirectory(groupName: groupName)
         else { return }
@@ -257,7 +258,7 @@ class FileController
             if fileURLS.count == 1, fileURLS[0].hasDirectoryPath
             {
                 print("Unpacked model files to: \(fileURLS[0])")
-                loadTrainingData(from: fileURLS[0])
+                _ = loadTrainingData(from: fileURLS[0])
                 
                 return fileURLS[0]
             }
@@ -273,7 +274,7 @@ class FileController
                 }
                 
                 print("Unpacked model files to: \(temporaryDirURL)")
-                loadTrainingData(from: temporaryDirURL)
+                _ = loadTrainingData(from: temporaryDirURL)
                 
                 return temporaryDirURL
             }
@@ -323,7 +324,7 @@ class FileController
         return appDirectory
     }
     
-    func loadTrainingData(from directoryURL: URL)
+    func loadTrainingData(from directoryURL: URL) -> TrainingData?
     {
         do {
             let files = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
@@ -337,31 +338,28 @@ class FileController
                     do
                     {
                         let trainingBytes = try Data(contentsOf: fileUrl)
-                        trainingData = try decoder.decode(TrainingData.self, from: trainingBytes)
-                        return
+                        return try decoder.decode(TrainingData.self, from: trainingBytes)
+                        
                     }
                     catch let decodeError
                     {
                         print("Error decoding training data: \(decodeError)")
-                        return
+                        return nil
                     }
+                }
+                else
+                {
+                    return nil
                 }
             }
             
-        } catch let error {
+        }
+        catch let error {
             print("Failed to load TrainingData. Error reading contents of directory: \(error)")
-            return
+            return nil
         }
         
+        return nil
     }
-    
-    func loadSongFile(fileURL: URL, completion:@escaping (_ completion:Bool) -> Void)
-    {
-        SymphonyController().launchSymphony(fromFile: fileURL)
-        {
-            (success) in
-            
-            completion(success)
-        }
-    }
+
 }

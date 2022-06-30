@@ -13,8 +13,6 @@ import CoreML
 
 class AllFeatures
 {
-    static let sharedInstance = AllFeatures()
-    
     var timeDifferenceList = [Double]()
     var inLengths = [Int]()
     var outLengths = [Int]()
@@ -22,8 +20,8 @@ class AllFeatures
     var outEntropies = [Double]()
     var tlsNames = [String]()
     var classificationLabels = [String]()
-    
-    func scoreAllFeatures(configModel: ProcessingConfigurationModel)
+
+    func scoreAllFeatures(labData: LabData, configModel: ProcessingConfigurationModel)
     {
         if configModel.trainingMode
         {
@@ -355,10 +353,10 @@ class AllFeatures
     }
     
     /// Returns: Bool indicating whether the connection was successfully processed
-    func processData(forConnection connection: ObservedConnection) -> Bool
+    func processData(labData: LabData, forConnection connection: ObservedConnection) -> Bool
     {
         /// Entropy
-        let (_, inEntropy, outEntropy, _) = EntropyCoreML().processEntropy(forConnection: connection)
+        let (_, inEntropy, outEntropy, _) = EntropyCoreML().processEntropy(labData: labData, forConnection: connection)
         
         guard let inPacketEntropy = inEntropy, let outPacketEntropy = outEntropy
         else

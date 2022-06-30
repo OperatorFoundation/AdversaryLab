@@ -8,16 +8,11 @@
 
 import Cocoa
 import Foundation
+import SwiftUI
 
 import Abacus
 
-var transportA = ""
-var transportB = ""
-var connectionGroupData = ConnectionGroupData()
-var packetLengths = PacketLengths()
-var packetTimings = PacketTimings()
-var packetEntropies = PacketEntropies()
-var trainingData = TrainingData()
+var modelDirectoryURL: URL?
 
 func getAdversarySupportDirectory() -> URL?
 {

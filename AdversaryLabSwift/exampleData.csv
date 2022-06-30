@@ -1,5 +1,0 @@
-length,entropy,timeDifference,tlsNames,classification,direction
-1,1,1,1,allowed,incoming
-2,2,2,2,blocked,incoming
-3,3,3,3,allowed,outgoing
-4,4,4,4,blocked,outgoing

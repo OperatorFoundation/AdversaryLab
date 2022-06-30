@@ -7,17 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		460CF7DA20758D2C00FB3723 /* redis-server in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7D220758D2C00FB3723 /* redis-server */; };
-		460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */; };
 		460CF7E62076C3D800FB3723 /* LaunchRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */; };
 		460CF7E82076C76D00FB3723 /* ShutdownRedisServerScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */; };
-		460CF7EA2076EB0800FB3723 /* redis.conf in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7E92076EB0800FB3723 /* redis.conf */; };
-		460CF7EC2076F75A00FB3723 /* redis-cli in Resources */ = {isa = PBXBuildFile; fileRef = 460CF7EB2076F75A00FB3723 /* redis-cli */; };
 		46175B6920253F86009311D6 /* FakeConnectionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */; };
 		46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B74202D2CDE009311D6 /* ConnectionInspector.swift */; };
 		46175B7C202D46AF009311D6 /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46175B7B202D46AF009311D6 /* Sequences.swift */; };
 		462271F72049021A00F21D08 /* DataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462271F62049021A00F21D08 /* DataHelper.swift */; };
-		462E73A72091421400C59B80 /* ProgressBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462E73A62091421400C59B80 /* ProgressBot.swift */; };
 		4651A15120083BF700037D31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15020083BF700037D31 /* AppDelegate.swift */; };
 		4651A15320083BF700037D31 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A15220083BF700037D31 /* ViewController.swift */; };
 		4651A15520083BF700037D31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4651A15420083BF700037D31 /* Assets.xcassets */; };
@@ -26,9 +21,7 @@
 		4651A1A82009403800037D31 /* AdversaryLabSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4651A1A72009403800037D31 /* AdversaryLabSwiftTests.swift */; };
 		467E493A2017F166008B19E3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467E49392017F166008B19E3 /* Constants.swift */; };
 		468B26522023D016000A2B5D /* ObservedConnections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468B26512023D016000A2B5D /* ObservedConnections.swift */; };
-		46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */ = {isa = PBXBuildFile; fileRef = 46CD66032093B100009E1141 /* AdversaryLabClient */; };
 		5343B39F208FB1F100AD5D72 /* ProcessingConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */; };
-		5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */; };
 		53C9A3262097BB7A00F813FF /* subsequences.so in Resources */ = {isa = PBXBuildFile; fileRef = 53C9A3252097BB7A00F813FF /* subsequences.so */; };
 		AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE0BC8AD226F87A400AD89E7 /* ServiceManagement.framework */; };
 		AE0BC8D5226FAC6500AD89E7 /* CheckRedisServerPortScript.sh in Resources */ = {isa = PBXBuildFile; fileRef = AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */; };
@@ -42,8 +35,6 @@
 		AE17921124DCC5CE00620B5E /* Auburn in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921024DCC5CE00620B5E /* Auburn */; };
 		AE17921424DCC5E900620B5E /* Datable in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921324DCC5E900620B5E /* Datable */; };
 		AE17921724DCC61500620B5E /* Abacus in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921624DCC61500620B5E /* Abacus */; };
-		AE17921A24DCC67A00620B5E /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921924DCC67A00620B5E /* Charts */; };
-		AE17922224E3011300620B5E /* Axis in Frameworks */ = {isa = PBXBuildFile; productRef = AE17922124E3011300620B5E /* Axis */; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
 		AE1D466B24EC5BF900344541 /* PacketTimings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1D466A24EC5BF900344541 /* PacketTimings.swift */; };
 		AE1D466D24EC5C6500344541 /* PacketEntropies.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1D466C24EC5C6500344541 /* PacketEntropies.swift */; };
@@ -55,14 +46,17 @@
 		AE51B0502519CCA70086668A /* TrainingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE51B04F2519CCA70086668A /* TrainingData.swift */; };
 		AE583DCE2502BD17003ED1D0 /* TrainingResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE583DCD2502BD17003ED1D0 /* TrainingResults.swift */; };
 		AE583DD025030560003ED1D0 /* TestResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE583DCF25030560003ED1D0 /* TestResults.swift */; };
-		AE5D5E6223CD44CB00C8646B /* RethinkPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */; };
 		AE85902B225288F9003B21C0 /* PacketLengthsCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */; };
 		AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE85902D2253E178003B21C0 /* TimingCoreML.swift */; };
 		AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */; };
 		AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE859055225656B3003B21C0 /* TLS12CoreML.swift */; };
-		AE8EA7B82527E2690071EA44 /* ChartsUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8EA7B72527E2690071EA44 /* ChartsUIView.swift */; };
 		AE8EA7D6252CC79F0071EA44 /* FileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE8EA7D5252CC79F0071EA44 /* FileController.swift */; };
 		AE929725226521F6005C1FBB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE929724226521F6005C1FBB /* Globals.swift */; };
+		AEA17595286A60F900B6EBE0 /* DataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA17594286A60F900B6EBE0 /* DataView.swift */; };
+		AEA17597286ACF2500B6EBE0 /* LabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA17596286ACF2500B6EBE0 /* LabView.swift */; };
+		AEA17599286D0D3500B6EBE0 /* LabData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA17598286D0D3500B6EBE0 /* LabData.swift */; };
+		AEA1759B286DACD000B6EBE0 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA1759A286DACD000B6EBE0 /* ChartsView.swift */; };
+		AEA1759E286DBA4800B6EBE0 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */; };
 		AEC00A2423733A0800E5582B /* ConnectionGroupData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
 		AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AFE228FBE8C009698CC /* Alerts.swift */; };
@@ -101,17 +95,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		460CF7D220758D2C00FB3723 /* redis-server */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "redis-server"; sourceTree = "<group>"; };
-		460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedisServerController.swift; sourceTree = "<group>"; };
 		460CF7E52076C3D800FB3723 /* LaunchRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = LaunchRedisServerScript.sh; sourceTree = "<group>"; };
 		460CF7E72076C76D00FB3723 /* ShutdownRedisServerScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = ShutdownRedisServerScript.sh; sourceTree = "<group>"; };
-		460CF7E92076EB0800FB3723 /* redis.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = redis.conf; sourceTree = "<group>"; };
-		460CF7EB2076F75A00FB3723 /* redis-cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "redis-cli"; sourceTree = "<group>"; };
 		46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeConnectionGenerator.swift; sourceTree = "<group>"; };
 		46175B74202D2CDE009311D6 /* ConnectionInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionInspector.swift; sourceTree = "<group>"; };
 		46175B7B202D46AF009311D6 /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		462271F62049021A00F21D08 /* DataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHelper.swift; sourceTree = "<group>"; };
-		462E73A62091421400C59B80 /* ProgressBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBot.swift; sourceTree = "<group>"; };
 		4651A14D20083BF700037D31 /* AdversaryLabSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdversaryLabSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4651A15020083BF700037D31 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4651A15220083BF700037D31 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -127,9 +116,7 @@
 		467E49392017F166008B19E3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		468B26232023B609000A2B5D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		468B26512023D016000A2B5D /* ObservedConnections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservedConnections.swift; sourceTree = "<group>"; };
-		46CD66032093B100009E1141 /* AdversaryLabClient */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = AdversaryLabClient; sourceTree = "<group>"; };
 		5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingConfigurationModel.swift; sourceTree = "<group>"; };
-		5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PauseBot.swift; path = AdversaryLabSwift/Models/PauseBot.swift; sourceTree = SOURCE_ROOT; };
 		53C9A3252097BB7A00F813FF /* subsequences.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = subsequences.so; sourceTree = "<group>"; };
 		AE0BC8AD226F87A400AD89E7 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		AE0BC8CD226FAC6500AD89E7 /* CheckRedisServerPortScript.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckRedisServerPortScript.sh; sourceTree = "<group>"; };
@@ -143,20 +130,21 @@
 		AE34E6CD22CBE0FA00F89F26 /* SequencesCoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequencesCoreML.swift; sourceTree = "<group>"; };
 		AE435F0C24B4DD7C007F0075 /* DataProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProcessing.swift; sourceTree = "<group>"; };
 		AE435F8224B50A9E007F0075 /* SymphonyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymphonyController.swift; sourceTree = "<group>"; };
-		AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = exampleData.csv; sourceTree = "<group>"; };
 		AE4A3702225BD58300F4B4E5 /* AllFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllFeatures.swift; sourceTree = "<group>"; };
 		AE51B03B2519C2F50086668A /* libswiftCreateML.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftCreateML.tbd; path = usr/lib/swift/libswiftCreateML.tbd; sourceTree = SDKROOT; };
 		AE51B04F2519CCA70086668A /* TrainingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingData.swift; sourceTree = "<group>"; };
 		AE583DCD2502BD17003ED1D0 /* TrainingResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingResults.swift; sourceTree = "<group>"; };
 		AE583DCF25030560003ED1D0 /* TestResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestResults.swift; sourceTree = "<group>"; };
-		AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RethinkPacket.swift; sourceTree = "<group>"; };
 		AE85902A225288F9003B21C0 /* PacketLengthsCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketLengthsCoreML.swift; sourceTree = "<group>"; };
 		AE85902D2253E178003B21C0 /* TimingCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingCoreML.swift; sourceTree = "<group>"; };
 		AE8590362253E4DE003B21C0 /* EntropyCoreML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntropyCoreML.swift; sourceTree = "<group>"; };
 		AE859055225656B3003B21C0 /* TLS12CoreML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLS12CoreML.swift; sourceTree = "<group>"; };
-		AE8EA7B72527E2690071EA44 /* ChartsUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsUIView.swift; sourceTree = "<group>"; };
 		AE8EA7D5252CC79F0071EA44 /* FileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileController.swift; sourceTree = "<group>"; };
 		AE929724226521F6005C1FBB /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		AEA17594286A60F900B6EBE0 /* DataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataView.swift; sourceTree = "<group>"; };
+		AEA17596286ACF2500B6EBE0 /* LabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabView.swift; sourceTree = "<group>"; };
+		AEA17598286D0D3500B6EBE0 /* LabData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabData.swift; sourceTree = "<group>"; };
+		AEA1759A286DACD000B6EBE0 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		AEBC57582411E15A00D9BFB0 /* libswiftCreateML.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswiftCreateML.dylib; path = Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/libswiftCreateML.dylib; sourceTree = DEVELOPER_DIR; };
 		AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionGroupData.swift; sourceTree = "<group>"; };
 		AED8490522B8465000998CC6 /* OperatorReportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorReportController.swift; sourceTree = "<group>"; };
@@ -172,7 +160,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE17921424DCC5E900620B5E /* Datable in Frameworks */,
-				AE17922224E3011300620B5E /* Axis in Frameworks */,
 				AE17920624DCC53800620B5E /* RawPacket in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE17921724DCC61500620B5E /* Abacus in Frameworks */,
@@ -181,7 +168,7 @@
 				AE17920C24DCC5AB00620B5E /* Symphony in Frameworks */,
 				AE17920E24DCC5AB00620B5E /* Song in Frameworks */,
 				AE51B04B2519C4D90086668A /* libswiftCreateML.tbd in Frameworks */,
-				AE17921A24DCC67A00620B5E /* Charts in Frameworks */,
+				AEA1759E286DBA4800B6EBE0 /* SwiftUICharts in Frameworks */,
 				AE17920924DCC55F00620B5E /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -218,7 +205,6 @@
 				AE1AC6F92258020500555456 /* MLModelController.swift */,
 				46175B6820253F86009311D6 /* FakeConnectionGenerator.swift */,
 				46175B74202D2CDE009311D6 /* ConnectionInspector.swift */,
-				460CF7DC2076AFDA00FB3723 /* RedisServerController.swift */,
 				AED8490522B8465000998CC6 /* OperatorReportController.swift */,
 				AE435F0C24B4DD7C007F0075 /* DataProcessing.swift */,
 				AE435F8224B50A9E007F0075 /* SymphonyController.swift */,
@@ -230,7 +216,6 @@
 		46175B76202D2DBE009311D6 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				462E73A62091421400C59B80 /* ProgressBot.swift */,
 				467E49392017F166008B19E3 /* Constants.swift */,
 				462271F62049021A00F21D08 /* DataHelper.swift */,
 				AE929724226521F6005C1FBB /* Globals.swift */,
@@ -243,7 +228,6 @@
 			isa = PBXGroup;
 			children = (
 				CA727CD32050A3580051A01B /* README.md */,
-				460CF7E92076EB0800FB3723 /* redis.conf */,
 				4651A14F20083BF700037D31 /* AdversaryLabSwift */,
 				4651A1A62009401F00037D31 /* AdversaryLabSwiftTests */,
 				4651A16D20083BF700037D31 /* AdversaryLabSwiftUITests */,
@@ -267,7 +251,6 @@
 		4651A14F20083BF700037D31 /* AdversaryLabSwift */ = {
 			isa = PBXGroup;
 			children = (
-				AE4A36FA225BCA2100F4B4E5 /* exampleData.csv */,
 				AE859022225288C2003B21C0 /* CoreMLFeatures */,
 				4612DCDB203B5C9D007F798E /* Features */,
 				46175B76202D2DBE009311D6 /* Helpers */,
@@ -277,7 +260,9 @@
 				4651A15220083BF700037D31 /* ViewController.swift */,
 				4651A15420083BF700037D31 /* Assets.xcassets */,
 				4651A15620083BF700037D31 /* Main.storyboard */,
-				AE8EA7B72527E2690071EA44 /* ChartsUIView.swift */,
+				AEA17594286A60F900B6EBE0 /* DataView.swift */,
+				AEA1759A286DACD000B6EBE0 /* ChartsView.swift */,
+				AEA17596286ACF2500B6EBE0 /* LabView.swift */,
 				4651A15920083BF700037D31 /* Info.plist */,
 				4651A15A20083BF700037D31 /* AdversaryLabSwift.entitlements */,
 			);
@@ -317,11 +302,10 @@
 		468B26502023CFF8000A2B5D /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				5343B3A7208FC4AC00AD5D72 /* PauseBot.swift */,
+				AEA17598286D0D3500B6EBE0 /* LabData.swift */,
 				468B26512023D016000A2B5D /* ObservedConnections.swift */,
 				5343B39E208FB1F100AD5D72 /* ProcessingConfigurationModel.swift */,
 				AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */,
-				AE5D5E6123CD44CA00C8646B /* RethinkPacket.swift */,
 				AE17917524D9FFA300620B5E /* PacketLengths.swift */,
 				AE1D466A24EC5BF900344541 /* PacketTimings.swift */,
 				AE1D466C24EC5C6500344541 /* PacketEntropies.swift */,
@@ -347,9 +331,6 @@
 			isa = PBXGroup;
 			children = (
 				53C9A3252097BB7A00F813FF /* subsequences.so */,
-				460CF7D220758D2C00FB3723 /* redis-server */,
-				460CF7EB2076F75A00FB3723 /* redis-cli */,
-				46CD66032093B100009E1141 /* AdversaryLabClient */,
 			);
 			path = Executables;
 			sourceTree = "<group>";
@@ -401,8 +382,7 @@
 				AE17921024DCC5CE00620B5E /* Auburn */,
 				AE17921324DCC5E900620B5E /* Datable */,
 				AE17921624DCC61500620B5E /* Abacus */,
-				AE17921924DCC67A00620B5E /* Charts */,
-				AE17922124E3011300620B5E /* Axis */,
+				AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */,
 			);
 			productName = AdversaryLabSwift;
 			productReference = 4651A14D20083BF700037D31 /* AdversaryLabSwift.app */;
@@ -489,8 +469,7 @@
 				AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */,
 				AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */,
 				AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */,
-				AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */,
-				AE17922024E3011300620B5E /* XCRemoteSwiftPackageReference "Axis" */,
+				AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
 			);
 			productRefGroup = 4651A14E20083BF700037D31 /* Products */;
 			projectDirPath = "";
@@ -514,12 +493,8 @@
 				460CF7E62076C3D800FB3723 /* LaunchRedisServerScript.sh in Resources */,
 				53C9A3262097BB7A00F813FF /* subsequences.so in Resources */,
 				AE0BC8D72273831500AD89E7 /* KillRedisServerScript.sh in Resources */,
-				46CD660B2093B100009E1141 /* AdversaryLabClient in Resources */,
 				4651A15820083BF700037D31 /* Main.storyboard in Resources */,
 				460CF7E82076C76D00FB3723 /* ShutdownRedisServerScript.sh in Resources */,
-				460CF7EC2076F75A00FB3723 /* redis-cli in Resources */,
-				460CF7DA20758D2C00FB3723 /* redis-server in Resources */,
-				460CF7EA2076EB0800FB3723 /* redis.conf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,14 +526,12 @@
 				AE34E6CE22CBE0FA00F89F26 /* SequencesCoreML.swift in Sources */,
 				AE4A3703225BD58300F4B4E5 /* AllFeatures.swift in Sources */,
 				AE1D466D24EC5C6500344541 /* PacketEntropies.swift in Sources */,
-				462E73A72091421400C59B80 /* ProgressBot.swift in Sources */,
+				AEA1759B286DACD000B6EBE0 /* ChartsView.swift in Sources */,
 				AE8590372253E4DE003B21C0 /* EntropyCoreML.swift in Sources */,
 				4651A15320083BF700037D31 /* ViewController.swift in Sources */,
 				46175B75202D2CDE009311D6 /* ConnectionInspector.swift in Sources */,
-				AE8EA7B82527E2690071EA44 /* ChartsUIView.swift in Sources */,
 				AE929725226521F6005C1FBB /* Globals.swift in Sources */,
-				AE5D5E6223CD44CB00C8646B /* RethinkPacket.swift in Sources */,
-				460CF7DD2076AFDA00FB3723 /* RedisServerController.swift in Sources */,
+				AEA17597286ACF2500B6EBE0 /* LabView.swift in Sources */,
 				AE435F8324B50A9E007F0075 /* SymphonyController.swift in Sources */,
 				AE8590352253E178003B21C0 /* TimingCoreML.swift in Sources */,
 				AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */,
@@ -575,9 +548,10 @@
 				AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */,
 				AE859056225656B3003B21C0 /* TLS12CoreML.swift in Sources */,
 				4651A15120083BF700037D31 /* AppDelegate.swift in Sources */,
+				AEA17599286D0D3500B6EBE0 /* LabData.swift in Sources */,
 				AE17917624D9FFA300620B5E /* PacketLengths.swift in Sources */,
-				5343B3A8208FC4AC00AD5D72 /* PauseBot.swift in Sources */,
 				CAA6C98420642A2D00EE8DF1 /* TLS12.swift in Sources */,
+				AEA17595286A60F900B6EBE0 /* DataView.swift in Sources */,
 				46175B7C202D46AF009311D6 /* Sequences.swift in Sources */,
 				467E493A2017F166008B19E3 /* Constants.swift in Sources */,
 			);
@@ -680,7 +654,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -737,7 +711,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -973,20 +947,12 @@
 				minimumVersion = 1.0.2;
 			};
 		};
-		AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */ = {
+		AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/danielgindi/Charts";
+			repositoryURL = "https://github.com/willdale/SwiftUICharts.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.5.0;
-			};
-		};
-		AE17922024E3011300620B5E /* XCRemoteSwiftPackageReference "Axis" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/OperatorFoundation/Axis";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.3;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1027,15 +993,10 @@
 			package = AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */;
 			productName = Abacus;
 		};
-		AE17921924DCC67A00620B5E /* Charts */ = {
+		AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AE17921824DCC67A00620B5E /* XCRemoteSwiftPackageReference "Charts" */;
-			productName = Charts;
-		};
-		AE17922124E3011300620B5E /* Axis */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AE17922024E3011300620B5E /* XCRemoteSwiftPackageReference "Axis" */;
-			productName = Axis;
+			package = AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
+			productName = SwiftUICharts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

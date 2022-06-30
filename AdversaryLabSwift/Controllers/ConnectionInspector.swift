@@ -8,198 +8,105 @@
 
 import Foundation
 
-class ConnectionInspector
+class ConnectionInspector: ObservableObject
 {
-    var pauseBuddy = PauseBot()
-
-    func analyzeConnections(configModel: ProcessingConfigurationModel, resetTrainingData: Bool, resetTestingData: Bool)
+    func analyzeConnections(labData: LabData, configModel: ProcessingConfigurationModel, resetTrainingData: Bool, resetTestingData: Bool) async -> Bool
     {
-        ProgressBot.sharedInstance.analysisComplete = false
-
-        analysisQueue.async
+        self.resetAnalysisData(labData: labData, resetTrainingData: resetTrainingData, resetTestingData: resetTestingData)
+        
+        // Allowed Connections
+        let aConnections = labData.connectionGroupData.aConnectionData.connections
+        var aConnectionsAnalyzed = 0
+        
+        for aConnectionID in aConnections
         {
-            if self.pauseBuddy.processingComplete
-            {
-                self.resetAnalysisData(resetTrainingData: resetTrainingData, resetTestingData: resetTestingData)
-                self.pauseBuddy.processingComplete = false
-            }
+            if "\(type(of: aConnectionID))" == "NSNull"
+            { continue }
 
-            // Allowed Connections
-            if self.pauseBuddy.processingAllowedConnections
-            {
-                let aConnections = connectionGroupData.aConnectionData.connections
-                for index in self.pauseBuddy.currentIndex ..< aConnections.count
-                {
-                    if configModel.processingEnabled
-                    {
-                        // Get the connection ID
-                        let allowedConnectionID = aConnections[index]
-
-                        if "\(type(of: allowedConnectionID))" == "NSNull"
-                        { continue }
-
-                        // Progress Indicator Stuff
-                        let totalAllowedConnections = aConnections.count
-                        DispatchQueue.main.async
-                        {
-                            ProgressBot.sharedInstance.update(progressMessage: "\(analyzingAllowedConnectionsString) \(index + 1) of \(totalAllowedConnections)", totalToAnalyze: totalAllowedConnections, currentProgress: index + 1)
-                        }
-
-                        // Analyze the connection
-                        let allowedConnection = ObservedConnection(connectionType: .transportA, connectionID: allowedConnectionID)
-                        self.analyze(connection: allowedConnection, configModel: configModel)
-
-                        DispatchQueue.main.async
-                        {
-                            //NotificationCenter.default.post(name: .updateStats, object: nil)
-                            self.pauseBuddy.currentIndex = index + 1
-                        }
-                    }
-                    else
-                    {
-                        print("\nI can't process this allowed connection. I'm paused! 🧐\n")
-                        break
-                    }
-                }
-
-                self.pauseBuddy.processingAllowedConnections = false
-                self.pauseBuddy.currentIndex = 0
-            }
-
-            // Blocked Connections
-            let bConnections = connectionGroupData.bConnectionData.connections
-            for index in self.pauseBuddy.currentIndex ..< bConnections.count
-            {
-                if configModel.processingEnabled
-                {
-                    // Get the first connection ID from the list
-                    let blockedConnectionID = bConnections[index]
-
-                    if "\(type(of: blockedConnectionID))" == "NSNull"
-                    { continue }
-
-                    // Progress Indicator Stuff
-                    let totalBlockedConnections = bConnections.count
-                    DispatchQueue.main.async
-                    {
-                        ProgressBot.sharedInstance.update(progressMessage: "\(analyzingBlockedConnectionString) \(index + 1) of \(totalBlockedConnections)", totalToAnalyze: totalBlockedConnections, currentProgress: index + 1)
-                    }
-
-                    // Analyze the connection
-                    let blockedConnection = ObservedConnection(connectionType: .transportB, connectionID: blockedConnectionID)
-                    self.analyze(connection: blockedConnection, configModel: configModel)
-
-                    // Let the UI know it needs an update
-                    //NotificationCenter.default.post(name: .updateStats, object: nil)
-                    self.pauseBuddy.currentIndex = index + 1
-                }
-                else
-                {
-                    print("\nI can't process this blocked connection. I'm paused! 🧐\n")
-                    break
-                }
-                self.pauseBuddy.processingAllowedConnections = true
-                self.pauseBuddy.currentIndex = 0
-            }
-
-            if configModel.processingEnabled
-            {
-                self.scoreConnections(configModel: configModel)
-            }
-
-            self.pauseBuddy.processingComplete = true
-            DispatchQueue.main.async
-            {
-                ProgressBot.sharedInstance.analysisComplete = true
-                NotificationCenter.default.post(name: .updateStats, object: nil)
-            }
+            // Analyze the connection
+            let aConnection = ObservedConnection(connectionType: .transportA, connectionID: aConnectionID)
+            self.analyze(labData: labData, connection: aConnection, configModel: configModel)
+            aConnectionsAnalyzed += 1
+            
+            labData.connectionGroupData.aConnectionData.packetsAnalyzed = aConnectionsAnalyzed
         }
+        print("Finished analyzing A connections")
+        
+        // Blocked Connections
+        let bConnections = labData.connectionGroupData.bConnectionData.connections
+        var bConnectionsAnalyzed = 0
+        
+        for bConnectionID in bConnections
+        {
+            if "\(type(of: bConnectionID))" == "NSNull"
+            { continue }
+
+            // Analyze the connection
+            let bConnection = ObservedConnection(connectionType: .transportB, connectionID: bConnectionID)
+            self.analyze(labData: labData, connection: bConnection, configModel: configModel)
+            bConnectionsAnalyzed += 1
+
+            labData.connectionGroupData.bConnectionData.packetsAnalyzed = bConnectionsAnalyzed
+            
+        }
+        print("Finished analyzing B connections")
+        
+        let handler = Task
+        {
+            await self.scoreConnections(labData: labData, configModel: configModel)
+        }
+        
+        let result = await handler.value
+        print("Finished scoring connections")
+        return result
     }
 
-    func scoreConnections(configModel: ProcessingConfigurationModel)
+    func scoreConnections(labData: LabData, configModel: ProcessingConfigurationModel) async -> Bool
     {
-        ProgressBot.sharedInstance.analysisComplete = false
-        var totalToScore = 4
-        var currentProgress = 0
-        var actionString = "Scoring"
-        sleep(1)
-
-        if configModel.trainingMode
-        {
-            actionString = "Training"
-            if configModel.enableSequenceAnalysis
-            {
-                totalToScore += 1
-            }
-        }
-        else
-        {
-            actionString = "Testing"
-        }
-
         if configModel.enableTLSAnalysis
         {
-            totalToScore += 1
-            currentProgress += 1
-
-            ProgressBot.sharedInstance.update(progressMessage: "\(actionString) TLS names.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-
             TLS12CoreML().scoreTLS12(configModel: configModel)
-            sleep(1)
+            //sleep(1)
         }
 
-        currentProgress += 1
-        ProgressBot.sharedInstance.update(progressMessage: "\(actionString) packet lengths.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-        PacketLengthsCoreML().scoreAllPacketLengths(configModel: configModel)
-        sleep(1)
+        PacketLengthsCoreML().scoreAllPacketLengths(labData: labData, configModel: configModel)
+        //sleep(1)
 
-        currentProgress += 1
-        ProgressBot.sharedInstance.update(progressMessage: "\(actionString) entropy.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-        EntropyCoreML().scoreAllEntropyInDatabase(configModel: configModel)
-        sleep(1)
+        EntropyCoreML().scoreAllEntropyInDatabase(labData: labData, configModel: configModel)
+        //sleep(1)
 
-        currentProgress += 1
-        ProgressBot.sharedInstance.update(progressMessage: "\(actionString) time differences.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-        TimingCoreML().scoreTiming(configModel: configModel)
-        sleep(1)
+        TimingCoreML().scoreTiming(labData: labData, configModel: configModel)
+        //sleep(1)
 
-        currentProgress += 1
-        ProgressBot.sharedInstance.update(progressMessage: "\(actionString) all features.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
-        AllFeatures.sharedInstance.scoreAllFeatures(configModel: configModel)
-        sleep(1)
+        AllFeatures().scoreAllFeatures(labData: labData, configModel: configModel)
+        //sleep(1)
 
         if configModel.trainingMode
         {
             if configModel.enableSequenceAnalysis
             {
-                currentProgress += 1
-                ProgressBot.sharedInstance.update(progressMessage: "\(actionString) sequences.", totalToAnalyze: totalToScore, currentProgress: currentProgress)
                 scoreAllFloatSequences(configModel: configModel)
                 scoreAllOffsetSequences(configModel: configModel)
-                sleep(1)
             }
 
+            let fileController = FileController()
+            
             // Save TrainingData to a file
-            FileController().saveTrainingData(groupName: configModel.modelName)
+            fileController.saveTrainingData(trainingData: labData.trainingData, groupName: configModel.modelName)
             
             // ZIP All Saved Models
-            FileController().bundle(modelGroup: configModel.modelName)
+            fileController.bundle(modelGroup: configModel.modelName)
         }
         else
         {
-            OperatorReportController.sharedInstance.createReportTextFile(forModel: configModel.modelName)
+            OperatorReportController().createReportTextFile(labData: labData, forModel: configModel.modelName)
         }
-
-        DispatchQueue.main.async
-        {
-            ProgressBot.sharedInstance.analysisComplete = true
-            //NotificationCenter.default.post(name: .updateStats, object: nil)
-        }
-
+        
         deleteTemporaryModelDirectory(named: configModel.modelName)
+        
+        return true
     }
 
-    // TODO: Decide when we should use this
     func deleteTemporaryModelDirectory(named modelName: String)
     {
         guard let appDirectory = getAdversarySupportDirectory()
@@ -217,34 +124,24 @@ class ConnectionInspector
         }
     }
 
-    func analyze(connection: ObservedConnection, configModel: ProcessingConfigurationModel)
+    func analyze(labData: LabData, connection: ObservedConnection, configModel: ProcessingConfigurationModel)
     {
-        // Process Packet Lengths
-        DispatchQueue.main.async {
-            ProgressBot.sharedInstance.progressMessage = "Analyzing packet lengths for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-        }
-        let (packetLengthProcessed, maybePacketlengthError) = PacketLengthsCoreML().processPacketLengths(forConnection: connection)
+        let (packetLengthProcessed, maybePacketlengthError) = PacketLengthsCoreML().processPacketLengths(labData: labData, forConnection: connection)
 
         // Process Packet Timing
-        DispatchQueue.main.async {
-            ProgressBot.sharedInstance.progressMessage = "Analyzing Packet Timing for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-        }
-        let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(forConnection: connection)
+        let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(labData: labData, forConnection: connection)
+        
         if let packetLengthError = maybePacketlengthError
         {
             print("Packet length error: \(packetLengthError.localizedDescription)")
         }
+        
         if let packetTimingError = maybePacketTimingError
         {
             print("Packet timing error: \(packetTimingError)")
         }
 
         // Process Offset and Float Sequences
-        DispatchQueue.main.async
-        {
-            ProgressBot.sharedInstance.progressMessage = "Analyzing Subsequences for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-        }
-
         var subsequenceNoErrors = true
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
@@ -259,22 +156,15 @@ class ConnectionInspector
         }
 
         // Process Entropy
-        DispatchQueue.main.async {
-            ProgressBot.sharedInstance.progressMessage = "Analyzing Entropy for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-        }
-        let (entropyProcessed, _, _, maybeEntropyError) = EntropyCoreML().processEntropy(forConnection: connection)
+        let (entropyProcessed, _, _, maybeEntropyError) = EntropyCoreML().processEntropy(labData: labData, forConnection: connection)
+        
         if let entropyError = maybeEntropyError
         {
             print("Entropy error: \(entropyError)")
         }
-
+        
         // Process All Features
-        DispatchQueue.main.async
-        {
-            ProgressBot.sharedInstance.progressMessage = "Analyzing All Features for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-        }
-
-        let allFeaturesProcessed = AllFeatures.sharedInstance.processData(forConnection: connection)
+        let allFeaturesProcessed = AllFeatures().processData(labData: labData, forConnection: connection)
 
         // Increment Packets Analyzed Field as we are done analyzing this connection
         if packetLengthProcessed || timingProcessed || subsequenceNoErrors || entropyProcessed || allFeaturesProcessed
@@ -282,19 +172,14 @@ class ConnectionInspector
             switch connection.connectionType
             {
             case .transportA:
-                connectionGroupData.aPacketsAnalyzed += 1
+                    labData.connectionGroupData.aConnectionData.packetsAnalyzed += 1
             case .transportB:
-                connectionGroupData.bPacketsAnalyzed += 1
+                    labData.connectionGroupData.bConnectionData.packetsAnalyzed += 1
             }
         }
 
         if configModel.enableTLSAnalysis
         {
-            DispatchQueue.main.async
-            {
-                ProgressBot.sharedInstance.progressMessage = "Analyzing TLS Names for connection \(ProgressBot.sharedInstance.currentProgress) of \(ProgressBot.sharedInstance.totalToAnalyze)"
-            }
-
             if let knownProtocol = detectKnownProtocol(connection: connection)
             {
                 processKnownProtocol(knownProtocol, connection)
@@ -302,35 +187,35 @@ class ConnectionInspector
         }
     }
 
-    func resetAnalysisData(resetTrainingData: Bool, resetTestingData: Bool)
+    func resetAnalysisData(labData: LabData, resetTrainingData: Bool, resetTestingData: Bool)
     {
         if resetTrainingData
         {
-            connectionGroupData.aPacketsAnalyzed = 0
-            connectionGroupData.bPacketsAnalyzed = 0
+            labData.connectionGroupData.aConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.bConnectionData.packetsAnalyzed = 0
 
-            trainingData.incomingEntropyTrainingResults = nil
-            trainingData.outgoingEntropyTrainingResults = nil
-            trainingData.outgoingLengthsTrainingResults = nil
-            trainingData.incomingLengthsTrainingResults = nil
-            trainingData.timingTrainingResults = nil
+            labData.trainingData.incomingEntropyTrainingResults = nil
+            labData.trainingData.outgoingEntropyTrainingResults = nil
+            labData.trainingData.outgoingLengthsTrainingResults = nil
+            labData.trainingData.incomingLengthsTrainingResults = nil
+            labData.trainingData.timingTrainingResults = nil
         }
 
         if resetTestingData
         {
-            connectionGroupData.aPacketsAnalyzed = 0
-            connectionGroupData.bPacketsAnalyzed = 0
+            labData.connectionGroupData.aConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.bConnectionData.packetsAnalyzed = 0
 
-            packetEntropies.incomingATestResults = nil
-            packetEntropies.incomingBTestResults = nil
-            packetEntropies.outgoingATestResults = nil
-            packetEntropies.outgoingBTestResults = nil
-            packetLengths.incomingATestResults = nil
-            packetLengths.incomingBTestResults = nil
-            packetLengths.outgoingATestResults = nil
-            packetLengths.outgoingBTestResults = nil
-            packetTimings.transportATestResults = nil
-            packetTimings.transportBTestResults = nil
+            labData.packetEntropies.incomingATestResults = nil
+            labData.packetEntropies.incomingBTestResults = nil
+            labData.packetEntropies.outgoingATestResults = nil
+            labData.packetEntropies.outgoingBTestResults = nil
+            labData.packetLengths.incomingATestResults = nil
+            labData.packetLengths.incomingBTestResults = nil
+            labData.packetLengths.outgoingATestResults = nil
+            labData.packetLengths.outgoingBTestResults = nil
+            labData.packetTimings.transportATestResults = nil
+            labData.packetTimings.transportBTestResults = nil
         }
     }
 

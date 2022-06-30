@@ -13,7 +13,7 @@ class ProcessingConfigurationModel
     var enableSequenceAnalysis = false
     var enableTLSAnalysis = false
     var removePackets = false
-    var processingEnabled = false
+    //var processingEnabled = true
     var trainingMode = true
     var modelName = "UnnamedModel.mlmodel"
 }

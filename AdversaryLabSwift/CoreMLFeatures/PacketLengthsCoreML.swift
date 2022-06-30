@@ -19,12 +19,13 @@ struct LengthRecommender: Codable {
     let transportBScore: Double
 }
 
-extension LengthRecommender {
+extension LengthRecommender
+{
     
     /// Assuming that these arrays are parallel
-    init?(connectionDirection: ConnectionDirection)
+    init?(connectionDirection: ConnectionDirection, packetLengths: PacketLengths)
     {
-        guard let (aLength, aScore, bLength, bScore) = getHighestScoredLength(forConnectionDirection: connectionDirection)
+        guard let (aLength, aScore, bLength, bScore) = getHighestScoredLength(forConnectionDirection: connectionDirection, packetLengths: packetLengths)
         else {
             return nil
         }
@@ -46,7 +47,7 @@ extension LengthRecommender {
     }
 }
 
-func getHighestScoredLength(forConnectionDirection connectionDirection: ConnectionDirection) -> (allowedLengths: Int, allowedLengthScore: Double, blockedLength: Int, blockedLengthScore: Double)?
+func getHighestScoredLength(forConnectionDirection connectionDirection: ConnectionDirection, packetLengths: PacketLengths) -> (allowedLengths: Int, allowedLengthScore: Double, blockedLength: Int, blockedLengthScore: Double)?
 {
     let aLengths: SortedMultiset<Int>
     let bLengths: SortedMultiset<Int>
@@ -54,19 +55,19 @@ func getHighestScoredLength(forConnectionDirection connectionDirection: Connecti
     switch connectionDirection
     {
     case .incoming:
-        aLengths = packetLengths.incomingA
-        bLengths = packetLengths.incomingB
+            aLengths = packetLengths.incomingA
+            bLengths = packetLengths.incomingB
     case .outgoing:
-        aLengths = packetLengths.outgoingA
-        bLengths = packetLengths.outgoingB
+            aLengths = packetLengths.outgoingA
+            bLengths = packetLengths.outgoingB
     }
     
     /// A is the sorted set of lengths for the Transport A traffic
-    guard let (aTopLength, aTopScore) = aLengths.array.first
+    guard let (aTopScore, aTopLength) = aLengths.array.first
         else { return nil }
     
     /// B is the sorted set of lengths for the Transport B traffic
-    guard let (bTopLength, bTopScore) = bLengths.array.first
+    guard let (bTopScore, bTopLength) = bLengths.array.first
         else { return nil }
     
     return (aTopLength, Double(aTopScore), bTopLength, Double(bTopScore))
@@ -75,17 +76,17 @@ func getHighestScoredLength(forConnectionDirection connectionDirection: Connecti
 class PacketLengthsCoreML
 {
     // TODO: Use Song Data and save to our global PacketLengths instance
-    func processPacketLengths(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
+    func processPacketLengths(labData: LabData, forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         switch connection.connectionType
         {
         case .transportA:
             // Get the out packet that corresponds with this connection ID
-            guard let outPacket = connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
+                guard let outPacket = labData.connectionGroupData.aConnectionData.outgoingPackets[connection.connectionID]
             else { return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID)) }
             
             // Get the in packet that corresponds with this connection ID
-            guard let inPacket = connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
+                guard let inPacket = labData.connectionGroupData.aConnectionData.incomingPackets[connection.connectionID]
             else { return(false, PacketLengthError.noInPacketForConnection(connection.connectionID)) }
             
             /// Sanity Check
@@ -97,15 +98,15 @@ class PacketLengthsCoreML
             
             // Add these packet lengths to our packetLengths
             // Adding an element increases the score if the element already exists
-            packetLengths.outgoingA.add(element: outPacket.count)
-            packetLengths.incomingA.add(element: inPacket.count)
+                labData.packetLengths.outgoingA.add(element: outPacket.count)
+                labData.packetLengths.incomingA.add(element: inPacket.count)
 
         case .transportB:
-            guard let outPacket = connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
+                guard let outPacket = labData.connectionGroupData.bConnectionData.outgoingPackets[connection.connectionID]
             else
             { return (false, PacketLengthError.noOutPacketForConnection(connection.connectionID)) }
             
-            guard let inPacket = connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
+                guard let inPacket = labData.connectionGroupData.bConnectionData.incomingPackets[connection.connectionID]
             else
             { return (false, PacketLengthError.noInPacketForConnection(connection.connectionID)) }
             
@@ -116,8 +117,8 @@ class PacketLengthsCoreML
                 print("\n⁉️  We got a weird out packet size... \(String(describing: String(data: outPacket, encoding: .utf8)))<----")
             }
             
-            packetLengths.outgoingB.add(element: outPacket.count)
-            packetLengths.incomingB.add(element: inPacket.count)
+                labData.packetLengths.outgoingB.add(element: outPacket.count)
+                labData.packetLengths.incomingB.add(element: inPacket.count)
         }
         
         return(true, nil)
@@ -128,26 +129,25 @@ class PacketLengthsCoreML
      
      - Parameter modelName: A String that will be used to save the resulting mlm file.
      */
-    func scoreAllPacketLengths(configModel: ProcessingConfigurationModel)
+    func scoreAllPacketLengths(labData: LabData, configModel: ProcessingConfigurationModel)
     {
         // Outgoing Lengths Scoring
-        scorePacketLengths(connectionDirection: .outgoing, configModel: configModel)
+        scorePacketLengths(labData: labData, connectionDirection: .outgoing, configModel: configModel)
         
         //Incoming Lengths Scoring
-        scorePacketLengths(connectionDirection: .incoming, configModel: configModel)
+        scorePacketLengths(labData: labData, connectionDirection: .incoming, configModel: configModel)
     }
     
-    func scorePacketLengths(connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func scorePacketLengths(labData: LabData, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
-        
         if configModel.trainingMode
         {
-            let classifierTable = createLengthClassifierTable(connectionDirection: connectionDirection)
-            guard let lengthRecommender = LengthRecommender(connectionDirection: connectionDirection)
+            let classifierTable = self.createLengthClassifierTable(labData: labData, connectionDirection: connectionDirection)
+            guard let lengthRecommender = LengthRecommender(connectionDirection: connectionDirection, packetLengths: labData.packetLengths)
             else
             { return }
             
-            trainModels(lengthsClassifierTable: classifierTable, lengthRecommender: lengthRecommender, connectionDirection: connectionDirection, modelName: configModel.modelName)
+            self.trainModels(labData: labData, lengthsClassifierTable: classifierTable, lengthRecommender: lengthRecommender, connectionDirection: connectionDirection, modelName: configModel.modelName)
         }
         else
         {
@@ -157,11 +157,11 @@ class PacketLengthsCoreML
             switch connectionDirection
             {
             case .outgoing:
-                aLengths = packetLengths.outgoingA.values
-                bLengths = packetLengths.outgoingB.values
+                    aLengths = labData.packetLengths.outgoingA.values
+                    bLengths = labData.packetLengths.outgoingB.values
             case .incoming:
-                aLengths = packetLengths.incomingA.values
-                bLengths = packetLengths.incomingB.values
+                    aLengths = labData.packetLengths.incomingA.values
+                    bLengths = labData.packetLengths.incomingB.values
             }
             
             guard bLengths.count > 0
@@ -172,20 +172,20 @@ class PacketLengthsCoreML
             }
             
             // TransportA
-            testModel(lengths: aLengths,
+            self.testModel(labData: labData, lengths: aLengths,
                       connectionType: .transportA,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
             
             // TransportB
-            testModel(lengths: bLengths,
+            self.testModel(labData: labData, lengths: bLengths,
                       connectionType: .transportB,
                       connectionDirection: connectionDirection,
                       configModel: configModel)
         }
     }
     
-    func testModel(lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
+    func testModel(labData: LabData, lengths: [Int], connectionType: ClassificationLabel, connectionDirection: ConnectionDirection, configModel: ProcessingConfigurationModel)
     {
         let classifierName: String
         let recommenderName: String
@@ -228,17 +228,17 @@ class PacketLengthsCoreML
                     switch connectionType
                     {
                     case .transportA:
-                        packetLengths.incomingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                            labData.packetLengths.incomingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
                     case .transportB:
-                        packetLengths.incomingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                            labData.packetLengths.incomingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
                     }
                 case .outgoing:
                     switch connectionType
                     {
                     case .transportA:
-                        packetLengths.outgoingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                            labData.packetLengths.outgoingATestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
                     case .transportB:
-                        packetLengths.outgoingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
+                            labData.packetLengths.outgoingBTestResults = TestResults(prediction: Double(result.transportALength), accuracy: nil)
                     }
                 }
             }
@@ -286,23 +286,26 @@ class PacketLengthsCoreML
                     // Show the accuracy as a percentage value
                     accuracy = accuracy * 100
                     
-                    switch connectionDirection
+                    if accuracy > 0
                     {
-                    case .incoming:
-                        switch connectionType
+                        switch connectionDirection
                         {
-                        case .transportA:
-                            packetLengths.incomingATestResults?.accuracy = accuracy
-                        case .transportB:
-                            packetLengths.incomingBTestResults?.accuracy = accuracy
-                        }
-                    case .outgoing:
-                        switch connectionType
-                        {
-                        case .transportA:
-                            packetLengths.outgoingATestResults?.accuracy = accuracy
-                        case .transportB:
-                            packetLengths.outgoingBTestResults?.accuracy = accuracy
+                        case .incoming:
+                            switch connectionType
+                            {
+                            case .transportA:
+                                    labData.packetLengths.incomingATestResults?.accuracy = accuracy
+                            case .transportB:
+                                    labData.packetLengths.incomingBTestResults?.accuracy = accuracy
+                            }
+                        case .outgoing:
+                            switch connectionType
+                            {
+                            case .transportA:
+                                    labData.packetLengths.outgoingATestResults?.accuracy = accuracy
+                            case .transportB:
+                                    labData.packetLengths.outgoingBTestResults?.accuracy = accuracy
+                            }
                         }
                     }
                 }
@@ -318,16 +321,15 @@ class PacketLengthsCoreML
         }
     }
     
-    func createLengthClassifierTable(connectionDirection: ConnectionDirection) -> MLDataTable
+    func createLengthClassifierTable(labData: LabData, connectionDirection: ConnectionDirection) -> MLDataTable
     {
         var expandedLengths = [Int]()
         var expandedClassificationLabels = [String]()
         
-        let (lengths, scores, classificationLabels) = getLengthsAndClassificationsArrays(connectionDirection: connectionDirection)
+        let (lengths, scores, classificationLabels) = getLengthsAndClassificationsArrays(labData: labData, connectionDirection: connectionDirection)
         
         for (index, length) in lengths.enumerated()
         {
-            // FIXME: Does this still need to be a double after switch to Abacus data?
             let score: Double = Double(scores[index])
             let classification = classificationLabels[index]
             let count = Int(score)
@@ -349,7 +351,7 @@ class PacketLengthsCoreML
         return lengthsTable
     }
     
-    func trainModels(lengthsClassifierTable: MLDataTable, lengthRecommender: LengthRecommender, connectionDirection: ConnectionDirection, modelName: String)
+    func trainModels(labData: LabData, lengthsClassifierTable: MLDataTable, lengthRecommender: LengthRecommender, connectionDirection: ConnectionDirection, modelName: String)
     {
         let recommenderName: String
         let classifierName: String
@@ -403,14 +405,14 @@ class PacketLengthsCoreML
             switch connectionDirection
             {
             case .incoming:
-                trainingData.incomingLengthsTrainingResults = TrainingResults(
+                    labData.trainingData.incomingLengthsTrainingResults = TrainingResults(
                     predictionForA: Double(lengthRecommender.transportALength),
                     predictionForB: Double(lengthRecommender.transportBLength),
                     trainingAccuracy: trainingAccuracy,
                     validationAccuracy: validationAccuracy,
                     evaluationAccuracy: evaluationAccuracy)
             case .outgoing:
-                trainingData.outgoingLengthsTrainingResults = TrainingResults(
+                    labData.trainingData.outgoingLengthsTrainingResults = TrainingResults(
                     predictionForA: Double(lengthRecommender.transportALength),
                     predictionForB: Double(lengthRecommender.transportBLength),
                     trainingAccuracy: trainingAccuracy,
@@ -445,7 +447,7 @@ class PacketLengthsCoreML
         return scaled
     }
     
-    func getLengthsAndClassificationsArrays(connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Int], classifications: [String])
+    func getLengthsAndClassificationsArrays(labData: LabData, connectionDirection: ConnectionDirection) -> (lengths: [Int], scores: [Int], classifications: [String])
     {
         var lengths = [Int]()
         var scores = [Int]()
@@ -455,33 +457,33 @@ class PacketLengthsCoreML
         {
         case .incoming:
             // Add transport A lengths
-            lengths.append(contentsOf: packetLengths.incomingA.values)
-            scores.append(contentsOf: packetLengths.incomingA.counts)
-            for _ in packetLengths.incomingA.values
+                lengths.append(contentsOf: labData.packetLengths.incomingA.values)
+                scores.append(contentsOf: labData.packetLengths.incomingA.counts)
+                for _ in labData.packetLengths.incomingA.values
             {
                 classificationLabels.append(ClassificationLabel.transportA.rawValue)
             }
             
             // Add transport B lengths
-            lengths.append(contentsOf: packetLengths.incomingB.values)
-            scores.append(contentsOf: packetLengths.incomingB.counts)
-            for _ in packetLengths.incomingB.values
+                lengths.append(contentsOf: labData.packetLengths.incomingB.values)
+                scores.append(contentsOf: labData.packetLengths.incomingB.counts)
+                for _ in labData.packetLengths.incomingB.values
             {
                 classificationLabels.append(ClassificationLabel.transportB.rawValue)
             }
         case .outgoing:
             // Add transport A lengths
-            lengths.append(contentsOf: packetLengths.outgoingA.values)
-            scores.append(contentsOf: packetLengths.outgoingA.counts)
-            for _ in packetLengths.outgoingA.values
+                lengths.append(contentsOf: labData.packetLengths.outgoingA.values)
+                scores.append(contentsOf: labData.packetLengths.outgoingA.counts)
+                for _ in labData.packetLengths.outgoingA.values
             {
                 classificationLabels.append(ClassificationLabel.transportA.rawValue)
             }
             
             // Add transport B lengths
-            lengths.append(contentsOf: packetLengths.outgoingB.values)
-            scores.append(contentsOf: packetLengths.outgoingB.counts)
-            for _ in packetLengths.outgoingB.values
+                lengths.append(contentsOf: labData.packetLengths.outgoingB.values)
+                scores.append(contentsOf: labData.packetLengths.outgoingB.counts)
+                for _ in labData.packetLengths.outgoingB.values
             {
                 classificationLabels.append(ClassificationLabel.transportB.rawValue)
             }

@@ -1,151 +1,167 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Abacus",
-        "repositoryURL": "https://github.com/OperatorFoundation/Abacus.git",
-        "state": {
-          "branch": null,
-          "revision": "46348c7cdbdba22fb46bdc654ab3143611aa2092",
-          "version": "1.0.2"
-        }
-      },
-      {
-        "package": "AdversaryLabClientSwift",
-        "repositoryURL": "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "8e0c6545dbe1f4764b274816488cd1a756b83666",
-          "version": "0.0.5"
-        }
-      },
-      {
-        "package": "Auburn",
-        "repositoryURL": "https://github.com/OperatorFoundation/Auburn.git",
-        "state": {
-          "branch": null,
-          "revision": "b2747ebe6a8e5ee60962c87c2eef1112e96151f9",
-          "version": "0.6.2"
-        }
-      },
-      {
-        "package": "Axis",
-        "repositoryURL": "https://github.com/OperatorFoundation/Axis",
-        "state": {
-          "branch": null,
-          "revision": "14fee853db8fbeb1436dfeaa2167181966dd04af",
-          "version": "1.0.3"
-        }
-      },
-      {
-        "package": "Bits",
-        "repositoryURL": "https://github.com/OperatorFoundation/Bits.git",
-        "state": {
-          "branch": null,
-          "revision": "d6bdf981268cae74ac670b07b27602ac35fee77f",
-          "version": "1.0.5"
-        }
-      },
-      {
-        "package": "Charts",
-        "repositoryURL": "https://github.com/danielgindi/Charts",
-        "state": {
-          "branch": null,
-          "revision": "66546404a6739173b8e436ab6bc1f2897cd08594",
-          "version": "3.6.0"
-        }
-      },
-      {
-        "package": "Datable",
-        "repositoryURL": "https://github.com/OperatorFoundation/Datable.git",
-        "state": {
-          "branch": null,
-          "revision": "1c23f2b72d0d0cf4386fad05f8a5db4b91e8d304",
-          "version": "3.0.2"
-        }
-      },
-      {
-        "package": "InternetProtocols",
-        "repositoryURL": "https://github.com/OperatorFoundation/InternetProtocols.git",
-        "state": {
-          "branch": null,
-          "revision": "07f3ef27293905aa34a3d031a581b4e610bd12b6",
-          "version": "1.0.9"
-        }
-      },
-      {
-        "package": "RedShot",
-        "repositoryURL": "https://github.com/OperatorFoundation/Redshot.git",
-        "state": {
-          "branch": null,
-          "revision": "d610adbedaa5273f7cd8c928816e4e8c3edc01af",
-          "version": "0.8.5"
-        }
-      },
-      {
-        "package": "Song",
-        "repositoryURL": "https://github.com/OperatorFoundation/Song.git",
-        "state": {
-          "branch": null,
-          "revision": "9a2e23e0db2fc23edcbaa8a9b57b0c7b533a915b",
-          "version": "0.1.0"
-        }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
-        "state": {
-          "branch": null,
-          "revision": "92646c0cdbaca076c8d3d0207891785b3379cbff",
-          "version": "0.3.1"
-        }
-      },
-      {
-        "package": "swift-ast",
-        "repositoryURL": "https://github.com/yanagiba/swift-ast",
-        "state": {
-          "branch": null,
-          "revision": "e8507d78b32dbd33ea5ea975bbbc82b7613870a1",
-          "version": "0.19.9"
-        }
-      },
-      {
-        "package": "SwiftHexTools",
-        "repositoryURL": "https://github.com/OperatorFoundation/SwiftHexTools",
-        "state": {
-          "branch": null,
-          "revision": "4ce4a4f66eea05c900d447af8c07ecaac720716c",
-          "version": "1.2.2"
-        }
-      },
-      {
-        "package": "SwiftPCAP",
-        "repositoryURL": "https://github.com/OperatorFoundation/SwiftPCAP.git",
-        "state": {
-          "branch": null,
-          "revision": "4ac0911d2f3d5611baa9c8a4ba56e4841c90ebb4",
-          "version": "1.1.8"
-        }
-      },
-      {
-        "package": "SwiftQueue",
-        "repositoryURL": "https://github.com/OperatorFoundation/SwiftQueue.git",
-        "state": {
-          "branch": null,
-          "revision": "0e5979acbb104516a427bb2bb09debc50ca100b4",
-          "version": "0.0.3"
-        }
-      },
-      {
-        "package": "ZIPFoundation",
-        "repositoryURL": "https://github.com/weichsel/ZIPFoundation",
-        "state": {
-          "branch": null,
-          "revision": "ec32d62d412578542c0ffb7a6ce34d3e64b43b94",
-          "version": "0.9.11"
-        }
+  "pins" : [
+    {
+      "identity" : "abacus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Abacus.git",
+      "state" : {
+        "revision" : "46348c7cdbdba22fb46bdc654ab3143611aa2092",
+        "version" : "1.0.2"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "adversarylabclientswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git",
+      "state" : {
+        "revision" : "515c104060918a7479ec0aff13e63cb2962475d4",
+        "version" : "0.3.17"
+      }
+    },
+    {
+      "identity" : "auburn",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Auburn.git",
+      "state" : {
+        "revision" : "b2747ebe6a8e5ee60962c87c2eef1112e96151f9",
+        "version" : "0.6.2"
+      }
+    },
+    {
+      "identity" : "bits",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Bits.git",
+      "state" : {
+        "revision" : "f05ebc8026f8c57dcd7e2eebffd816b078d3a142",
+        "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "chord",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Chord.git",
+      "state" : {
+        "revision" : "756eeb26b10016784e6dc7cfce33068b36e49f39",
+        "version" : "0.0.15"
+      }
+    },
+    {
+      "identity" : "datable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Datable.git",
+      "state" : {
+        "revision" : "f2a622a4f72cccb92d9847ff6616b26e6de25ca3",
+        "version" : "3.1.5"
+      }
+    },
+    {
+      "identity" : "internetprotocols",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/InternetProtocols.git",
+      "state" : {
+        "revision" : "ab344e7c952e3484a507ef34dc599081df9373fb",
+        "version" : "2.2.1"
+      }
+    },
+    {
+      "identity" : "net",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Net.git",
+      "state" : {
+        "revision" : "c77993026c898f18d244f19bd505ab37baf10e92",
+        "version" : "0.0.7"
+      }
+    },
+    {
+      "identity" : "packetcapturebpf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/PacketCaptureBPF.git",
+      "state" : {
+        "revision" : "aaa6c509569cb11904e35dd682bb581b9b2f8083",
+        "version" : "0.2.10"
+      }
+    },
+    {
+      "identity" : "packetstream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/PacketStream.git",
+      "state" : {
+        "revision" : "2340145ec9c547f23aeb0464a3b230f6afaa529b",
+        "version" : "0.2.1"
+      }
+    },
+    {
+      "identity" : "redshot",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Redshot.git",
+      "state" : {
+        "revision" : "d610adbedaa5273f7cd8c928816e4e8c3edc01af",
+        "version" : "0.8.5"
+      }
+    },
+    {
+      "identity" : "song",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Song.git",
+      "state" : {
+        "revision" : "30e043dc38908eb882f3991eb2af9249ec8988ce",
+        "version" : "0.2.6"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
+        "version" : "0.5.0"
+      }
+    },
+    {
+      "identity" : "swift-ast",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/swift-ast.git",
+      "state" : {
+        "revision" : "d7e0cf0d9d3b90831a1c297ce911a338a4bd44f3",
+        "version" : "0.19.12"
+      }
+    },
+    {
+      "identity" : "swift-netutils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/swift-netutils.git",
+      "state" : {
+        "revision" : "776909ce0b37bd9ea1fa0f2156e4e5ad07a592b8",
+        "version" : "4.3.0"
+      }
+    },
+    {
+      "identity" : "swiftqueue",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/SwiftQueue.git",
+      "state" : {
+        "revision" : "5e6cd8b325493f520a45d20d788efca707b53e6c",
+        "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "swiftuicharts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/willdale/SwiftUICharts.git",
+      "state" : {
+        "revision" : "9a71bffb72c35960c6836891ca1e13e089532991",
+        "version" : "2.10.1"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation",
+      "state" : {
+        "revision" : "7254c74b49cec2cb81520523ba993c671f71b066",
+        "version" : "0.9.14"
+      }
+    }
+  ],
+  "version" : 2
 }

@@ -16,7 +16,8 @@ class TimingCoreML
 {
     // TODO: Currently not using error
     // TODO: Replace observedConnection with ConnectionType
-    func processTiming(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
+    
+    func processTiming(labData: LabData, forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         var outDate: Double?
         var inDate: Double?
@@ -24,12 +25,12 @@ class TimingCoreML
         switch connection.connectionType
         {
         case .transportA:
-            outDate = connectionGroupData.aConnectionData.outgoingDates[connection.connectionID]
-            inDate = connectionGroupData.aConnectionData.incomingDates[connection.connectionID]
+                outDate = labData.connectionGroupData.aConnectionData.outgoingDates[connection.connectionID]
+                inDate = labData.connectionGroupData.aConnectionData.incomingDates[connection.connectionID]
             
         case .transportB:
-            outDate = connectionGroupData.bConnectionData.outgoingDates[connection.connectionID]
-            inDate = connectionGroupData.bConnectionData.incomingDates[connection.connectionID]
+                outDate = labData.connectionGroupData.bConnectionData.outgoingDates[connection.connectionID]
+                inDate = labData.connectionGroupData.bConnectionData.incomingDates[connection.connectionID]
         }
         
         guard let timeOut = outDate else { return (false, nil) }
@@ -41,11 +42,11 @@ class TimingCoreML
         switch connection.connectionType
         {
         case .transportA:
-            packetTimings.transportA.append(timeDifference)
+                labData.packetTimings.transportA.append(timeDifference)
         case .transportB:
-            packetTimings.transportB.append(timeDifference)
+                labData.packetTimings.transportB.append(timeDifference)
         }
-                
+        
         return (true, nil)
     }
     
@@ -54,36 +55,36 @@ class TimingCoreML
 //        scoreTiming(allowedTimeDifferenceKey: allowedConnectionsTimeDiffKey, blockedTimeDifferenceKey: blockedConnectionsTimeDiffKey, requiredTimeDifferenceKey: requiredTimeDiffKey, requiredTimeDifferenceAccKey: requiredTimeDiffAccKey, forbiddenTimeDifferenceKey: forbiddenTimeDiffKey, forbiddenTimeDifferenceAccKey: forbiddenTimeDiffAccKey)
 //    }
     
-    func scoreTiming(configModel: ProcessingConfigurationModel)
+    func scoreTiming(labData: LabData, configModel: ProcessingConfigurationModel)
     {
         if configModel.trainingMode
         {
-            trainModels(configModel: configModel)
+            trainModels(labData: labData, configModel: configModel)
         }
         else
         {
-            testModel(configModel: configModel)
+            testModel(labData: labData, configModel: configModel)
         }
     }
     
-    func testModel(configModel: ProcessingConfigurationModel)
+    func testModel(labData: LabData, configModel: ProcessingConfigurationModel)
     {
-        guard packetTimings.transportB.count > 0
+        guard labData.packetTimings.transportB.count > 0
             else
         {
             print("\nError: No blocked time differences found in the database. Tests cannot be run without blocked connection data.")
             return
         }
         
-        testModel(connectionType: .transportB, timeDifferences: packetTimings.transportB, configModel: configModel)
+        self.testModel(labData: labData, connectionType: .transportB, timeDifferences: labData.packetTimings.transportB, configModel: configModel)
         
-        if packetTimings.transportA.count > 0
+        if labData.packetTimings.transportA.count > 0
         {
-            testModel(connectionType: .transportA, timeDifferences: packetTimings.transportA, configModel: configModel)
+            self.testModel(labData: labData, connectionType: .transportA, timeDifferences: labData.packetTimings.transportA, configModel: configModel)
         }
     }
     
-    func testModel(connectionType: ClassificationLabel, timeDifferences: [Double], configModel: ProcessingConfigurationModel)
+    func testModel(labData: LabData, connectionType: ClassificationLabel, timeDifferences: [Double], configModel: ProcessingConfigurationModel)
     {
         do
         {
@@ -120,10 +121,11 @@ class TimingCoreML
                 switch connectionType
                 {
                 case .transportA:
-                    packetTimings.transportATestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                        labData.packetTimings.transportATestResults = TestResults(prediction: thisFeatureValue.doubleValue/1000, accuracy: nil)
                 case .transportB:
-                    packetTimings.transportBTestResults = TestResults(prediction: thisFeatureValue.doubleValue, accuracy: nil)
+                        labData.packetTimings.transportBTestResults = TestResults(prediction: thisFeatureValue.doubleValue/1000, accuracy: nil)
                 }
+                
             }
             
             if FileManager.default.fileExists(atPath: classifierFileURL.path)
@@ -155,12 +157,15 @@ class TimingCoreML
                 accuracy = accuracy * 100
                 
                 // Save the accuracy
-                switch connectionType
+                if accuracy > 0
                 {
-                case .transportA:
-                    packetTimings.transportATestResults?.accuracy = accuracy
-                case .transportB:
-                    packetTimings.transportBTestResults?.accuracy = accuracy
+                    switch connectionType
+                    {
+                    case .transportA:
+                            labData.packetTimings.transportATestResults?.accuracy = accuracy
+                    case .transportB:
+                            labData.packetTimings.transportBTestResults?.accuracy = accuracy
+                    }
                 }
             }
         }
@@ -170,9 +175,9 @@ class TimingCoreML
         }
     }
     
-    func trainModels(configModel: ProcessingConfigurationModel)
+    func trainModels(labData: LabData, configModel: ProcessingConfigurationModel)
     {
-        let (timeDifferenceList, classificationLabels) = getTimeDifferenceAndClassificationArrays()
+        let (timeDifferenceList, classificationLabels) = getTimeDifferenceAndClassificationArrays(labData: labData)
         
         // Create the time difference table
         var timeDifferenceTable = MLDataTable()
@@ -258,12 +263,13 @@ class TimingCoreML
                     print("\nPredicted transportB time difference = \(transportBPredictedTimeDifference)")
                     
                     /// Save Predicted Time Difference
-                    trainingData.timingTrainingResults = TrainingResults(
-                        predictionForA: transportAPredictedTimeDifference,
-                        predictionForB: transportBPredictedTimeDifference,
+                    labData.trainingData.timingTrainingResults = TrainingResults(
+                        predictionForA: transportAPredictedTimeDifference/1000,
+                        predictionForB: transportBPredictedTimeDifference/1000,
                         trainingAccuracy: trainingAccuracy,
                         validationAccuracy: validationAccuracy,
                         evaluationAccuracy: evaluationAccuracy)
+                    
                     
                     // Save the models
                     FileController().saveModel(classifier: classifier,
@@ -291,20 +297,20 @@ class TimingCoreML
     }
     
     
-    func getTimeDifferenceAndClassificationArrays() -> (timeDifferenceList: [Double], classificationLabels: [String])
+    func getTimeDifferenceAndClassificationArrays(labData: LabData) -> (timeDifferenceList: [Double], classificationLabels: [String])
     {
         var timeDifferenceList = [Double]()
         var classificationLabels = [String]()
         
         /// TimeDifferences for the Transport A traffic
-        for aTimeDifference in packetTimings.transportA
+        for aTimeDifference in labData.packetTimings.transportA
         {
             timeDifferenceList.append(aTimeDifference)
             classificationLabels.append(ClassificationLabel.transportA.rawValue)
         }
         
         /// TimeDifferences for Transport B traffic
-        for bTimeDifference in packetTimings.transportB
+        for bTimeDifference in labData.packetTimings.transportB
         {
             timeDifferenceList.append(bTimeDifference)
             classificationLabels.append(ClassificationLabel.transportB.rawValue)

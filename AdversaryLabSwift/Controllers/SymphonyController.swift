@@ -13,22 +13,19 @@ import RawPacket
 
 class SymphonyController
 {
-    static let sharedInstance = SymphonyController()
-    
+    //static let sharedInstance = SymphonyController()    
+    let dataQueue = DispatchQueue(label: "DataQueue")
     let tableName = "Packets"
+    
     var transportNames: [String] = []
     var symphony: Symphony?
     var tablesURL: URL?
 
-    func launchSymphony(fromFile fileURL: URL, completion: @escaping (Bool) -> Void)
+    func launchSymphony(fromFile fileURL: URL, labData: LabData) -> [String]?
     {
         // Unzip the directory
-        guard let songDirectory = unzipSong(sourceURL: fileURL)
-            else
-        {
-            completion(false)
-            return
-        }
+        guard let songDirectory = unzipSong(sourceURL: fileURL) else
+        { return nil }
         
         symphony = Symphony(root: songDirectory)
         
@@ -42,61 +39,40 @@ class SymphonyController
                 transportNames.append(tableURL.lastPathComponent)
             }
             
-            saveSymphonyDataAsConnectionGroup()
-            completion(true)
+            // Make sure that we have a connection to the database
+            guard symphony != nil
+                else
+            {
+                print("Failed to find Symphony instance.")
+                return nil
+            }
+
+            return transportNames
         }
         catch let error
         {
             print("Error looking for transport directories: \(error)")
-            completion(false)
-            return
+            return nil
         }
     }
     
-    func saveSymphonyDataAsConnectionGroup()
+    func processConnectionData(labData: LabData) async -> Bool
     {
-        let processor = DataProcessing()
-        // Make sure that we have a connection to the database
-        guard symphony != nil
-            else
-        {
-            print("Unable to save Symphony data into Redis database. Failed to find Symphony instance.")
-            return
-        }
-
-        guard transportNames.count > 1 else
-        {
-            print("Unable to add Symphony data to Redis, we need at least two transports.")
-            return
-        }
-        
-        print("Found transports in database: \(transportNames)")
-        
-        ///Ask the user which transport is allowed and which is blocked
-        guard let (transportA, remainingTransports) = showChooseAConnectionsAlert(transportNames: self.transportNames)
-            else
-        {
-            return
-        }
-            
-        guard let (transportB, _) = showChooseBConnectionsAlert(transportNames: remainingTransports)
-            else
-        {
-            return
-        }
-        
-        guard let (aPackets, bPackets) = self.packetArraysFromSymphony(for: transportA, transportB: transportB)
+        guard let (aPackets, bPackets) = self.packetArraysFromSymphony(for: labData.transportA, transportB: labData.transportB)
         else
         {
            print("Failed to get both blocked and allowed packets from Symphony.")
-           return
+           return false
         }
-            
-        ///Write Swift data structures
-        processor.updateConnectionGroupData(forTransportA: transportA,
-                                            aRawPackets: aPackets,
-                                            transportB: transportB,
-                                            bRawPackets: bPackets)
+        let handler = Task
+        {
+            await DataProcessing().updateConnectionGroupData(labData: labData, aRawPackets: aPackets, bRawPackets: bPackets)
+        }
+        print("1) Called updateConnectionGroupData")
+        let finished = await handler.value
+        print("5) Finished updateConnectionGroupData")
+        
+        return finished
     }
     
     /// File management
@@ -109,9 +85,15 @@ class SymphonyController
         }
         
         let destinationURL = applicationSupportDir.appendingPathComponent("adversary_data")
+        let otherZIPURL = applicationSupportDir.appendingPathComponent("__MACOSX")
         do
         {
             // Overwrite any old data at this directory
+            if FileManager.default.fileExists(atPath: otherZIPURL.path)
+            {
+                try FileManager.default.removeItem(at: otherZIPURL)
+            }
+            
             if FileManager.default.fileExists(atPath: destinationURL.path)
             {
                 try FileManager.default.removeItem(at: destinationURL)

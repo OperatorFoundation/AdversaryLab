@@ -20,24 +20,6 @@ For instance, a simulated adversary could allow HTTP, but block HTTPS. By traini
 
 Swift 5.0, included in Xcode 11
 
-Install and run Redis.
-
-Using Homebrew:
-
-```
-brew install redis
-brew services start redis
-```
-
-Or refer to the [Redis documentation](https://redis.io/download) to install it manually.
-
-### Installing
-
-Check out the project from Github and add the following executables to the AdversaryLab/Executables/ folder: 
-- redis-cli  
-- redis-server
-
-
 ## Deployment
 
 Open the Xcode project. Once you have addressed signing as needed, you can run the project using Xcode. Note that you have to have started redis using `brew services start redis` for AdversaryLab to run correctly.
@@ -47,9 +29,7 @@ To add network traffic to Adversary Lab for analysis you can use [CanaryDesktop]
 ## Built With
 
 * [Auburn](https://github.com/OperatorFoundation/Auburn) - An idiomatic Swift library for using Redis
-* [RedShot](https://github.com/OperatorFoundation/Redshot) - Lightweight Redis client for Swift
 * [Datable](https://github.com/OperatorFoundation/Datable) - Swift convenience functions to convert between various different types and Data
-* [Redis](https://redis.io/) - A fast database with support for data structures
 
 ## Contributing
 

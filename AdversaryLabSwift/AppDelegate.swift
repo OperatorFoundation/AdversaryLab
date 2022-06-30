@@ -68,20 +68,4 @@ class AppDelegate: NSObject, NSApplicationDelegate
             print("\nUnable to find the application support directory. This is needed in order to save and unpack model files.")
         }
     }
-
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply
-    {
-        // Quit Redis Server
-        print("TERMINATE Redis Server. 🤖")
-        RedisServerController.sharedInstance.shutdownRedisServer()
-        sleep(1)
-        return NSApplication.TerminateReply.terminateNow
-    }
-    
-    func applicationWillTerminate(_ aNotification: Notification)
-    {
-        
-    }
-
-
 }
