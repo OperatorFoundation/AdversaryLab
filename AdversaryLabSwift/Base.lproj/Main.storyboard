@@ -716,14 +716,12 @@
                                     <rect key="frame" x="4" y="4" width="279" height="281"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Smf-4j-n6x">
+                                        <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Smf-4j-n6x">
                                             <rect key="frame" x="-29" y="-72" width="356" height="406"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="al-256" id="gEa-Eq-R2K"/>
                                         </imageView>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KIV-L6-1gO">
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KIV-L6-1gO">
                                             <rect key="frame" x="68" y="114" width="143" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="push" title="Start a New Lab" bezelStyle="rounded" image="NSAddTemplate" imagePosition="leading" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ABJ-Ra-uc9">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" size="14" name="Hubballi-Regular"/>
@@ -734,6 +732,14 @@
                                             </connections>
                                         </button>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="Smf-4j-n6x" firstAttribute="leading" secondItem="J0M-t7-QSy" secondAttribute="leading" constant="-29" id="JP0-XV-FiZ"/>
+                                        <constraint firstItem="KIV-L6-1gO" firstAttribute="centerY" secondItem="Smf-4j-n6x" secondAttribute="centerY" id="L6U-6J-5Zy"/>
+                                        <constraint firstAttribute="trailing" secondItem="Smf-4j-n6x" secondAttribute="trailing" constant="-48" id="OXH-Ot-gGm"/>
+                                        <constraint firstItem="KIV-L6-1gO" firstAttribute="top" secondItem="J0M-t7-QSy" secondAttribute="top" constant="140" id="RaV-yj-pOh"/>
+                                        <constraint firstItem="Smf-4j-n6x" firstAttribute="top" secondItem="J0M-t7-QSy" secondAttribute="top" constant="-53" id="laY-aT-FZ5"/>
+                                        <constraint firstItem="KIV-L6-1gO" firstAttribute="centerX" secondItem="J0M-t7-QSy" secondAttribute="centerX" id="lxx-1N-y4M"/>
+                                    </constraints>
                                 </view>
                                 <color key="borderColor" red="0.6394116862" green="0.49871700149999998" blue="0.79499363729999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

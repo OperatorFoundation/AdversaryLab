@@ -7,8 +7,8 @@
 //
 
 import Foundation
+
 import Auburn
-import RedShot
 import Datable
 
 class FakeConnectionGenerator

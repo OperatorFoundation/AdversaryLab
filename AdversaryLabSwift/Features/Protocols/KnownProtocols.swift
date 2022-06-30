@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Auburn
 
 func detectKnownProtocol(connection: ObservedConnection) -> KnownProtocolType? {
     if TLS12CoreML().isTls12(forConnection: connection) {

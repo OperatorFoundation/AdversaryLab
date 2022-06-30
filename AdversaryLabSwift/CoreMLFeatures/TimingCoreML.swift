@@ -10,8 +10,6 @@ import Foundation
 import CreateML
 import CoreML
 
-import Auburn
-
 class TimingCoreML
 {
     // TODO: Currently not using error

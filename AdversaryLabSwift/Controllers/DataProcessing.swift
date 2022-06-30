@@ -10,8 +10,8 @@ import Foundation
 
 import Abacus
 import Auburn
-import Symphony
 import RawPacket
+import Symphony
 
 class DataProcessing
 {

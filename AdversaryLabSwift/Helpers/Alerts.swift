@@ -7,54 +7,8 @@
 //
 
 import Cocoa
+import UniformTypeIdentifiers
 
-//func showCorruptRedisAlert(processPID: String)
-//{
-//    let alert = NSAlert()
-//    alert.messageText = "A redis server is already running"
-//    alert.informativeText = "This server will need to be shut down in order to proceed. Manually shut down this server?"
-//
-//    alert.addButton(withTitle: "Yes")
-//    alert.addButton(withTitle: "Quit")
-//
-//    let response = alert.runModal()
-//
-//    switch response
-//    {
-//    case .alertFirstButtonReturn:
-//        print("User chose to quit Adversary Lab rather than kill server.")
-//        quitAdversaryLab()
-//    case .alertSecondButtonReturn:
-//        // TODO: Kill Redis Server
-//        print("User chose to manually kill Redis server with PID: \(processPID)")
-//        RedisServerController.sharedInstance.killProcess(pid: processPID, completion:
-//        {
-//            (_) in
-//
-//            // Launch Redis Server
-//            RedisServerController.sharedInstance.launchRedisServer
-//            {
-//                (result) in
-//
-//                switch result
-//                {
-//                case .okay(_):
-//                    // Update Labels and Progress Indicator
-//                        print("Redis Launched")
-//                case .otherProcessOnPort(let processName):
-//                    showOtherProcessAlert(processName: processName)
-//                case .corruptRedisOnPort(let pidString):
-//                    showCorruptRedisAlert(processPID: pidString)
-//                case .failure(let failureString):
-//                    print("Received failure on launch server: \(failureString ?? "")")
-//                    quitAdversaryLab()
-//                }
-//            }
-//        })
-//    default:
-//        print("Unknown error user chose unknown option for redis server alert.")
-//    }
-//}
 
 /// Call this when there is no appropriate data to be processed
 func showNoDataAlert(labData: LabData)
@@ -63,23 +17,6 @@ func showNoDataAlert(labData: LabData)
     alert.messageText = "Not enough packets to process"
     alert.informativeText = "There is not enough valid data in the selected database file."
     _ = alert.runModal()
-//        
-//    if result.rawValue == 0
-//    {
-//        if let selectedFileURL = showRethinkFileAlert()
-//        {
-//            Task
-//            {
-//                await FileController().loadSongFile(fileURL: selectedFileURL, labData: labData)
-//            }
-//        }
-//    }
-//    else
-//    {
-//        print("Alert result: \(result)")
-//        completion(false)
-//        return
-//    }
 }
 
 func showNoBlockedConnectionsAlert()
@@ -121,7 +58,7 @@ func showSelectAdversaryFileAlert() -> URL?
     let panel = NSOpenPanel()
     panel.canChooseFiles = true
     panel.canChooseDirectories = false
-    panel.allowedFileTypes = ["adversary"]
+    panel.allowedContentTypes = [UTType("org.operatorFoundation.AdversaryLabSwift")!]
     
     let result = panel.runModal()
     
@@ -137,7 +74,7 @@ func showRethinkFileAlert() -> URL?
     panel.canChooseFiles = true
     panel.canChooseDirectories = false
     panel.allowsMultipleSelection = false
-    panel.allowedFileTypes = ["zip"]
+    panel.allowedContentTypes = [UTType.zip]
     
     let result = panel.runModal()
     guard result == NSApplication.ModalResponse.OK

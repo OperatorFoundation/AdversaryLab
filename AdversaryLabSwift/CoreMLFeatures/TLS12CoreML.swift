@@ -7,10 +7,12 @@
 //
 
 import Foundation
+import CoreML
+import CreateML
+
 import Auburn
 import Datable
-import CreateML
-import CoreML
+
 
 let tlsRequestStart=Data([0x16, 0x03])
 let tlsResponseStart=Data([0x16, 0x03])

@@ -32,7 +32,6 @@
 		AE17920924DCC55F00620B5E /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920824DCC55F00620B5E /* ZIPFoundation */; };
 		AE17920C24DCC5AB00620B5E /* Symphony in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920B24DCC5AB00620B5E /* Symphony */; };
 		AE17920E24DCC5AB00620B5E /* Song in Frameworks */ = {isa = PBXBuildFile; productRef = AE17920D24DCC5AB00620B5E /* Song */; };
-		AE17921124DCC5CE00620B5E /* Auburn in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921024DCC5CE00620B5E /* Auburn */; };
 		AE17921424DCC5E900620B5E /* Datable in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921324DCC5E900620B5E /* Datable */; };
 		AE17921724DCC61500620B5E /* Abacus in Frameworks */ = {isa = PBXBuildFile; productRef = AE17921624DCC61500620B5E /* Abacus */; };
 		AE1AC6FA2258020500555456 /* MLModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1AC6F92258020500555456 /* MLModelController.swift */; };
@@ -57,6 +56,7 @@
 		AEA17599286D0D3500B6EBE0 /* LabData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA17598286D0D3500B6EBE0 /* LabData.swift */; };
 		AEA1759B286DACD000B6EBE0 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA1759A286DACD000B6EBE0 /* ChartsView.swift */; };
 		AEA1759E286DBA4800B6EBE0 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */; };
+		AEA175A1286E001600B6EBE0 /* Auburn in Frameworks */ = {isa = PBXBuildFile; productRef = AEA175A0286E001600B6EBE0 /* Auburn */; };
 		AEC00A2423733A0800E5582B /* ConnectionGroupData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
 		AEE50AFF228FBE8C009698CC /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE50AFE228FBE8C009698CC /* Alerts.swift */; };
@@ -160,11 +160,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE17921424DCC5E900620B5E /* Datable in Frameworks */,
+				AEA175A1286E001600B6EBE0 /* Auburn in Frameworks */,
 				AE17920624DCC53800620B5E /* RawPacket in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE17921724DCC61500620B5E /* Abacus in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
-				AE17921124DCC5CE00620B5E /* Auburn in Frameworks */,
 				AE17920C24DCC5AB00620B5E /* Symphony in Frameworks */,
 				AE17920E24DCC5AB00620B5E /* Song in Frameworks */,
 				AE51B04B2519C4D90086668A /* libswiftCreateML.tbd in Frameworks */,
@@ -379,10 +379,10 @@
 				AE17920824DCC55F00620B5E /* ZIPFoundation */,
 				AE17920B24DCC5AB00620B5E /* Symphony */,
 				AE17920D24DCC5AB00620B5E /* Song */,
-				AE17921024DCC5CE00620B5E /* Auburn */,
 				AE17921324DCC5E900620B5E /* Datable */,
 				AE17921624DCC61500620B5E /* Abacus */,
 				AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */,
+				AEA175A0286E001600B6EBE0 /* Auburn */,
 			);
 			productName = AdversaryLabSwift;
 			productReference = 4651A14D20083BF700037D31 /* AdversaryLabSwift.app */;
@@ -466,10 +466,10 @@
 				AE17920424DCC53800620B5E /* XCRemoteSwiftPackageReference "AdversaryLabClientSwift" */,
 				AE17920724DCC55F00620B5E /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */,
-				AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */,
 				AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */,
 				AE17921524DCC61500620B5E /* XCRemoteSwiftPackageReference "Abacus" */,
 				AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
+				AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */,
 			);
 			productRefGroup = 4651A14E20083BF700037D31 /* Products */;
 			projectDirPath = "";
@@ -923,14 +923,6 @@
 				minimumVersion = 0.0.23;
 			};
 		};
-		AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/OperatorFoundation/Auburn.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.2;
-			};
-		};
 		AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OperatorFoundation/Datable.git";
@@ -953,6 +945,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
+			};
+		};
+		AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OperatorFoundation/Auburn.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -978,11 +978,6 @@
 			package = AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */;
 			productName = Song;
 		};
-		AE17921024DCC5CE00620B5E /* Auburn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AE17920F24DCC5CE00620B5E /* XCRemoteSwiftPackageReference "Auburn" */;
-			productName = Auburn;
-		};
 		AE17921324DCC5E900620B5E /* Datable */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */;
@@ -997,6 +992,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
 			productName = SwiftUICharts;
+		};
+		AEA175A0286E001600B6EBE0 /* Auburn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */;
+			productName = Auburn;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

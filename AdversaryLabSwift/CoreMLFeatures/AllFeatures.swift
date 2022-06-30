@@ -6,10 +6,11 @@
 //  Copyright © 2019 Operator Foundation. All rights reserved.
 //
 
-import Foundation
-import Auburn
 import CreateML
 import CoreML
+import Foundation
+
+import Auburn
 
 class AllFeatures
 {

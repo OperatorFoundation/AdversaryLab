@@ -7,8 +7,8 @@
 //
 
 import Foundation
+
 import Auburn
-import RedShot
 import Datable
 
 func processSequences(forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)

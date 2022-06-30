@@ -10,10 +10,6 @@ import Cocoa
 import CoreML
 import SwiftUI
 
-import Auburn
-import RedShot
-import Datable
-
 class ViewController: NSViewController
 {
     var streaming: Bool = false
