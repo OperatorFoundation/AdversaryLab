@@ -18,11 +18,9 @@ For instance, a simulated adversary could allow HTTP, but block HTTPS. By traini
 
 ### Prerequisites
 
-Swift 5.0, included in Xcode 11
+Swift 5.6, included in Xcode 11
 
 ## Deployment
-
-Open the Xcode project. Once you have addressed signing as needed, you can run the project using Xcode. Note that you have to have started redis using `brew services start redis` for AdversaryLab to run correctly.
 
 To add network traffic to Adversary Lab for analysis you can use [CanaryDesktop](https://github.com/OperatorFoundation/CanaryDesktop.git) for macOS, or [CanaryLinux](https://github.com/OperatorFoundation/CanaryLinux.git) for Linux. When selecting data to load, you should browse to the location of one of the zip files created by Canary. These zip files are named "adversary_data" followed by a timestamp.
 
@@ -31,6 +29,9 @@ To add network traffic to Adversary Lab for analysis you can use [CanaryDesktop]
 * [Auburn](https://github.com/OperatorFoundation/Auburn) - An idiomatic Swift library for using Redis
 * [Datable](https://github.com/OperatorFoundation/Datable) - Swift convenience functions to convert between various different types and Data
 * [Song](https://github.com/OperatorFoundation/Song.git) - Data structure serialization with static typing.
+* [Abacus](https://github.com/OperatorFoundation/Abacus.git) - Swift data structures for data processing.
+* [SwiftUICharts](https://github.com/willdale/SwiftUICharts.git) - A charts / plotting library for SwiftUI.
+* [ZIPFoundation](https://github.com/weichsel/ZIPFoundation) - ZIP Foundation is a library to create, read and modify ZIP archive files.
 
 ## Contributing
 
