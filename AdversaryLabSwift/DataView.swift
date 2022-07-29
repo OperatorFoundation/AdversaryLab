@@ -361,14 +361,24 @@ struct DataView: View
         }
     }
     
-    fileprivate func makeConnectionsBox(transportConnectionData: ConnectionViewData, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>> {
+    fileprivate func makeConnectionsBox(transportConnectionData: ConnectionViewData, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>>
+    {
+        let totalConnections = transportConnectionData.connectionsCount
+        var connectionOverhead = 0
+        
+        if totalConnections > 0
+        {
+            connectionOverhead = transportConnectionData.totalPayloadBytes/totalConnections
+        }
+        
         return GroupBox(label: Text(labelText))
         {
-            Text("Connections Seen: \(transportConnectionData.connectionsCount)")
+            Text("Connections Seen: \(totalConnections)")
             Text("Connections Analyzed: \(transportConnectionData.packetsAnalyzed)")
             Text("Outgoing Packets: \(transportConnectionData.outgoingPacketsCount)")
             Text("Incoming Packets: \(transportConnectionData.incomingPacketsCount)")
-            Text("Transport Overhead: \(transportConnectionData.totalPayloadBytes) bytes")
+            Text("Transport Overhead: \(connectionOverhead) bytes")
+            
         }
     }
 
