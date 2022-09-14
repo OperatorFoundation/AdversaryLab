@@ -12,9 +12,6 @@ import CoreML
 
 class TimingCoreML
 {
-    // TODO: Currently not using error
-    // TODO: Replace observedConnection with ConnectionType
-    
     func processTiming(labData: LabData, forConnection connection: ObservedConnection) -> (processed: Bool, error: Error?)
     {
         var outDate: Double?

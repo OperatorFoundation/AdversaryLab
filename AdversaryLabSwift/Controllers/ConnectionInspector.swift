@@ -126,15 +126,16 @@ class ConnectionInspector: ObservableObject
 
     func analyze(labData: LabData, connection: ObservedConnection, configModel: ProcessingConfigurationModel)
     {
+        // Process Packet Lengths
         let (packetLengthProcessed, maybePacketlengthError) = PacketLengthsCoreML().processPacketLengths(labData: labData, forConnection: connection)
-
-        // Process Packet Timing
-        let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(labData: labData, forConnection: connection)
         
         if let packetLengthError = maybePacketlengthError
         {
             print("Packet length error: \(packetLengthError.localizedDescription)")
         }
+
+        // Process Packet Timing
+        let (timingProcessed, maybePacketTimingError) = TimingCoreML().processTiming(labData: labData, forConnection: connection)
         
         if let packetTimingError = maybePacketTimingError
         {
@@ -150,6 +151,7 @@ class ConnectionInspector: ObservableObject
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }
+        
         if let offsetError = maybeSubsequenceError
         {
             print("Offset error: \(offsetError)")

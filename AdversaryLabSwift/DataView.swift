@@ -48,159 +48,161 @@ struct DataView: View
             .padding()
             .background(.black)
             
-            GroupBox(label: Text("Training Data")) // Training Data
-            {
-                HStack
+            HStack {
+                GroupBox(label: Text("Training Data")) // Training Data
                 {
-                    makeResultsBox(trainingResults: labViewData.trainingData.timingTrainingResults, labelText: "Timing")
-                    Spacer()
-                    GroupBox(label: Text("Packet Lengths"))
+                    HStack
                     {
-                        makeResultsBox(trainingResults: labViewData.trainingData.outgoingLengthsTrainingResults, labelText: "Outgoing Rules")
-                        makeResultsBox(trainingResults: labViewData.trainingData.incomingLengthsTrainingResults, labelText: "Incoming Rules")
-                    }
-                    Spacer()
-                    GroupBox(label: Text("Entropy"))
-                    {
-                        makeResultsBox(trainingResults: labViewData.trainingData.outgoingEntropyTrainingResults, labelText: "Outgoing Rules")
-                        makeResultsBox(trainingResults: labViewData.trainingData.incomingEntropyTrainingResults, labelText: "Incoming Rules")
-                    }
-                }
-                
-                HStack
-                {
-                    Button
-                    {
-                        if let selectedFileURL = showRethinkFileAlert()
+                        makeResultsBox(trainingResults: labViewData.trainingData.timingTrainingResults, labelText: "Timing")
+                        Spacer()
+                        GroupBox(label: Text("Packet Lengths"))
                         {
-                            let symphony = SymphonyController()
-                            
-                            guard let possibleTransports = symphony.launchSymphony(fromFile: selectedFileURL, labData: labData) else
-                            { return }
-                            guard selectTransports(transportNames: possibleTransports) else
-                            { return }
+                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingLengthsTrainingResults, labelText: "Outgoing Rules")
+                            makeResultsBox(trainingResults: labViewData.trainingData.incomingLengthsTrainingResults, labelText: "Incoming Rules")
+                        }
+                        Spacer()
+                        GroupBox(label: Text("Entropy"))
+                        {
+                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingEntropyTrainingResults, labelText: "Outgoing Rules")
+                            makeResultsBox(trainingResults: labViewData.trainingData.incomingEntropyTrainingResults, labelText: "Incoming Rules")
+                        }
+                    }
+                    
+                    HStack
+                    {
+                        Button
+                        {
+                            if let selectedFileURL = showRethinkFileAlert()
+                            {
+                                let symphony = SymphonyController()
+                                
+                                guard let possibleTransports = symphony.launchSymphony(fromFile: selectedFileURL, labData: labData) else
+                                { return }
+                                guard selectTransports(transportNames: possibleTransports) else
+                                { return }
 
+                                Task
+                                {
+                                    isLoading = true
+                                    _ = await symphony.processConnectionData(labData: labData)
+                                    labViewData.copyLabConnectionData(labData: labData)
+                                    isLoading = false
+                                }
+                                
+                            }
+                        } label: {
+                            Text("Load Data")
+                                .opacity(isLoading ? 0.3 : 1)
+                        }
+                        .disabled(isLoading)
+                        
+                        Button
+                        {
                             Task
                             {
-                                isLoading = true
-                                _ = await symphony.processConnectionData(labData: labData)
-                                labViewData.copyLabConnectionData(labData: labData)
-                                isLoading = false
+                                await runTraining()
                             }
                             
                         }
-                    } label: {
-                        Text("Load Data")
-                            .opacity(isLoading ? 0.3 : 1)
-                    }
-                    .disabled(isLoading)
-                    
-                    Button
-                    {
-                        Task
-                        {
-                            await runTraining()
+                        label: {
+                            Text("Train")
+                                .opacity(isLoading ? 0.3 : 1)
                         }
-                        
+                        .disabled(isLoading)
                     }
-                    label: {
-                        Text("Train")
-                            .opacity(isLoading ? 0.3 : 1)
-                    }
-                    .disabled(isLoading)
                 }
-            }
-            .foregroundColor(.black)
-            .padding()
-            .background(.white)
-            .overlay
-            {
-                if isLoading
+                .foregroundColor(.black)
+                .padding()
+                .background(.white)
+                .overlay
                 {
-                    ProgressView()
-                }
-            }
-            
-            GroupBox(label: Text("Test Data: \(modelName)")) // Test Data
-            {
-                HStack
-                {
-                    GroupBox(label: Text("Timing"))
+                    if isLoading
                     {
-                        makeResultsBox(testResults: labViewData.packetTimings.transportATestResults, labelText: labViewData.transportA)
-                        makeResultsBox(testResults: labViewData.packetTimings.transportBTestResults, labelText: labViewData.transportB)
-                    }
-                    Spacer()
-                    GroupBox(label: Text("Packet Lengths"))
-                    {
-                        makeResultsBox(testResults: labViewData.packetLengths.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
-                        makeResultsBox(testResults: labViewData.packetLengths.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
-                        makeResultsBox(testResults: labViewData.packetLengths.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
-                        makeResultsBox(testResults: labViewData.packetLengths.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
-                    }
-                    Spacer()
-                    GroupBox(label: Text("Entropy"))
-                    {
-                        makeResultsBox(testResults: labViewData.packetEntropies.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
-                        makeResultsBox(testResults: labViewData.packetEntropies.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
-                        makeResultsBox(testResults: labViewData.packetEntropies.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
-                        makeResultsBox(testResults: labViewData.packetEntropies.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
+                        ProgressView()
                     }
                 }
                 
-                HStack
+                GroupBox(label: Text("Test Data: \(modelName)")) // Test Data
                 {
-                    Button
+                    HStack
                     {
-                        // Get the user to select the correct .adversary file
-                        if let selectedURL = showSelectAdversaryFileAlert()
+                        GroupBox(label: Text("Timing"))
                         {
-                            // Model Group Name should be the same as the directory
-                            modelName = selectedURL.deletingPathExtension().lastPathComponent
-                            configModel.modelName = modelName
-                            
-                            // Unpack to a temporary directory
-                            if let maybeModelDirectory = FileController().unpack(adversaryURL: selectedURL)
-                            {
-                                modelDirectoryURL = maybeModelDirectory
-                            }
-                            else
-                            {
-                                print("🚨  Failed to unpack the selected adversary file.  🚨")
-                            }
+                            makeResultsBox(testResults: labViewData.packetTimings.transportATestResults, labelText: labViewData.transportA)
+                            makeResultsBox(testResults: labViewData.packetTimings.transportBTestResults, labelText: labViewData.transportB)
+                        }
+                        Spacer()
+                        GroupBox(label: Text("Packet Lengths"))
+                        {
+                            makeResultsBox(testResults: labViewData.packetLengths.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
+                            makeResultsBox(testResults: labViewData.packetLengths.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
+                            makeResultsBox(testResults: labViewData.packetLengths.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
+                            makeResultsBox(testResults: labViewData.packetLengths.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
+                        }
+                        Spacer()
+                        GroupBox(label: Text("Entropy"))
+                        {
+                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
+                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
+                            makeResultsBox(testResults: labViewData.packetEntropies.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
+                            makeResultsBox(testResults: labViewData.packetEntropies.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
                         }
                     }
-                    label: {
-                        Text("Load Model")
-                            .opacity(isLoading ? 0.3 : 1)
-                    }
-                    .disabled(isLoading)
                     
-                    Button
+                    HStack
                     {
-                        Task
+                        Button
                         {
-                            await runTest()
+                            // Get the user to select the correct .adversary file
+                            if let selectedURL = showSelectAdversaryFileAlert()
+                            {
+                                // Model Group Name should be the same as the directory
+                                modelName = selectedURL.deletingPathExtension().lastPathComponent
+                                configModel.modelName = modelName
+                                
+                                // Unpack to a temporary directory
+                                if let maybeModelDirectory = FileController().unpack(adversaryURL: selectedURL)
+                                {
+                                    modelDirectoryURL = maybeModelDirectory
+                                }
+                                else
+                                {
+                                    print("🚨  Failed to unpack the selected adversary file.  🚨")
+                                }
+                            }
                         }
+                        label: {
+                            Text("Load Model")
+                                .opacity(isLoading ? 0.3 : 1)
+                        }
+                        .disabled(isLoading)
                         
-                    }
-                    label: {
-                        Text("Test")
-                            .opacity(isLoading ? 0.3 : 1)
+                        Button
+                        {
+                            Task
+                            {
+                                await runTest()
+                            }
                             
-                    }
-                    .disabled(isLoading)
+                        }
+                        label: {
+                            Text("Test")
+                                .opacity(isLoading ? 0.3 : 1)
+                                
+                        }
+                        .disabled(isLoading)
 
+                    }
                 }
-            }
-            .foregroundColor(.black)
-            .padding()
-            .background(.white)
-            .overlay
-            {
-                if isLoading
+                .foregroundColor(.black)
+                .padding()
+                .background(.white)
+                .overlay
                 {
-                    ProgressView()
+                    if isLoading
+                    {
+                        ProgressView()
+                    }
                 }
             }
         }
@@ -273,8 +275,6 @@ struct DataView: View
                     _ = await ConnectionInspector().analyzeConnections(labData: labData, configModel: configModel, resetTrainingData: true, resetTestingData: false)
                     labViewData.copyAllLabData(labData: labData)
                     isLoading = false
-                    print("DataView View Data Entropy \(labViewData.packetEntropies.incomingA.count)")
-                    print("DataView Data Entropy \(labData.packetEntropies.incomingA.count)")
                 }
             }
         }

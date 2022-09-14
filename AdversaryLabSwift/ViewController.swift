@@ -22,7 +22,8 @@ class ViewController: NSViewController
     // MARK: - IBActions
     @IBAction func newLabClicked(_ sender: NSButton)
     {
-        let panel = NSPanel(contentViewController: NSHostingController(rootView: LabView().frame(minWidth: 800, minHeight: 960)))
+        let panel = NSPanel(contentViewController: NSHostingController(rootView: LabView().frame(minWidth: 800, minHeight: 700)))
+        panel.center()
         panel.title = "Adversary Lab"
         panel.makeKeyAndOrderFront(nil)
     }
