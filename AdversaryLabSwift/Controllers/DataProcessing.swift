@@ -8,7 +8,6 @@
 
 import Foundation
 
-import Auburn
 import RawPacket
 import Symphony
 
@@ -95,51 +94,6 @@ class DataProcessing
         }
         
         return true
-    }
-    
-    func intDictionary(from key: String) -> [String: Int]
-    {
-        let intMap = RMap<String, Int>(key: key)
-        var intDictionary = [String: Int]()
-        
-        let mapKeys: [String] = intMap.keys
-        
-        for mapKey in mapKeys
-        {
-            intDictionary[mapKey] = intMap[mapKey]
-        }
-        
-        return intDictionary
-    }
-    
-    func dataDictionary(from key: String) -> [String: Data]
-    {
-        let dataMap = RMap<String, Data>(key: key)
-        var dataDictionary = [String: Data]()
-        
-        let mapKeys: [String] = dataMap.keys
-        
-        for mapKey in mapKeys
-        {
-            dataDictionary[mapKey] = dataMap[mapKey]
-        }
-        
-        return dataDictionary
-    }
-    
-    func doubleDictionary(from key: String) -> [String: Double]
-    {
-        let doubleMap = RMap<String, Double>(key: key)
-        var doubleDictionary = [String: Double]()
-        
-        let mapKeys: [String] = doubleMap.keys
-        
-        for mapKey in mapKeys
-        {
-            doubleDictionary[mapKey] = doubleMap[mapKey]
-        }
-        
-        return doubleDictionary
     }
 
 

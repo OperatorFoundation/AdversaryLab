@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Abacus.git",
       "state" : {
-        "revision" : "46348c7cdbdba22fb46bdc654ab3143611aa2092",
-        "version" : "1.0.2"
+        "branch" : "main",
+        "revision" : "58fd6c03d9f9dc866f61cb1a999433f89d6472a9"
       }
     },
     {
@@ -14,17 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git",
       "state" : {
-        "revision" : "515c104060918a7479ec0aff13e63cb2962475d4",
-        "version" : "0.3.17"
-      }
-    },
-    {
-      "identity" : "auburn",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/OperatorFoundation/Auburn.git",
-      "state" : {
-        "revision" : "b2747ebe6a8e5ee60962c87c2eef1112e96151f9",
-        "version" : "0.6.2"
+        "branch" : "main",
+        "revision" : "31bb8a3ada490c05e678c54abd16f39ddcb1922c"
       }
     },
     {
@@ -32,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Bits.git",
       "state" : {
-        "revision" : "f05ebc8026f8c57dcd7e2eebffd816b078d3a142",
-        "version" : "2.0.1"
+        "branch" : "main",
+        "revision" : "bf60b26441a60f48651b1646e4c348b1b2d0b804"
       }
     },
     {
@@ -41,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Chord.git",
       "state" : {
-        "revision" : "756eeb26b10016784e6dc7cfce33068b36e49f39",
-        "version" : "0.0.15"
+        "branch" : "main",
+        "revision" : "a9be8f0d8bc5a3f075edc6aad3bad6f517b0d83b"
       }
     },
     {
@@ -50,8 +41,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Datable.git",
       "state" : {
-        "revision" : "f2a622a4f72cccb92d9847ff6616b26e6de25ca3",
-        "version" : "3.1.5"
+        "branch" : "main",
+        "revision" : "93daf97ee4b6fcb275e22cc2ce1f019409cb257e"
+      }
+    },
+    {
+      "identity" : "gardener",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OperatorFoundation/Gardener",
+      "state" : {
+        "branch" : "main",
+        "revision" : "bd831adaedddfdf9a5d319d93b3aba5e73121aed"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/InternetProtocols.git",
       "state" : {
-        "revision" : "ab344e7c952e3484a507ef34dc599081df9373fb",
-        "version" : "2.2.1"
+        "branch" : "main",
+        "revision" : "bb4ccd8665249d932f2314b396101c667e33a24c"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Net.git",
       "state" : {
-        "revision" : "c77993026c898f18d244f19bd505ab37baf10e92",
-        "version" : "0.0.7"
+        "branch" : "main",
+        "revision" : "9e76bf97d943bf04aa1ab5367811094b62bde4c2"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/PacketCaptureBPF.git",
       "state" : {
-        "revision" : "aaa6c509569cb11904e35dd682bb581b9b2f8083",
-        "version" : "0.2.10"
+        "branch" : "main",
+        "revision" : "bfff0839718bef984c224001ff2edc0c36db83a8"
       }
     },
     {
@@ -86,17 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/PacketStream.git",
       "state" : {
-        "revision" : "2340145ec9c547f23aeb0464a3b230f6afaa529b",
-        "version" : "0.2.1"
-      }
-    },
-    {
-      "identity" : "redshot",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/OperatorFoundation/Redshot.git",
-      "state" : {
-        "revision" : "d610adbedaa5273f7cd8c928816e4e8c3edc01af",
-        "version" : "0.8.5"
+        "branch" : "main",
+        "revision" : "7916aeea1914fdac7312af542ee7843ef776fb96"
       }
     },
     {
@@ -104,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/Song.git",
       "state" : {
-        "revision" : "30e043dc38908eb882f3991eb2af9249ec8988ce",
-        "version" : "0.2.6"
+        "branch" : "main",
+        "revision" : "cb5e5ce897bea90244e73929d21ac5497576595d"
       }
     },
     {
@@ -113,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
-        "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
-        "version" : "0.5.0"
+        "revision" : "9f39744e025c7d377987f30b03770805dcb0bcd1",
+        "version" : "1.1.4"
       }
     },
     {
@@ -122,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/swift-ast.git",
       "state" : {
-        "revision" : "d7e0cf0d9d3b90831a1c297ce911a338a4bd44f3",
-        "version" : "0.19.12"
+        "branch" : "main",
+        "revision" : "d7e0cf0d9d3b90831a1c297ce911a338a4bd44f3"
       }
     },
     {
@@ -131,8 +122,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/swift-netutils.git",
       "state" : {
-        "revision" : "776909ce0b37bd9ea1fa0f2156e4e5ad07a592b8",
-        "version" : "4.3.0"
+        "branch" : "main",
+        "revision" : "7eabe761969f96c92ca4e67480cbc71356c47a45"
+      }
+    },
+    {
+      "identity" : "swift-system",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-system",
+      "state" : {
+        "revision" : "025bcb1165deab2e20d4eaba79967ce73013f496",
+        "version" : "1.2.1"
       }
     },
     {
@@ -140,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OperatorFoundation/SwiftQueue.git",
       "state" : {
-        "revision" : "5e6cd8b325493f520a45d20d788efca707b53e6c",
-        "version" : "0.1.2"
+        "branch" : "main",
+        "revision" : "89ba7491f43d36181e3cfa7515ff194e6d2c80c8"
       }
     },
     {

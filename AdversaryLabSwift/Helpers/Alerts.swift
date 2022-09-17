@@ -68,7 +68,7 @@ func showSelectAdversaryFileAlert() -> URL?
     return panel.urls[0]    
 }
 
-func showRethinkFileAlert() -> URL?
+func showSelectAdversaryLabDataAlert() -> URL?
 {
     let panel = NSOpenPanel()
     panel.canChooseFiles = true

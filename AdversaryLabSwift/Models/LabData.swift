@@ -44,6 +44,13 @@ class LabViewData: ObservableObject
         connectionGroupData.copyLabConnectionData(connectionGroupData: labData.connectionGroupData)
     }
     
+    func resetLabConnectionData(labData: LabData)
+    {
+        transportA = ""
+        transportB = ""
+        connectionGroupData = ConnectionViewGroupData()
+    }
+    
     func copyLabTrainingData(labData: LabData)
     {
         connectionGroupData.aConnectionData.packetsAnalyzed = labData.connectionGroupData.aConnectionData.packetsAnalyzed

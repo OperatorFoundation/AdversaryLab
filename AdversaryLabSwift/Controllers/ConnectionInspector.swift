@@ -63,11 +63,12 @@ class ConnectionInspector: ObservableObject
 
     func scoreConnections(labData: LabData, configModel: ProcessingConfigurationModel) async -> Bool
     {
-        if configModel.enableTLSAnalysis
-        {
-            TLS12CoreML().scoreTLS12(configModel: configModel)
-            //sleep(1)
-        }
+        // TODO: Implement TLS
+//        if configModel.enableTLSAnalysis
+//        {
+//            TLS12CoreML().scoreTLS12(configModel: configModel)
+//            //sleep(1)
+//        }
 
         PacketLengthsCoreML().scoreAllPacketLengths(labData: labData, configModel: configModel)
         //sleep(1)
@@ -78,15 +79,15 @@ class ConnectionInspector: ObservableObject
         TimingCoreML().scoreTiming(labData: labData, configModel: configModel)
         //sleep(1)
 
-        AllFeatures().scoreAllFeatures(labData: labData, configModel: configModel)
+//        AllFeatures().scoreAllFeatures(labData: labData, configModel: configModel)
         //sleep(1)
 
         if configModel.trainingMode
         {
             if configModel.enableSequenceAnalysis
             {
-                scoreAllFloatSequences(configModel: configModel)
-                scoreAllOffsetSequences(configModel: configModel)
+//                scoreAllFloatSequences(configModel: configModel)
+//                scoreAllOffsetSequences(configModel: configModel)
             }
 
             let fileController = FileController()
@@ -99,7 +100,7 @@ class ConnectionInspector: ObservableObject
         }
         else
         {
-            OperatorReportController().createReportTextFile(labData: labData, forModel: configModel.modelName)
+//            OperatorReportController().createReportTextFile(labData: labData, forModel: configModel.modelName)
         }
         
         deleteTemporaryModelDirectory(named: configModel.modelName)
@@ -147,7 +148,7 @@ class ConnectionInspector: ObservableObject
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
         {
-            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(forConnection: connection)
+            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(labData: labData, forConnection: connection)
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }
@@ -166,10 +167,10 @@ class ConnectionInspector: ObservableObject
         }
         
         // Process All Features
-        let allFeaturesProcessed = AllFeatures().processData(labData: labData, forConnection: connection)
+//        let allFeaturesProcessed = AllFeatures().processData(labData: labData, forConnection: connection)
 
         // Increment Packets Analyzed Field as we are done analyzing this connection
-        if packetLengthProcessed || timingProcessed || subsequenceNoErrors || entropyProcessed || allFeaturesProcessed
+        if packetLengthProcessed || timingProcessed || subsequenceNoErrors || entropyProcessed //|| allFeaturesProcessed
         {
             switch connection.connectionType
             {
@@ -180,13 +181,14 @@ class ConnectionInspector: ObservableObject
             }
         }
 
-        if configModel.enableTLSAnalysis
-        {
-            if let knownProtocol = detectKnownProtocol(connection: connection)
-            {
-                processKnownProtocol(knownProtocol, connection)
-            }
-        }
+        // TODO: Implement TLS
+//        if configModel.enableTLSAnalysis
+//        {
+//            if let knownProtocol = detectKnownProtocol(connection: connection)
+//            {
+//                processKnownProtocol(knownProtocol, connection)
+//            }
+//        }
     }
 
     func resetAnalysisData(labData: LabData, resetTrainingData: Bool, resetTestingData: Bool)
@@ -194,7 +196,10 @@ class ConnectionInspector: ObservableObject
         if resetTrainingData
         {
             labData.connectionGroupData.aConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.aConnectionData.totalPayloadBytes = 0
+            
             labData.connectionGroupData.bConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.bConnectionData.totalPayloadBytes = 0
 
             labData.trainingData.incomingEntropyTrainingResults = nil
             labData.trainingData.outgoingEntropyTrainingResults = nil

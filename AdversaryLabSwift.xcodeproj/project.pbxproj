@@ -55,7 +55,6 @@
 		AEA17599286D0D3500B6EBE0 /* LabData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA17598286D0D3500B6EBE0 /* LabData.swift */; };
 		AEA1759B286DACD000B6EBE0 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEA1759A286DACD000B6EBE0 /* ChartsView.swift */; };
 		AEA1759E286DBA4800B6EBE0 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */; };
-		AEA175A1286E001600B6EBE0 /* Auburn in Frameworks */ = {isa = PBXBuildFile; productRef = AEA175A0286E001600B6EBE0 /* Auburn */; };
 		AEA175A4286E076500B6EBE0 /* Abacus in Frameworks */ = {isa = PBXBuildFile; productRef = AEA175A3286E076500B6EBE0 /* Abacus */; };
 		AEC00A2423733A0800E5582B /* ConnectionGroupData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC00A2323733A0800E5582B /* ConnectionGroupData.swift */; };
 		AED8490622B8465000998CC6 /* OperatorReportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8490522B8465000998CC6 /* OperatorReportController.swift */; };
@@ -160,7 +159,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE17921424DCC5E900620B5E /* Datable in Frameworks */,
-				AEA175A1286E001600B6EBE0 /* Auburn in Frameworks */,
 				AE17920624DCC53800620B5E /* RawPacket in Frameworks */,
 				AE0BC8DF2280923E00AD89E7 /* Security.framework in Frameworks */,
 				AE0BC8AE226F87A400AD89E7 /* ServiceManagement.framework in Frameworks */,
@@ -381,7 +379,6 @@
 				AE17920D24DCC5AB00620B5E /* Song */,
 				AE17921324DCC5E900620B5E /* Datable */,
 				AEA1759D286DBA4800B6EBE0 /* SwiftUICharts */,
-				AEA175A0286E001600B6EBE0 /* Auburn */,
 				AEA175A3286E076500B6EBE0 /* Abacus */,
 			);
 			productName = AdversaryLabSwift;
@@ -468,7 +465,6 @@
 				AE17920A24DCC5AB00620B5E /* XCRemoteSwiftPackageReference "Song" */,
 				AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */,
 				AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
-				AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */,
 				AEA175A2286E076500B6EBE0 /* XCRemoteSwiftPackageReference "Abacus" */,
 			);
 			productRefGroup = 4651A14E20083BF700037D31 /* Products */;
@@ -903,8 +899,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.3;
+				branch = main;
+				kind = branch;
 			};
 		};
 		AE17920724DCC55F00620B5E /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
@@ -919,16 +915,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OperatorFoundation/Song.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.23;
+				branch = main;
+				kind = branch;
 			};
 		};
 		AE17921224DCC5E900620B5E /* XCRemoteSwiftPackageReference "Datable" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OperatorFoundation/Datable.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.2;
+				branch = main;
+				kind = branch;
 			};
 		};
 		AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */ = {
@@ -939,20 +935,12 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/OperatorFoundation/Auburn.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.2;
-			};
-		};
 		AEA175A2286E076500B6EBE0 /* XCRemoteSwiftPackageReference "Abacus" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OperatorFoundation/Abacus.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -987,11 +975,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AEA1759C286DBA4800B6EBE0 /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
 			productName = SwiftUICharts;
-		};
-		AEA175A0286E001600B6EBE0 /* Auburn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AEA1759F286E001600B6EBE0 /* XCRemoteSwiftPackageReference "Auburn" */;
-			productName = Auburn;
 		};
 		AEA175A3286E076500B6EBE0 /* Abacus */ = {
 			isa = XCSwiftPackageProductDependency;

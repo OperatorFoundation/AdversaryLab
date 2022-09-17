@@ -72,8 +72,11 @@ struct DataView: View
                     {
                         Button
                         {
-                            if let selectedFileURL = showRethinkFileAlert()
+                            if let selectedFileURL = showSelectAdversaryLabDataAlert()
                             {
+                                ConnectionInspector().resetAnalysisData(labData: labData, resetTrainingData: true, resetTestingData: false)
+                                labViewData.resetLabConnectionData(labData: labData)
+                                
                                 let symphony = SymphonyController()
                                 
                                 guard let possibleTransports = symphony.launchSymphony(fromFile: selectedFileURL, labData: labData) else
