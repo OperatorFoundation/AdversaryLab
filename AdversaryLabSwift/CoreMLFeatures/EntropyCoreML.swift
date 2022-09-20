@@ -395,10 +395,9 @@ class EntropyCoreML
                 {
                     let transportAEntropyColumn = try regressor.predictions(from: allowedEntropyTable)
                     
-                    guard let transportAEntropies = transportAEntropyColumn.doubles
-                        else
+                    guard let transportAEntropies = transportAEntropyColumn.doubles else
                     {
-                        print("Failed to identify allowed entropy.")
+                        print("Failed to identify transport A entropy.")
                         return
                     }
                     
@@ -421,14 +420,14 @@ class EntropyCoreML
                     switch connectionDirection
                     {
                     case .incoming:
-                            labData.trainingData.incomingEntropyTrainingResults = TrainingResults(
+                            labData.trainingData.incomingEntropyTrainingResults = NumericTrainingResults(
                             predictionForA: predictedTransportAEntropy,
                             predictionForB: predictedTransportBEntropy,
                             trainingAccuracy: trainingAccuracy,
                             validationAccuracy: validationAccuracy,
                             evaluationAccuracy: evaluationAccuracy)
                     case .outgoing:
-                            labData.trainingData.outgoingEntropyTrainingResults = TrainingResults(
+                            labData.trainingData.outgoingEntropyTrainingResults = NumericTrainingResults(
                             predictionForA: predictedTransportAEntropy,
                             predictionForB: predictedTransportBEntropy,
                             trainingAccuracy: trainingAccuracy,

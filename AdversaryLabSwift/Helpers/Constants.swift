@@ -303,6 +303,8 @@ enum ColumnLabel: String
     case tlsNames = "tlsNames"
     case classification = "classification"
     case direction = "direction"
+    
+    case floatSequences = "floatSequences"
 }
 
 enum ServerCheckResult

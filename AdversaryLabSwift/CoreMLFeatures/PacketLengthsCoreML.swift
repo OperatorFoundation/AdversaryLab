@@ -405,14 +405,14 @@ class PacketLengthsCoreML
             switch connectionDirection
             {
             case .incoming:
-                    labData.trainingData.incomingLengthsTrainingResults = TrainingResults(
+                    labData.trainingData.incomingLengthsTrainingResults = NumericTrainingResults(
                     predictionForA: Double(lengthRecommender.transportALength),
                     predictionForB: Double(lengthRecommender.transportBLength),
                     trainingAccuracy: trainingAccuracy,
                     validationAccuracy: validationAccuracy,
                     evaluationAccuracy: evaluationAccuracy)
             case .outgoing:
-                    labData.trainingData.outgoingLengthsTrainingResults = TrainingResults(
+                    labData.trainingData.outgoingLengthsTrainingResults = NumericTrainingResults(
                     predictionForA: Double(lengthRecommender.transportALength),
                     predictionForB: Double(lengthRecommender.transportBLength),
                     trainingAccuracy: trainingAccuracy,

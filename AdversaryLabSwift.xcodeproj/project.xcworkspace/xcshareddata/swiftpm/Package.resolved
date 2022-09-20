@@ -6,7 +6,7 @@
       "location" : "https://github.com/OperatorFoundation/Abacus.git",
       "state" : {
         "branch" : "main",
-        "revision" : "58fd6c03d9f9dc866f61cb1a999433f89d6472a9"
+        "revision" : "e70be2b1b39d571d9246b16131db040281a3b753"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/OperatorFoundation/AdversaryLabClientSwift.git",
       "state" : {
         "branch" : "main",
-        "revision" : "31bb8a3ada490c05e678c54abd16f39ddcb1922c"
+        "revision" : "d848c99e00cc414e9983b8007acad333762e78fb"
       }
     },
     {

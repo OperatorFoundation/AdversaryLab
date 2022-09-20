@@ -148,7 +148,7 @@ class ConnectionInspector: ObservableObject
         var maybeSubsequenceError: Error? = nil
         if configModel.enableSequenceAnalysis
         {
-            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = processSequences(labData: labData, forConnection: connection)
+            let (subsequenceProcessed, maybeSubsequenceErrorResponse) = SequencesCoreML().processSequences(labData: labData, forConnection: connection)
             subsequenceNoErrors = subsequenceProcessed
             maybeSubsequenceError = maybeSubsequenceErrorResponse
         }

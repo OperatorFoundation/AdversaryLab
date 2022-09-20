@@ -258,7 +258,7 @@ class TimingCoreML
                     print("\nPredicted transportB time difference = \(transportBPredictedTimeDifference)")
                     
                     /// Save Predicted Time Difference
-                    labData.trainingData.timingTrainingResults = TrainingResults(
+                    labData.trainingData.timingTrainingResults = NumericTrainingResults(
                         predictionForA: transportAPredictedTimeDifference/1000,
                         predictionForB: transportBPredictedTimeDifference/1000,
                         trainingAccuracy: trainingAccuracy,

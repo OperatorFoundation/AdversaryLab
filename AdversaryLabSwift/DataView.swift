@@ -309,7 +309,7 @@ struct DataView: View
         return true
     }
     
-    fileprivate func makeResultsBox(trainingResults: TrainingResults?, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>>
+    fileprivate func makeResultsBox(trainingResults: NumericTrainingResults?, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>>
     {
         if let trainingResults = trainingResults
         {

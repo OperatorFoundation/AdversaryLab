@@ -10,11 +10,14 @@ import Foundation
 
 struct TrainingData: Codable
 {
-    var outgoingEntropyTrainingResults: TrainingResults?
-    var incomingEntropyTrainingResults: TrainingResults?
+    var outgoingEntropyTrainingResults: NumericTrainingResults?
+    var incomingEntropyTrainingResults: NumericTrainingResults?
     
-    var outgoingLengthsTrainingResults: TrainingResults?
-    var incomingLengthsTrainingResults: TrainingResults?
+    var outgoingLengthsTrainingResults: NumericTrainingResults?
+    var incomingLengthsTrainingResults: NumericTrainingResults?
     
-    var timingTrainingResults: TrainingResults?
+    var outgoingFloatSequencesTrainingResults: FloatSequenceTrainingResults?
+    var incomingFloatSequencesTrainingResults: FloatSequenceTrainingResults?
+    
+    var timingTrainingResults: NumericTrainingResults?
 }
