@@ -80,16 +80,16 @@ class SequencesCoreML
         }
         else
         {
-            let (allowedFloatSequences, blockedFloatSequences) = getFloats(forConnectionDirection: connectionDirection)
-            guard blockedFloatSequences.count > 0
+            let (aFloatSequences, bFloatSequences) = getFloats(forConnectionDirection: connectionDirection)
+            guard bFloatSequences.count > 0
                 else
             {
                 print("\nUnable to test float sequences. The blocked lengths list is empty.")
                 return
             }
 
-            testFloatModel(floatSequences: allowedFloatSequences, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
-            testFloatModel(floatSequences: blockedFloatSequences, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
+            testFloatModel(floatSequences: aFloatSequences, connectionType: .transportA, connectionDirection: connectionDirection, configModel: configModel)
+            testFloatModel(floatSequences: bFloatSequences, connectionType: .transportB, connectionDirection: connectionDirection, configModel: configModel)
         }
     }
 

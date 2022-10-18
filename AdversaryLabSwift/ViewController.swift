@@ -22,24 +22,12 @@ class ViewController: NSViewController
     // MARK: - IBActions
     @IBAction func newLabClicked(_ sender: NSButton)
     {
-        let panel = NSPanel(contentViewController: NSHostingController(rootView: LabView().frame(minWidth: 900, minHeight: 600)))
+        let panel = NSPanel(contentViewController: NSHostingController(rootView: LabView().frame(minWidth: 700, minHeight: 625)))
         panel.center()
         panel.title = "Adversary Lab"
         panel.makeKeyAndOrderFront(nil)
     }
-    
-    
-//    func streamConnections()
-//    {
-//        analysisQueue.async
-//        {
-//            while self.streaming == true
-//            {
-//                let connectionGenerator = FakeConnectionGenerator()
-//                connectionGenerator.addConnections()
-//            }
-//        }
-//    }
+
 }
 
 

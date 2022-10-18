@@ -45,11 +45,6 @@ class TimingCoreML
         return (true, nil)
     }
     
-//    func scoreAllTiming()
-//    {
-//        scoreTiming(allowedTimeDifferenceKey: allowedConnectionsTimeDiffKey, blockedTimeDifferenceKey: blockedConnectionsTimeDiffKey, requiredTimeDifferenceKey: requiredTimeDiffKey, requiredTimeDifferenceAccKey: requiredTimeDiffAccKey, forbiddenTimeDifferenceKey: forbiddenTimeDiffKey, forbiddenTimeDifferenceAccKey: forbiddenTimeDiffAccKey)
-//    }
-    
     func scoreTiming(labData: LabData, configModel: ProcessingConfigurationModel)
     {
         if configModel.trainingMode

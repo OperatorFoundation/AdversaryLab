@@ -33,49 +33,53 @@ struct ChartsView: View
             VStack
             {
                 let lengthData = lengthChartData()
-                createMultilineChart(data: lengthData)
+                createMultilineChart(data: lengthData, floatLabels: false)
             }
-            .navigationTitle("Packet Lengths")
-            
+            Spacer()
+            Divider()
             VStack
             {
                 let entropyData = entropyChartData()
-                createMultilineChart(data: entropyData)
+                createMultilineChart(data: entropyData, floatLabels: true)
             }
-            .navigationTitle("Entropy")
                 
             VStack
             {
                 let timeData = timeChartData()
-                createMultilineChart(data: timeData)
+                createMultilineChart(data: timeData, floatLabels: false)
             }
-            .navigationTitle("Packet Timing")
         }
         .background(.white)
         
     }
     
-    func createMultilineChart(data: MultiLineChartData) -> some View
+    func createMultilineChart(data: MultiLineChartData, floatLabels: Bool) -> some View
     {
-        MultiLineChart(chartData: data)
+        var specifier = "%.0f"
+        
+        if floatLabels
+        {
+            specifier = "%.2f"
+        }
+        
+        return MultiLineChart(chartData: data)
             .pointMarkers(chartData: data)
-            .touchOverlay(chartData: data, specifier: "%.0f")
-            .averageLine(chartData: data,
-                         strokeStyle: StrokeStyle(lineWidth: 1.0, dash: [2, 4]))
+            .touchOverlay(chartData: data, specifier: specifier)
             .xAxisGrid(chartData: data)
             .yAxisGrid(chartData: data)
             .xAxisLabels(chartData: data)
-            .yAxisLabels(chartData: data)
+            .yAxisLabels(chartData: data, specifier: specifier)
             .infoBox(chartData: data)
             .headerBox(chartData: data)
             .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible())])
             .id(data.id)
-            .frame(minWidth: 150, maxWidth: 800, minHeight: 150, idealHeight: 250, maxHeight: 800, alignment: .center)
+            .frame(idealWidth: 150, idealHeight: 150, alignment: .center)
     }
 
 
     func lengthChartData() -> MultiLineChartData
     {
+        print("ChartView Lengths")
         let aOutLengths = labViewData.packetLengths.outgoingA.expanded
         let aInLengths = labViewData.packetLengths.incomingA.expanded
         let bOutLengths = labViewData.packetLengths.outgoingB.expanded
@@ -94,7 +98,7 @@ struct ChartsView: View
 
         let blockedOutLine = LineDataSet(dataPoints: blockedOutLengthsEntry, legendTitle: "\(labViewData.transportB) Outgoing Packet Lengths", pointStyle: defaultPointStyle, style: LineStyle(lineColour: ColourStyle(colour: .purple), lineType: .curvedLine, strokeStyle: defaultStrokeStyle))
         
-        let metadata   = ChartMetadata(title: "Packet Length", subtitle: "")
+        let metadata   = ChartMetadata(title: "Packet Lengths", subtitle: "")
         let chartStyle = defaultChartStyle()
         
         let multilineData = MultiLineDataSet(dataSets: [allowedInLine, allowedOutLine, blockedInLine, blockedOutLine])
@@ -105,7 +109,7 @@ struct ChartsView: View
 
     func entropyChartData() -> MultiLineChartData
     {
-        print("ChartView Entropy \(labViewData.packetEntropies.incomingA.count)")
+        print("ChartView Entropy")
         var aInEntropy = labViewData.packetEntropies.incomingA.sorted()
         for index in 0 ..< aInEntropy.count
         {
@@ -155,6 +159,7 @@ struct ChartsView: View
 
     func timeChartData() -> MultiLineChartData
     {
+        print("ChartView Packet Timing")
         var aTimeDifferences = labViewData.packetTimings.transportA.sorted()
         for index in 0 ..< aTimeDifferences.count
         {
@@ -200,7 +205,7 @@ struct ChartsView: View
         var lineChartData = [LineChartDataPoint]()
         for i in 0..<dataArray.count
         {
-            let value = LineChartDataPoint(value: Double(dataArray[i]), xAxisLabel: String(i), description: "")
+            let value = LineChartDataPoint(value: Double(dataArray[i]), xAxisLabel: String(i), description: "\(dataArray[i])")
             lineChartData.append(value)
         }
 
@@ -212,7 +217,7 @@ struct ChartsView: View
         var lineChartData = [LineChartDataPoint]()
         for i in 0..<dataArray.count
         {
-            let value = LineChartDataPoint(value: Double(dataArray[i]), xAxisLabel: String(i), description: "")
+            let value = LineChartDataPoint(value: Double(dataArray[i]), xAxisLabel: String(i), description: "\(dataArray[i])")
             lineChartData.append(value)
         }
 
@@ -231,7 +236,6 @@ struct ChartsView: View
     func defaultChartStyle() -> LineChartStyle
     {
         let gridStyle = defaultGridStyle()
-        
         return LineChartStyle(infoBoxPlacement    : .infoBox(isStatic: false),
                                         infoBoxBorderColour : Color.primary,
                                         infoBoxBorderStyle  : StrokeStyle(lineWidth: 0.5, lineCap: .butt, lineJoin: .bevel, miterLimit: 1),
@@ -248,7 +252,7 @@ struct ChartsView: View
                                         yAxisLabelColour    : Color.primary,
                                         yAxisNumberOfLabels : 5,
                                         
-                                        baseline            : .zero,
+                                        baseline            : .minimumValue,
                                         topLine             : .maximumValue,
                                         
                                         globalAnimation     : .easeOut(duration: 1))

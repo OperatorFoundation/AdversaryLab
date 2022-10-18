@@ -12,7 +12,7 @@ class ConnectionInspector: ObservableObject
 {
     func analyzeConnections(labData: LabData, configModel: ProcessingConfigurationModel, resetTrainingData: Bool, resetTestingData: Bool) async -> Bool
     {
-        self.resetAnalysisData(labData: labData, resetTrainingData: resetTrainingData, resetTestingData: resetTestingData)
+        self.resetAnalysisData(labData: labData, resetConnectionData: false, resetTrainingData: resetTrainingData, resetTestingData: resetTestingData)
         
         // Allowed Connections
         let aConnections = labData.connectionGroupData.aConnectionData.connections
@@ -191,15 +191,20 @@ class ConnectionInspector: ObservableObject
 //        }
     }
 
-    func resetAnalysisData(labData: LabData, resetTrainingData: Bool, resetTestingData: Bool)
+    func resetAnalysisData(labData: LabData, resetConnectionData:Bool, resetTrainingData: Bool, resetTestingData: Bool)
     {
+        if resetConnectionData
+        {
+            labData.connectionGroupData.bConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.aConnectionData.packetsAnalyzed = 0
+            labData.connectionGroupData.aConnectionData.totalPayloadBytes = 0
+            labData.connectionGroupData.bConnectionData.totalPayloadBytes = 0
+        }
+        
         if resetTrainingData
         {
             labData.connectionGroupData.aConnectionData.packetsAnalyzed = 0
-            labData.connectionGroupData.aConnectionData.totalPayloadBytes = 0
-            
             labData.connectionGroupData.bConnectionData.packetsAnalyzed = 0
-            labData.connectionGroupData.bConnectionData.totalPayloadBytes = 0
 
             labData.trainingData.incomingEntropyTrainingResults = nil
             labData.trainingData.outgoingEntropyTrainingResults = nil

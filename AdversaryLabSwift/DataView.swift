@@ -7,12 +7,16 @@
 //
 
 import SwiftUI
-
+//rgb(1.00,0.70,0.95)
+let adLabPink = Color(red: 1.00, green: 0.70, blue: 0.95)
 struct DataView: View
 {
     @EnvironmentObject var labViewData: LabViewData
     @State var modelName = ""
     @State private var isLoading = false
+    
+    let packetLengthUnits = "bytes"
+    let timeIntervalUnits = "ms"
     
     var configModel = ProcessingConfigurationModel()
     var labData: LabData
@@ -53,18 +57,23 @@ struct DataView: View
                 {
                     HStack
                     {
-                        makeResultsBox(trainingResults: labViewData.trainingData.timingTrainingResults, labelText: "Timing")
-                        Spacer()
-                        GroupBox(label: Text("Packet Lengths"))
+                        GroupBox(label: Text("Timing"))
                         {
-                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingLengthsTrainingResults, labelText: "Outgoing Rules")
-                            makeResultsBox(trainingResults: labViewData.trainingData.incomingLengthsTrainingResults, labelText: "Incoming Rules")
+                            makeResultsBox(trainingResults: labViewData.trainingData.timingTrainingResults, labelText: "", unitLabel: timeIntervalUnits, valueIsInt: false)
                         }
                         Spacer()
+                        
+                        GroupBox(label: Text("Packet Lengths"))
+                        {
+                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingLengthsTrainingResults, labelText: "Outgoing Rules", unitLabel: packetLengthUnits, valueIsInt: true)
+                            makeResultsBox(trainingResults: labViewData.trainingData.incomingLengthsTrainingResults, labelText: "Incoming Rules", unitLabel: packetLengthUnits, valueIsInt: true)
+                        }
+                        Spacer()
+                        
                         GroupBox(label: Text("Entropy"))
                         {
-                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingEntropyTrainingResults, labelText: "Outgoing Rules")
-                            makeResultsBox(trainingResults: labViewData.trainingData.incomingEntropyTrainingResults, labelText: "Incoming Rules")
+                            makeResultsBox(trainingResults: labViewData.trainingData.outgoingEntropyTrainingResults, labelText: "Outgoing Rules", unitLabel: "", valueIsInt: false)
+                            makeResultsBox(trainingResults: labViewData.trainingData.incomingEntropyTrainingResults, labelText: "Incoming Rules", unitLabel: "", valueIsInt: false)
                         }
                     }
                     
@@ -74,7 +83,7 @@ struct DataView: View
                         {
                             if let selectedFileURL = showSelectAdversaryLabDataAlert()
                             {
-                                ConnectionInspector().resetAnalysisData(labData: labData, resetTrainingData: true, resetTestingData: false)
+                                ConnectionInspector().resetAnalysisData(labData: labData, resetConnectionData: true, resetTrainingData: true, resetTestingData: false)
                                 labViewData.resetLabConnectionData(labData: labData)
                                 
                                 let symphony = SymphonyController()
@@ -125,88 +134,88 @@ struct DataView: View
                     }
                 }
                 
-                GroupBox(label: Text("Test Data: \(modelName)")) // Test Data
-                {
-                    HStack
-                    {
-                        GroupBox(label: Text("Timing"))
-                        {
-                            makeResultsBox(testResults: labViewData.packetTimings.transportATestResults, labelText: labViewData.transportA)
-                            makeResultsBox(testResults: labViewData.packetTimings.transportBTestResults, labelText: labViewData.transportB)
-                        }
-                        Spacer()
-                        GroupBox(label: Text("Packet Lengths"))
-                        {
-                            makeResultsBox(testResults: labViewData.packetLengths.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
-                            makeResultsBox(testResults: labViewData.packetLengths.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
-                            makeResultsBox(testResults: labViewData.packetLengths.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
-                            makeResultsBox(testResults: labViewData.packetLengths.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
-                        }
-                        Spacer()
-                        GroupBox(label: Text("Entropy"))
-                        {
-                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing")
-                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing")
-                            makeResultsBox(testResults: labViewData.packetEntropies.incomingATestResults, labelText: "\(labViewData.transportA) Incoming")
-                            makeResultsBox(testResults: labViewData.packetEntropies.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming")
-                        }
-                    }
-                    
-                    HStack
-                    {
-                        Button
-                        {
-                            // Get the user to select the correct .adversary file
-                            if let selectedURL = showSelectAdversaryFileAlert()
-                            {
-                                // Model Group Name should be the same as the directory
-                                modelName = selectedURL.deletingPathExtension().lastPathComponent
-                                configModel.modelName = modelName
-                                
-                                // Unpack to a temporary directory
-                                if let maybeModelDirectory = FileController().unpack(adversaryURL: selectedURL)
-                                {
-                                    modelDirectoryURL = maybeModelDirectory
-                                }
-                                else
-                                {
-                                    print("🚨  Failed to unpack the selected adversary file.  🚨")
-                                }
-                            }
-                        }
-                        label: {
-                            Text("Load Model")
-                                .opacity(isLoading ? 0.3 : 1)
-                        }
-                        .disabled(isLoading)
-                        
-                        Button
-                        {
-                            Task
-                            {
-                                await runTest()
-                            }
-                            
-                        }
-                        label: {
-                            Text("Test")
-                                .opacity(isLoading ? 0.3 : 1)
-                                
-                        }
-                        .disabled(isLoading)
-
-                    }
-                }
-                .foregroundColor(.black)
-                .padding()
-                .background(.white)
-                .overlay
-                {
-                    if isLoading
-                    {
-                        ProgressView()
-                    }
-                }
+//                GroupBox(label: Text("Test Data: \(modelName)")) // Test Data
+//                {
+//                    HStack
+//                    {
+//                        GroupBox(label: Text("Timing"))
+//                        {
+//                            makeResultsBox(testResults: labViewData.packetTimings.transportATestResults, labelText: labViewData.transportA, unitLabel: timeIntervalUnits)
+//                            makeResultsBox(testResults: labViewData.packetTimings.transportBTestResults, labelText: labViewData.transportB, unitLabel: timeIntervalUnits)
+//                        }
+//                        Spacer()
+//                        GroupBox(label: Text("Packet Lengths"))
+//                        {
+//                            makeResultsBox(testResults: labViewData.packetLengths.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing", unitLabel: packetLengthUnits)
+//                            makeResultsBox(testResults: labViewData.packetLengths.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing", unitLabel: packetLengthUnits)
+//                            makeResultsBox(testResults: labViewData.packetLengths.incomingATestResults, labelText: "\(labViewData.transportA) Incoming", unitLabel: packetLengthUnits)
+//                            makeResultsBox(testResults: labViewData.packetLengths.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming", unitLabel: packetLengthUnits)
+//                        }
+//                        Spacer()
+//                        GroupBox(label: Text("Entropy"))
+//                        {
+//                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingATestResults, labelText: "\(labViewData.transportA) Outgoing", unitLabel: "")
+//                            makeResultsBox(testResults: labViewData.packetEntropies.outgoingBTestResults, labelText: "\(labViewData.transportB) Outgoing", unitLabel: "")
+//                            makeResultsBox(testResults: labViewData.packetEntropies.incomingATestResults, labelText: "\(labViewData.transportA) Incoming", unitLabel: "")
+//                            makeResultsBox(testResults: labViewData.packetEntropies.incomingBTestResults, labelText: "\(labViewData.transportB) Incoming", unitLabel: "")
+//                        }
+//                    }
+//
+//                    HStack
+//                    {
+//                        Button
+//                        {
+//                            // Get the user to select the correct .adversary file
+//                            if let selectedURL = showSelectAdversaryFileAlert()
+//                            {
+//                                // Model Group Name should be the same as the directory
+//                                modelName = selectedURL.deletingPathExtension().lastPathComponent
+//                                configModel.modelName = modelName
+//
+//                                // Unpack to a temporary directory
+//                                if let maybeModelDirectory = FileController().unpack(adversaryURL: selectedURL)
+//                                {
+//                                    modelDirectoryURL = maybeModelDirectory
+//                                }
+//                                else
+//                                {
+//                                    print("🚨  Failed to unpack the selected adversary file.  🚨")
+//                                }
+//                            }
+//                        }
+//                        label: {
+//                            Text("Load Model")
+//                                .opacity(isLoading ? 0.3 : 1)
+//                        }
+//                        .disabled(isLoading)
+//
+//                        Button
+//                        {
+//                            Task
+//                            {
+//                                await runTest()
+//                            }
+//
+//                        }
+//                        label: {
+//                            Text("Test")
+//                                .opacity(isLoading ? 0.3 : 1)
+//
+//                        }
+//                        .disabled(isLoading)
+//
+//                    }
+//                }
+//                .foregroundColor(.black)
+//                .padding()
+//                .background(.white)
+//                .overlay
+//                {
+//                    if isLoading
+//                    {
+//                        ProgressView()
+//                    }
+//                }
             }
         }
     }
@@ -309,62 +318,106 @@ struct DataView: View
         return true
     }
     
-    fileprivate func makeResultsBox(trainingResults: NumericTrainingResults?, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>>
+    fileprivate func makeResultsBox(trainingResults: NumericTrainingResults?, labelText: String, unitLabel: String, valueIsInt: Bool) -> GroupBox<Text, VStack<TupleView<(HStack<TupleView<(Text, Text)>>, HStack<TupleView<(Text, Text)>>, HStack<TupleView<(Text, Text)>>, HStack<TupleView<(Text, Text)>>, HStack<TupleView<(Text, Text)>>)>>>
     {
+        var aPrediction = "--"
+        var bPrediction = "--"
+        var trainingAccuracy = "--"
+        var validationAccuracy = "--"
+        var evaluationAccuracy = "--"
+        
         if let trainingResults = trainingResults
         {
-            let aPrediction = (String(format: "%.2f", trainingResults.transportAPrediction))
-            let bPrediction = (String(format: "%.2f", trainingResults.transportBPrediction))
-            let trainingAccuracy = trainingResults.trainingAccuracy != nil ? String(format: "%.2f", trainingResults.trainingAccuracy!) : "--"
-            let validationAccuracy = trainingResults.validationAccuracy != nil ? String(format: "%.2f", trainingResults.validationAccuracy!) : "--"
-            let evaluationAccuracy = trainingResults.evaluationAccuracy != nil ? String(format: "%.2f", trainingResults.evaluationAccuracy!) : "--"
-            
-            return GroupBox(label: Text(labelText))
+            if valueIsInt
             {
-                Text("\(labViewData.transportA): \(aPrediction)")
-                Text("\(labViewData.transportB): \(bPrediction)")
-                Text("Training Accuracy: \(trainingAccuracy)")
-                Text("Validation Accuracy: \(validationAccuracy)")
-                Text("Evaluation Accuracy: \(evaluationAccuracy)")
+                aPrediction = (String(Int(trainingResults.transportAPrediction)))
+                bPrediction = (String(Int(trainingResults.transportBPrediction)))
             }
-        }
-        else
-        {
-            return GroupBox(label: Text(labelText))
+            else
             {
-                Text("\(labViewData.transportA): --")
-                Text("\(labViewData.transportB): --")
-                Text("Training Accuracy: --")
-                Text("Validation Accuracy: --")
-                Text("Evaluation Accuracy: --")
+                aPrediction = (String(format: "%.2f", trainingResults.transportAPrediction))
+                bPrediction = (String(format: "%.2f", trainingResults.transportBPrediction))
+            }
+            trainingAccuracy = trainingResults.trainingAccuracy != nil ? String(format: "%.2f", trainingResults.trainingAccuracy!) : "--"
+            validationAccuracy = trainingResults.validationAccuracy != nil ? String(format: "%.2f", trainingResults.validationAccuracy!) : "--"
+            evaluationAccuracy = trainingResults.evaluationAccuracy != nil ? String(format: "%.2f", trainingResults.evaluationAccuracy!) : "--"
+        }
+        
+        return GroupBox(label: Text(labelText))
+        {
+            VStack(alignment: .leading)
+            {
+                HStack
+                {
+                    Text("\(labViewData.transportA): ")
+                    Text("\(aPrediction) \(unitLabel)")
+                }
+                
+                HStack
+                {
+                    Text("\(labViewData.transportB): ")
+                    Text("\(bPrediction) \(unitLabel)")
+                }
+                
+                HStack
+                {
+                    Text("Training Accuracy: ")
+                    Text("\(trainingAccuracy)%")
+                }
+                
+                HStack
+                {
+                    Text("Validation Accuracy: ")
+                    Text("\(validationAccuracy)%")
+                }
+                
+                HStack
+                {
+                    Text("Evaluation Accuracy: ")
+                    Text("\(evaluationAccuracy)%")
+                }
             }
         }
     }
     
-    fileprivate func makeResultsBox(testResults: TestResults?, labelText: String) -> GroupBox<Text, TupleView<(Text, Text)>>
+    fileprivate func makeResultsBox(testResults: TestResults?, labelText: String, unitLabel: String) ->  GroupBox<Text, VStack<TupleView<(HStack<TupleView<(Text, Text)>>, HStack<TupleView<(Text, Text)>>)>>>
     {
+        let testPrediction: String
+        let testAccuracy: String
+        
         if let testResults = testResults
         {
-            let testPrediction = String(format: "%.2f", testResults.prediction)
-            let testAccuracy = testResults.accuracy != nil ? String(format: "%.2f", testResults.accuracy!) : "--"
-
-            return GroupBox(label: Text(labelText))
-            {
-                Text("Prediction: \(testPrediction)")
-                Text("Accuracy: \(testAccuracy)")
-            }
+            testPrediction = String(format: "%.2f", testResults.prediction)
+            testAccuracy = testResults.accuracy != nil ? String(format: "%.2f", testResults.accuracy!) : "--"
         }
         else
         {
-            return GroupBox(label: Text(labelText))
+            testPrediction = "--"
+            testAccuracy = "--"
+        }
+        
+        let resultsBox = GroupBox(label: Text(labelText))
+        {
+            VStack(alignment: .leading)
             {
-                Text("Prediction: --")
-                Text("Accuracy: --")
+                HStack
+                {
+                    Text("Prediction: ")
+                    Text("\(testPrediction) \(unitLabel)")
+                }
+                
+                HStack
+                {
+                    Text("Accuracy: ")
+                    Text("\(testAccuracy)%")
+                }
             }
         }
+        
+        return resultsBox
     }
     
-    fileprivate func makeConnectionsBox(transportConnectionData: ConnectionViewData, labelText: String) -> GroupBox<Text, TupleView<(Text, Text, Text, Text, Text)>>
+    fileprivate func makeConnectionsBox(transportConnectionData: ConnectionViewData, labelText: String) -> GroupBox<Text, VStack<TupleView<(Text, Text, Text, Text, Text)>>>
     {
         let totalConnections = transportConnectionData.connectionsCount
         var connectionOverhead = 0
@@ -374,15 +427,19 @@ struct DataView: View
             connectionOverhead = transportConnectionData.totalPayloadBytes/totalConnections
         }
         
-        return GroupBox(label: Text(labelText))
+        let connectionsBox = GroupBox(label: Text(labelText).font(.title).foregroundColor(adLabPink))
         {
-            Text("Connections Seen: \(totalConnections)")
-            Text("Connections Analyzed: \(transportConnectionData.packetsAnalyzed)")
-            Text("Outgoing Packets: \(transportConnectionData.outgoingPacketsCount)")
-            Text("Incoming Packets: \(transportConnectionData.incomingPacketsCount)")
-            Text("Transport Overhead: \(connectionOverhead) bytes")
+            VStack(alignment: .leading) {
+                Text("Connections Seen: \(totalConnections)")
+                Text("Connections Analyzed: \(transportConnectionData.packetsAnalyzed)")
+                Text("Outgoing Packets: \(transportConnectionData.outgoingPacketsCount)")
+                Text("Incoming Packets: \(transportConnectionData.incomingPacketsCount)")
+                Text("Transport Overhead: \(connectionOverhead) bytes")
+            }
             
         }
+        
+        return connectionsBox
     }
 
 }
