@@ -1,8 +1,8 @@
-# The Operator Foundation
+### The Operator Foundation
 
 [Operator](https://operatorfoundation.org) makes useable tools to help people around the world with censorship, security, and privacy.
 
-## Adversary Lab
+# Adversary Lab
 
 Adversary Lab is a service that analyzes captured network traffic to extract statistical properties. Using this analysis, filtering rules can be synthesized to block sampled traffic.
 
