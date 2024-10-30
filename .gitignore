@@ -94,3 +94,4 @@ rethinkdb_data/metadata
 *.xcscheme
 *.xcbkptlist
 AdversaryLabSwift.xcodeproj/xcuserdata/
+AdversaryLabSwift.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
